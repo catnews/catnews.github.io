@@ -1,0 +1,25 @@
+{
+  "date": "2024-04-20",
+  "categories": {
+    "papers": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "summary": "本文提出了Transformer模型架构，该架构完全基于注意力机制，摒弃了循环和卷积。在两个机器翻译任务上的实验表明，这些模型在质量上具有优势，同时具有更高的可并行性，训练时间显著减少。",
+        "source": "arxiv"
+      },
+      {
+        "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+        "url": "https://arxiv.org/abs/1810.04805",
+        "summary": "本文介绍了BERT，一种新的语言表示模型，它代表来自Transformers的双向编码器表示。与最近的语言表示模型不同，BERT旨在通过在所有层中联合调节左右上下文来预训练深度双向表示。",
+        "source": "arxiv"
+      },
+      {
+        "title": "GPT-4 Technical Report",
+        "url": "https://arxiv.org/abs/2303.08774",
+        "summary": "本文介绍了GPT-4，这是一个能够接受图像和文本输入并生成文本输出的大型多模态模型。虽然在许多现实场景中不如人类，但GPT-4在各种专业和学术基准测试中展现出人类水平的表现。",
+        "source": "arxiv"
+      }
+    ]
+  }
+}

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatNews - 每日论文精选</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .date-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .date-nav button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .date-nav button:hover {
+            background-color: #2980b9;
+        }
+        
+        .date-nav button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .current-date {
+            font-size: 18px;
+            font-weight: 500;
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        .category-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .category-title {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .paper-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .paper-item:last-child {
+            border-bottom: none;
+        }
+        
+        .paper-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .paper-title a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        
+        .paper-summary {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .paper-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+        }
+        
+        .source-tag {
+            background-color: #e8f4fc;
+            color: #3498db;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+        
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CatNews - 每日论文精选</h1>
+            <div class="date-nav">
+                <button id="prevDay">&larr; 前一天</button>
+                <span class="current-date" id="currentDate">-</span>
+                <button id="nextDay">后一天 &rarr;</button>
+            </div>
+        </header>
+        
+        <main id="content">
+            <div class="loading">加载中...</div>
+        </main>
+        
+        <footer>
+            Powered by CatNews | GitHub Pages
+        </footer>
+    </div>
+    
+    <script>
+        let currentDate = new Date();
+        
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function formatDisplayDate(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${year}年${month}月${day}日`;
+        }
+        
+        function renderContent(data) {
+            const content = document.getElementById('content');
+            
+            if (!data || !data.categories || Object.keys(data.categories).length === 0) {
+                content.innerHTML = '<div class="empty-message">暂无数据</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            if (data.categories.papers && data.categories.papers.length > 0) {
+                html += '<section class="category-section">';
+                html += '<h2 class="category-title">论文</h2>';
+                data.categories.papers.forEach(paper => {
+                    html += '<div class="paper-item">';
+                    html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
+                    html += `<div class="paper-summary">${paper.summary}</div>`;
+                    html += '<div class="paper-meta">';
+                    html += `<span class="source-tag">${paper.source}</span>`;
+                    html += '</div></div>';
+                });
+                html += '</section>';
+            }
+            
+            content.innerHTML = html || '<div class="empty-message">暂无数据</div>';
+        }
+        
+        async function loadData(date) {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">加载中...</div>';
+            
+            const dateStr = formatDate(date);
+            const url = `docs/${dateStr}.json`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('No data');
+                }
+                const data = await response.json();
+                renderContent(data);
+            } catch (error) {
+                content.innerHTML = '<div class="empty-message">该日期暂无数据</div>';
+            }
+            
+            document.getElementById('currentDate').textContent = formatDisplayDate(date);
+            updateNavButtons();
+        }
+        
+        function updateNavButtons() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const checkDate = new Date(currentDate);
+            checkDate.setHours(0, 0, 0, 0);
+            
+            document.getElementById('nextDay').disabled = checkDate >= today;
+        }
+        
+        document.getElementById('prevDay').addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() - 1);
+            loadData(currentDate);
+        });
+        
+        document.getElementById('nextDay').addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() + 1);
+            loadData(currentDate);
+        });
+        
+        loadData(currentDate);
+    </script>
+</body>
+</html>
