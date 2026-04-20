@@ -157,6 +157,19 @@
             color: #4f46e5;
         }
         
+        .feature-tag {
+            background-color: #d1fae5;
+            color: #059669;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+        
+        .tags-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
         .reading-time {
             color: #95a5a6;
             font-size: 12px;
@@ -234,13 +247,23 @@
                 html += '<section class="category-section">';
                 html += `<h2 class="category-title">论文 <span class="paper-count">共 ${data.categories.papers.length} 篇</span></h2>`;
                 data.categories.papers.forEach(paper => {
-                    const readingTime = Math.ceil(paper.summary.length / 400);
+                    const chineseChars = paper.summary.replace(/[^\u4e00-\u9fa5]/g, '').length;
+                    const readingTime = Math.max(1, Math.ceil(chineseChars / 350));
                     const sourceClass = paper.source.toLowerCase().replace(/[^a-z]/g, '');
+                    const tags = paper.tags || [];
+                    
                     html += '<div class="paper-item">';
                     html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
                     html += `<div class="paper-summary">${paper.summary}</div>`;
                     html += '<div class="paper-meta">';
                     html += `<span class="source-tag ${sourceClass}">${paper.source}</span>`;
+                    if (tags.length > 0) {
+                        html += '<div class="tags-container">';
+                        tags.forEach(tag => {
+                            html += `<span class="feature-tag">${tag}</span>`;
+                        });
+                        html += '</div>';
+                    }
                     html += `<span class="reading-time">约 ${readingTime} 分钟阅读</span>`;
                     html += '</div></div>';
                 });

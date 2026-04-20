@@ -5,23 +5,83 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import os
+import re
 
 ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 
 SEARCH_KEYWORDS = [
-    "Linux kernel networking",
-    "Linux network stack",
-    "eBPF networking",
-    "XDP eXpress Data Path",
-    "Linux TCP/IP stack optimization",
+    "Linux kernel network",
+    "eBPF XDP",
+    "Linux TCP optimization",
+    "kernel bypass networking",
+    "DPDK Linux",
+    "Linux network driver",
+    "Linux socket performance",
+    "netfilter iptables",
+    "Linux networking subsystem",
 ]
 
 MIN_YEAR = 2020
-MAX_RESULTS_PER_SOURCE = 20
+MAX_RESULTS = 15
+
+REQUIRED_KEYWORDS = [
+    "linux", "kernel", "eBPF", "XDP", "bpf", "netfilter", 
+    "iptables", "nftables", "tcp", "udp", "socket", "networking",
+    "network stack", "dpdk", "bypass", "driver", "ethernet",
+    "vlan", "bonding", "bridge", "routing", "packet",
+]
+
+TAG_MAP = {
+    "eBPF": ["ebpf", "bpf", "extended bpf"],
+    "XDP": ["xdp", "express data path"],
+    "旁路": ["bypass", "kernel bypass", "dpdk", "user-space networking"],
+    "TCP优化": ["tcp optimization", "tcp congestion", "tcp performance"],
+    "驱动": ["driver", "nic driver", "ethernet driver"],
+    "Socket": ["socket", "unix socket", "network socket"],
+    "Netfilter": ["netfilter", "iptables", "nftables"],
+    "路由": ["routing", "route", "forwarding"],
+    "性能": ["performance", "optimization", "latency", "throughput"],
+    "虚拟化": ["virtio", "vhost", "sriov", "virtual networking"],
+}
 
 
-def fetch_arxiv_papers(query, max_results=10):
+def translate_text(text):
+    try:
+        url = "https://api.mymemory.translated.net/get"
+        params = {"q": text[:500], "langpair": "en|zh"}
+        req = urllib.request.Request(
+            f"{url}?{urllib.parse.urlencode(params)}",
+            headers={"User-Agent": "CatNews/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            return data.get("responseData", {}).get("translatedText", text)
+    except Exception as e:
+        print(f"Translation error: {e}")
+        return text
+
+
+def extract_tags(title, summary):
+    text = (title + " " + summary).lower()
+    tags = []
+    for tag, keywords in TAG_MAP.items():
+        for kw in keywords:
+            if kw.lower() in text:
+                if tag not in tags:
+                    tags.append(tag)
+                break
+    return tags[:3]
+
+
+def is_relevant_paper(title, summary):
+    text = (title + " " + summary).lower()
+    linux_found = "linux" in text or "kernel" in text
+    network_found = any(kw in text for kw in ["network", "tcp", "udp", "socket", "packet", "ethernet", "bpf", "xdp"])
+    return linux_found and network_found
+
+
+def fetch_arxiv_papers(query, max_results=5):
     papers = []
     try:
         params = {
@@ -41,27 +101,46 @@ def fetch_arxiv_papers(query, max_results=10):
         ns = {"atom": "http://www.w3.org/2005/Atom"}
         
         for entry in root.findall("atom:entry", ns):
-            title = entry.find("atom:title", ns).text.strip().replace("\n", " ")
-            summary = entry.find("atom:summary", ns).text.strip().replace("\n", " ")[:300]
-            url = entry.find("atom:id", ns).text
-            published = entry.find("atom:published", ns).text
-            year = int(published[:4])
+            title_elem = entry.find("atom:title", ns)
+            summary_elem = entry.find("atom:summary", ns)
+            id_elem = entry.find("atom:id", ns)
+            published_elem = entry.find("atom:published", ns)
             
-            if year >= MIN_YEAR:
-                papers.append({
-                    "title": title,
-                    "url": url,
-                    "summary": summary + "...",
-                    "source": "arxiv",
-                    "year": year,
-                })
+            if not all([title_elem, summary_elem, id_elem, published_elem]):
+                continue
+                
+            title = title_elem.text.strip().replace("\n", " ")
+            summary_orig = summary_elem.text.strip().replace("\n", " ")
+            url_val = id_elem.text
+            year = int(published_elem.text[:4])
+            
+            if year < MIN_YEAR:
+                continue
+            
+            if not is_relevant_paper(title, summary_orig):
+                continue
+            
+            summary_cn = translate_text(summary_orig[:200])
+            if summary_cn == summary_orig[:200]:
+                summary_cn = summary_orig[:200]
+            
+            tags = extract_tags(title, summary_orig)
+            
+            papers.append({
+                "title": title,
+                "url": url_val,
+                "summary": summary_cn + "...",
+                "summary_en": summary_orig[:200] + "...",
+                "source": "arxiv",
+                "tags": tags,
+            })
     except Exception as e:
         print(f"arXiv fetch error: {e}")
     
     return papers
 
 
-def fetch_semantic_scholar_papers(query, max_results=10):
+def fetch_semantic_scholar_papers(query, max_results=5):
     papers = []
     try:
         params = {
@@ -78,19 +157,30 @@ def fetch_semantic_scholar_papers(query, max_results=10):
         
         for item in data.get("data", []):
             title = item.get("title", "")
-            abstract = item.get("abstract", "") or "无摘要"
-            url = item.get("url", "")
+            abstract = item.get("abstract", "") or ""
+            url_val = item.get("url", "")
             year = item.get("year", 0)
             
-            if title and url and year >= MIN_YEAR:
-                summary = abstract[:300] + "..." if len(abstract) > 300 else abstract
-                papers.append({
-                    "title": title,
-                    "url": url,
-                    "summary": summary,
-                    "source": "Semantic Scholar",
-                    "year": year,
-                })
+            if not title or not url_val or year < MIN_YEAR:
+                continue
+            
+            if not is_relevant_paper(title, abstract):
+                continue
+            
+            summary_cn = translate_text(abstract[:200])
+            if summary_cn == abstract[:200]:
+                summary_cn = abstract[:200] if abstract else "暂无摘要"
+            
+            tags = extract_tags(title, abstract)
+            
+            papers.append({
+                "title": title,
+                "url": url_val,
+                "summary": summary_cn + "..." if len(summary_cn) > 50 else summary_cn,
+                "summary_en": abstract[:200] + "..." if abstract else "",
+                "source": "Semantic Scholar",
+                "tags": tags,
+            })
     except Exception as e:
         print(f"Semantic Scholar fetch error: {e}")
     
@@ -101,7 +191,7 @@ def deduplicate_papers(papers):
     seen = set()
     unique = []
     for p in papers:
-        key = p["title"].lower()
+        key = re.sub(r'[^\w]', '', p["title"].lower())
         if key not in seen:
             seen.add(key)
             unique.append(p)
@@ -109,20 +199,18 @@ def deduplicate_papers(papers):
 
 
 def main():
-    print("Starting paper fetch...")
+    print("Starting Linux kernel networking paper fetch...")
     all_papers = []
     
     for keyword in SEARCH_KEYWORDS:
-        print(f"Fetching: {keyword}")
-        all_papers.extend(fetch_arxiv_papers(keyword, MAX_RESULTS_PER_SOURCE // 2))
-        all_papers.extend(fetch_semantic_scholar_papers(keyword, MAX_RESULTS_PER_SOURCE // 2))
+        print(f"Searching: {keyword}")
+        all_papers.extend(fetch_arxiv_papers(keyword, 3))
+        all_papers.extend(fetch_semantic_scholar_papers(keyword, 3))
     
     all_papers = deduplicate_papers(all_papers)
-    all_papers.sort(key=lambda x: x.get("year", 0), reverse=True)
-    all_papers = all_papers[:MAX_RESULTS_PER_SOURCE]
+    all_papers = all_papers[:MAX_RESULTS]
     
-    for p in all_papers:
-        del p["year"]
+    print(f"Found {len(all_papers)} relevant papers")
     
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -141,7 +229,7 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
     
-    print(f"Saved {len(all_papers)} papers to {output_path}")
+    print(f"Saved to {output_path}")
 
 
 if __name__ == "__main__":
