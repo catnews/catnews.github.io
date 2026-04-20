@@ -11,15 +11,18 @@ ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 
 SEARCH_KEYWORDS = [
-    "Linux kernel network",
-    "eBPF XDP",
-    "Linux TCP optimization",
-    "kernel bypass networking",
-    "DPDK Linux",
-    "Linux network driver",
-    "Linux socket performance",
-    "netfilter iptables",
-    "Linux networking subsystem",
+    "Linux TCP IP stack",
+    "Linux network stack implementation",
+    "Linux socket implementation kernel",
+    "Linux netfilter nftables",
+    "Linux kernel packet processing",
+    "Linux routing subsystem",
+    "Linux bridge networking",
+    "Linux eBPF XDP networking",
+    "Linux network driver development",
+    "Linux kernel bypass DPDK",
+    "Linux virtio network",
+    "Linux network performance optimization",
 ]
 
 MIN_YEAR = 2020
@@ -33,16 +36,18 @@ REQUIRED_KEYWORDS = [
 ]
 
 TAG_MAP = {
-    "eBPF": ["ebpf", "bpf", "extended bpf"],
+    "eBPF": ["ebpf", "bpf", "extended bpf", "berkeley packet filter"],
     "XDP": ["xdp", "express data path"],
-    "旁路": ["bypass", "kernel bypass", "dpdk", "user-space networking"],
-    "TCP优化": ["tcp optimization", "tcp congestion", "tcp performance"],
-    "驱动": ["driver", "nic driver", "ethernet driver"],
-    "Socket": ["socket", "unix socket", "network socket"],
-    "Netfilter": ["netfilter", "iptables", "nftables"],
-    "路由": ["routing", "route", "forwarding"],
-    "性能": ["performance", "optimization", "latency", "throughput"],
-    "虚拟化": ["virtio", "vhost", "sriov", "virtual networking"],
+    "旁路": ["bypass", "kernel bypass", "dpdk", "user-space networking", "userspace"],
+    "TCP/IP": ["tcp/ip", "tcp", "ip stack", "protocol stack", "tcp congestion"],
+    "Socket": ["socket", "unix socket", "network socket", "socket api"],
+    "Netfilter": ["netfilter", "iptables", "nftables", "nf_tables"],
+    "路由": ["routing", "route", "forwarding", "routing table"],
+    "网桥": ["bridge", "bridging", "linux bridge"],
+    "驱动": ["driver", "nic driver", "ethernet driver", "network device driver"],
+    "包处理": ["packet processing", "packet", "skb", "sk_buff"],
+    "虚拟化": ["virtio", "vhost", "sriov", "virtual networking", "vm networking"],
+    "性能": ["performance", "optimization", "latency", "throughput", "scaling"],
 }
 
 
@@ -76,13 +81,21 @@ def extract_tags(title, summary):
 
 def is_relevant_paper(title, summary):
     text = (title + " " + summary).lower()
-    network_keywords = ["network", "tcp", "udp", "socket", "packet", "ethernet", "bpf", "xdp", "netfilter", "iptables"]
-    system_keywords = ["linux", "kernel", "operating system", "os"]
     
-    network_found = any(kw in text for kw in network_keywords)
-    system_found = any(kw in text for kw in system_keywords)
+    linux_keywords = ["linux", "kernel"]
+    linux_found = any(kw in text for kw in linux_keywords)
     
-    return network_found and (system_found or "driver" in text or "performance" in text)
+    networking_core = [
+        "network stack", "tcp/ip", "tcp", "udp", "ip stack", 
+        "socket", "netfilter", "iptables", "nftables",
+        "packet processing", "skb", "routing", "bridge",
+        "ebpf", "xdp", "bpf", "network driver",
+        "ethernet", "virtio", "vhost", "dpdk",
+        "network subsystem", "networking"
+    ]
+    network_found = any(kw in text for kw in networking_core)
+    
+    return linux_found and network_found
 
 
 def fetch_arxiv_papers(query, max_results=5):
