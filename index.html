@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatNews - 每日论文精选</title>
+    <title>CatNews - 每日Linux内核网络论文精选</title>
     <style>
         * {
             margin: 0;
@@ -18,10 +18,35 @@
             line-height: 1.6;
         }
         
-        .container {
-            max-width: 900px;
+        .page-wrapper {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+        
+        .layout {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                order: -1;
+            }
         }
         
         header {
@@ -33,8 +58,8 @@
         }
         
         h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 20px;
+            margin-bottom: 15px;
             color: #2c3e50;
         }
         
@@ -42,17 +67,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
         }
         
         .date-nav button {
             background-color: #3498db;
             color: #fff;
             border: none;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: background-color 0.2s;
         }
         
@@ -66,9 +91,9 @@
         }
         
         .current-date {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 500;
-            min-width: 150px;
+            min-width: 140px;
             text-align: center;
         }
         
@@ -81,7 +106,7 @@
         }
         
         .category-title {
-            font-size: 18px;
+            font-size: 16px;
             color: #2c3e50;
             margin-bottom: 15px;
             padding-bottom: 10px;
@@ -92,13 +117,13 @@
         }
         
         .paper-count {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: normal;
             color: #7f8c8d;
         }
         
         .paper-item {
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
         }
         
@@ -107,10 +132,10 @@
         }
         
         .paper-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             color: #2c3e50;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .paper-title a {
@@ -123,22 +148,23 @@
         }
         
         .paper-summary {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
-            margin-bottom: 8px;
-            line-height: 1.6;
+            margin-bottom: 6px;
+            line-height: 1.5;
         }
         
         .paper-meta {
             display: flex;
-            gap: 10px;
-            font-size: 12px;
+            gap: 8px;
+            font-size: 11px;
+            align-items: center;
         }
         
         .source-tag {
             background-color: #e8f4fc;
             color: #3498db;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 3px;
         }
         
@@ -147,32 +173,65 @@
             color: #dc2626;
         }
         
-        .source-tag.huggingface {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
-        
-        .source-tag.github {
-            background-color: #e0e7ff;
-            color: #4f46e5;
+        .source-tag.semanticscholar {
+            background-color: #dbeafe;
+            color: #2563eb;
         }
         
         .feature-tag {
             background-color: #d1fae5;
             color: #059669;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 3px;
         }
         
         .tags-container {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
         }
         
         .reading-time {
             color: #95a5a6;
+            font-size: 11px;
+        }
+        
+        .sidebar-section {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tag-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+        
+        .tag-stat-name {
+            color: #333;
+        }
+        
+        .tag-stat-count {
+            background-color: #3498db;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
             font-size: 12px;
+            font-weight: 500;
         }
         
         .empty-message {
@@ -190,16 +249,16 @@
         
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             color: #999;
             font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="page-wrapper">
         <header>
-            <h1>CatNews - 每日论文精选</h1>
+            <h1>CatNews - 每日Linux内核网络论文精选</h1>
             <div class="date-nav">
                 <button id="prevDay">&larr; 前一天</button>
                 <span class="current-date" id="currentDate">-</span>
@@ -207,9 +266,20 @@
             </div>
         </header>
         
-        <main id="content">
-            <div class="loading">加载中...</div>
-        </main>
+        <div class="layout">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">特性统计</h3>
+                    <div class="tag-stats" id="tagStats">
+                        <div class="loading">加载中...</div>
+                    </div>
+                </div>
+            </aside>
+            
+            <main class="main-content" id="content">
+                <div class="loading">加载中...</div>
+            </main>
+        </div>
         
         <footer>
             Powered by CatNews | GitHub Pages
@@ -233,12 +303,40 @@
             return `${year}年${month}月${day}日`;
         }
         
+        function renderTagStats(tagStats) {
+            const container = document.getElementById('tagStats');
+            
+            if (!tagStats || Object.keys(tagStats).length === 0) {
+                container.innerHTML = '<div class="empty-message">暂无统计</div>';
+                return;
+            }
+            
+            const sortedTags = Object.entries(tagStats).sort((a, b) => b[1] - a[1]);
+            
+            let html = '';
+            sortedTags.forEach(([tag, count]) => {
+                html += `<div class="tag-stat-item">`;
+                html += `<span class="tag-stat-name">${tag}</span>`;
+                html += `<span class="tag-stat-count">${count}</span>`;
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
         function renderContent(data) {
             const content = document.getElementById('content');
             
             if (!data || !data.categories || Object.keys(data.categories).length === 0) {
                 content.innerHTML = '<div class="empty-message">暂无数据</div>';
+                renderTagStats({});
                 return;
+            }
+            
+            if (data.tagStats) {
+                renderTagStats(data.tagStats);
+            } else {
+                renderTagStats({});
             }
             
             let html = '';
@@ -264,7 +362,7 @@
                         });
                         html += '</div>';
                     }
-                    html += `<span class="reading-time">约 ${readingTime} 分钟阅读</span>`;
+                    html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
                     html += '</div></div>';
                 });
                 html += '</section>';
@@ -276,6 +374,7 @@
         async function loadData(date) {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading">加载中...</div>';
+            document.getElementById('tagStats').innerHTML = '<div class="loading">加载中...</div>';
             
             const dateStr = formatDate(date);
             const url = `docs/${dateStr}.json`;
@@ -289,6 +388,7 @@
                 renderContent(data);
             } catch (error) {
                 content.innerHTML = '<div class="empty-message">该日期暂无数据</div>';
+                renderTagStats({});
             }
             
             document.getElementById('currentDate').textContent = formatDisplayDate(date);

@@ -5,6 +5,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 import os
+import hashlib
 import re
 
 ARXIV_API = "http://export.arxiv.org/api/query"
@@ -204,19 +205,55 @@ def fetch_semantic_scholar_papers(query, max_results=5):
     return papers
 
 
-def deduplicate_papers(papers):
+def get_paper_hash(title):
+    normalized = re.sub(r'[^\w]', '', title.lower())
+    return hashlib.md5(normalized.encode()).hexdigest()
+
+
+def load_existing_hashes(docs_dir):
+    hashes = set()
+    for filename in os.listdir(docs_dir):
+        if filename.endswith('.json'):
+            filepath = os.path.join(docs_dir, filename)
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    for paper in data.get('categories', {}).get('papers', []):
+                        hashes.add(get_paper_hash(paper['title']))
+            except:
+                pass
+    return hashes
+
+
+def deduplicate_papers(papers, existing_hashes):
     seen = set()
     unique = []
     for p in papers:
-        key = re.sub(r'[^\w]', '', p["title"].lower())
-        if key not in seen:
-            seen.add(key)
+        hash_val = get_paper_hash(p["title"])
+        if hash_val not in seen and hash_val not in existing_hashes:
+            seen.add(hash_val)
             unique.append(p)
     return unique
 
 
+def count_tags(papers):
+    tag_counts = {}
+    for paper in papers:
+        for tag in paper.get("tags", []):
+            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+    return tag_counts
+
+
 def main():
     print("Starting Linux kernel networking paper fetch...")
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    docs_dir = os.path.join(script_dir, "..", "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+    
+    existing_hashes = load_existing_hashes(docs_dir)
+    print(f"Loaded {len(existing_hashes)} existing paper hashes")
+    
     all_papers = []
     
     for keyword in SEARCH_KEYWORDS:
@@ -224,10 +261,12 @@ def main():
         all_papers.extend(fetch_arxiv_papers(keyword, 5))
         all_papers.extend(fetch_semantic_scholar_papers(keyword, 5))
     
-    all_papers = deduplicate_papers(all_papers)
+    all_papers = deduplicate_papers(all_papers, existing_hashes)
     all_papers = all_papers[:MAX_RESULTS]
     
-    print(f"Found {len(all_papers)} relevant papers")
+    tag_counts = count_tags(all_papers)
+    
+    print(f"Found {len(all_papers)} new papers")
     
     beijing_now = datetime.now(timezone.utc) + timedelta(hours=8)
     today = beijing_now.strftime("%Y-%m-%d")
@@ -236,12 +275,9 @@ def main():
         "date": today,
         "categories": {
             "papers": all_papers
-        }
+        },
+        "tagStats": tag_counts
     }
-    
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    docs_dir = os.path.join(script_dir, "..", "docs")
-    os.makedirs(docs_dir, exist_ok=True)
     
     output_path = os.path.join(docs_dir, f"{today}.json")
     with open(output_path, "w", encoding="utf-8") as f:
