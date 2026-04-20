@@ -1,55 +1,7 @@
 {
   "date": "2026-04-21",
   "categories": {
-    "papers": [
-      {
-        "title": "Accelerating container networking with eBPF: performance characterization, evaluation, and optimization. (Accélération des réseaux de conteneurs avec eBPF: caractérisation des performances, évaluation et optimisation)",
-        "url": "https://www.semanticscholar.org/paper/e80065cd1e2b6f6ce4460be33c8836bc94c64066",
-        "summary": "Les architectures microservices modernes créent des exigences réseau sans précédent, la surcharge de communication consommant jusqu 'à 36% du temps d' exécution. Cette thèse étudie技术评论...",
-        "summary_en": "\n Les architectures microservices modernes créent des exigences réseau sans précédent, la surcharge de communication consommant jusqu'à 36% du temps d'exécution. Cette thèse étudie comment les technol...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "eBPF",
-          "XDP",
-          "旁路"
-        ]
-      },
-      {
-        "title": "KERNEL-ACCELERATED STATELESS LOAD DISTRIBUTION ENGINE WITH EBPF",
-        "url": "https://www.semanticscholar.org/paper/3cf2ac53ba88c3d20a5e00b7fbc8a2fd4a4fb76c",
-        "summary": "摘要—使用eBPF的内核加速无状态负载分配引擎是一种高性能网络解决方案，旨在满足现代云原生环境的需求，...",
-        "summary_en": "Abstract — The Kernel-Accelerated Stateless Load Distribution Engine with eBPF is a high-performance networking solution designed to meet the demands of modern cloud-native environments requiring ultr...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "eBPF",
-          "XDP",
-          "路由"
-        ]
-      },
-      {
-        "title": "XDQ: Enhancing XDP with Queuing and Packet Scheduling",
-        "url": "https://www.semanticscholar.org/paper/7457e3b4e9f53eedf5fcc7944ddfe19ce605de04",
-        "summary": "现代互联网用户希望在使用实时应用程序时实现无缝、不间断的通信，即使与产生大量流量的设备共享网络连接也是如此。这一趋势有p...",
-        "summary_en": "Modern internet users expect seamless, uninterrupted communication when using real-time applications, even when sharing the network connection with devices that produce heavy traffic. This trend has p...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "eBPF",
-          "XDP",
-          "路由"
-        ]
-      },
-      {
-        "title": "Corundum: An Open-Source 100-Gbps Nic",
-        "url": "https://www.semanticscholar.org/paper/c4d0c7ba619820bb1c570614bc6962cfdf3b6f35",
-        "summary": "Corundum是一个基于FPGA的开源原型平台，用于高达100 Gbps及以上的网络接口开发。Corundum平台包括几个核心功能，以实现实时、...",
-        "summary_en": "Corundum is an open-source, FPGA-based prototyping platform for network interface development at up to 100 Gbps and beyond. The Corundum platform includes several core features to enable real-time, hi...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "驱动",
-          "包处理",
-          "性能"
-        ]
-      }
-    ]
-  }
+    "papers": []
+  },
+  "tagStats": {}
 }
