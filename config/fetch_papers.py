@@ -3,7 +3,7 @@ import json
 import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import os
 import re
 
@@ -229,7 +229,8 @@ def main():
     
     print(f"Found {len(all_papers)} relevant papers")
     
-    today = datetime.now().strftime("%Y-%m-%d")
+    beijing_now = datetime.now(timezone.utc) + timedelta(hours=8)
+    today = beijing_now.strftime("%Y-%m-%d")
     
     output = {
         "date": today,
