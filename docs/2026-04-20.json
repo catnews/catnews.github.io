@@ -3,34 +3,124 @@
   "categories": {
     "papers": [
       {
-        "title": "Attention Is All You Need",
-        "url": "https://arxiv.org/abs/1706.03762",
-        "summary": "本文提出了Transformer模型架构，该架构完全基于注意力机制，摒弃了循环和卷积。在两个机器翻译任务上的实验表明，这些模型在质量上具有优势，同时具有更高的可并行性，训练时间显著减少。",
+        "title": "Resolution-Agnostic Lensless Imaging via Fourier Neural Operators",
+        "url": "http://arxiv.org/abs/2604.16295v1",
+        "summary": "Lensless cameras based on thin diffusers offer a compact alternative to conventional refractive imaging but rely on computational reconstruction, since the diffuser's point spread function (PSF) globally multiplexes every scene point across the sensor. Here, we report a Fourier Neural Operator (FNO)...",
         "source": "arxiv"
       },
       {
-        "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
-        "url": "https://arxiv.org/abs/1810.04805",
-        "summary": "本文介绍了BERT，一种新的语言表示模型，它代表来自Transformers的双向编码器表示。与最近的语言表示模型不同，BERT旨在通过在所有层中联合调节左右上下文来预训练深度双向表示。",
+        "title": "Fluctuating Pair Density Wave in Finite-temperature Phase Diagram of the $t$-$t^\\prime$ Hubbard Model",
+        "url": "http://arxiv.org/abs/2604.16293v1",
+        "summary": "The Hubbard model and its extensions are canonical theoretical frameworks for understanding correlated electronic states, including those in high-$T_c$ cuprates. Here, we use state-of-the-art thermal tensor network method to map out the temperature-doping phase diagram of the $t$-$t^\\prime$ Hubbard ...",
         "source": "arxiv"
       },
       {
-        "title": "GPT-4 Technical Report",
-        "url": "https://arxiv.org/abs/2303.08774",
-        "summary": "本文介绍了GPT-4，这是一个能够接受图像和文本输入并生成文本输出的大型多模态模型。虽然在许多现实场景中不如人类，但GPT-4在各种专业和学术基准测试中展现出人类水平的表现。",
+        "title": "Hero-Mamba: Mamba-based Dual Domain Learning for Underwater Image Enhancement",
+        "url": "http://arxiv.org/abs/2604.16266v1",
+        "summary": "Underwater images often suffer from severe degradation, such as color distortion, low contrast, and blurred details, due to light absorption and scattering in water. While learning-based methods like CNNs and Transformers have shown promise, they face critical limitations: CNNs struggle to model the...",
         "source": "arxiv"
       },
       {
-        "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models",
-        "url": "https://huggingface.co/meta-llama/Llama-2-7b-chat-hf",
-        "summary": "Llama 2是一系列预训练和微调的大型语言模型，参数规模从70亿到700亿不等。我们专注于微调后的聊天模型Llama 2-Chat，针对对话场景进行了优化。在有用性和安全性基准测试中，这些模型表现出色。",
-        "source": "HuggingFace"
+        "title": "Joint-Centric Dual Contrastive Alignment with Structure-Preserving and Information-Balanced Regularization",
+        "url": "http://arxiv.org/abs/2604.16247v1",
+        "summary": "We propose HILBERT (HIerarchical Long-sequence Balanced Embedding with Reciprocal contrastive Training), a cross-attentive multimodal framework for learning document-level audio-text representations from long, segmented sequences in low-resource data settings. HILBERT leverages frozen pre-trained sp...",
+        "source": "arxiv"
       },
       {
-        "title": "LangChain: Building applications with LLMs through composability",
-        "url": "https://github.com/langchain-ai/langchain",
-        "summary": "LangChain是一个开源框架，用于开发由大型语言模型驱动的应用程序。它提供了一套工具和抽象，可以轻松组合LLM与其他数据源和计算源，构建端到端的应用程序。",
-        "source": "GitHub"
+        "title": "Long-term Performance Analysis of a Commercial QKD Device Under Real-world Deployment Conditions",
+        "url": "http://arxiv.org/abs/2604.16236v1",
+        "summary": "Quantum key distribution (QKD) has reached a commercially viable stage, with several companies offering hardware systems designed for operational deployment. Evaluating the performance of commercial QKD devices under real-world deployment conditions is essential for users seeking to understand the p...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Simulating Arbitrage Optimization for Market Monitoring in Gas and Electricity Transmission Networks",
+        "url": "http://arxiv.org/abs/2604.16229v1",
+        "summary": "We examine market outcomes in energy transport networks with a focus on gas-fired generators, which are producers in a wholesale electricity market and consumers in the natural gas market. Market administrators monitor bids to determine whether a participant wields market power to manipulate the pri...",
+        "source": "arxiv"
+      },
+      {
+        "title": "TRON: Trainable, architecture-reconfigurable random optical neural networks",
+        "url": "http://arxiv.org/abs/2604.16228v1",
+        "summary": "Deep learning has triggered explosive growth in the demand for specialized hardware processors, thus motivating the development of scalable and reconfigurable computing substrates. Optical processors offer a fundamentally different computing paradigm, combining massive parallelism and ultrahigh band...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Network Meta-analysis and Diffusion",
+        "url": "http://arxiv.org/abs/2604.16221v1",
+        "summary": "We show that the covariance matrix of the treatment effect estimates in a network meta-analysis can be obtained without matrix inversion using a geometric series of diffusion matrices. This property extends to the hat matrix and provides a connection between parameter estimation in regression analys...",
+        "source": "arxiv"
+      },
+      {
+        "title": "GAViD: A Large-Scale Multimodal Dataset for Context-Aware Group Affect Recognition from Videos",
+        "url": "http://arxiv.org/abs/2604.16214v1",
+        "summary": "Understanding affective dynamics in real-world social systems is fundamental to modeling and analyzing human-human interactions in complex environments. Group affect emerges from intertwined human-human interactions, contextual influences, and behavioral cues, making its quantitative modeling a chal...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Data-Driven Distributed Stability Certification for Power Systems via Input-State Trajectories",
+        "url": "http://arxiv.org/abs/2604.16212v1",
+        "summary": "This article proposes a data-driven framework to verify the distributed conditions that guarantee the system-wide stability for interconnected power systems. To guarantee system wide stability, the dynamics of each bus are required to satisfy an output differential passivity (ODP) condition with a s...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Find, Fix, Reason: Context Repair for Video Reasoning",
+        "url": "http://arxiv.org/abs/2604.16243v1",
+        "summary": "Reinforcement learning has advanced video reasoning in large multi-modal models, yet dominant pipelines either rely on on-policy self-exploration, which plateaus at the model's knowledge boundary, or hybrid replay that mixes policies and demands careful regularization. Dynamic context methods zoom i...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Correcting socioeconomic bias in mobile phone mobility estimates using multilevel regression and poststratification",
+        "url": "http://arxiv.org/abs/2604.16193v1",
+        "summary": "Call detail records (CDR) from mobile phone networks are widely used to study human mobility however CDR data from a single mobile operator are inherently biased because the observed users do not mirror the population distribution. Using data from a major Chilean carrier in Santiago, we observe the ...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Synthetic data in cryptocurrencies using generative models",
+        "url": "http://arxiv.org/abs/2604.16182v1",
+        "summary": "Data plays a fundamental role in consolidating markets, services, and products in the digital financial ecosystem. However, the use of real data, especially in the financial context, can lead to privacy risks and access restrictions, affecting institutions, research, and modeling processes. Although...",
+        "source": "arxiv"
+      },
+      {
+        "title": "TTV-Not-So-Fast: Uniqueness and Degeneracy in Perturbing Planet Parameters",
+        "url": "http://arxiv.org/abs/2604.16297v1",
+        "summary": "Nontransiting planets can reveal themselves through transit timing variations (TTVs), but inferring the properties of the perturbing planet is a highly degenerate inverse problem. We present a systematic reassessment of all 12 published cases in which a nontransiting planet was claimed to have been ...",
+        "source": "arxiv"
+      },
+      {
+        "title": "The hydrodynamical response of cold circumgalactic clouds to quasar radiation",
+        "url": "http://arxiv.org/abs/2604.16294v1",
+        "summary": "Recent simulations increasingly resolve the small-scale structure of the circumgalactic medium (CGM), but the dynamical impact of ionising radiation on its cold $10^4$ K component remains poorly understood. We investigate the evolution of cold gas structures exposed to quasars' EUV radiation. We dev...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Global dynamics and regime shifts in a resource-consumer model with facilitation and habitat loss",
+        "url": "http://arxiv.org/abs/2604.16291v1",
+        "summary": "Modelling how populations respond to habitat loss is crucial for understanding ecosystem stability, especially when positive interactions among resource species, such as plant-plant facilitation, play a key role. Habitat loss not only reduces available organic nutrients and space for primary produce...",
+        "source": "arxiv"
+      },
+      {
+        "title": "NaijaS2ST: A Multi-Accent Benchmark for Speech-to-Speech Translation in Low-Resource Nigerian Languages",
+        "url": "http://arxiv.org/abs/2604.16287v1",
+        "summary": "Speech translation for low-resource languages remains fundamentally limited by the scarcity of high-quality, diverse parallel speech data, a challenge that is especially pronounced in African linguistic contexts. To address this, we introduce NaijaS2ST, a parallel speech translation dataset spanning...",
+        "source": "arxiv"
+      },
+      {
+        "title": "ASMR-Bench: Auditing for Sabotage in ML Research",
+        "url": "http://arxiv.org/abs/2604.16286v1",
+        "summary": "As AI systems are increasingly used to conduct research autonomously, misaligned systems could introduce subtle flaws that produce misleading results while evading detection. We introduce ASMR-Bench (Auditing for Sabotage in ML Research), a benchmark for evaluating the ability of auditors to detect ...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Using Large Language Models and Knowledge Graphs to Improve the Interpretability of Machine Learning Models in Manufacturing",
+        "url": "http://arxiv.org/abs/2604.16280v1",
+        "summary": "Explaining Machine Learning (ML) results in a transparent and user-friendly manner remains a challenging task of Explainable Artificial Intelligence (XAI). In this paper, we present a method to enhance the interpretability of ML models by using a Knowledge Graph (KG). We store domain-specific data a...",
+        "source": "arxiv"
+      },
+      {
+        "title": "Evaluating the Progression of Large Language Model Capabilities for Small-Molecule Drug Design",
+        "url": "http://arxiv.org/abs/2604.16279v1",
+        "summary": "Large Language Models (LLMs) have the potential to accelerate small molecule drug design due to their ability to reason about information from diverse sources and formats. However, their practical utility remains unclear due to the lack of benchmarks that reflect real-world scenarios. In this work, ...",
+        "source": "arxiv"
       }
     ]
   }
