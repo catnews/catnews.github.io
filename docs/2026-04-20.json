@@ -3,10 +3,10 @@
   "categories": {
     "papers": [
       {
-        "title": "Pegasus: Transparent and Unified Kernel-Bypass Networking for Fast Local and Remote Communication",
-        "url": "https://www.semanticscholar.org/paper/8b4685b02a0a104e6d1a679dd31b941d57998b96",
-        "summary": "云计算中的现代软件架构高度依赖于互连的本地和远程服务。服务网格等流行架构依赖于独立服务的使用",
-        "summary_en": "Modern software architectures in cloud computing are highly reliant on interconnected local and remote services. Popular architectures, such as the service mesh, rely on the use of independent service...",
+        "title": "Integration of DPDK for Real-Time Communication in the Elettra Synchrotron Orbit Feedback Control System: Jitter and Latency Optimization",
+        "url": "https://www.semanticscholar.org/paper/9a5e591e6d735d6df14e736af3e091c8628a5f7b",
+        "summary": "这项工作的范围是评估即将于2026年部署的Elettra 2.0同步加速器全球轨道校正反馈系统的软件驱动平台。这里有一个细节...",
+        "summary_en": "The scope of this work is the evaluation of the software-driven platform for the upcoming global orbit correction feedback system for the Elettra 2.0 synchrotron to be deployed in 2026. Here, a detail...",
         "source": "Semantic Scholar",
         "tags": [
           "旁路",
@@ -14,10 +14,10 @@
         ]
       },
       {
-        "title": "This Is INSANE! Kernel-Bypass Networking Finally Made Easy",
-        "url": "https://www.semanticscholar.org/paper/fb851c3070c75dd3d2519df1db5acbb14ffcfd89",
-        "summary": "本教程介绍了INSANE ，这是一个旨在使内核旁路网络可访问且可移植的中间件。随着现代硬件和软件堆栈（如SmartNIC和DPDK ）的推出，云通信...",
-        "summary_en": "This tutorial presents INSANE, a middleware designed to make kernel bypass networking accessible and portable. As modern hardware and software stacks, such as SmartNICs and DPDK, push cloud communicat...",
+        "title": "MoonEm - High-Precision Path Property Emulation Using DPDK",
+        "url": "https://www.semanticscholar.org/paper/dfd6817a32b74eaf4064ef7ade771f7a2a2afb4a",
+        "summary": "网络路径条件，如丢失、容量和延迟，对网络应用的行为和性能有重大影响。路径属性模拟器是必不可少的，并被广泛使用...",
+        "summary_en": "Network path conditions, such as loss, capacity, and delay, have a significant impact on the behavior and performance of networked applications. Path property emulators are essential and widely used t...",
         "source": "Semantic Scholar",
         "tags": [
           "旁路",
@@ -25,46 +25,37 @@
         ]
       },
       {
-        "title": "Enabling Kernel Bypass Networking on gem5",
-        "url": "https://www.semanticscholar.org/paper/dd503b9eb3e8e2afee850f8f871d1bfaa8238467",
-        "summary": "计算机系统的全系统仿真对于捕捉未来系统中各种硬件和软件组件之间的复杂相互作用至关重要。网络子系统建模必不可少...",
-        "summary_en": "Full-system simulation of computer systems is critical to capture the complex interplay between various hardware and software components in future systems. Modeling the network subsystem is indispensa...",
+        "title": "Joyride: Rethinking Linux's network stack design for better performance, security, and reliability",
+        "url": "https://www.semanticscholar.org/paper/2ab20469bc932e48e910b4b72b01db08d39cee1b",
+        "summary": "当代分布式计算工作负载，包括科学计算、数据挖掘和机器学习，越来越需要具有最小延迟和高吞吐量的操作系统网络，...",
+        "summary_en": "Contemporary distributed computing workloads, including scientific computation, data mining, and machine learning, increasingly demand OS networking with minimal latency as well as high throughput, se...",
         "source": "Semantic Scholar",
         "tags": [
           "旁路",
-          "驱动",
           "性能"
         ]
       },
       {
-        "title": "Development of a Linux Kernel Driver for the SBNI Network Interface Using Remote Real-Time Processing Units",
-        "url": "https://www.semanticscholar.org/paper/34a6515b76c475885c397123f1fe5ca0915a5cb4",
-        "summary": "本文涵盖了为现有的双绞线租用线路的SBNI网络接口开发Linux内核驱动程序的主题，该驱动程序用于在DA中提供远程数据传输...",
-        "summary_en": "This article covers the subject of developing a Linux kernel driver for the existing SBNI network interface for twisted-pair leased lines, which is used to provide long-range data transmission in a da...",
+        "title": "Startup Delay Performance Evaluation for SOME/IP: A Comparative Analysis on Linux Network API",
+        "url": "https://www.semanticscholar.org/paper/e73b5d976ff5c4f1d2c6a65c428cefe43d0ac19a",
+        "summary": "在软件定义的车辆中，车载通信的早期可用性至关重要。本文研究了两种低级组网方法--Raw Socket和PCAP--如何影响S的启动延迟。...",
+        "summary_en": "In software-defined vehicles, early availability of in-vehicle communication is critical. This paper investigates how two low-level networking methods—Raw Socket and PCAP—affect the startup delay of S...",
         "source": "Semantic Scholar",
         "tags": [
-          "驱动"
+          "XDP",
+          "旁路",
+          "Socket"
         ]
       },
       {
-        "title": "Takeaways of Implementing a Native Rust UDP Tunneling Network Driver in the Linux Kernel",
-        "url": "https://www.semanticscholar.org/paper/aec97257033a4bb81bf0b5eba3cd68787e907d4d",
-        "summary": "C是Linux内核中使用的主要编程语言。最近， Linux开发人员社区监督了Rust在内核构建系统中的实验性添加。人际交往是...",
-        "summary_en": "C is the primary programming language used in the Linux kernel. Recently, the Linux developer community oversaw the experimental addition of Rust into the kernel's build system. Networking is one of t...",
+        "title": "Accelerating Key-Value Store with Layer-2 Transparent Proxy Cache Using DPDK",
+        "url": "https://www.semanticscholar.org/paper/2dcb07cb9c40f377842a60d231a2269052382eef",
+        "summary": "Redis和Memcached等内存键值存储（ KVS ）可用作关系数据库的缓存，以减少数据库负载，同时减少响应时间。然而，内存中的KVS每...",
+        "summary_en": "In-memory Key-Value Stores (KVSs) such as Redis and Memcached can be used as caches for relational databases to reduce the database load while decreasing the response time. However, in-memory KVSs per...",
         "source": "Semantic Scholar",
         "tags": [
-          "驱动",
-          "性能"
-        ]
-      },
-      {
-        "title": "The NODROP Patch: Hardening Secure Networking for Real-time Teleoperation by Preventing Packet Drops in the Linux TUN Driver",
-        "url": "https://www.semanticscholar.org/paper/d65859507ac82afbccb67cababf2f12ae75f1153",
-        "summary": "吞吐量关键型远程操作需要强大且低延迟的通信，以确保安全性和性能。通常，这些类型的应用程序在基于Linux的操作系统中实现，...",
-        "summary_en": "Throughput-critical teleoperation requires robust and low-latency communication to ensure safety and performance. Often, these kinds of applications are implemented in Linux-based operating systems an...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "驱动",
+          "eBPF",
+          "旁路",
           "性能"
         ]
       },
@@ -88,6 +79,16 @@
         "tags": [
           "eBPF",
           "性能"
+        ]
+      },
+      {
+        "title": "BRF: Fuzzing the eBPF Runtime",
+        "url": "https://www.semanticscholar.org/paper/9d2f0ddbce2e950fd4c58cac20c391ac34762f26",
+        "summary": "Linux内核中的eBPF技术由于其提供的可编程性，已被广泛用于不同的应用，例如网络、跟踪和安全性。通过允许用户提供...",
+        "summary_en": "The eBPF technology in the Linux kernel has been widely adopted for different applications, such as networking, tracing, and security, thanks to the programmability it provides. By allowing user-suppl...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF"
         ]
       }
     ]
