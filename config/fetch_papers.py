@@ -23,7 +23,7 @@ SEARCH_KEYWORDS = [
 ]
 
 MIN_YEAR = 2020
-MAX_RESULTS = 15
+MAX_RESULTS = 20
 
 REQUIRED_KEYWORDS = [
     "linux", "kernel", "eBPF", "XDP", "bpf", "netfilter", 
@@ -76,9 +76,13 @@ def extract_tags(title, summary):
 
 def is_relevant_paper(title, summary):
     text = (title + " " + summary).lower()
-    linux_found = "linux" in text or "kernel" in text
-    network_found = any(kw in text for kw in ["network", "tcp", "udp", "socket", "packet", "ethernet", "bpf", "xdp"])
-    return linux_found and network_found
+    network_keywords = ["network", "tcp", "udp", "socket", "packet", "ethernet", "bpf", "xdp", "netfilter", "iptables"]
+    system_keywords = ["linux", "kernel", "operating system", "os"]
+    
+    network_found = any(kw in text for kw in network_keywords)
+    system_found = any(kw in text for kw in system_keywords)
+    
+    return network_found and (system_found or "driver" in text or "performance" in text)
 
 
 def fetch_arxiv_papers(query, max_results=5):
@@ -204,8 +208,8 @@ def main():
     
     for keyword in SEARCH_KEYWORDS:
         print(f"Searching: {keyword}")
-        all_papers.extend(fetch_arxiv_papers(keyword, 3))
-        all_papers.extend(fetch_semantic_scholar_papers(keyword, 3))
+        all_papers.extend(fetch_arxiv_papers(keyword, 5))
+        all_papers.extend(fetch_semantic_scholar_papers(keyword, 5))
     
     all_papers = deduplicate_papers(all_papers)
     all_papers = all_papers[:MAX_RESULTS]
