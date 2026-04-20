@@ -86,6 +86,15 @@
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .paper-count {
+            font-size: 14px;
+            font-weight: normal;
+            color: #7f8c8d;
         }
         
         .paper-item {
@@ -131,6 +140,26 @@
             color: #3498db;
             padding: 2px 8px;
             border-radius: 3px;
+        }
+        
+        .source-tag.arxiv {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .source-tag.huggingface {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .source-tag.github {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+        }
+        
+        .reading-time {
+            color: #95a5a6;
+            font-size: 12px;
         }
         
         .empty-message {
@@ -203,13 +232,16 @@
             
             if (data.categories.papers && data.categories.papers.length > 0) {
                 html += '<section class="category-section">';
-                html += '<h2 class="category-title">论文</h2>';
+                html += `<h2 class="category-title">论文 <span class="paper-count">共 ${data.categories.papers.length} 篇</span></h2>`;
                 data.categories.papers.forEach(paper => {
+                    const readingTime = Math.ceil(paper.summary.length / 400);
+                    const sourceClass = paper.source.toLowerCase().replace(/[^a-z]/g, '');
                     html += '<div class="paper-item">';
                     html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
                     html += `<div class="paper-summary">${paper.summary}</div>`;
                     html += '<div class="paper-meta">';
-                    html += `<span class="source-tag">${paper.source}</span>`;
+                    html += `<span class="source-tag ${sourceClass}">${paper.source}</span>`;
+                    html += `<span class="reading-time">约 ${readingTime} 分钟阅读</span>`;
                     html += '</div></div>';
                 });
                 html += '</section>';
