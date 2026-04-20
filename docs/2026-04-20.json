@@ -3,124 +3,92 @@
   "categories": {
     "papers": [
       {
-        "title": "Resolution-Agnostic Lensless Imaging via Fourier Neural Operators",
-        "url": "http://arxiv.org/abs/2604.16295v1",
-        "summary": "Lensless cameras based on thin diffusers offer a compact alternative to conventional refractive imaging but rely on computational reconstruction, since the diffuser's point spread function (PSF) globally multiplexes every scene point across the sensor. Here, we report a Fourier Neural Operator (FNO)...",
-        "source": "arxiv"
+        "title": "Pegasus: Transparent and Unified Kernel-Bypass Networking for Fast Local and Remote Communication",
+        "url": "https://www.semanticscholar.org/paper/8b4685b02a0a104e6d1a679dd31b941d57998b96",
+        "summary": "云计算中的现代软件架构高度依赖于互连的本地和远程服务。服务网格等流行架构依赖于独立服务的使用",
+        "summary_en": "Modern software architectures in cloud computing are highly reliant on interconnected local and remote services. Popular architectures, such as the service mesh, rely on the use of independent service...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "旁路",
+          "性能"
+        ]
       },
       {
-        "title": "Fluctuating Pair Density Wave in Finite-temperature Phase Diagram of the $t$-$t^\\prime$ Hubbard Model",
-        "url": "http://arxiv.org/abs/2604.16293v1",
-        "summary": "The Hubbard model and its extensions are canonical theoretical frameworks for understanding correlated electronic states, including those in high-$T_c$ cuprates. Here, we use state-of-the-art thermal tensor network method to map out the temperature-doping phase diagram of the $t$-$t^\\prime$ Hubbard ...",
-        "source": "arxiv"
+        "title": "This Is INSANE! Kernel-Bypass Networking Finally Made Easy",
+        "url": "https://www.semanticscholar.org/paper/fb851c3070c75dd3d2519df1db5acbb14ffcfd89",
+        "summary": "本教程介绍了INSANE ，这是一个旨在使内核旁路网络可访问且可移植的中间件。随着现代硬件和软件堆栈（如SmartNIC和DPDK ）的推出，云通信...",
+        "summary_en": "This tutorial presents INSANE, a middleware designed to make kernel bypass networking accessible and portable. As modern hardware and software stacks, such as SmartNICs and DPDK, push cloud communicat...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "旁路",
+          "性能"
+        ]
       },
       {
-        "title": "Hero-Mamba: Mamba-based Dual Domain Learning for Underwater Image Enhancement",
-        "url": "http://arxiv.org/abs/2604.16266v1",
-        "summary": "Underwater images often suffer from severe degradation, such as color distortion, low contrast, and blurred details, due to light absorption and scattering in water. While learning-based methods like CNNs and Transformers have shown promise, they face critical limitations: CNNs struggle to model the...",
-        "source": "arxiv"
+        "title": "Enabling Kernel Bypass Networking on gem5",
+        "url": "https://www.semanticscholar.org/paper/dd503b9eb3e8e2afee850f8f871d1bfaa8238467",
+        "summary": "计算机系统的全系统仿真对于捕捉未来系统中各种硬件和软件组件之间的复杂相互作用至关重要。网络子系统建模必不可少...",
+        "summary_en": "Full-system simulation of computer systems is critical to capture the complex interplay between various hardware and software components in future systems. Modeling the network subsystem is indispensa...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "旁路",
+          "驱动",
+          "性能"
+        ]
       },
       {
-        "title": "Joint-Centric Dual Contrastive Alignment with Structure-Preserving and Information-Balanced Regularization",
-        "url": "http://arxiv.org/abs/2604.16247v1",
-        "summary": "We propose HILBERT (HIerarchical Long-sequence Balanced Embedding with Reciprocal contrastive Training), a cross-attentive multimodal framework for learning document-level audio-text representations from long, segmented sequences in low-resource data settings. HILBERT leverages frozen pre-trained sp...",
-        "source": "arxiv"
+        "title": "Development of a Linux Kernel Driver for the SBNI Network Interface Using Remote Real-Time Processing Units",
+        "url": "https://www.semanticscholar.org/paper/34a6515b76c475885c397123f1fe5ca0915a5cb4",
+        "summary": "本文涵盖了为现有的双绞线租用线路的SBNI网络接口开发Linux内核驱动程序的主题，该驱动程序用于在DA中提供远程数据传输...",
+        "summary_en": "This article covers the subject of developing a Linux kernel driver for the existing SBNI network interface for twisted-pair leased lines, which is used to provide long-range data transmission in a da...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "驱动"
+        ]
       },
       {
-        "title": "Long-term Performance Analysis of a Commercial QKD Device Under Real-world Deployment Conditions",
-        "url": "http://arxiv.org/abs/2604.16236v1",
-        "summary": "Quantum key distribution (QKD) has reached a commercially viable stage, with several companies offering hardware systems designed for operational deployment. Evaluating the performance of commercial QKD devices under real-world deployment conditions is essential for users seeking to understand the p...",
-        "source": "arxiv"
+        "title": "Takeaways of Implementing a Native Rust UDP Tunneling Network Driver in the Linux Kernel",
+        "url": "https://www.semanticscholar.org/paper/aec97257033a4bb81bf0b5eba3cd68787e907d4d",
+        "summary": "C是Linux内核中使用的主要编程语言。最近， Linux开发人员社区监督了Rust在内核构建系统中的实验性添加。人际交往是...",
+        "summary_en": "C is the primary programming language used in the Linux kernel. Recently, the Linux developer community oversaw the experimental addition of Rust into the kernel's build system. Networking is one of t...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "驱动",
+          "性能"
+        ]
       },
       {
-        "title": "Simulating Arbitrage Optimization for Market Monitoring in Gas and Electricity Transmission Networks",
-        "url": "http://arxiv.org/abs/2604.16229v1",
-        "summary": "We examine market outcomes in energy transport networks with a focus on gas-fired generators, which are producers in a wholesale electricity market and consumers in the natural gas market. Market administrators monitor bids to determine whether a participant wields market power to manipulate the pri...",
-        "source": "arxiv"
+        "title": "The NODROP Patch: Hardening Secure Networking for Real-time Teleoperation by Preventing Packet Drops in the Linux TUN Driver",
+        "url": "https://www.semanticscholar.org/paper/d65859507ac82afbccb67cababf2f12ae75f1153",
+        "summary": "吞吐量关键型远程操作需要强大且低延迟的通信，以确保安全性和性能。通常，这些类型的应用程序在基于Linux的操作系统中实现，...",
+        "summary_en": "Throughput-critical teleoperation requires robust and low-latency communication to ensure safety and performance. Often, these kinds of applications are implemented in Linux-based operating systems an...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "驱动",
+          "性能"
+        ]
       },
       {
-        "title": "TRON: Trainable, architecture-reconfigurable random optical neural networks",
-        "url": "http://arxiv.org/abs/2604.16228v1",
-        "summary": "Deep learning has triggered explosive growth in the demand for specialized hardware processors, thus motivating the development of scalable and reconfigurable computing substrates. Optical processors offer a fundamentally different computing paradigm, combining massive parallelism and ultrahigh band...",
-        "source": "arxiv"
+        "title": "Identifying Linux Kernel Instability Due to Poor RCU Synchronization",
+        "url": "https://www.semanticscholar.org/paper/a9441fd61bf83418a37bfa197e1a35e87bfd3279",
+        "summary": "Read-Copy-Update （ RCU ）在Linux内核中被广泛用于管理对共享数据结构的并发访问。但是，删除受RCU保护的哈希表条目时同步不当可能会导致...",
+        "summary_en": "Read-Copy-Update (RCU) is widely used in the Linux kernel to manage concurrent access to shared data structures. However, improper synchronization when removing RCU-protected hash table entries can le...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "驱动",
+          "Socket"
+        ]
       },
       {
-        "title": "Network Meta-analysis and Diffusion",
-        "url": "http://arxiv.org/abs/2604.16221v1",
-        "summary": "We show that the covariance matrix of the treatment effect estimates in a network meta-analysis can be obtained without matrix inversion using a geometric series of diffusion matrices. This property extends to the hat matrix and provides a connection between parameter estimation in regression analys...",
-        "source": "arxiv"
-      },
-      {
-        "title": "GAViD: A Large-Scale Multimodal Dataset for Context-Aware Group Affect Recognition from Videos",
-        "url": "http://arxiv.org/abs/2604.16214v1",
-        "summary": "Understanding affective dynamics in real-world social systems is fundamental to modeling and analyzing human-human interactions in complex environments. Group affect emerges from intertwined human-human interactions, contextual influences, and behavioral cues, making its quantitative modeling a chal...",
-        "source": "arxiv"
-      },
-      {
-        "title": "Data-Driven Distributed Stability Certification for Power Systems via Input-State Trajectories",
-        "url": "http://arxiv.org/abs/2604.16212v1",
-        "summary": "This article proposes a data-driven framework to verify the distributed conditions that guarantee the system-wide stability for interconnected power systems. To guarantee system wide stability, the dynamics of each bus are required to satisfy an output differential passivity (ODP) condition with a s...",
-        "source": "arxiv"
-      },
-      {
-        "title": "Find, Fix, Reason: Context Repair for Video Reasoning",
-        "url": "http://arxiv.org/abs/2604.16243v1",
-        "summary": "Reinforcement learning has advanced video reasoning in large multi-modal models, yet dominant pipelines either rely on on-policy self-exploration, which plateaus at the model's knowledge boundary, or hybrid replay that mixes policies and demands careful regularization. Dynamic context methods zoom i...",
-        "source": "arxiv"
-      },
-      {
-        "title": "Correcting socioeconomic bias in mobile phone mobility estimates using multilevel regression and poststratification",
-        "url": "http://arxiv.org/abs/2604.16193v1",
-        "summary": "Call detail records (CDR) from mobile phone networks are widely used to study human mobility however CDR data from a single mobile operator are inherently biased because the observed users do not mirror the population distribution. Using data from a major Chilean carrier in Santiago, we observe the ...",
-        "source": "arxiv"
-      },
-      {
-        "title": "Synthetic data in cryptocurrencies using generative models",
-        "url": "http://arxiv.org/abs/2604.16182v1",
-        "summary": "Data plays a fundamental role in consolidating markets, services, and products in the digital financial ecosystem. However, the use of real data, especially in the financial context, can lead to privacy risks and access restrictions, affecting institutions, research, and modeling processes. Although...",
-        "source": "arxiv"
-      },
-      {
-        "title": "TTV-Not-So-Fast: Uniqueness and Degeneracy in Perturbing Planet Parameters",
-        "url": "http://arxiv.org/abs/2604.16297v1",
-        "summary": "Nontransiting planets can reveal themselves through transit timing variations (TTVs), but inferring the properties of the perturbing planet is a highly degenerate inverse problem. We present a systematic reassessment of all 12 published cases in which a nontransiting planet was claimed to have been ...",
-        "source": "arxiv"
-      },
-      {
-        "title": "The hydrodynamical response of cold circumgalactic clouds to quasar radiation",
-        "url": "http://arxiv.org/abs/2604.16294v1",
-        "summary": "Recent simulations increasingly resolve the small-scale structure of the circumgalactic medium (CGM), but the dynamical impact of ionising radiation on its cold $10^4$ K component remains poorly understood. We investigate the evolution of cold gas structures exposed to quasars' EUV radiation. We dev...",
-        "source": "arxiv"
-      },
-      {
-        "title": "Global dynamics and regime shifts in a resource-consumer model with facilitation and habitat loss",
-        "url": "http://arxiv.org/abs/2604.16291v1",
-        "summary": "Modelling how populations respond to habitat loss is crucial for understanding ecosystem stability, especially when positive interactions among resource species, such as plant-plant facilitation, play a key role. Habitat loss not only reduces available organic nutrients and space for primary produce...",
-        "source": "arxiv"
-      },
-      {
-        "title": "NaijaS2ST: A Multi-Accent Benchmark for Speech-to-Speech Translation in Low-Resource Nigerian Languages",
-        "url": "http://arxiv.org/abs/2604.16287v1",
-        "summary": "Speech translation for low-resource languages remains fundamentally limited by the scarcity of high-quality, diverse parallel speech data, a challenge that is especially pronounced in African linguistic contexts. To address this, we introduce NaijaS2ST, a parallel speech translation dataset spanning...",
-        "source": "arxiv"
-      },
-      {
-        "title": "ASMR-Bench: Auditing for Sabotage in ML Research",
-        "url": "http://arxiv.org/abs/2604.16286v1",
-        "summary": "As AI systems are increasingly used to conduct research autonomously, misaligned systems could introduce subtle flaws that produce misleading results while evading detection. We introduce ASMR-Bench (Auditing for Sabotage in ML Research), a benchmark for evaluating the ability of auditors to detect ...",
-        "source": "arxiv"
-      },
-      {
-        "title": "Using Large Language Models and Knowledge Graphs to Improve the Interpretability of Machine Learning Models in Manufacturing",
-        "url": "http://arxiv.org/abs/2604.16280v1",
-        "summary": "Explaining Machine Learning (ML) results in a transparent and user-friendly manner remains a challenging task of Explainable Artificial Intelligence (XAI). In this paper, we present a method to enhance the interpretability of ML models by using a Knowledge Graph (KG). We store domain-specific data a...",
-        "source": "arxiv"
-      },
-      {
-        "title": "Evaluating the Progression of Large Language Model Capabilities for Small-Molecule Drug Design",
-        "url": "http://arxiv.org/abs/2604.16279v1",
-        "summary": "Large Language Models (LLMs) have the potential to accelerate small molecule drug design due to their ability to reason about information from diverse sources and formats. However, their practical utility remains unclear due to the lack of benchmarks that reflect real-world scenarios. In this work, ...",
-        "source": "arxiv"
+        "title": "SoK: Challenges and Paths Toward Memory Safety for eBPF",
+        "url": "https://www.semanticscholar.org/paper/0607e0b6aa767b12d1e2eaf3ee39e7adf69947be",
+        "summary": "Linux中的扩展Berkeley Packet Filter (eBPF)子系统可以在不修改内核代码的情况下扩展内核功能。除了在网络中使用之外， eBPF还提供灵活的...",
+        "summary_en": "The extended Berkeley Packet Filter (eBPF) subsystem in Linux enables the extension of kernel functionality without modifying kernel code. In addition to its use in networking, eBPF provides the flexi...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "性能"
+        ]
       }
     ]
   }
