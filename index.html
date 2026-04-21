@@ -219,6 +219,17 @@
             align-items: center;
             padding: 6px 0;
             font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 4px;
+        }
+        
+        .tag-stat-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .tag-stat-item.active {
+            background-color: #e8f4fc;
         }
         
         .tag-stat-name {
@@ -232,6 +243,17 @@
             border-radius: 10px;
             font-size: 12px;
             font-weight: 500;
+        }
+        
+        .clear-filter {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
         }
         
         .empty-message {
@@ -288,6 +310,8 @@
     
     <script>
         let currentDate = new Date();
+        let selectedFilter = null;
+        let currentData = null;
         
         function formatDate(date) {
             const year = date.getFullYear();
@@ -315,60 +339,100 @@
             
             let html = '';
             sortedTags.forEach(([tag, count]) => {
-                html += `<div class="tag-stat-item">`;
+                const isActive = selectedFilter === tag ? 'active' : '';
+                html += `<div class="tag-stat-item ${isActive}" data-tag="${tag}">`;
                 html += `<span class="tag-stat-name">${tag}</span>`;
                 html += `<span class="tag-stat-count">${count}</span>`;
                 html += '</div>';
             });
             
+            if (selectedFilter) {
+                html += '<div class="clear-filter" id="clearFilter">清除筛选</div>';
+            }
+            
             container.innerHTML = html;
+            
+            container.querySelectorAll('.tag-stat-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const tag = item.dataset.tag;
+                    selectedFilter = selectedFilter === tag ? null : tag;
+                    renderTagStats(currentData?.tagStats || {});
+                    renderPapers(currentData);
+                });
+            });
+            
+            const clearBtn = container.querySelector('#clearFilter');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    selectedFilter = null;
+                    renderTagStats(currentData?.tagStats || {});
+                    renderPapers(currentData);
+                });
+            }
+        }
+        
+        function renderPapers(data) {
+            const content = document.getElementById('content');
+            
+            if (!data || !data.categories || !data.categories.papers) {
+                content.innerHTML = '<div class="empty-message">暂无数据</div>';
+                return;
+            }
+            
+            let papers = data.categories.papers;
+            
+            if (selectedFilter) {
+                papers = papers.filter(paper => 
+                    paper.tags && paper.tags.includes(selectedFilter)
+                );
+            }
+            
+            if (papers.length === 0) {
+                content.innerHTML = `<div class="empty-message">${selectedFilter ? '当前筛选无匹配论文' : '暂无数据'}</div>`;
+                return;
+            }
+            
+            let html = '<section class="category-section">';
+            html += `<h2 class="category-title">论文 <span class="paper-count">共 ${papers.length} 篇${selectedFilter ? ` (${selectedFilter})` : ''}</span></h2>`;
+            
+            papers.forEach(paper => {
+                const chineseChars = paper.summary.replace(/[^\u4e00-\u9fa5]/g, '').length;
+                const readingTime = paper.readingTime || Math.max(1, Math.ceil(chineseChars / 350));
+                const sourceClass = paper.source.toLowerCase().replace(/[^a-z]/g, '');
+                const tags = paper.tags || [];
+                
+                html += '<div class="paper-item">';
+                html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
+                html += `<div class="paper-summary">${paper.summary}</div>`;
+                html += '<div class="paper-meta">';
+                html += `<span class="source-tag ${sourceClass}">${paper.source}</span>`;
+                if (tags.length > 0) {
+                    html += '<div class="tags-container">';
+                    tags.forEach(tag => {
+                        const highlight = tag === selectedFilter ? 'font-weight: bold; background-color: #a7f3d0;' : '';
+                        html += `<span class="feature-tag" style="${highlight}">${tag}</span>`;
+                    });
+                    html += '</div>';
+                }
+                html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
+                html += '</div></div>';
+            });
+            html += '</section>';
+            
+            content.innerHTML = html;
         }
         
         function renderContent(data) {
-            const content = document.getElementById('content');
+            currentData = data;
             
             if (!data || !data.categories || Object.keys(data.categories).length === 0) {
-                content.innerHTML = '<div class="empty-message">暂无数据</div>';
+                document.getElementById('content').innerHTML = '<div class="empty-message">暂无数据</div>';
                 renderTagStats({});
                 return;
             }
             
-            if (data.tagStats) {
-                renderTagStats(data.tagStats);
-            } else {
-                renderTagStats({});
-            }
-            
-            let html = '';
-            
-            if (data.categories.papers && data.categories.papers.length > 0) {
-                html += '<section class="category-section">';
-                html += `<h2 class="category-title">论文 <span class="paper-count">共 ${data.categories.papers.length} 篇</span></h2>`;
-                data.categories.papers.forEach(paper => {
-                    const chineseChars = paper.summary.replace(/[^\u4e00-\u9fa5]/g, '').length;
-                    const readingTime = Math.max(1, Math.ceil(chineseChars / 350));
-                    const sourceClass = paper.source.toLowerCase().replace(/[^a-z]/g, '');
-                    const tags = paper.tags || [];
-                    
-                    html += '<div class="paper-item">';
-                    html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
-                    html += `<div class="paper-summary">${paper.summary}</div>`;
-                    html += '<div class="paper-meta">';
-                    html += `<span class="source-tag ${sourceClass}">${paper.source}</span>`;
-                    if (tags.length > 0) {
-                        html += '<div class="tags-container">';
-                        tags.forEach(tag => {
-                            html += `<span class="feature-tag">${tag}</span>`;
-                        });
-                        html += '</div>';
-                    }
-                    html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
-                    html += '</div></div>';
-                });
-                html += '</section>';
-            }
-            
-            content.innerHTML = html || '<div class="empty-message">暂无数据</div>';
+            renderTagStats(data.tagStats || {});
+            renderPapers(data);
         }
         
         async function loadData(date) {
