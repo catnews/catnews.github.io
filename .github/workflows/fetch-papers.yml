@@ -27,6 +27,8 @@ jobs:
           
       - name: Fetch papers
         run: python config/fetch_papers.py
+        env:
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
         
       - name: Check for changes
         id: check_changes
