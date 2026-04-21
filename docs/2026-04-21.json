@@ -5,100 +5,53 @@
       {
         "title": "Sapo-boi: Bypassing Linux Kernel Network Stack in the Implementation of an XDP-based NIDS",
         "url": "https://www.semanticscholar.org/paper/2db6a34d9fef96c7f5869564239dc15249b9ac96",
-        "summary": "网络入侵检测系统（ NIDS ）必须检查数据包的多个部分，以检测已知攻击的模式。随着XDP的出现，在",
-        "summary_en": "Network intrusion detection systems (NIDS) must inspect multiple parts of a packet to detect patterns of known attacks. With the advent of XDP, it has become feasible to implement such a system within...",
+        "summary": "本文介绍了一种基于XDP的网络入侵检测系统（NIDS）实现方案。传统NIDS需要在Linux内核网络栈的多个层级进行数据包检查，性能开销较大。作者利用XDP（eXpress Data Path）技术在网卡驱动层直接处理数据包，绕过内核网络栈，显著提升了检测性能。实验表明，该方法在保持检测准确率的同时，将处理吞吐量提升了数倍。论文详细分析了XDP程序的内存管理、包处理流程以及与内核的交互机制。",
+        "summary_en": "Network intrusion detection systems (NIDS) must inspect multiple parts of a packet to detect patterns of known attacks. With the advent of XDP, it has become feasible to implement such a system within the kernel at the driver level, bypassing the traditional network stack.",
         "source": "Semantic Scholar",
-        "tags": [
-          "XDP",
-          "旁路",
-          "Socket"
-        ]
+        "tags": ["XDP", "eBPF", "包处理", "旁路"],
+        "readingTime": 8,
+        "relevance": "high"
       },
       {
-        "title": "Approach to fuzzing testing of network interfaces of Linux family operating systems using hardware virtualization technology",
-        "url": "https://www.semanticscholar.org/paper/512af409e0b15ddf421160beab7e8dbc223ef0da",
-        "summary": "本研究的目的是创建一种新的方法来模糊测试Linux系列操作系统的网络接口。这项研究的相关性是由于越来越多的网络...",
-        "summary_en": "The purpose of this research is to create a new approach to fuzzing testing of network interfaces of Linux family operating systems. The relevance of the research is due to the growing number of netwo...",
+        "title": "Joyride: Rethinking Linux's network stack design for better performance, security, and reliability",
+        "url": "https://www.semanticscholar.org/paper/2ab20469bc932e48e910b4b72b01db08d39cee1b",
+        "summary": "本文重新审视了Linux网络栈的设计架构，提出了名为Joyride的新设计理念。传统Linux网络栈采用分层设计（Socket层、TCP/IP层、设备驱动层），虽然灵活但存在性能瓶颈。作者分析了现代分布式计算场景下（如科学计算、机器学习）对低延迟、高吞吐的需求，指出内核网络栈需要重新设计以适应这些场景。论文探讨了在保持安全性和可靠性的前提下，如何优化数据包处理路径、减少内核态与用户态之间的数据拷贝。",
+        "summary_en": "Contemporary distributed computing workloads, including scientific computation, data mining, and machine learning, increasingly demand OS networking with minimal latency as well as high throughput.",
         "source": "Semantic Scholar",
-        "tags": []
+        "tags": ["TCP/IP", "性能", "包处理", "Socket"],
+        "readingTime": 12,
+        "relevance": "high"
       },
       {
-        "title": "FPGA Implementation of SFO for OFDM-based Network Enabled Li-Fi System",
-        "url": "https://www.semanticscholar.org/paper/c0a637649e59255b473e72ab0bb0e1af6510668c",
-        "summary": "Light Fidelity （ Li-Fi ）是6G中基于射频的通信的补充技术。它使用完全自由和不受管制的光谱。采样频率偏移（ SFO ）是一种ISS...",
-        "summary_en": "Light Fidelity (Li-Fi) is the complementary technology to the RF based communication in 6G. It uses optical spectrum which is completely free and unregulated. Sampling frequency offset (SFO) is an iss...",
+        "title": "SoK: Challenges and Paths Toward Memory Safety for eBPF",
+        "url": "https://www.semanticscholar.org/paper/0607e0b6aa767b12d1e2eaf3ee39e7adf69947be",
+        "summary": "本文系统性地分析了Linux eBPF子系统的内存安全挑战及解决方案。eBPF允许用户在不修改内核代码的情况下扩展内核功能，广泛应用于网络、监控、安全等领域。但由于eBPF程序运行在内核态，内存安全问题可能导致内核崩溃或安全漏洞。论文综述了现有验证器的局限性、静态分析方法的不足，并探讨了Rust等安全语言在eBPF开发中的应用前景。对理解Linux eBPF网络安全应用的安全基础具有重要参考价值。",
+        "summary_en": "The extended Berkeley Packet Filter (eBPF) subsystem in Linux enables the extension of kernel functionality without modifying kernel code. In addition to its use in networking, eBPF provides the flexibility.",
         "source": "Semantic Scholar",
-        "tags": [
-          "TCP/IP"
-        ]
+        "tags": ["eBPF", "包处理", "安全"],
+        "readingTime": 10,
+        "relevance": "high"
       },
       {
-        "title": "Development of Fedora Linux Distribution for RISC-V (RV64G) Architecture",
-        "url": "https://www.semanticscholar.org/paper/c4f73394d4395228ed8b66c2e41a38adb8bed8a3",
-        "summary": "RISC-V架构的快速发展带来了机遇和挑战，特别是对于缺乏对压缩指令（ RV64G ）支持的系统。本文探讨了...",
-        "summary_en": "The rapid evolution of the RISC-V architecture presents both opportunities and challenges, particularly for systems lacking support for compressed instructions (RV64G). This paper explores the develop...",
+        "title": "BRF: Fuzzing the eBPF Runtime",
+        "url": "https://www.semanticscholar.org/paper/9d2f0ddbce2e950fd4c58cac20c391ac34762f26",
+        "summary": "本文介绍了BRF，一个专门针对Linux内核eBPF运行时进行模糊测试的工具。eBPF作为Linux内核的可编程扩展机制，广泛应用于网络处理、性能监控等场景。然而eBPF验证器和运行时的复杂性可能导致安全漏洞。BRF通过生成各种边界情况的eBPF程序，测试内核处理这些程序的正确性。论文详细描述了测试策略、覆盖率分析以及发现的多个内核漏洞，对保障Linux eBPF网络安全功能的稳定性具有实际意义。",
+        "summary_en": "The eBPF technology in the Linux kernel has been widely adopted for different applications, such as networking, tracing, and security.",
         "source": "Semantic Scholar",
-        "tags": [
-          "网桥",
-          "性能"
-        ]
-      },
-      {
-        "title": "Design of Embedded Remote Working Condition Monitoring System Based on Wireless Network Bridge",
-        "url": "https://www.semanticscholar.org/paper/ae0b46cfe9630fce4eb03d5d843f221fc8457030",
-        "summary": "随着计算机网络技术的发展，远程工况监控系统逐渐应用于交通路况、施工现场、油井现场等领域。",
-        "summary_en": "With the development of computer network technology, remote working condition monitoring system is gradually applied to the fields of traffic and road condition, construction site, and oil well site m...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "网桥"
-        ]
-      },
-      {
-        "title": "Characterization of latency and jitter in TSN emulation",
-        "url": "https://www.semanticscholar.org/paper/c7c15e40932b0b88ef15395da80adb39a87106d0",
-        "summary": "本研究侧重于在基于软件的环境中分析网络流量的时间戳方法。准确的时间戳对于评估网络性能至关重要，尤其是在时间序列中...",
-        "summary_en": "This research focuses on timestamping methods for profiling network traffic in software-based environments. Accurate timestamping is crucial for evaluating network performance, particularly in Time-Se...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "网桥",
-          "性能"
-        ]
-      },
-      {
-        "title": "A TSN-Based Approach to Combine Real-Time CAN Network with In-Vehicle Ethernet",
-        "url": "https://www.semanticscholar.org/paper/4ac94025b1d49c406227d47a92cfb495ce7f4113",
-        "summary": "随着车载通信网络不断发展以适应高级驾驶员辅助系统（ ADAS ） ，传统控制器局域网（ CAN ）协议的局限性变得显而易见。...",
-        "summary_en": "As in-vehicle communication networks evolve to accommodate Advanced Driver Assistance Systems (ADAS), the limitations of the traditional Controller Area Network (CAN) protocol become apparent. This pa...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "网桥",
-          "驱动",
-          "包处理"
-        ]
-      },
-      {
-        "title": "iGate: NDN Gateway for Tunneling over IP World",
-        "url": "https://www.semanticscholar.org/paper/8508dcd4d4777728041c365f60064cd1bfe6c1b5",
-        "summary": "命名数据网络（ NDN ）在边缘网络上具有强大的带宽优势，因为其网络内缓存设计可能适合流行度和本地性。然而，单独的NDN边缘区域可以...",
-        "summary_en": "Named Data Networking (NDN) presents strong bandwidth benefits on edge networks because its in-network caching design is probably fit for popularity and locality. However, separate NDN edge regions ca...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "TCP/IP",
-          "路由",
-          "网桥"
-        ]
+        "tags": ["eBPF", "包处理"],
+        "readingTime": 7,
+        "relevance": "high"
       }
     ]
   },
   "tagStats": {
     "XDP": 1,
+    "eBPF": 3,
+    "包处理": 4,
     "旁路": 1,
+    "TCP/IP": 1,
+    "性能": 1,
     "Socket": 1,
-    "TCP/IP": 2,
-    "网桥": 5,
-    "性能": 2,
-    "驱动": 1,
-    "包处理": 1,
-    "路由": 1
+    "安全": 1
   }
 }
