@@ -19,16 +19,13 @@ REQUEST_DELAY_MIN = 5
 REQUEST_DELAY_MAX = 8
 LLM_DELAY_MIN = 5
 LLM_DELAY_MAX = 10
+ARXIV_DELAY = 5
 
 SEARCH_KEYWORDS = [
-    "Linux kernel network stack",
-    "eBPF XDP packet processing Linux",
-    "Linux TCP IP implementation kernel",
-    "Linux netfilter nftables kernel",
-    "Linux network driver kernel",
-    "Linux kernel bypass DPDK",
-    "Linux virtio vhost networking",
-    "Linux socket performance kernel",
+    "Linux kernel network stack eBPF",
+    "Linux XDP packet processing",
+    "Linux TCP socket kernel",
+    "Linux network driver",
 ]
 
 MIN_YEAR = 2020
@@ -140,50 +137,65 @@ def analyze_paper_with_llm(title, abstract):
 
 def fetch_arxiv_papers(query, max_results=5):
     papers = []
-    try:
-        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
-        
-        params = {
-            "search_query": f"all:{query}",
-            "start": 0,
-            "max_results": max_results,
-            "sortBy": "submittedDate",
-            "sortOrder": "descending",
-        }
-        url = f"{ARXIV_API}?{urllib.parse.urlencode(params)}"
-        
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = response.read().decode("utf-8")
-        
-        root = ET.fromstring(data)
-        ns = {"atom": "http://www.w3.org/2005/Atom"}
-        
-        for entry in root.findall("atom:entry", ns):
-            title_elem = entry.find("atom:title", ns)
-            summary_elem = entry.find("atom:summary", ns)
-            id_elem = entry.find("atom:id", ns)
-            published_elem = entry.find("atom:published", ns)
+    for attempt in range(3):
+        try:
+            print(f"  Waiting {ARXIV_DELAY}s for arXiv...")
+            time.sleep(ARXIV_DELAY)
             
-            if not all([title_elem is not None, summary_elem is not None, 
-                        id_elem is not None, published_elem is not None]):
-                continue
+            params = {
+                "search_query": f"all:{query}",
+                "start": 0,
+                "max_results": max_results,
+                "sortBy": "submittedDate",
+                "sortOrder": "descending",
+            }
+            url = f"{ARXIV_API}?{urllib.parse.urlencode(params)}"
             
-            title = title_elem.text.strip().replace("\n", " ") if title_elem.text else ""
-            summary = summary_elem.text.strip().replace("\n", " ") if summary_elem.text else ""
-            url_val = id_elem.text if id_elem.text else ""
-            year = int(published_elem.text[:4]) if published_elem.text else 0
+            req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
+            with urllib.request.urlopen(req, timeout=30) as response:
+                data = response.read().decode("utf-8")
             
-            if year >= MIN_YEAR and title and summary:
-                papers.append({
-                    "title": title,
-                    "url": url_val,
-                    "abstract": summary,
-                    "source": "arXiv",
-                    "year": year
-                })
-    except Exception as e:
-        print(f"arXiv fetch error: {e}")
+            root = ET.fromstring(data)
+            ns = {"atom": "http://www.w3.org/2005/Atom"}
+            
+            for entry in root.findall("atom:entry", ns):
+                title_elem = entry.find("atom:title", ns)
+                summary_elem = entry.find("atom:summary", ns)
+                id_elem = entry.find("atom:id", ns)
+                published_elem = entry.find("atom:published", ns)
+                
+                if not all([title_elem is not None, summary_elem is not None, 
+                            id_elem is not None, published_elem is not None]):
+                    continue
+                
+                title = title_elem.text.strip().replace("\n", " ") if title_elem.text else ""
+                summary = summary_elem.text.strip().replace("\n", " ") if summary_elem.text else ""
+                url_val = id_elem.text if id_elem.text else ""
+                year = int(published_elem.text[:4]) if published_elem.text else 0
+                
+                if year >= MIN_YEAR and title and summary:
+                    papers.append({
+                        "title": title,
+                        "url": url_val,
+                        "abstract": summary,
+                        "source": "arXiv",
+                        "year": year
+                    })
+            break
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                wait = 30 + attempt * 20
+                print(f"  arXiv rate limited, waiting {wait}s...")
+                time.sleep(wait)
+            else:
+                print(f"arXiv HTTP error: {e.code}")
+                break
+        except Exception as e:
+            print(f"arXiv fetch error: {e}")
+            if attempt < 2:
+                time.sleep(10)
+            else:
+                break
     
     return papers
 
