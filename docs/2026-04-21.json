@@ -1,7 +1,192 @@
 {
   "date": "2026-04-21",
   "categories": {
-    "papers": []
+    "papers": [
+      {
+        "title": "Take Kernel Stack Overhead Out: eBPF-Enhanced Network Acceleration for Distributed Training within Ethernet",
+        "url": "https://www.semanticscholar.org/paper/4fb1e03dd899cb69a52acc86f216ce6d6b75a7e7",
+        "summary": "本文针对以太网数据中心中分布式训练场景下的网络通信开销问题进行研究。通过测量分析，作者发现Linux内核网络栈占用了30%至40%的通信开销。为解决这一问题，论文提出利用eBPF技术增强网络加速，直接在内核层面绕过或优化传统网络栈处理路径，提升分布式训练中多节点间的通信效率。这是eBPF在高性能网络场景应用的典型案例，直接涉及TCP/IP协议栈优化和eBPF/XDP在内核网络子系统中的应用，与Linux内核网络开发高度相关。",
+        "summary_en": "As deep neural networks (DNN) continue to scale up in size to achieve greater capabilities, distributed training (DT) has become the prevailing approa...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "网络加速",
+          "分布式训练",
+          "TCP/IP协议栈",
+          "内核旁路",
+          "数据中心网络"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Tracing Network Packets in the Linux Kernel using eBPF",
+        "url": "https://www.semanticscholar.org/paper/e9788556e433e5703bb3d0813166c7bc5af67ecc",
+        "summary": "本文探讨了在复杂网络基础设施开发维护中使用eBPF技术追踪Linux内核中的网络数据包。研究指出，尽管现有排障工具众多，但其功能受限于Linux内核API的有限接口，无法提供系统级的网络栈视图。文章聚焦于eBPF这一内核级技术，用于解决传统网络观测工具的局限性，实现更深层的网络包追踪与诊断。这是Linux内核网络子系统中eBPF可观测性方向的典型研究。",
+        "summary_en": "During the development and maintenance of complex network infrastructure for a big project, developers face a lot of problems. Although there exist pl...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "网络追踪",
+          "内核观测",
+          "数据包分析",
+          "性能诊断"
+        ],
+        "readingTime": 12,
+        "relevance": "high"
+      },
+      {
+        "title": "Measuring the Cost of the Linux Network Stack in Real-Time",
+        "url": "https://www.semanticscholar.org/paper/571b3386d511eff5a55af1ee55e7047739a675fa",
+        "summary": "本文探讨在生产环境中实时测量Linux内核网络栈处理网络流量的CPU开销的可行性。研究背景是数据中心网络接口速度不断提升，越来越多的服务在软件层面实现，需要量化服务器CPU在网络处理上的实际消耗。核心技术方案是使用eBPF tracing（扩展伯克利包过滤器追踪）能力来实时采集网络栈各层的开销数据。这是Linux内核网络子系统中eBPF应用的重要场景，涉及TCP/IP协议栈内核路径的性能测量，对于理解networking开销、优化系统架构具有重要实践价值。",
+        "summary_en": "As network interfaces in the data center get faster and faster, and an increasingly big portion of the services is implemented in software, we must wo...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "网络栈测量",
+          "性能分析",
+          "TCP/IP协议栈",
+          "内核追踪",
+          "CPU开销"
+        ],
+        "readingTime": 6,
+        "relevance": "high"
+      },
+      {
+        "title": "XDP Packet Mill: An L2 Frame Interception Framework",
+        "url": "https://www.semanticscholar.org/paper/083f9e55b149a406c51bdb842125c3df29a82ed2",
+        "summary": "本文提出XDP Packet Mill框架，这是一个L2层帧拦截框架，用于解决传统Linux网络栈在处理高速现代网卡高包率时的性能瓶颈问题。作者分析了kernel bypass方案（如DPDK）的缺点，包括需要独占网卡访问权限、缺乏特权指令访问能力以及破坏现有应用兼容性等。XDP Packet Mill利用eXpress Data Path (XDP)技术，在L2层实现高效的数据包拦截和处理，提供了介于传统内核栈和完全bypass之间的折中方案。该框架允许在保持Linux内核网络栈完整性的同时，实现接近kernel bypass的高性能数据平面处理能力。",
+        "summary_en": "Traditional Linux network stacks struggle to handle the high packet rates of modern Network Interface Cards (NICs), pushing high-performance users tow...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "XDP",
+          "eBPF",
+          "kernel bypass",
+          "L2帧拦截",
+          "高性能网络",
+          "DPDK",
+          "网络子系统"
+        ],
+        "readingTime": 18,
+        "relevance": "high"
+      },
+      {
+        "title": "Fast Packet Processing with eBPF and XDP",
+        "url": "https://www.semanticscholar.org/paper/18641327df6725b9c1dc51645e8d787d459ca69c",
+        "summary": "本文介绍了eBPF（扩展Berkeley数据包过滤器）及其在XDP（快速数据路径）中的应用。eBPF是Linux内核内部的指令集和执行环境，允许在运行时对内核进行编程和修改。XDP是Linux内核网络层，能够在靠近网卡的层面处理数据包，实现高速数据包转发。开发者可以使用C或P4语言编写eBPF程序来操控XDP，实现高性能网络数据包处理。这是Linux内核网络子系统中非常重要的技术方向。",
+        "summary_en": "Extended Berkeley Packet Filter (eBPF) is an instruction set and an execution environment inside the Linux kernel. It enables modification, interactio...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "Packet Processing",
+          "Linux Kernel",
+          "Networking",
+          "Kernel Bypass"
+        ],
+        "readingTime": 4,
+        "relevance": "high"
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for April 16, 2026",
+        "url": "https://lwn.net/Articles/1066922/",
+        "summary": "这是LWN.net的周刊合集，包含当周Linux内核相关的多个主题报道。LWN周刊通常涵盖内核更新、安全公告、驱动新闻等，具体本期是否包含网络相关内容需要查看目录详情。",
+        "source": "LWN.net",
+        "tags": [
+          "内核更新",
+          "技术新闻",
+          "开源社区"
+        ],
+        "readingTime": 20,
+        "relevance": "medium"
+      },
+      {
+        "title": "LWN.net Weekly Edition for March 26, 2026",
+        "url": "https://lwn.net/Articles/1063660/",
+        "summary": "LWN.net Weekly Edition 是该网站每周一次的综合性汇编，通常包含Linux内核更新、驱动新闻、安全补丁、网络子系统变化等技术内容。但由于仅提供标题信息，无法确定本期是否包含网络相关主题。LWN.net是Linux内核社区的重要资讯来源，其周刊内容通常涉及内核开发的最新进展。",
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核",
+          "开源社区",
+          "技术新闻",
+          "驱动程序",
+          "内核更新"
+        ],
+        "readingTime": 1,
+        "relevance": "medium"
+      },
+      {
+        "title": "LWN.net Weekly Edition for March 19, 2026",
+        "url": "https://lwn.net/Articles/1062571/",
+        "summary": "LWN.net 是知名的 Linux/开源技术新闻网站，其 Weekly Edition 通常包含多篇文章，涵盖内核更新、文件系统、驱动、安全等主题。由于仅提供标题而未提供具体文章内容，无法确定本期的具体主题范围。LWN.net 周刊通常会包含部分 Linux 内核网络相关的讨论，但具体占比取决于该期内容。",
+        "source": "LWN.net",
+        "tags": [
+          "LWN.net",
+          "周刊",
+          "Linux新闻",
+          "待定内容"
+        ],
+        "readingTime": 0,
+        "relevance": "medium"
+      },
+      {
+        "title": "Intel IRDMA Driver Adds Support For GEN4 Hardware In Linux 7.1",
+        "url": "https://www.phoronix.com/news/Intel-IRDMA-Gen4-Linux-7.1",
+        "summary": "Intel IRDMA驱动新增对第四代硬件的支持，计划整合到Linux 7.1内核中。IRDMA是Intel的RDMA（远程直接内存访问）技术实现，旨在为高性能计算和数据中心场景提供低延迟、低CPU占用的网络通信能力。此次更新将为新硬件提供驱动支持，提升网络性能表现。",
+        "source": "Phoronix",
+        "tags": [
+          "驱动",
+          "RDMA",
+          "Intel",
+          "网络性能",
+          "硬件支持"
+        ],
+        "readingTime": 1,
+        "relevance": "high"
+      }
+    ]
   },
-  "tagStats": {}
+  "tagStats": {
+    "eBPF": 5,
+    "XDP": 3,
+    "网络加速": 1,
+    "分布式训练": 1,
+    "TCP/IP协议栈": 2,
+    "内核旁路": 1,
+    "数据中心网络": 1,
+    "网络追踪": 1,
+    "内核观测": 1,
+    "数据包分析": 1,
+    "性能诊断": 1,
+    "网络栈测量": 1,
+    "性能分析": 1,
+    "内核追踪": 1,
+    "CPU开销": 1,
+    "kernel bypass": 1,
+    "L2帧拦截": 1,
+    "高性能网络": 1,
+    "DPDK": 1,
+    "网络子系统": 1,
+    "Packet Processing": 1,
+    "Linux Kernel": 1,
+    "Networking": 1,
+    "Kernel Bypass": 1,
+    "内核更新": 2,
+    "技术新闻": 2,
+    "开源社区": 2,
+    "Linux内核": 1,
+    "驱动程序": 1,
+    "LWN.net": 1,
+    "周刊": 1,
+    "Linux新闻": 1,
+    "待定内容": 1,
+    "驱动": 1,
+    "RDMA": 1,
+    "Intel": 1,
+    "网络性能": 1,
+    "硬件支持": 1
+  }
 }
