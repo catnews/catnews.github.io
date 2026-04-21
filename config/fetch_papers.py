@@ -12,7 +12,7 @@ import random
 
 ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
-MINIMAX_API = "https://api.minimax.chat/v1/text/chatcompletion_v2"
+MINIMAX_API = "https://api.minimaxi.com/v1/chat/completions"
 
 REQUEST_DELAY_MIN = 3
 REQUEST_DELAY_MAX = 5
@@ -69,12 +69,12 @@ def call_minimax(prompt):
     
     try:
         payload = {
-            "model": "abab6.5s-chat",
+            "model": "MiniMax-M2.7-highspeed",
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}
             ],
-            "temperature": 0.3,
+            "temperature": 0.7,
             "max_tokens": 500
         }
         
