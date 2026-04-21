@@ -7,25 +7,32 @@ from datetime import datetime, timezone, timedelta
 import os
 import hashlib
 import re
+import time
+import random
 
 ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 MINIMAX_API = "https://api.minimax.chat/v1/text/chatcompletion_v2"
 
+REQUEST_DELAY_MIN = 3
+REQUEST_DELAY_MAX = 5
+LLM_DELAY_MIN = 2
+LLM_DELAY_MAX = 4
+
 SEARCH_KEYWORDS = [
     "Linux kernel network stack",
-    "eBPF XDP packet processing",
-    "Linux TCP IP implementation",
-    "Linux netfilter nftables",
-    "Linux network driver",
-    "Linux kernel bypass networking",
-    "Linux virtio vhost network",
-    "Linux socket performance",
+    "eBPF XDP packet processing Linux",
+    "Linux TCP IP implementation kernel",
+    "Linux netfilter nftables kernel",
+    "Linux network driver kernel",
+    "Linux kernel bypass DPDK",
+    "Linux virtio vhost networking",
+    "Linux socket performance kernel",
 ]
 
 MIN_YEAR = 2020
-MAX_RESULTS = 10
-MAX_CANDIDATES = 30
+MAX_RESULTS = 8
+MAX_CANDIDATES = 25
 
 SYSTEM_PROMPT = """你是一个专业的论文筛选助手。你的任务是：
 1. 判断论文是否与 Linux 内核网络子系统直接相关
@@ -49,10 +56,15 @@ Linux 内核网络相关主题包括：
 - 其他操作系统的网络实现
 - 与 Linux 内核网络无关的 eBPF 应用"""
 
+def random_delay(min_sec, max_sec):
+    delay = random.uniform(min_sec, max_sec)
+    print(f"  Waiting {delay:.1f}s...")
+    time.sleep(delay)
+
 def call_minimax(prompt):
     api_key = os.environ.get("MINIMAX_API_KEY", "")
     if not api_key:
-        print("Warning: MINIMAX_API_KEY not set, using fallback")
+        print("Warning: MINIMAX_API_KEY not set")
         return None
     
     try:
@@ -92,7 +104,7 @@ def analyze_paper_with_llm(title, abstract):
 请回答以下问题（JSON格式）：
 1. relevance: 这篇论文是否与 Linux 内核网络子系统直接相关？返回 "high", "medium", "low" 或 "none"
 2. summary: 如果相关，生成150-300字的中文总结，说明论文的核心内容、技术方案、对Linux内核的贡献
-3. tags: 提取2-4个特性标签，可选：eBPF, XDP, 旁路, TCP/IP, Socket, Netfilter, 路由, 网桥, 驱动, 包处理, 虚拟化, 性能
+3. tags: 提取2-4个特性标签，可选：eBPF, XDP, 旁路, TCP/IP, Socket, Netfilter, 路由, 网桥, 动, 包处理, 虚拟化, 性能
 4. readingTime: 估算阅读时长（分钟，基于内容深度）
 
 返回格式：
@@ -110,9 +122,11 @@ def analyze_paper_with_llm(title, abstract):
         pass
     return None
 
-def fetch_arxiv_papers(query, max_results=10):
+def fetch_arxiv_papers(query, max_results=5):
     papers = []
     try:
+        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+        
         params = {
             "search_query": f"all:{query}",
             "start": 0,
@@ -122,7 +136,7 @@ def fetch_arxiv_papers(query, max_results=10):
         }
         url = f"{ARXIV_API}?{urllib.parse.urlencode(params)}"
         
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
         with urllib.request.urlopen(req, timeout=30) as response:
             data = response.read().decode("utf-8")
         
@@ -149,7 +163,7 @@ def fetch_arxiv_papers(query, max_results=10):
                     "title": title,
                     "url": url_val,
                     "abstract": summary,
-                    "source": "arxiv",
+                    "source": "arXiv",
                     "year": year
                 })
     except Exception as e:
@@ -157,9 +171,11 @@ def fetch_arxiv_papers(query, max_results=10):
     
     return papers
 
-def fetch_semantic_scholar_papers(query, max_results=10):
+def fetch_semantic_scholar_papers(query, max_results=5):
     papers = []
     try:
+        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+        
         params = {
             "query": query,
             "limit": max_results,
@@ -168,7 +184,7 @@ def fetch_semantic_scholar_papers(query, max_results=10):
         }
         url = f"{SEMANTIC_SCHOLAR_API}?{urllib.parse.urlencode(params)}"
         
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
         with urllib.request.urlopen(req, timeout=30) as response:
             data = json.loads(response.read().decode("utf-8"))
         
@@ -188,6 +204,51 @@ def fetch_semantic_scholar_papers(query, max_results=10):
                 })
     except Exception as e:
         print(f"Semantic Scholar fetch error: {e}")
+    
+    return papers
+
+def fetch_google_scholar_papers(query, max_results=5):
+    papers = []
+    try:
+        random_delay(REQUEST_DELAY_MIN + 2, REQUEST_DELAY_MAX + 2)
+        
+        serpapi_key = os.environ.get("SERPAPI_KEY", "")
+        if not serpapi_key:
+            print("  SERPAPI_KEY not set, skipping Google Scholar")
+            return papers
+        
+        params = {
+            "engine": "google_scholar",
+            "q": query + " Linux kernel",
+            "as_ylo": MIN_YEAR,
+            "num": max_results,
+            "api_key": serpapi_key
+        }
+        url = f"https://serpapi.com/search?{urllib.parse.urlencode(params)}"
+        
+        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        
+        for item in data.get("organic_results", []):
+            title = item.get("title", "")
+            snippet = item.get("snippet", "") or ""
+            link = item.get("link", "")
+            
+            result_id = item.get("result_id", "")
+            if result_id and not link:
+                link = f"https://scholar.google.com/scholar?q={urllib.parse.quote(title)}"
+            
+            if title and snippet:
+                papers.append({
+                    "title": title,
+                    "url": link,
+                    "abstract": snippet,
+                    "source": "Google Scholar",
+                    "year": MIN_YEAR
+                })
+    except Exception as e:
+        print(f"Google Scholar fetch error: {e}")
     
     return papers
 
@@ -229,7 +290,8 @@ def count_tags(papers):
     return tag_counts
 
 def main():
-    print("Starting Linux kernel networking paper fetch with LLM analysis...")
+    print("Starting Linux kernel networking paper fetch...")
+    print("=" * 50)
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
     docs_dir = os.path.join(script_dir, "..", "docs")
@@ -239,19 +301,33 @@ def main():
     print(f"Loaded {len(existing_hashes)} existing paper hashes")
     
     candidates = []
-    for keyword in SEARCH_KEYWORDS:
-        print(f"Searching: {keyword}")
-        candidates.extend(fetch_arxiv_papers(keyword, 8))
-        candidates.extend(fetch_semantic_scholar_papers(keyword, 8))
+    
+    print("\n[Phase 1] Fetching from arXiv...")
+    for keyword in SEARCH_KEYWORDS[:4]:
+        print(f"  Keyword: {keyword}")
+        candidates.extend(fetch_arxiv_papers(keyword, 3))
+    
+    print("\n[Phase 2] Fetching from Semantic Scholar...")
+    for keyword in SEARCH_KEYWORDS[4:]:
+        print(f"  Keyword: {keyword}")
+        candidates.extend(fetch_semantic_scholar_papers(keyword, 3))
+    
+    print("\n[Phase 3] Fetching from Google Scholar (optional)...")
+    for keyword in SEARCH_KEYWORDS[:2]:
+        print(f"  Keyword: {keyword}")
+        candidates.extend(fetch_google_scholar_papers(keyword, 2))
     
     candidates = deduplicate_papers(candidates, existing_hashes)
     candidates = candidates[:MAX_CANDIDATES]
     
-    print(f"Found {len(candidates)} candidates, analyzing with LLM...")
+    print(f"\n[Phase 4] LLM Analysis of {len(candidates)} candidates...")
+    print("=" * 50)
     
     selected_papers = []
     for i, paper in enumerate(candidates):
-        print(f"Analyzing [{i+1}/{len(candidates)}]: {paper['title'][:50]}...")
+        print(f"\n[{i+1}/{len(candidates)}] {paper['title'][:60]}...")
+        
+        random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
         
         analysis = analyze_paper_with_llm(paper['title'], paper['abstract'])
         
@@ -266,14 +342,18 @@ def main():
                 "readingTime": analysis.get('readingTime', 5),
                 "relevance": analysis.get('relevance')
             })
-            print(f"  -> Selected (relevance: {analysis.get('relevance')})")
+            print(f"  ✓ Selected (relevance: {analysis.get('relevance')})")
+        else:
+            print(f"  ✗ Skipped (relevance: {analysis.get('relevance', 'none') if analysis else 'error'})")
         
         if len(selected_papers) >= MAX_RESULTS:
+            print(f"\nReached max results ({MAX_RESULTS}), stopping...")
             break
     
     tag_counts = count_tags(selected_papers)
     
-    print(f"Selected {len(selected_papers)} relevant papers")
+    print("\n" + "=" * 50)
+    print(f"Summary: Selected {len(selected_papers)} relevant papers")
     
     beijing_now = datetime.now(timezone.utc) + timedelta(hours=8)
     today = beijing_now.strftime("%Y-%m-%d")
@@ -290,7 +370,8 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
     
-    print(f"Saved to {output_path}")
+    print(f"Output: {output_path}")
+    print("=" * 50)
 
 if __name__ == "__main__":
     main()
