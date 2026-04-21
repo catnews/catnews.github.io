@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CatNews - 每日Linux内核网络论文精选</title>
+    <title>CatNews - 每日Linux内核网络内容精选</title>
     <style>
         * {
             margin: 0;
@@ -178,6 +178,25 @@
             color: #2563eb;
         }
         
+        .source-tag.lwnnet {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .source-tag.phoronix {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+        }
+        
+        .source-tag.kernelnewbies {
+            background-color: #fce7f3;
+            color: #db2777;
+        }
+        
+        .news-section {
+            border-bottom-color: #f59e0b;
+        }
+        
         .feature-tag {
             background-color: #d1fae5;
             color: #059669;
@@ -280,7 +299,7 @@
 <body>
     <div class="page-wrapper">
         <header>
-            <h1>CatNews - 每日Linux内核网络论文精选</h1>
+            <h1>CatNews - 每日Linux内核网络内容精选</h1>
             <div class="date-nav">
                 <button id="prevDay">&larr; 前一天</button>
                 <span class="current-date" id="currentDate">-</span>
@@ -357,7 +376,7 @@
                     const tag = item.dataset.tag;
                     selectedFilter = selectedFilter === tag ? null : tag;
                     renderTagStats(currentData?.tagStats || {});
-                    renderPapers(currentData);
+                    renderItems(currentData);
                 });
             });
             
@@ -366,58 +385,95 @@
                 clearBtn.addEventListener('click', () => {
                     selectedFilter = null;
                     renderTagStats(currentData?.tagStats || {});
-                    renderPapers(currentData);
+                    renderItems(currentData);
                 });
             }
         }
         
-        function renderPapers(data) {
+        function renderItems(data) {
             const content = document.getElementById('content');
             
-            if (!data || !data.categories || !data.categories.papers) {
+            if (!data || !data.categories) {
                 content.innerHTML = '<div class="empty-message">暂无数据</div>';
                 return;
             }
             
-            let papers = data.categories.papers;
+            let html = '';
             
-            if (selectedFilter) {
-                papers = papers.filter(paper => 
-                    paper.tags && paper.tags.includes(selectedFilter)
-                );
-            }
+            const papers = data.categories.papers || [];
+            const news = data.categories.news || [];
             
-            if (papers.length === 0) {
-                content.innerHTML = `<div class="empty-message">${selectedFilter ? '当前筛选无匹配论文' : '暂无数据'}</div>`;
-                return;
-            }
-            
-            let html = '<section class="category-section">';
-            html += `<h2 class="category-title">论文 <span class="paper-count">共 ${papers.length} 篇${selectedFilter ? ` (${selectedFilter})` : ''}</span></h2>`;
-            
-            papers.forEach(paper => {
-                const chineseChars = paper.summary.replace(/[^\u4e00-\u9fa5]/g, '').length;
-                const readingTime = paper.readingTime || Math.max(1, Math.ceil(chineseChars / 350));
-                const sourceClass = paper.source.toLowerCase().replace(/[^a-z]/g, '');
-                const tags = paper.tags || [];
+            if (papers.length > 0) {
+                let filteredPapers = selectedFilter 
+                    ? papers.filter(p => p.tags && p.tags.includes(selectedFilter))
+                    : papers;
                 
-                html += '<div class="paper-item">';
-                html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
-                html += `<div class="paper-summary">${paper.summary}</div>`;
-                html += '<div class="paper-meta">';
-                html += `<span class="source-tag ${sourceClass}">${paper.source}</span>`;
-                if (tags.length > 0) {
-                    html += '<div class="tags-container">';
-                    tags.forEach(tag => {
-                        const highlight = tag === selectedFilter ? 'font-weight: bold; background-color: #a7f3d0;' : '';
-                        html += `<span class="feature-tag" style="${highlight}">${tag}</span>`;
+                if (filteredPapers.length > 0) {
+                    html += '<section class="category-section">';
+                    html += `<h2 class="category-title">论文 <span class="paper-count">共 ${filteredPapers.length} 篇</span></h2>`;
+                    
+                    filteredPapers.forEach(paper => {
+                        const readingTime = paper.readingTime || 5;
+                        const sourceClass = paper.source.toLowerCase().replace(/[^a-z]/g, '');
+                        const tags = paper.tags || [];
+                        
+                        html += '<div class="paper-item">';
+                        html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
+                        html += `<div class="paper-summary">${paper.summary}</div>`;
+                        html += '<div class="paper-meta">';
+                        html += `<span class="source-tag ${sourceClass}">${paper.source}</span>`;
+                        if (tags.length > 0) {
+                            html += '<div class="tags-container">';
+                            tags.forEach(tag => {
+                                const highlight = tag === selectedFilter ? 'font-weight: bold;' : '';
+                                html += `<span class="feature-tag" style="${highlight}">${tag}</span>`;
+                            });
+                            html += '</div>';
+                        }
+                        html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
+                        html += '</div></div>';
                     });
-                    html += '</div>';
+                    html += '</section>';
                 }
-                html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
-                html += '</div></div>';
-            });
-            html += '</section>';
+            }
+            
+            if (news.length > 0) {
+                let filteredNews = selectedFilter 
+                    ? news.filter(n => n.tags && n.tags.includes(selectedFilter))
+                    : news;
+                
+                if (filteredNews.length > 0) {
+                    html += '<section class="category-section news-section">';
+                    html += `<h2 class="category-title">资讯 <span class="paper-count">共 ${filteredNews.length} 条</span></h2>`;
+                    
+                    filteredNews.forEach(item => {
+                        const readingTime = item.readingTime || 3;
+                        const sourceClass = item.source.toLowerCase().replace(/[^a-z]/g, '');
+                        const tags = item.tags || [];
+                        
+                        html += '<div class="paper-item">';
+                        html += `<div class="paper-title"><a href="${item.url}" target="_blank">${item.title}</a></div>`;
+                        html += `<div class="paper-summary">${item.summary}</div>`;
+                        html += '<div class="paper-meta">';
+                        html += `<span class="source-tag ${sourceClass}">${item.source}</span>`;
+                        if (tags.length > 0) {
+                            html += '<div class="tags-container">';
+                            tags.forEach(tag => {
+                                const highlight = tag === selectedFilter ? 'font-weight: bold;' : '';
+                                html += `<span class="feature-tag" style="${highlight}">${tag}</span>`;
+                            });
+                            html += '</div>';
+                        }
+                        html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
+                        html += '</div></div>';
+                    });
+                    html += '</section>';
+                }
+            }
+            
+            if (!html) {
+                html = `<div class="empty-message">${selectedFilter ? '当前筛选无匹配内容' : '暂无数据'}</div>`;
+            }
             
             content.innerHTML = html;
         }
@@ -432,7 +488,7 @@
             }
             
             renderTagStats(data.tagStats || {});
-            renderPapers(data);
+            renderItems(data);
         }
         
         async function loadData(date) {

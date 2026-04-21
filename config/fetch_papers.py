@@ -29,37 +29,30 @@ SEARCH_KEYWORDS = [
 ]
 
 MIN_YEAR = 2020
-MAX_RESULTS = 8
-MAX_CANDIDATES = 25
+MAX_PAPERS = 5
+MAX_NEWS = 5
+MAX_CANDIDATES = 20
 
-SYSTEM_PROMPT = """你是一个专业的论文筛选助手。你的任务是：
-1. 判断论文是否与 Linux 内核网络子系统直接相关
-2. 为相关论文生成高质量中文总结（150-300字）
-3. 提取合适的特性标签
-4. 估算阅读时长
+PAPER_PROMPT = """你是一个专业的论文筛选助手。分析论文是否与 Linux 内核网络子系统直接相关。
 
-Linux 内核网络相关主题包括：
-- Linux TCP/IP 协议栈实现与优化
-- Linux Socket API 与性能
-- eBPF/XDP 数据包处理
-- Netfilter/nftables 防火墙
-- Kernel Bypass (DPDK)
-- Virtio/vHost 虚拟化网络
-- Linux 网络驱动开发
-- Linux 路由、网桥、包处理
+Linux 内核网络相关主题：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter/nftables、Kernel Bypass、Virtio/vHost、网络驱动、路由/网桥/包处理。
 
-排除以下内容：
-- 通用网络协议研究（不涉及 Linux 内核）
-- 纯应用层网络编程
-- 其他操作系统的网络实现
-- 与 Linux 内核网络无关的 eBPF 应用"""
+返回JSON格式：
+{"relevance": "high/medium/low/none", "summary": "中文总结150-300字", "tags": ["eBPF","XDP"...], "readingTime": 分钟数}"""
+
+NEWS_PROMPT = """你是一个技术资讯筛选助手。分析文章是否与 Linux 内核网络相关。
+
+相关主题：网络性能测试、内核网络更新、驱动发布、网络子系统讨论等。
+
+返回JSON格式：
+{"relevance": "high/medium/low/none", "summary": "中文总结100-200字", "tags": ["性能","驱动"...], "readingTime": 分钟数}"""
 
 def random_delay(min_sec, max_sec):
     delay = random.uniform(min_sec, max_sec)
     print(f"  Waiting {delay:.1f}s...")
     time.sleep(delay)
 
-def call_minimax(prompt, max_retries=3):
+def call_minimax(prompt, system_prompt, max_retries=3):
     api_key = os.environ.get("MINIMAX_API_KEY", "")
     if not api_key:
         print("Warning: MINIMAX_API_KEY not set")
@@ -70,7 +63,7 @@ def call_minimax(prompt, max_retries=3):
             payload = {
                 "model": "MiniMax-M2.7",
                 "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.7,
@@ -94,7 +87,7 @@ def call_minimax(prompt, max_retries=3):
         except urllib.error.HTTPError as e:
             if e.code == 429:
                 wait_time = 30 + attempt * 20
-                print(f"  Rate limited (429), waiting {wait_time}s before retry...")
+                print(f"  Rate limited (429), waiting {wait_time}s...")
                 time.sleep(wait_time)
             else:
                 print(f"MiniMax API HTTP error: {e.code} {e.reason}")
@@ -103,27 +96,18 @@ def call_minimax(prompt, max_retries=3):
             print(f"MiniMax API error: {e}")
             if attempt < max_retries - 1:
                 time.sleep(10)
-            else:
-                return None
     
     return None
 
-def analyze_paper_with_llm(title, abstract):
-    prompt = f"""请分析以下论文：
+def analyze_item_with_llm(title, content, is_news=False):
+    prompt = f"""标题：{title}
+内容：{content[:400]}
 
-标题：{title}
-摘要：{abstract[:500]}
-
-请回答以下问题（JSON格式）：
-1. relevance: 这篇论文是否与 Linux 内核网络子系统直接相关？返回 "high", "medium", "low" 或 "none"
-2. summary: 如果相关，生成150-300字的中文总结，说明论文的核心内容、技术方案、对Linux内核的贡献
-3. tags: 提取2-4个特性标签，可选：eBPF, XDP, 旁路, TCP/IP, Socket, Netfilter, 路由, 网桥, 动, 包处理, 虚拟化, 性能
-4. readingTime: 估算阅读时长（分钟，基于内容深度）
-
-返回格式：
-{{"relevance": "...", "summary": "...", "tags": [...], "readingTime": ...}}"""
+请分析并返回JSON。"""
     
-    response = call_minimax(prompt)
+    system_prompt = NEWS_PROMPT if is_news else PAPER_PROMPT
+    response = call_minimax(prompt, system_prompt)
+    
     if not response:
         return None
     
@@ -235,59 +219,104 @@ def fetch_semantic_scholar_papers(query, max_results=5):
     
     return papers
 
-def fetch_google_scholar_papers(query, max_results=5):
-    papers = []
+def fetch_lwn_news():
+    news = []
     try:
-        random_delay(REQUEST_DELAY_MIN + 2, REQUEST_DELAY_MAX + 2)
+        print("  Fetching LWN.net...")
+        time.sleep(3)
         
-        serpapi_key = os.environ.get("SERPAPI_KEY", "")
-        if not serpapi_key:
-            print("  SERPAPI_KEY not set, skipping Google Scholar")
-            return papers
-        
-        params = {
-            "engine": "google_scholar",
-            "q": query + " Linux kernel",
-            "as_ylo": MIN_YEAR,
-            "num": max_results,
-            "api_key": serpapi_key
-        }
-        url = f"https://serpapi.com/search?{urllib.parse.urlencode(params)}"
-        
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
+        req = urllib.request.Request(
+            "https://lwn.net/Archives/",
+            headers={"User-Agent": "CatNews/2.0"}
+        )
         with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode("utf-8"))
+            html = response.read().decode("utf-8")
         
-        for item in data.get("organic_results", []):
-            title = item.get("title", "")
-            snippet = item.get("snippet", "") or ""
-            link = item.get("link", "")
-            
-            result_id = item.get("result_id", "")
-            if result_id and not link:
-                link = f"https://scholar.google.com/scholar?q={urllib.parse.quote(title)}"
-            
-            if title and snippet:
-                papers.append({
-                    "title": title,
-                    "url": link,
-                    "abstract": snippet,
-                    "source": "Google Scholar",
-                    "year": MIN_YEAR
+        network_keywords = ["network", "net", "TCP", "socket", "eBPF", "XDP", "driver", "packet"]
+        
+        links = re.findall(r'<a href="/Articles/(\d+)/"[^>]*>([^<]+)</a>', html)
+        for link_id, title in links[:20]:
+            title_lower = title.lower()
+            if any(kw.lower() in title_lower for kw in network_keywords):
+                news.append({
+                    "title": title.strip(),
+                    "url": f"https://lwn.net/Articles/{link_id}/",
+                    "abstract": title,
+                    "source": "LWN.net"
                 })
+        
+        print(f"    Found {len(news)} LWN articles")
     except Exception as e:
-        print(f"Google Scholar fetch error: {e}")
+        print(f"LWN fetch error: {e}")
     
-    return papers
+    return news[:10]
 
-def get_paper_hash(title):
+def fetch_phoronix_news():
+    news = []
+    try:
+        print("  Fetching Phoronix...")
+        time.sleep(3)
+        
+        req = urllib.request.Request(
+            "https://www.phoronix.com/news/Linux-Networking",
+            headers={"User-Agent": "CatNews/2.0"}
+        )
+        with urllib.request.urlopen(req, timeout=30) as response:
+            html = response.read().decode("utf-8")
+        
+        articles = re.findall(r'<a[^>]*href="([^"]+)"[^>]*>([^<]{20,}?)</a>', html)
+        for url, title in articles[:10]:
+            if title.strip() and not url.startswith("#"):
+                news.append({
+                    "title": title.strip(),
+                    "url": url if url.startswith("http") else f"https://www.phoronix.com{url}",
+                    "abstract": title.strip(),
+                    "source": "Phoronix"
+                })
+        
+        print(f"    Found {len(news)} Phoronix articles")
+    except Exception as e:
+        print(f"Phoronix fetch error: {e}")
+    
+    return news[:5]
+
+def fetch_kernel_newbies():
+    news = []
+    try:
+        print("  Fetching Kernel Newbies...")
+        time.sleep(3)
+        
+        req = urllib.request.Request(
+            "https://kernelnewbies.org/KernelMap",
+            headers={"User-Agent": "CatNews/2.0"}
+        )
+        with urllib.request.urlopen(req, timeout=30) as response:
+            html = response.read().decode("utf-8")
+        
+        network_sections = re.findall(r'(Network[^<]*|TCP[^<]*|Socket[^<]*|Driver[^<]*)', html)
+        for section in network_sections[:5]:
+            news.append({
+                "title": section.strip(),
+                "url": "https://kernelnewbies.org/KernelMap",
+                "abstract": section.strip(),
+                "source": "Kernel Newbies"
+            })
+        
+        print(f"    Found {len(news)} Kernel Newbies items")
+    except Exception as e:
+        print(f"Kernel Newbies fetch error: {e}")
+    
+    return news[:3]
+
+def get_hash(title):
     normalized = re.sub(r'[^\w]', '', title.lower())
     return hashlib.md5(normalized.encode()).hexdigest()
 
 def load_existing_hashes(docs_dir):
-    hashes = set()
+    hashes = {"papers": set(), "news": set()}
     if not os.path.exists(docs_dir):
         return hashes
+    
     for filename in os.listdir(docs_dir):
         if filename.endswith('.json'):
             filepath = os.path.join(docs_dir, filename)
@@ -295,30 +324,32 @@ def load_existing_hashes(docs_dir):
                 with open(filepath, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     for paper in data.get('categories', {}).get('papers', []):
-                        hashes.add(get_paper_hash(paper['title']))
+                        hashes["papers"].add(get_hash(paper['title']))
+                    for item in data.get('categories', {}).get('news', []):
+                        hashes["news"].add(get_hash(item['title']))
             except:
                 pass
     return hashes
 
-def deduplicate_papers(papers, existing_hashes):
+def deduplicate(items, existing_hashes, hash_key="papers"):
     seen = set()
     unique = []
-    for p in papers:
-        hash_val = get_paper_hash(p["title"])
-        if hash_val not in seen and hash_val not in existing_hashes:
-            seen.add(hash_val)
-            unique.append(p)
+    for item in items:
+        h = get_hash(item["title"])
+        if h not in seen and h not in existing_hashes[hash_key]:
+            seen.add(h)
+            unique.append(item)
     return unique
 
-def count_tags(papers):
-    tag_counts = {}
-    for paper in papers:
-        for tag in paper.get("tags", []):
-            tag_counts[tag] = tag_counts.get(tag, 0) + 1
-    return tag_counts
+def count_tags(items):
+    counts = {}
+    for item in items:
+        for tag in item.get("tags", []):
+            counts[tag] = counts.get(tag, 0) + 1
+    return counts
 
 def main():
-    print("Starting Linux kernel networking paper fetch...")
+    print("Starting Linux kernel networking content fetch...")
     print("=" * 50)
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -326,62 +357,86 @@ def main():
     os.makedirs(docs_dir, exist_ok=True)
     
     existing_hashes = load_existing_hashes(docs_dir)
-    print(f"Loaded {len(existing_hashes)} existing paper hashes")
+    print(f"Loaded {len(existing_hashes['papers'])} paper hashes, {len(existing_hashes['news'])} news hashes")
     
-    candidates = []
+    paper_candidates = []
     
-    print("\n[Phase 1] Fetching from arXiv...")
-    for keyword in SEARCH_KEYWORDS[:4]:
+    print("\n[Phase 1] Fetching papers from arXiv...")
+    for keyword in SEARCH_KEYWORDS:
         print(f"  Keyword: {keyword}")
-        candidates.extend(fetch_arxiv_papers(keyword, 3))
+        paper_candidates.extend(fetch_arxiv_papers(keyword, 3))
     
-    print("\n[Phase 2] Fetching from Semantic Scholar...")
-    for keyword in SEARCH_KEYWORDS[4:]:
+    print("\n[Phase 2] Fetching papers from Semantic Scholar...")
+    for keyword in SEARCH_KEYWORDS:
         print(f"  Keyword: {keyword}")
-        candidates.extend(fetch_semantic_scholar_papers(keyword, 3))
+        paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 3))
     
-    print("\n[Phase 3] Fetching from Google Scholar (optional)...")
-    for keyword in SEARCH_KEYWORDS[:2]:
-        print(f"  Keyword: {keyword}")
-        candidates.extend(fetch_google_scholar_papers(keyword, 2))
+    paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
+    paper_candidates = paper_candidates[:MAX_CANDIDATES]
     
-    candidates = deduplicate_papers(candidates, existing_hashes)
-    candidates = candidates[:MAX_CANDIDATES]
+    print("\n[Phase 3] Fetching news from LWN/Phoronix...")
+    news_candidates = []
+    news_candidates.extend(fetch_lwn_news())
+    news_candidates.extend(fetch_phoronix_news())
+    news_candidates.extend(fetch_kernel_newbies())
     
-    print(f"\n[Phase 4] LLM Analysis of {len(candidates)} candidates...")
-    print("=" * 50)
+    news_candidates = deduplicate(news_candidates, existing_hashes, "news")
+    news_candidates = news_candidates[:10]
     
     selected_papers = []
-    for i, paper in enumerate(candidates):
-        print(f"\n[{i+1}/{len(candidates)}] {paper['title'][:60]}...")
-        
+    selected_news = []
+    
+    print(f"\n[Phase 4] LLM Analysis of {len(paper_candidates)} paper candidates...")
+    for i, paper in enumerate(paper_candidates):
+        print(f"\n[{i+1}/{len(paper_candidates)}] {paper['title'][:50]}...")
         random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
         
-        analysis = analyze_paper_with_llm(paper['title'], paper['abstract'])
+        analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
         
         if analysis and analysis.get('relevance') in ['high', 'medium']:
             selected_papers.append({
                 "title": paper['title'],
                 "url": paper['url'],
                 "summary": analysis.get('summary', ''),
-                "summary_en": paper['abstract'][:200] + "...",
+                "summary_en": paper['abstract'][:150] + "...",
                 "source": paper['source'],
                 "tags": analysis.get('tags', []),
                 "readingTime": analysis.get('readingTime', 5),
                 "relevance": analysis.get('relevance')
             })
-            print(f"  ✓ Selected (relevance: {analysis.get('relevance')})")
-        else:
-            print(f"  ✗ Skipped (relevance: {analysis.get('relevance', 'none') if analysis else 'error'})")
+            print(f"  ✓ Selected")
         
-        if len(selected_papers) >= MAX_RESULTS:
-            print(f"\nReached max results ({MAX_RESULTS}), stopping...")
+        if len(selected_papers) >= MAX_PAPERS:
             break
     
-    tag_counts = count_tags(selected_papers)
+    print(f"\n[Phase 5] LLM Analysis of {len(news_candidates)} news candidates...")
+    for i, item in enumerate(news_candidates):
+        print(f"\n[{i+1}/{len(news_candidates)}] {item['title'][:50]}...")
+        random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
+        
+        analysis = analyze_item_with_llm(item['title'], item['abstract'], is_news=True)
+        
+        if analysis and analysis.get('relevance') in ['high', 'medium']:
+            selected_news.append({
+                "title": item['title'],
+                "url": item['url'],
+                "summary": analysis.get('summary', ''),
+                "source": item['source'],
+                "tags": analysis.get('tags', []),
+                "readingTime": analysis.get('readingTime', 3),
+                "relevance": analysis.get('relevance')
+            })
+            print(f"  ✓ Selected")
+        
+        if len(selected_news) >= MAX_NEWS:
+            break
+    
+    paper_tags = count_tags(selected_papers)
+    news_tags = count_tags(selected_news)
+    all_tags = {**paper_tags, **news_tags}
     
     print("\n" + "=" * 50)
-    print(f"Summary: Selected {len(selected_papers)} relevant papers")
+    print(f"Summary: {len(selected_papers)} papers, {len(selected_news)} news")
     
     beijing_now = datetime.now(timezone.utc) + timedelta(hours=8)
     today = beijing_now.strftime("%Y-%m-%d")
@@ -389,9 +444,10 @@ def main():
     output = {
         "date": today,
         "categories": {
-            "papers": selected_papers
+            "papers": selected_papers,
+            "news": selected_news
         },
-        "tagStats": tag_counts
+        "tagStats": all_tags
     }
     
     output_path = os.path.join(docs_dir, f"{today}.json")
@@ -399,7 +455,6 @@ def main():
         json.dump(output, f, ensure_ascii=False, indent=2)
     
     print(f"Output: {output_path}")
-    print("=" * 50)
 
 if __name__ == "__main__":
     main()
