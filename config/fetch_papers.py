@@ -2,6 +2,7 @@
 import json
 import urllib.request
 import urllib.parse
+import urllib.error
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 import os
@@ -14,10 +15,10 @@ ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 MINIMAX_API = "https://api.minimaxi.com/v1/chat/completions"
 
-REQUEST_DELAY_MIN = 3
-REQUEST_DELAY_MAX = 5
-LLM_DELAY_MIN = 2
-LLM_DELAY_MAX = 4
+REQUEST_DELAY_MIN = 5
+REQUEST_DELAY_MAX = 8
+LLM_DELAY_MIN = 5
+LLM_DELAY_MAX = 10
 
 SEARCH_KEYWORDS = [
     "Linux kernel network stack",
@@ -61,39 +62,54 @@ def random_delay(min_sec, max_sec):
     print(f"  Waiting {delay:.1f}s...")
     time.sleep(delay)
 
-def call_minimax(prompt):
+def call_minimax(prompt, max_retries=3):
     api_key = os.environ.get("MINIMAX_API_KEY", "")
     if not api_key:
         print("Warning: MINIMAX_API_KEY not set")
         return None
     
-    try:
-        payload = {
-            "model": "MiniMax-M2.7",
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.7,
-            "max_tokens": 500
-        }
-        
-        data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            MINIMAX_API,
-            data=data,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
+    for attempt in range(max_retries):
+        try:
+            payload = {
+                "model": "MiniMax-M2.7",
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.7,
+                "max_tokens": 500
             }
-        )
+            
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                MINIMAX_API,
+                data=data,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                }
+            )
+            
+            with urllib.request.urlopen(req, timeout=60) as response:
+                result = json.loads(response.read().decode("utf-8"))
+                return result.get("choices", [{}])[0].get("message", {}).get("content", "")
         
-        with urllib.request.urlopen(req, timeout=60) as response:
-            result = json.loads(response.read().decode("utf-8"))
-            return result.get("choices", [{}])[0].get("message", {}).get("content", "")
-    except Exception as e:
-        print(f"MiniMax API error: {e}")
-        return None
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                wait_time = 30 + attempt * 20
+                print(f"  Rate limited (429), waiting {wait_time}s before retry...")
+                time.sleep(wait_time)
+            else:
+                print(f"MiniMax API HTTP error: {e.code} {e.reason}")
+                return None
+        except Exception as e:
+            print(f"MiniMax API error: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(10)
+            else:
+                return None
+    
+    return None
 
 def analyze_paper_with_llm(title, abstract):
     prompt = f"""请分析以下论文：
