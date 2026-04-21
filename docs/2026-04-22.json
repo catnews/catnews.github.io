@@ -1,0 +1,29 @@
+{
+  "date": "2026-04-22",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for April 2, 2026",
+        "url": "https://lwn.net/Articles/1064762/",
+        "abstract": " LWN.net Weekly Edition for April 2, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pa",
+        "summary": "LWN.net 2026年4月2日周刊本期主要报道：LiteLLM在PyPI被植入信息窃取恶意软件，数千次下载引发软件供应链安全警示；systemd年龄验证功能变更引发社区激烈争议；内核维护者对LLM自动审查系统提出异议；OpenBSD的ext4代码贡献因目的存疑被拒绝；Rust编译器新一代trait solver开发取得进展；Pandoc文档转换工具发布新版本。本期内容主要涉及开源社区治理、AI工具应用、安全事件等话题，未涉及Linux内核网络技术专题。",
+        "source": "LWN.net",
+        "tags": [
+          "软件供应链安全",
+          "LLM应用争议",
+          "Rust语言发展",
+          "开源社区治理"
+        ],
+        "readingTime": 2,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "软件供应链安全": 1,
+    "LLM应用争议": 1,
+    "Rust语言发展": 1,
+    "开源社区治理": 1
+  }
+}
