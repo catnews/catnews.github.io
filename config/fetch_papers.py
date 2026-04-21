@@ -69,7 +69,7 @@ def call_minimax(prompt):
     
     try:
         payload = {
-            "model": "MiniMax-M2.7-highspeed",
+            "model": "MiniMax-M2.7",
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}
