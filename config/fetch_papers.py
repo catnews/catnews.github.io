@@ -117,6 +117,33 @@ def call_minimax(prompt, system_prompt, max_retries=3):
     
     return None
 
+QUICK_FILTER_PROMPT = """你是论文筛选助手。快速判断文章是否与Linux内核网络子系统直接相关。
+
+Linux内核网络：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter、Kernel Bypass、Virtio、网络驱动、路由/网桥。
+
+严格标准：必须直接涉及Linux内核网络代码/实现，而非通用网络研究。
+
+返回JSON：{"relevance": "high/medium/low/none"}"""
+
+def quick_filter_relevance(title, abstract):
+    prompt = f"""标题：{title}
+摘要：{abstract[:200]}
+
+判断相关性，返回JSON。"""
+    
+    response = call_minimax(prompt, QUICK_FILTER_PROMPT)
+    if not response:
+        return "none"
+    
+    try:
+        json_match = re.search(r'\{[^{}]+\}', response)
+        if json_match:
+            result = json.loads(json_match.group())
+            return result.get('relevance', 'none')
+    except:
+        pass
+    return "none"
+
 def analyze_item_with_llm(title, content, is_news=False):
     prompt = f"""标题：{title}
 内容：{content[:400]}
@@ -452,28 +479,64 @@ def main():
         paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 5))
     
     paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
-    paper_candidates = paper_candidates[:MAX_CANDIDATES]
     
-    print("\n[Phase 3] Fetching news from LWN/Phoronix...")
+    print(f"\n[Phase 3] Quick filtering {len(paper_candidates)} paper candidates...")
+    filtered_candidates = []
+    for i, paper in enumerate(paper_candidates[:MAX_CANDIDATES]):
+        print(f"  [{i+1}] {paper['title'][:40]}...")
+        random_delay(2, 3)
+        
+        relevance = quick_filter_relevance(paper['title'], paper['abstract'])
+        print(f"    -> {relevance}")
+        
+        if relevance in ['high', 'medium']:
+            filtered_candidates.append(paper)
+        
+        if len(filtered_candidates) >= MAX_PAPERS * 2:
+            break
+    
+    print(f"  Filtered: {len(filtered_candidates)} relevant papers")
+    
+    print("\n[Phase 4] Fetching news from LWN/Phoronix...")
     news_candidates = []
     news_candidates.extend(fetch_lwn_news())
     news_candidates.extend(fetch_phoronix_news())
     news_candidates.extend(fetch_kernel_newbies())
     
     news_candidates = deduplicate(news_candidates, existing_hashes, "news")
-    news_candidates = news_candidates[:10]
+    
+    print(f"\n[Phase 5] Quick filtering {len(news_candidates)} news candidates...")
+    filtered_news = []
+    for i, item in enumerate(news_candidates[:15]):
+        if item.get('source') == 'LWN.net' and item.get('summary'):
+            filtered_news.append(item)
+            print(f"  [{i+1}] {item['title'][:40]}... -> pre-processed")
+        else:
+            print(f"  [{i+1}] {item['title'][:40]}...")
+            random_delay(2, 3)
+            
+            relevance = quick_filter_relevance(item['title'], item.get('abstract', item['title']))
+            print(f"    -> {relevance}")
+            
+            if relevance in ['high', 'medium']:
+                filtered_news.append(item)
+        
+        if len(filtered_news) >= MAX_NEWS * 2:
+            break
+    
+    print(f"  Filtered: {len(filtered_news)} relevant news")
     
     selected_papers = []
     selected_news = []
     
-    print(f"\n[Phase 4] LLM Analysis of {len(paper_candidates)} paper candidates...")
-    for i, paper in enumerate(paper_candidates):
-        print(f"\n[{i+1}/{len(paper_candidates)}] {paper['title'][:50]}...")
+    print(f"\n[Phase 6] Detailed analysis of {len(filtered_candidates)} filtered papers...")
+    for i, paper in enumerate(filtered_candidates):
+        print(f"\n[{i+1}/{len(filtered_candidates)}] {paper['title'][:50]}...")
         random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
         
         analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
         
-        if analysis and analysis.get('relevance') in ['high', 'medium']:
+        if analysis:
             selected_papers.append({
                 "title": paper['title'],
                 "url": paper['url'],
@@ -482,43 +545,38 @@ def main():
                 "source": paper['source'],
                 "tags": analysis.get('tags', [])[:4],
                 "readingTime": analysis.get('readingTime', 5),
-                "relevance": analysis.get('relevance')
+                "relevance": analysis.get('relevance', 'high')
             })
-            print(f"  ✓ Selected")
+            print(f"  ✓ Processed")
         
         if len(selected_papers) >= MAX_PAPERS:
             break
     
-    print(f"\n[Phase 5] Processing news...")
-    lwn_items = [n for n in news_candidates if n.get('source') == 'LWN.net' and n.get('summary')]
-    other_items = [n for n in news_candidates if n.get('source') != 'LWN.net' or not n.get('summary')]
-    
-    print(f"  LWN items (already processed): {len(lwn_items)}")
-    for item in lwn_items:
-        if len(selected_news) < MAX_NEWS:
-            selected_news.append(item)
-            print(f"    ✓ {item['title'][:40]}...")
-    
-    print(f"\n  Other items need analysis: {len(other_items)}")
-    for i, item in enumerate(other_items):
+    print(f"\n[Phase 7] Detailed analysis of {len(filtered_news)} filtered news...")
+    for i, item in enumerate(filtered_news):
         if len(selected_news) >= MAX_NEWS:
             break
-        print(f"\n  [{i+1}/{len(other_items)}] {item['title'][:50]}...")
-        random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
         
-        analysis = analyze_item_with_llm(item['title'], item.get('abstract', ''), is_news=True)
-        
-        if analysis and analysis.get('relevance') in ['high', 'medium']:
-            selected_news.append({
-                "title": item['title'],
-                "url": item['url'],
-                "summary": analysis.get('summary', ''),
-                "source": item['source'],
-                "tags": analysis.get('tags', [])[:4],
-                "readingTime": analysis.get('readingTime', 3),
-                "relevance": analysis.get('relevance')
-            })
-            print(f"    ✓ Selected")
+        if item.get('source') == 'LWN.net' and item.get('summary'):
+            selected_news.append(item)
+            print(f"  [{i+1}] {item['title'][:40]}... -> ✓ pre-processed")
+        else:
+            print(f"\n  [{i+1}/{len(filtered_news)}] {item['title'][:50]}...")
+            random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
+            
+            analysis = analyze_item_with_llm(item['title'], item.get('abstract', item['title']), is_news=True)
+            
+            if analysis:
+                selected_news.append({
+                    "title": item['title'],
+                    "url": item['url'],
+                    "summary": analysis.get('summary', ''),
+                    "source": item['source'],
+                    "tags": analysis.get('tags', [])[:4],
+                    "readingTime": analysis.get('readingTime', 3),
+                    "relevance": analysis.get('relevance', 'high')
+                })
+                print(f"    ✓ Processed")
     
     paper_tags = count_tags(selected_papers)
     news_tags = count_tags(selected_news)
