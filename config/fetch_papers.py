@@ -15,23 +15,30 @@ ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 MINIMAX_API = "https://api.minimaxi.com/v1/chat/completions"
 
-REQUEST_DELAY_MIN = 5
-REQUEST_DELAY_MAX = 8
-LLM_DELAY_MIN = 5
-LLM_DELAY_MAX = 10
-ARXIV_DELAY = 5
+REQUEST_DELAY_MIN = 3
+REQUEST_DELAY_MAX = 5
+LLM_DELAY_MIN = 3
+LLM_DELAY_MAX = 5
+ARXIV_DELAY = 3
 
 SEARCH_KEYWORDS = [
-    "Linux kernel network stack eBPF",
-    "Linux XDP packet processing",
-    "Linux TCP socket kernel",
+    "Linux kernel network",
+    "Linux eBPF networking",
+    "Linux XDP data path",
+    "Linux TCP IP kernel",
+    "Linux socket performance",
+    "Linux netfilter iptables",
     "Linux network driver",
+    "Linux kernel bypass",
+    "Linux packet processing",
+    "Linux virtio network",
+    "Linux network optimization",
 ]
 
 MIN_YEAR = 2020
-MAX_PAPERS = 5
-MAX_NEWS = 5
-MAX_CANDIDATES = 20
+MAX_PAPERS = 10
+MAX_NEWS = 8
+MAX_CANDIDATES = 40
 
 PAPER_PROMPT = """你是一个专业的论文筛选助手。分析论文是否与 Linux 内核网络子系统直接相关。
 
@@ -287,7 +294,7 @@ def fetch_lwn_news():
         links = re.findall(r'<a href="/Articles/(\d+)/"[^>]*>([^<]+)</a>', html)
         candidates = []
         
-        for link_id, title in links[:30]:
+        for link_id, title in links[:50]:
             title_lower = title.lower()
             if any(kw.lower() in title_lower for kw in network_keywords):
                 candidates.append({
@@ -296,9 +303,9 @@ def fetch_lwn_news():
                     "source": "LWN.net"
                 })
         
-        print(f"    Found {len(candidates)} candidates, processing top 3...")
+        print(f"    Found {len(candidates)} candidates, processing top 5...")
         
-        for i, article in enumerate(candidates[:3]):
+        for i, article in enumerate(candidates[:5]):
             print(f"    [{i+1}] {article['title'][:40]}...")
             time.sleep(2)
             
@@ -435,14 +442,14 @@ def main():
     paper_candidates = []
     
     print("\n[Phase 1] Fetching papers from arXiv...")
-    for keyword in SEARCH_KEYWORDS:
+    for keyword in SEARCH_KEYWORDS[:6]:
         print(f"  Keyword: {keyword}")
-        paper_candidates.extend(fetch_arxiv_papers(keyword, 3))
+        paper_candidates.extend(fetch_arxiv_papers(keyword, 5))
     
     print("\n[Phase 2] Fetching papers from Semantic Scholar...")
-    for keyword in SEARCH_KEYWORDS:
+    for keyword in SEARCH_KEYWORDS[6:]:
         print(f"  Keyword: {keyword}")
-        paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 3))
+        paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 5))
     
     paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
     paper_candidates = paper_candidates[:MAX_CANDIDATES]
