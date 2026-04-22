@@ -3,49 +3,191 @@
   "categories": {
     "papers": [
       {
-        "title": "Development of a Linux Kernel Driver for the SBNI Network Interface Using Remote Real-Time Processing Units",
-        "url": "https://www.semanticscholar.org/paper/34a6515b76c475885c397123f1fe5ca0915a5cb4",
-        "summary": "本文介绍了为SBNI（Siberian Board Network Interface）网络接口开发Linux内核驱动的技术方案。SBNI是Granch公司于90年代末开发的双绞线租用线路网络接口，专门用于地下采矿等危险环境下的长距离数据传输。论文重点讨论了如何利用远程实时处理单元来实现该网络接口的驱动程序开发，涉及到Linux内核网络子系统的驱动层开发、硬件抽象层设计以及实时数据传输机制的构建。虽然该应用场景较为特殊（工业/矿业网络），但核心技术是Linux内核网络驱动的设计与实现，对理解Linux网络子系统中的设备驱动框架具有参考价值。",
-        "summary_en": "This article covers the subject of developing a Linux kernel driver for the existing SBNI network interface for twisted-pair leased lines, which is us...",
+        "title": "Optimizing Kubernetes Network Performance: A Study of Container Network Interfaces and System Tuning Profiles",
+        "url": "https://www.semanticscholar.org/paper/e4d5536648476c1d9d2a9adc2b636407c4f25576",
+        "summary": "本文研究Kubernetes容器网络性能优化，聚焦容器网络接口（CNI）和系统调优配置文件。随着云原生技术发展，Kubernetes已成为容器编排的事实标准，其网络性能直接影响容器化应用的响应速度和吞吐量。本文涉及的关键技术包括容器网络接口的实现机制、系统内核参数调优以及容器网络性能基准测试，这些都与Linux内核网络子系统深度相关。通过优化TCP/IP协议栈参数、网卡配置和内核调度策略，可显著提升跨节点容器通信效率，降低网络延迟并提高整体集群吞吐量。",
+        "summary_en": "The rapid development of cloud computing and big data has led to containers becoming the top choice for application deployment platforms due to their ...",
         "source": "Semantic Scholar",
         "tags": [
-          "Linux内核驱动",
-          "网络驱动开发",
-          "嵌入式网络",
-          "工业网络通信"
+          "Kubernetes",
+          "容器网络/CNI",
+          "性能优化"
+        ],
+        "readingTime": 12,
+        "relevance": "high"
+      },
+      {
+        "title": "Exploring the Network Performance Management of Kubernetes in Edge Devices",
+        "url": "https://www.semanticscholar.org/paper/144778b811de5a72183657637553bfc4759890a0",
+        "summary": "该论文研究Kubernetes环境下边缘设备的网络性能管理，重点分析Linux tc（traffic control）在容器网络带宽管理中的应用问题。论文通过实验发现tc在Kubernetes环境中无法提供稳定的网络性能，经分析识别出根本原因是Kubernetes与Linux tc之间的参数调优不当。这是一个直接涉及Linux内核网络流量控制子系统与容器编排系统交互的实际工程问题，对理解容器网络性能优化具有重要参考价值。",
+        "summary_en": "This paper examines the effect of parameter tuning on network bandwidth management in Kubernetes environments. Although Linux tc is commonly used for ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Kubernetes",
+          "Linux tc",
+          "边缘计算",
+          "网络性能优化"
         ],
         "readingTime": 6,
         "relevance": "high"
       },
       {
-        "title": "Takeaways of Implementing a Native Rust UDP Tunneling Network Driver in the Linux Kernel",
-        "url": "https://www.semanticscholar.org/paper/aec97257033a4bb81bf0b5eba3cd68787e907d4d",
-        "summary": "本文介绍了在Linux内核中实现一个原生Rust语言UDP隧道网络驱动的经验总结。论文探讨了Rust语言在内核网络子系统中的应用潜力和挑战，重点关注内存安全和性能的平衡问题。作为一个内核网络驱动实现，涉及UDP协议处理和隧道技术，这是Linux内核网络子系统的核心功能领域。研究总结了Rust与C语言在内核网络开发中的互操作性、驱动架构设计以及性能优化等方面的实践经验，对了解Rust在内核网络栈中的实际应用具有重要参考价值。",
-        "summary_en": "C is the primary programming language used in the Linux kernel. Recently, the Linux developer community oversaw the experimental addition of Rust into...",
-        "source": "Semantic Scholar",
+        "title": "eBandit: Kernel-Driven Reinforcement Learning for Adaptive Video Streaming",
+        "url": "http://arxiv.org/abs/2604.08791v2",
+        "summary": "User-space Adaptive Bitrate (ABR) algorithms cannot see the transport layer signals that matter most, such as minimum RTT and instantaneous delivery rate, and they respond to network changes only after damage has already...",
+        "summary_en": "User-space Adaptive Bitrate (ABR) algorithms cannot see the transport layer signals that matter most, such as minimum RTT and instantaneous delivery r...",
+        "source": "arXiv",
         "tags": [
-          "网络驱动开发",
-          "Rust内核编程",
-          "UDP协议栈",
-          "Linux内核网络"
+          "eBPF",
+          "TCP/IP",
+          "Linux内核网络",
+          "网络优化"
         ],
-        "readingTime": 6,
+        "readingTime": 5,
         "relevance": "high"
       },
       {
-        "title": "The NODROP Patch: Hardening Secure Networking for Real-time Teleoperation by Preventing Packet Drops in the Linux TUN Driver",
-        "url": "https://www.semanticscholar.org/paper/d65859507ac82afbccb67cababf2f12ae75f1153",
-        "summary": "本文提出了NODROP补丁，用于强化实时远程操作的安全网络通信。研究发现Linux TUN驱动中存在导致数据包丢弃的bug，在高吞吐量关键应用中这会严重影响安全性和性能。通过修改Linux内核TUN驱动，防止数据包在隧道接口传输过程中被丢弃，提升了VPN通信的可靠性。TUN是Linux内核提供的虚拟隧道接口，用于将用户空间应用与内核网络栈连接。该研究直接涉及Linux内核网络子系统的数据包处理机制，属于内核网络驱动优化范畴。",
-        "summary_en": "Throughput-critical teleoperation requires robust and low-latency communication to ensure safety and performance. Often, these kinds of applications a...",
+        "title": "Greedy Routing in a Sequentially Grown One-Dimensional Random Graph",
+        "url": "http://arxiv.org/abs/2604.19733v1",
+        "summary": "We analyze greedy routing in a random graph G_n constructed on the vertex set V = {1, 2, ..., n} embedded in Z. Vertices are inserted according to a uniform random permutation pi, and each newly inserted vertex connects ...",
+        "summary_en": "We analyze greedy routing in a random graph G_n constructed on the vertex set V = {1, 2, ..., n} embedded in Z. Vertices are inserted according to a u...",
+        "source": "arXiv",
+        "tags": [
+          "路由",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "Linux Configuration Tuning: Is Having a Large Dataset Enough?",
+        "url": "https://www.semanticscholar.org/paper/13e67738fd8065b0af1a00912cfe44e2de62953e",
+        "summary": "本文探讨使用大规模Linux性能数据集为网络应用提供最优配置建议的可行性。研究通过一系列实验，筛选出对网络性能有显著影响的硬件和Linux配置选项。核心问题在于数据量是否足以解决调优问题，实际答案取决于数据质量与具体问题的匹配度。文章属于Linux内核网络性能优化领域，涉及配置参数选择与benchmark实验设计。",
+        "summary_en": ": While it would seem that enough data can solve any problem, data quality determines the appropriateness of data to solve specific problems. We inten...",
         "source": "Semantic Scholar",
         "tags": [
-          "Linux TUN Driver",
-          "Packet Drop",
-          "VPN/隧道网络",
-          "实时网络优化"
+          "Linux内核网络",
+          "性能调优",
+          "benchmark"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Reducing Kernel Queuing Delays with TCP Window Space Events",
+        "url": "https://www.semanticscholar.org/paper/d0e651022822eccdf1d2c67eb3e7238fc080466a",
+        "summary": "本文研究通过TCP窗口空间事件来减少内核排队延迟。这是直接针对Linux内核网络协议栈中TCP实现的性能优化研究，聚焦于降低数据包在内核网络栈中的排队时间。TCP窗口控制是TCP拥塞控制的核心机制，文章提出的窗口空间事件机制旨在更及时地通知发送端调整发送速率，减少不必要的缓冲区占用和排队。对于关注Linux内核网络性能优化、特别是TCP协议栈延迟降低的研究者和开发者具有较高参考价值。",
+        "summary_en": "...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP协议",
+          "性能优化",
+          "内核网络",
+          "延迟降低"
+        ],
+        "readingTime": 4,
+        "relevance": "high"
+      },
+      {
+        "title": "ProcRoute: Process-Scoped Authorization of Split-Tunnel Routes",
+        "url": "http://arxiv.org/abs/2604.16080v1",
+        "summary": "In most split-tunnel VPN/ZTNA deployments, installing an internal route authorizes the entire device, not a specific application, to use it. An unprivileged malicious process can therefore reach internal services by reus...",
+        "summary_en": "In most split-tunnel VPN/ZTNA deployments, installing an internal route authorizes the entire device, not a specific application, to use it. An unpriv...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "Socket",
+          "Netfilter"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Systematic Capability Benchmarking of Frontier Large Language Models for Offensive Cyber Tasks",
+        "url": "http://arxiv.org/abs/2604.17159v1",
+        "summary": "本文对10个前沿LLM模型在进攻性网络安全任务上的能力进行全面基准测试，使用NYU CTF Bench的200个挑战，基于D-CIPHER多智能体框架，集成自定义Kali Linux环境（含100+渗透测试工具）。研究聚焦于LLM在CTF夺旗比赛中的自动化攻击能力评估，涵盖Web漏洞利用、密码破解、逆向工程等任务。虽然涉及系统级安全测试，但核心主题是AI能力评测，而非Linux内核网络子系统的技术细节。",
+        "summary_en": "We present, to our knowledge, the most comprehensive cross-model evaluation of LLM agents on offensive cybersecurity tasks, benchmarking 10 frontier m...",
+        "source": "arXiv",
+        "tags": [
+          "LLM基准测试",
+          "CTF竞赛",
+          "AI安全代理",
+          "渗透测试自动化"
+        ],
+        "readingTime": 6,
+        "relevance": "low"
+      },
+      {
+        "title": "SCENIC: Stream Computation-Enhanced SmartNIC",
+        "url": "http://arxiv.org/abs/2604.15128v1",
+        "summary": "本文提出SCENIC架构，旨在解决现代AI数据中心中SmartNIC设计的权衡问题。论文指出商业SmartNIC虽然提供高带宽和良好软件兼容性，但定制化支持有限；而研究用SmartNIC则面临带宽低、功能受限和软件兼容性差的问题。SCENIC通过流计算增强来改进SmartNIC设计。然而，本文主要聚焦于SmartNIC硬件架构设计与数据面卸载策略，不直接涉及Linux内核网络子系统的核心组件如协议栈、Socket API、eBPF/XDP或容器网络等热点领域，偏向计算机体系结构而非内核网络软件实现。",
+        "summary_en": "Although modern, AI-centric datacenters heavily rely on SmartNICs, existing devices impose a hard trade-off. Commercial SmartNICs provide high bandwid...",
+        "source": "arXiv",
+        "tags": [
+          "SmartNIC硬件架构",
+          "网络卸载",
+          "数据中心网络"
         ],
         "readingTime": 8,
-        "relevance": "high"
+        "relevance": "low"
+      },
+      {
+        "title": "KMonPro: A Kernel-Level Module for Comprehensive Resource Monitoring and Process Insights in Linux Systems",
+        "url": "https://www.semanticscholar.org/paper/2797afe3564abd7cdb492690b953b985890c7003",
+        "summary": "KMonPro是一个Linux内核级监控系统模块，旨在通过直接与内核交互实现对CPU使用率、内存统计、网络活动和进程详情的实时监控。与典型的用户态监控工具不同，其100%捕获率的设计目标主要针对通用系统资源监控，而非聚焦于内核网络子系统的深度机制或性能优化。该工作未涉及TCP/IP协议栈、eBPF/XDP、Netfilter、路由等网络核心技术，也不属于容器网络或网络性能调优的研究范畴，判定为与Linux内核网络子系统直接相关性较低。",
+        "summary_en": "This paper introduces a new kernel module, KMonPro. Design elements of the Linux-based operating system consider bringing perfectly accurate real-time...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "内核监控",
+          "系统资源",
+          "进程管理"
+        ],
+        "readingTime": 3,
+        "relevance": "low"
+      },
+      {
+        "title": "Malware Detection and Analysis Using YARA Tool",
+        "url": "https://www.semanticscholar.org/paper/f5cd6470943bc744a046165f9af251266bb66d71",
+        "summary": "该论文讨论使用YARA工具进行恶意软件检测与分析，属于安全/恶意软件检测领域。论文涉及文件和网络数据包的模式匹配，但重点是YARA规则编写和病毒引擎集成，并未涉及Linux内核网络子系统的底层实现、协议栈开发或内核级网络性能优化。虽然提到网络数据包分析，但主要是作为恶意软件检测的样本来源，而非Linux内核网络功能研究。",
+        "summary_en": "Malicious software, or malware, is one of the biggest threats to the vast amounts of data and files handled today. One widely used tool for malware de...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "恶意软件检测",
+          "YARA工具",
+          "安全分析"
+        ],
+        "readingTime": 5,
+        "relevance": "low"
+      },
+      {
+        "title": "EvoPatch-IoT: Evolution-Aware Cross-Architecture Vulnerability Retrieval and Patch-State Profiling for BusyBox-Based IoT Firmware",
+        "url": "http://arxiv.org/abs/2604.19496v1",
+        "summary": "本文提出EvoPatch-IoT框架，针对BusyBox-based IoT固件进行跨架构漏洞检索和补丁状态分析。研究解决固件strip化、厂商补丁不一致、跨架构编译等安全评估难题。BusyBox是Linux用户空间工具集（非内核组件），论文聚焦于二进制安全分析、固件成分识别和漏洞检索技术，属于软件供应链安全和固件安全分析领域，与Linux内核网络子系统的TCP/IP协议栈、网络驱动、eBPF、Netfilter等核心技术无直接关联。",
+        "summary_en": "BusyBox is one of the most widely reused userland components in Linux-based Internet-of-Things (IoT) firmware, yet its security assessment remains dif...",
+        "source": "arXiv",
+        "tags": [
+          "IoT固件安全",
+          "二进制漏洞分析",
+          "BusyBox",
+          "固件成分识别"
+        ],
+        "readingTime": 12,
+        "relevance": "low"
+      },
+      {
+        "title": "Optimizing Network Latency: Unveiling the Impact of Reflection Server Tuning",
+        "url": "https://www.semanticscholar.org/paper/e7eeca9111ecc28e185c7310ca2cbfe9a4fefed2",
+        "summary": "该论文专注于网络延迟优化，涉及反射服务器调优（Reflection Server Tuning）。反射服务器通常指负载均衡代理或反向代理服务器，用于流量转发和请求处理。虽然网络延迟优化是Linux内核网络的重要研究方向，但反射服务器调优更多属于应用层服务器配置和中间件优化范畴，而非直接涉及内核网络子系统的底层实现（如TCP/IP协议栈、eBPF/XDP、Netfilter等）。该主题可能与网络性能评估和benchmark相关，但缺乏与Linux内核网络核心机制的直接关联。",
+        "summary_en": "...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "网络延迟优化",
+          "服务器调优",
+          "性能基准测试"
+        ],
+        "readingTime": 12,
+        "relevance": "medium"
       }
     ],
     "news": [
@@ -53,13 +195,58 @@
         "title": "LWN.net Weekly Edition for April 9, 2026",
         "url": "https://lwn.net/Articles/1065979/",
         "abstract": " LWN.net Weekly Edition for April 9, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pa",
-        "summary": "LWN.net 2026年4月9日周刊重点内容：TPM（可信平台模块）安全防护成为焦点，James Bottomley在SCALE 23x会议上介绍了防止TPM中间人攻击的工作，以及内核如何与TPM协同工作。进程间通信（IPC）方面取得进展，包括消息队列peek功能、io_uring增强以及bus1新IPC机制的提案。内核整数溢出安全API也在推进中，旨在实现更安全的整数运算操作。Ubuntu的GRUB精简计划引发社区讨论。此外还有音频工具fre:ac和去中心化社交平台Scuttlebutt的介绍。",
+        "summary": "本期LWN.net周报聚焦多个内核与系统安全主题。TPM（可信平台模块）安全成为焦点，James Bottomley在SCALE会议介绍了防止TPM与内核间通信遭受interposer攻击的解决方案。内核开发者正推进整数溢出安全API，以实现更安全的整数运算。IPC领域有新进展：消息队列peek功能、io_uring持续演进以及bus1新IPC机制提案。Ubuntu精简GRUB的计划引发社区讨论。此外还介绍了fre:ac音频工具和Scuttlebutt去中心化社交平台。",
         "source": "LWN.net",
         "tags": [
           "TPM安全",
           "io_uring",
-          "进程间通信",
-          "内核API"
+          "IPC机制",
+          "内核安全"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "LWN.net Weekly Edition for April 2, 2026",
+        "url": "https://lwn.net/Articles/1064762/",
+        "abstract": " LWN.net Weekly Edition for April 2, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pa",
+        "summary": "LWN.net 2026年4月2日周报重点关注软件供应链安全：LiteLLM库在PyPI被植入信息窃取恶意软件，数千次下载暴露供应链脆弱性。同时Linux内核社区对AI工具有新争议——维护者反对使用LLM进行补丁审查和systemd年龄验证的强制性要求。Rust语言方面，新一代trait solver正在取得进展。Pandoc文档转换工具发布新版本。整体反映出开源社区在AI时代面临的安全威胁、工具整合压力和语言演进等多重挑战。",
+        "source": "LWN.net",
+        "tags": [
+          "软件供应链安全",
+          "AI工具争议",
+          "Rust语言发展",
+          "开源社区治理"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "LWN.net Weekly Edition for March 26, 2026",
+        "url": "https://lwn.net/Articles/1063660/",
+        "abstract": " LWN.net Weekly Edition for March 26, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: P",
+        "summary": "LWN.net 2026年3月26日周刊主要内容概览：本周重点关注内核层面的两项重要技术改进。首先是内核直接映射(direct map)的页面移除优化，通过改进的补丁集提升内存管理效率和安全隔离。其次是BPF程序睡眠状态追踪机制，旨在允许sleepable BPF程序在原子上下文与非睡眠上下文之间安全切换，这对网络包处理和内核可观测性具有重要意义。此外还涉及开发工具链改进(如Sashiko、b4 review工具)和安全事件协作处理的主题。",
+        "source": "LWN.net",
+        "tags": [
+          "BPF",
+          "内核内存管理",
+          "direct map",
+          "安全事件处理"
+        ],
+        "readingTime": 3,
+        "relevance": "high"
+      },
+      {
+        "title": "LWN.net Weekly Edition for March 19, 2026",
+        "url": "https://lwn.net/Articles/1062571/",
+        "abstract": " LWN.net Weekly Edition for March 19, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: P",
+        "summary": "2026年3月19日LWN.net周刊发布。本期重点内容包括：BPF终于支持io_uring，Pavel Begunkov历经五年开发的补丁集允许在io_uring中运行BPF程序，这是Linux内核网络和I/O领域的重要里程碑。此外，内核安全方面持续关注页面缓存的时序侧信道攻击防御。内存管理方面引入了更安全的7.0版本kmalloc()类型安全内存分配函数。文件系统方面探讨了null文件系统的实际应用场景。本期还涵盖Fedora沙箱技术生命周期提案以及EFF隐私保护历史等话题。",
+        "source": "LWN.net",
+        "tags": [
+          "BPF",
+          "io_uring",
+          "内核安全",
+          "内存管理"
         ],
         "readingTime": 3,
         "relevance": "high"
@@ -67,36 +254,73 @@
       {
         "title": "Many Great Networking Improvements Arrive In Linux 7.1",
         "url": "https://www.phoronix.com/news/Linux-7.1-Networking",
-        "summary": "这篇文章介绍了Linux系统中的多项网络改进。虽然Linux内核主版本目前为6.x系列，但此类文章通常聚焦于网络子系统的优化，包括网络协议栈更新、驱动改进、网络性能提升等方面。这些改进对于提升服务器网络吞吐量、降低延迟以及增强网络安全性具有重要意义。",
+        "summary": "本文介绍了Linux 7.1内核中多项重要的网络改进。该版本在内核网络子系统方面进行了多项优化，包括网络协议栈的增强、驱动更新以及网络性能提升。这些改进涉及TCP/IP协议栈优化、网络过滤机制的更新以及其他核心网络功能的改进，旨在提升Linux系统的网络处理能力和稳定性。",
         "source": "Phoronix",
         "tags": [
-          "网络优化",
           "Linux内核",
-          "性能改进"
+          "网络子系统",
+          "TCP/IP协议栈",
+          "性能优化"
         ],
-        "readingTime": 1,
+        "readingTime": 4,
         "relevance": "high"
       }
     ]
   },
   "tagStats": {
-    "Linux内核驱动": 1,
-    "网络驱动开发": 2,
-    "嵌入式网络": 1,
-    "工业网络通信": 1,
-    "Rust内核编程": 1,
-    "UDP协议栈": 1,
-    "Linux内核网络": 1,
-    "Linux TUN Driver": 1,
-    "Packet Drop": 1,
-    "VPN/隧道网络": 1,
-    "实时网络优化": 1,
+    "Kubernetes": 2,
+    "容器网络/CNI": 1,
+    "性能优化": 1,
+    "Linux tc": 1,
+    "边缘计算": 1,
+    "网络性能优化": 1,
+    "eBPF": 2,
+    "TCP/IP": 2,
+    "Linux内核网络": 2,
+    "网络优化": 2,
+    "路由": 1,
+    "性能调优": 1,
+    "benchmark": 1,
+    "TCP协议": 1,
+    "内核网络": 1,
+    "延迟降低": 1,
+    "Socket": 1,
+    "Netfilter": 1,
+    "LLM基准测试": 1,
+    "CTF竞赛": 1,
+    "AI安全代理": 1,
+    "渗透测试自动化": 1,
+    "SmartNIC硬件架构": 1,
+    "网络卸载": 1,
+    "数据中心网络": 1,
+    "内核监控": 1,
+    "系统资源": 1,
+    "进程管理": 1,
+    "恶意软件检测": 1,
+    "YARA工具": 1,
+    "安全分析": 1,
+    "IoT固件安全": 1,
+    "二进制漏洞分析": 1,
+    "BusyBox": 1,
+    "固件成分识别": 1,
+    "网络延迟优化": 1,
+    "服务器调优": 1,
+    "性能基准测试": 1,
     "TPM安全": 1,
-    "io_uring": 1,
-    "进程间通信": 1,
-    "内核API": 1,
-    "网络优化": 1,
+    "io_uring": 2,
+    "IPC机制": 1,
+    "内核安全": 2,
+    "软件供应链安全": 1,
+    "AI工具争议": 1,
+    "Rust语言发展": 1,
+    "开源社区治理": 1,
+    "BPF": 2,
+    "内核内存管理": 1,
+    "direct map": 1,
+    "安全事件处理": 1,
+    "内存管理": 1,
     "Linux内核": 1,
-    "性能改进": 1
+    "网络子系统": 1,
+    "TCP/IP协议栈": 1
   }
 }
