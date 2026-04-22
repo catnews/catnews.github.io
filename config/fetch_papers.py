@@ -38,6 +38,46 @@ SEARCH_KEYWORDS = [
     "Linux vhost networking",
     "Linux network namespace kernel",
     "Linux qdisc traffic control",
+    "Linux container networking",
+    "Linux CNI networking",
+    "Linux Kubernetes networking",
+    "Linux conntrack netfilter",
+    "Linux network performance tuning",
+    "Linux TCP performance optimization",
+    "Linux AF_XDP performance",
+    "Linux io_uring networking",
+]
+
+HOT_TOPIC_KEYWORDS = [
+    "container",
+    "containers",
+    "kubernetes",
+    "k8s",
+    "cni",
+    "pod",
+    "network namespace",
+    "netns",
+    "veth",
+    "ovs",
+    "open v switch",
+    "cilium",
+    "service mesh",
+    "conntrack",
+    "netfilter",
+    "iptables",
+    "nftables",
+    "performance",
+    "latency",
+    "throughput",
+    "benchmark",
+    "optimization",
+    "qdisc",
+    "xps",
+    "rps",
+    "rfs",
+    "af_xdp",
+    "io_uring",
+    "busy poll",
 ]
 
 DOMAIN_KEYWORDS = {
@@ -65,6 +105,22 @@ DOMAIN_KEYWORDS = {
     "dpdk": "旁路",
     "linux kernel": "Linux内核网络",
     "network": "网络优化",
+    "container": "容器网络",
+    "kubernetes": "容器网络",
+    "k8s": "容器网络",
+    "cni": "容器网络",
+    "namespace": "容器网络",
+    "netns": "容器网络",
+    "veth": "容器网络",
+    "ovs": "容器网络",
+    "cilium": "容器网络",
+    "service mesh": "容器网络",
+    "conntrack": "Netfilter",
+    "qdisc": "网络优化",
+    "benchmark": "性能",
+    "optimization": "性能",
+    "af_xdp": "XDP",
+    "io_uring": "性能",
     "latency": "性能",
     "throughput": "性能",
     "performance": "性能",
@@ -90,6 +146,7 @@ MIN_NEWS_TARGET = 8
 PAPER_PROMPT = """你是一个专业的论文筛选助手。分析论文是否与 Linux 内核网络子系统直接相关。
 
 Linux 内核网络相关主题：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter/nftables、Kernel Bypass、Virtio/vHost、网络驱动、路由/网桥/包处理。
+重点关注热点：容器网络（Kubernetes/CNI/netns/veth/OVS/Cilium）与 Linux 内核网络性能优化（延迟/吞吐/调度/benchmark）。
 
 返回JSON格式：
 {"relevance": "high/medium/low/none", "summary": "中文总结150-300字", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
@@ -99,6 +156,7 @@ Linux 内核网络相关主题：TCP/IP协议栈、Socket API、eBPF/XDP、Netfi
 NEWS_PROMPT = """你是一个技术资讯筛选助手。分析文章是否与 Linux 内核网络相关。
 
 相关主题：网络性能测试、内核网络更新、驱动发布、网络子系统讨论等。
+重点关注热点：容器网络（Kubernetes/CNI）和 Linux 网络性能提升。
 
 返回JSON格式：
 {"relevance": "high/medium/low/none", "summary": "中文总结100-200字", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
@@ -167,6 +225,7 @@ def call_minimax(prompt, system_prompt, max_retries=3):
 QUICK_FILTER_PROMPT = """你是论文筛选助手。快速判断文章是否与Linux内核网络子系统直接相关。
 
 Linux内核网络：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter、Kernel Bypass、Virtio、网络驱动、路由/网桥。
+优先关注：容器网络（Kubernetes/CNI/netns/veth）和网络性能优化（latency/throughput/qdisc/tc）。
 
 严格标准：必须直接涉及Linux内核网络代码/实现，而非通用网络研究。
 
@@ -180,7 +239,7 @@ def quick_filter_relevance(title, abstract):
     
     response = call_minimax(prompt, QUICK_FILTER_PROMPT)
     if not response:
-        return "none"
+        return heuristic_relevance(title, abstract)
     
     try:
         json_match = re.search(r'\{[^{}]+\}', response)
@@ -204,7 +263,8 @@ def heuristic_relevance(title, abstract):
     merged_text = f"{title} {abstract}".lower()
     hit_count = keyword_hit_count(merged_text)
     penalty = sum(1 for keyword in NEGATIVE_KEYWORDS if keyword in merged_text)
-    score = hit_count - penalty
+    hot_score = hot_topic_score(merged_text)
+    score = hit_count - penalty + hot_score
 
     if score >= 4:
         return "high"
@@ -213,6 +273,29 @@ def heuristic_relevance(title, abstract):
     if score >= 1:
         return "low"
     return "none"
+
+def hot_topic_score(text):
+    text_lower = (text or "").lower()
+    hits = 0
+    for keyword in HOT_TOPIC_KEYWORDS:
+        if keyword in text_lower:
+            hits += 1
+    if hits >= 4:
+        return 2
+    if hits >= 2:
+        return 1
+    return 0
+
+def prioritize_items(items, content_field="abstract"):
+    def score(item):
+        text = f"{item.get('title', '')} {item.get(content_field, '')}"
+        return (
+            hot_topic_score(text),
+            keyword_hit_count(text),
+            int(item.get("year", 0)),
+        )
+
+    return sorted(items, key=score, reverse=True)
 
 def infer_tags(text, max_tags=4):
     text_lower = (text or "").lower()
@@ -602,6 +685,8 @@ def main():
         "news_preprocessed": 0,
         "news_fill_medium_high": 0,
         "news_fill_low": 0,
+        "paper_hotspot_in_final": 0,
+        "news_hotspot_in_final": 0,
     }
     
     paper_candidates = []
@@ -620,6 +705,7 @@ def main():
     stats["paper_candidates_raw"] = len(paper_candidates)
     
     paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
+    paper_candidates = prioritize_items(paper_candidates, "abstract")
     stats["paper_candidates_dedup"] = len(paper_candidates)
     
     print(f"\n[Phase 3] Quick filtering {len(paper_candidates)} paper candidates...")
@@ -671,6 +757,7 @@ def main():
     stats["news_candidates_raw"] = len(news_candidates)
     
     news_candidates = deduplicate(news_candidates, existing_hashes, "news")
+    news_candidates = prioritize_items(news_candidates, "abstract")
     stats["news_candidates_dedup"] = len(news_candidates)
     
     print(f"\n[Phase 5] Quick filtering {len(news_candidates)} news candidates...")
@@ -729,6 +816,8 @@ def main():
         analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
         
         if analysis and analysis.get('relevance') in ['high', 'medium', 'low']:
+            if hot_topic_score(f"{paper['title']} {paper['abstract']}") > 0:
+                stats["paper_hotspot_in_final"] += 1
             selected_papers.append({
                 "title": paper['title'],
                 "url": paper['url'],
@@ -759,6 +848,8 @@ def main():
             analysis = analyze_item_with_llm(item['title'], item.get('abstract', item['title']), is_news=True)
             
             if analysis and analysis.get('relevance') in ['high', 'medium', 'low']:
+                if hot_topic_score(f"{item['title']} {item.get('abstract', item['title'])}") > 0:
+                    stats["news_hotspot_in_final"] += 1
                 selected_news.append({
                     "title": item['title'],
                     "url": item['url'],
@@ -783,6 +874,7 @@ def main():
         f"quick_hm={stats['paper_quick_high_medium']}, "
         f"fill_hm={stats['paper_fill_medium_high']}, "
         f"fill_low={stats['paper_fill_low']}, "
+        f"hotspot_final={stats['paper_hotspot_in_final']}, "
         f"final={len(selected_papers)}, "
         f"dedup_rate={safe_ratio(stats['paper_candidates_dedup'], stats['paper_candidates_raw'])}, "
         f"final_rate={safe_ratio(len(selected_papers), stats['paper_candidates_dedup'])}"
@@ -795,6 +887,7 @@ def main():
         f"quick_hm={stats['news_quick_high_medium']}, "
         f"fill_hm={stats['news_fill_medium_high']}, "
         f"fill_low={stats['news_fill_low']}, "
+        f"hotspot_final={stats['news_hotspot_in_final']}, "
         f"final={len(selected_news)}, "
         f"dedup_rate={safe_ratio(stats['news_candidates_dedup'], stats['news_candidates_raw'])}, "
         f"final_rate={safe_ratio(len(selected_news), stats['news_candidates_dedup'])}"
