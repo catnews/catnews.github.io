@@ -33,12 +33,59 @@ SEARCH_KEYWORDS = [
     "Linux packet processing",
     "Linux virtio network",
     "Linux network optimization",
+    "Linux skb networking",
+    "Linux netdev kernel",
+    "Linux vhost networking",
+    "Linux network namespace kernel",
+    "Linux qdisc traffic control",
+]
+
+DOMAIN_KEYWORDS = {
+    "ebpf": "eBPF",
+    "bpf": "eBPF",
+    "xdp": "XDP",
+    "tcp": "TCP/IP",
+    "ip": "TCP/IP",
+    "socket": "Socket",
+    "netfilter": "Netfilter",
+    "iptables": "Netfilter",
+    "nftables": "Netfilter",
+    "routing": "路由",
+    "forwarding": "路由",
+    "bridge": "网桥",
+    "bridging": "网桥",
+    "driver": "驱动",
+    "nic": "驱动",
+    "packet": "包处理",
+    "skb": "包处理",
+    "virtio": "虚拟化",
+    "vhost": "虚拟化",
+    "sriov": "虚拟化",
+    "kernel bypass": "旁路",
+    "dpdk": "旁路",
+    "linux kernel": "Linux内核网络",
+    "network": "网络优化",
+    "latency": "性能",
+    "throughput": "性能",
+    "performance": "性能",
+}
+
+NEGATIVE_KEYWORDS = [
+    "wireless sensor",
+    "social network",
+    "image network",
+    "neural network",
+    "blockchain",
+    "5g application",
+    "iot application",
 ]
 
 MIN_YEAR = 2020
-MAX_PAPERS = 10
-MAX_NEWS = 8
-MAX_CANDIDATES = 40
+MAX_PAPERS = 16
+MAX_NEWS = 12
+MAX_CANDIDATES = 80
+MIN_PAPERS_TARGET = 12
+MIN_NEWS_TARGET = 8
 
 PAPER_PROMPT = """你是一个专业的论文筛选助手。分析论文是否与 Linux 内核网络子系统直接相关。
 
@@ -127,7 +174,7 @@ Linux内核网络：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter、Kernel
 
 def quick_filter_relevance(title, abstract):
     prompt = f"""标题：{title}
-摘要：{abstract[:200]}
+摘要：{abstract[:600]}
 
 判断相关性，返回JSON。"""
     
@@ -142,7 +189,49 @@ def quick_filter_relevance(title, abstract):
             return result.get('relevance', 'none')
     except:
         pass
+
+    return heuristic_relevance(title, abstract)
+
+def keyword_hit_count(text):
+    text_lower = (text or "").lower()
+    hits = 0
+    for keyword in DOMAIN_KEYWORDS.keys():
+        if keyword in text_lower:
+            hits += 1
+    return hits
+
+def heuristic_relevance(title, abstract):
+    merged_text = f"{title} {abstract}".lower()
+    hit_count = keyword_hit_count(merged_text)
+    penalty = sum(1 for keyword in NEGATIVE_KEYWORDS if keyword in merged_text)
+    score = hit_count - penalty
+
+    if score >= 4:
+        return "high"
+    if score >= 2:
+        return "medium"
+    if score >= 1:
+        return "low"
     return "none"
+
+def infer_tags(text, max_tags=4):
+    text_lower = (text or "").lower()
+    tags = []
+    for keyword, tag in DOMAIN_KEYWORDS.items():
+        if keyword in text_lower and tag not in tags:
+            tags.append(tag)
+        if len(tags) >= max_tags:
+            break
+    return tags
+
+def fallback_summary(content, min_len=90):
+    normalized = re.sub(r"\s+", " ", content or "").strip()
+    if not normalized:
+        return "暂无摘要，可打开原文查看与 Linux 内核网络相关的细节。"
+    clipped = normalized[:220]
+    if len(clipped) < min_len:
+        return clipped
+    return f"{clipped}..."
 
 def analyze_item_with_llm(title, content, is_news=False):
     prompt = f"""标题：{title}
@@ -154,7 +243,13 @@ def analyze_item_with_llm(title, content, is_news=False):
     response = call_minimax(prompt, system_prompt)
     
     if not response:
-        return None
+        inferred_relevance = heuristic_relevance(title, content)
+        return {
+            "relevance": inferred_relevance if inferred_relevance != "none" else "low",
+            "summary": fallback_summary(content, min_len=80 if is_news else 120),
+            "tags": infer_tags(f"{title} {content}"),
+            "readingTime": 3 if is_news else 5,
+        }
     
     try:
         json_match = re.search(r'\{[^{}]+\}', response)
@@ -165,9 +260,16 @@ def analyze_item_with_llm(title, content, is_news=False):
             return result
     except:
         pass
-    return None
 
-def fetch_arxiv_papers(query, max_results=5):
+    inferred_relevance = heuristic_relevance(title, content)
+    return {
+        "relevance": inferred_relevance if inferred_relevance != "none" else "low",
+        "summary": fallback_summary(content, min_len=80 if is_news else 120),
+        "tags": infer_tags(f"{title} {content}"),
+        "readingTime": 3 if is_news else 5,
+    }
+
+def fetch_arxiv_papers(query, max_results=8):
     papers = []
     for attempt in range(3):
         try:
@@ -196,14 +298,23 @@ def fetch_arxiv_papers(query, max_results=5):
                 id_elem = entry.find("atom:id", ns)
                 published_elem = entry.find("atom:published", ns)
                 
-                if not all([title_elem is not None, summary_elem is not None, 
-                            id_elem is not None, published_elem is not None]):
+                if (
+                    title_elem is None
+                    or summary_elem is None
+                    or id_elem is None
+                    or published_elem is None
+                ):
                     continue
                 
-                title = title_elem.text.strip().replace("\n", " ") if title_elem.text else ""
-                summary = summary_elem.text.strip().replace("\n", " ") if summary_elem.text else ""
-                url_val = id_elem.text if id_elem.text else ""
-                year = int(published_elem.text[:4]) if published_elem.text else 0
+                title_text = title_elem.text or ""
+                summary_text = summary_elem.text or ""
+                id_text = id_elem.text or ""
+                published_text = published_elem.text or ""
+
+                title = title_text.strip().replace("\n", " ")
+                summary = summary_text.strip().replace("\n", " ")
+                url_val = id_text
+                year = int(published_text[:4]) if len(published_text) >= 4 else 0
                 
                 if year >= MIN_YEAR and title and summary:
                     papers.append({
@@ -231,7 +342,7 @@ def fetch_arxiv_papers(query, max_results=5):
     
     return papers
 
-def fetch_semantic_scholar_papers(query, max_results=5):
+def fetch_semantic_scholar_papers(query, max_results=8):
     papers = []
     try:
         random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
@@ -463,6 +574,11 @@ def count_tags(items):
             counts[tag] = counts.get(tag, 0) + 1
     return counts
 
+def safe_ratio(part, total):
+    if total <= 0:
+        return "0.0%"
+    return f"{(part * 100.0 / total):.1f}%"
+
 def main():
     print("Starting Linux kernel networking content fetch...")
     print("=" * 50)
@@ -473,20 +589,38 @@ def main():
     
     existing_hashes = load_existing_hashes(docs_dir)
     print(f"Loaded {len(existing_hashes['papers'])} paper hashes, {len(existing_hashes['news'])} news hashes")
+
+    stats = {
+        "paper_candidates_raw": 0,
+        "paper_candidates_dedup": 0,
+        "paper_quick_high_medium": 0,
+        "paper_fill_medium_high": 0,
+        "paper_fill_low": 0,
+        "news_candidates_raw": 0,
+        "news_candidates_dedup": 0,
+        "news_quick_high_medium": 0,
+        "news_preprocessed": 0,
+        "news_fill_medium_high": 0,
+        "news_fill_low": 0,
+    }
     
     paper_candidates = []
     
     print("\n[Phase 1] Fetching papers from arXiv...")
-    for keyword in SEARCH_KEYWORDS[:6]:
+    split_idx = len(SEARCH_KEYWORDS) // 2
+    for keyword in SEARCH_KEYWORDS[:split_idx]:
         print(f"  Keyword: {keyword}")
-        paper_candidates.extend(fetch_arxiv_papers(keyword, 5))
+        paper_candidates.extend(fetch_arxiv_papers(keyword, 8))
     
     print("\n[Phase 2] Fetching papers from Semantic Scholar...")
-    for keyword in SEARCH_KEYWORDS[6:]:
+    for keyword in SEARCH_KEYWORDS[split_idx:]:
         print(f"  Keyword: {keyword}")
-        paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 5))
+        paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 8))
+
+    stats["paper_candidates_raw"] = len(paper_candidates)
     
     paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
+    stats["paper_candidates_dedup"] = len(paper_candidates)
     
     print(f"\n[Phase 3] Quick filtering {len(paper_candidates)} paper candidates...")
     filtered_candidates = []
@@ -499,25 +633,52 @@ def main():
         
         if relevance in ['high', 'medium']:
             filtered_candidates.append(paper)
+            stats["paper_quick_high_medium"] += 1
         
         if len(filtered_candidates) >= MAX_PAPERS * 2:
             break
     
-    print(f"  Filtered: {len(filtered_candidates)} relevant papers")
+    if len(filtered_candidates) < MIN_PAPERS_TARGET:
+        print("  Relevant papers below target, adding heuristic low-relevance candidates...")
+        low_pool = []
+        for paper in paper_candidates[:MAX_CANDIDATES]:
+            if paper in filtered_candidates:
+                continue
+            fallback_relevance = heuristic_relevance(paper['title'], paper['abstract'])
+            if fallback_relevance in ['medium', 'high']:
+                filtered_candidates.append(paper)
+                stats["paper_fill_medium_high"] += 1
+            elif fallback_relevance == 'low':
+                low_pool.append(paper)
+            if len(filtered_candidates) >= MAX_PAPERS * 2:
+                break
+
+        if len(filtered_candidates) < MIN_PAPERS_TARGET:
+            for paper in low_pool:
+                filtered_candidates.append(paper)
+                stats["paper_fill_low"] += 1
+                if len(filtered_candidates) >= MAX_PAPERS * 2:
+                    break
+
+    print(f"  Filtered: {len(filtered_candidates)} relevant/near-relevant papers")
     
     print("\n[Phase 4] Fetching news from LWN/Phoronix...")
     news_candidates = []
     news_candidates.extend(fetch_lwn_news())
     news_candidates.extend(fetch_phoronix_news())
     news_candidates.extend(fetch_kernel_newbies())
+
+    stats["news_candidates_raw"] = len(news_candidates)
     
     news_candidates = deduplicate(news_candidates, existing_hashes, "news")
+    stats["news_candidates_dedup"] = len(news_candidates)
     
     print(f"\n[Phase 5] Quick filtering {len(news_candidates)} news candidates...")
     filtered_news = []
     for i, item in enumerate(news_candidates[:15]):
         if item.get('source') == 'LWN.net' and item.get('summary'):
             filtered_news.append(item)
+            stats["news_preprocessed"] += 1
             print(f"  [{i+1}] {item['title'][:40]}... -> pre-processed")
         else:
             print(f"  [{i+1}] {item['title'][:40]}...")
@@ -528,11 +689,34 @@ def main():
             
             if relevance in ['high', 'medium']:
                 filtered_news.append(item)
+                stats["news_quick_high_medium"] += 1
         
         if len(filtered_news) >= MAX_NEWS * 2:
             break
     
-    print(f"  Filtered: {len(filtered_news)} relevant news")
+    if len(filtered_news) < MIN_NEWS_TARGET:
+        print("  Relevant news below target, adding heuristic low-relevance candidates...")
+        low_pool = []
+        for item in news_candidates[:20]:
+            if item in filtered_news:
+                continue
+            fallback_relevance = heuristic_relevance(item['title'], item.get('abstract', item['title']))
+            if fallback_relevance in ['medium', 'high']:
+                filtered_news.append(item)
+                stats["news_fill_medium_high"] += 1
+            elif fallback_relevance == 'low':
+                low_pool.append(item)
+            if len(filtered_news) >= MAX_NEWS * 2:
+                break
+
+        if len(filtered_news) < MIN_NEWS_TARGET:
+            for item in low_pool:
+                filtered_news.append(item)
+                stats["news_fill_low"] += 1
+                if len(filtered_news) >= MAX_NEWS * 2:
+                    break
+
+    print(f"  Filtered: {len(filtered_news)} relevant/near-relevant news")
     
     selected_papers = []
     selected_news = []
@@ -544,7 +728,7 @@ def main():
         
         analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
         
-        if analysis:
+        if analysis and analysis.get('relevance') in ['high', 'medium', 'low']:
             selected_papers.append({
                 "title": paper['title'],
                 "url": paper['url'],
@@ -574,7 +758,7 @@ def main():
             
             analysis = analyze_item_with_llm(item['title'], item.get('abstract', item['title']), is_news=True)
             
-            if analysis:
+            if analysis and analysis.get('relevance') in ['high', 'medium', 'low']:
                 selected_news.append({
                     "title": item['title'],
                     "url": item['url'],
@@ -592,6 +776,29 @@ def main():
     
     print("\n" + "=" * 50)
     print(f"Summary: {len(selected_papers)} papers, {len(selected_news)} news")
+    print(
+        "Paper pipeline: "
+        f"raw={stats['paper_candidates_raw']}, "
+        f"dedup={stats['paper_candidates_dedup']}, "
+        f"quick_hm={stats['paper_quick_high_medium']}, "
+        f"fill_hm={stats['paper_fill_medium_high']}, "
+        f"fill_low={stats['paper_fill_low']}, "
+        f"final={len(selected_papers)}, "
+        f"dedup_rate={safe_ratio(stats['paper_candidates_dedup'], stats['paper_candidates_raw'])}, "
+        f"final_rate={safe_ratio(len(selected_papers), stats['paper_candidates_dedup'])}"
+    )
+    print(
+        "News pipeline: "
+        f"raw={stats['news_candidates_raw']}, "
+        f"dedup={stats['news_candidates_dedup']}, "
+        f"preprocessed={stats['news_preprocessed']}, "
+        f"quick_hm={stats['news_quick_high_medium']}, "
+        f"fill_hm={stats['news_fill_medium_high']}, "
+        f"fill_low={stats['news_fill_low']}, "
+        f"final={len(selected_news)}, "
+        f"dedup_rate={safe_ratio(stats['news_candidates_dedup'], stats['news_candidates_raw'])}, "
+        f"final_rate={safe_ratio(len(selected_news), stats['news_candidates_dedup'])}"
+    )
     
     beijing_now = datetime.now(timezone.utc) + timedelta(hours=8)
     today = beijing_now.strftime("%Y-%m-%d")
