@@ -1,28 +1,102 @@
 {
   "date": "2026-04-22",
   "categories": {
-    "papers": [],
+    "papers": [
+      {
+        "title": "Development of a Linux Kernel Driver for the SBNI Network Interface Using Remote Real-Time Processing Units",
+        "url": "https://www.semanticscholar.org/paper/34a6515b76c475885c397123f1fe5ca0915a5cb4",
+        "summary": "本文介绍了为SBNI（Siberian Board Network Interface）网络接口开发Linux内核驱动的技术方案。SBNI是Granch公司于90年代末开发的双绞线租用线路网络接口，专门用于地下采矿等危险环境下的长距离数据传输。论文重点讨论了如何利用远程实时处理单元来实现该网络接口的驱动程序开发，涉及到Linux内核网络子系统的驱动层开发、硬件抽象层设计以及实时数据传输机制的构建。虽然该应用场景较为特殊（工业/矿业网络），但核心技术是Linux内核网络驱动的设计与实现，对理解Linux网络子系统中的设备驱动框架具有参考价值。",
+        "summary_en": "This article covers the subject of developing a Linux kernel driver for the existing SBNI network interface for twisted-pair leased lines, which is us...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux内核驱动",
+          "网络驱动开发",
+          "嵌入式网络",
+          "工业网络通信"
+        ],
+        "readingTime": 6,
+        "relevance": "high"
+      },
+      {
+        "title": "Takeaways of Implementing a Native Rust UDP Tunneling Network Driver in the Linux Kernel",
+        "url": "https://www.semanticscholar.org/paper/aec97257033a4bb81bf0b5eba3cd68787e907d4d",
+        "summary": "本文介绍了在Linux内核中实现一个原生Rust语言UDP隧道网络驱动的经验总结。论文探讨了Rust语言在内核网络子系统中的应用潜力和挑战，重点关注内存安全和性能的平衡问题。作为一个内核网络驱动实现，涉及UDP协议处理和隧道技术，这是Linux内核网络子系统的核心功能领域。研究总结了Rust与C语言在内核网络开发中的互操作性、驱动架构设计以及性能优化等方面的实践经验，对了解Rust在内核网络栈中的实际应用具有重要参考价值。",
+        "summary_en": "C is the primary programming language used in the Linux kernel. Recently, the Linux developer community oversaw the experimental addition of Rust into...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "网络驱动开发",
+          "Rust内核编程",
+          "UDP协议栈",
+          "Linux内核网络"
+        ],
+        "readingTime": 6,
+        "relevance": "high"
+      },
+      {
+        "title": "The NODROP Patch: Hardening Secure Networking for Real-time Teleoperation by Preventing Packet Drops in the Linux TUN Driver",
+        "url": "https://www.semanticscholar.org/paper/d65859507ac82afbccb67cababf2f12ae75f1153",
+        "summary": "本文提出了NODROP补丁，用于强化实时远程操作的安全网络通信。研究发现Linux TUN驱动中存在导致数据包丢弃的bug，在高吞吐量关键应用中这会严重影响安全性和性能。通过修改Linux内核TUN驱动，防止数据包在隧道接口传输过程中被丢弃，提升了VPN通信的可靠性。TUN是Linux内核提供的虚拟隧道接口，用于将用户空间应用与内核网络栈连接。该研究直接涉及Linux内核网络子系统的数据包处理机制，属于内核网络驱动优化范畴。",
+        "summary_en": "Throughput-critical teleoperation requires robust and low-latency communication to ensure safety and performance. Often, these kinds of applications a...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux TUN Driver",
+          "Packet Drop",
+          "VPN/隧道网络",
+          "实时网络优化"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      }
+    ],
     "news": [
       {
-        "title": "Linux May Drop Old Network Drivers Now That AI-Driven Bug Reports Are Causing A Burden",
-        "url": "https://www.phoronix.com/news/Linux-Old-Network-AI",
-        "summary": "Linux内核社区正在考虑移除旧的网络驱动，主要原因是AI驱动的自动bug报告系统产生了大量低质量报告，给维护者带来沉重负担。这些AI生成的报告往往包含大量噪音信息，使得维护者难以有效筛选真正重要的bug。随着AI工具在bug发现中的广泛应用，内核开发者认为维护这些老旧驱动已不再值得投入如此多的精力，可能选择放弃支持部分已不再广泛使用的旧网络驱动。",
+        "title": "LWN.net Weekly Edition for April 9, 2026",
+        "url": "https://lwn.net/Articles/1065979/",
+        "abstract": " LWN.net Weekly Edition for April 9, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pa",
+        "summary": "LWN.net 2026年4月9日周刊重点内容：TPM（可信平台模块）安全防护成为焦点，James Bottomley在SCALE 23x会议上介绍了防止TPM中间人攻击的工作，以及内核如何与TPM协同工作。进程间通信（IPC）方面取得进展，包括消息队列peek功能、io_uring增强以及bus1新IPC机制的提案。内核整数溢出安全API也在推进中，旨在实现更安全的整数运算操作。Ubuntu的GRUB精简计划引发社区讨论。此外还有音频工具fre:ac和去中心化社交平台Scuttlebutt的介绍。",
+        "source": "LWN.net",
+        "tags": [
+          "TPM安全",
+          "io_uring",
+          "进程间通信",
+          "内核API"
+        ],
+        "readingTime": 3,
+        "relevance": "high"
+      },
+      {
+        "title": "Many Great Networking Improvements Arrive In Linux 7.1",
+        "url": "https://www.phoronix.com/news/Linux-7.1-Networking",
+        "summary": "这篇文章介绍了Linux系统中的多项网络改进。虽然Linux内核主版本目前为6.x系列，但此类文章通常聚焦于网络子系统的优化，包括网络协议栈更新、驱动改进、网络性能提升等方面。这些改进对于提升服务器网络吞吐量、降低延迟以及增强网络安全性具有重要意义。",
         "source": "Phoronix",
         "tags": [
-          "内核维护",
-          "网络驱动",
-          "AI bug报告",
-          "驱动移除"
+          "网络优化",
+          "Linux内核",
+          "性能改进"
         ],
-        "readingTime": 2,
+        "readingTime": 1,
         "relevance": "high"
       }
     ]
   },
   "tagStats": {
-    "内核维护": 1,
-    "网络驱动": 1,
-    "AI bug报告": 1,
-    "驱动移除": 1
+    "Linux内核驱动": 1,
+    "网络驱动开发": 2,
+    "嵌入式网络": 1,
+    "工业网络通信": 1,
+    "Rust内核编程": 1,
+    "UDP协议栈": 1,
+    "Linux内核网络": 1,
+    "Linux TUN Driver": 1,
+    "Packet Drop": 1,
+    "VPN/隧道网络": 1,
+    "实时网络优化": 1,
+    "TPM安全": 1,
+    "io_uring": 1,
+    "进程间通信": 1,
+    "内核API": 1,
+    "网络优化": 1,
+    "Linux内核": 1,
+    "性能改进": 1
   }
 }
