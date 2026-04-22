@@ -47,19 +47,6 @@
         "relevance": "high"
       },
       {
-        "title": "Greedy Routing in a Sequentially Grown One-Dimensional Random Graph",
-        "url": "http://arxiv.org/abs/2604.19733v1",
-        "summary": "We analyze greedy routing in a random graph G_n constructed on the vertex set V = {1, 2, ..., n} embedded in Z. Vertices are inserted according to a uniform random permutation pi, and each newly inserted vertex connects ...",
-        "summary_en": "We analyze greedy routing in a random graph G_n constructed on the vertex set V = {1, 2, ..., n} embedded in Z. Vertices are inserted according to a u...",
-        "source": "arXiv",
-        "tags": [
-          "路由",
-          "网络优化"
-        ],
-        "readingTime": 5,
-        "relevance": "medium"
-      },
-      {
         "title": "Linux Configuration Tuning: Is Having a Large Dataset Enough?",
         "url": "https://www.semanticscholar.org/paper/13e67738fd8065b0af1a00912cfe44e2de62953e",
         "summary": "本文探讨使用大规模Linux性能数据集为网络应用提供最优配置建议的可行性。研究通过一系列实验，筛选出对网络性能有显著影响的硬件和Linux配置选项。核心问题在于数据量是否足以解决调优问题，实际答案取决于数据质量与具体问题的匹配度。文章属于Linux内核网络性能优化领域，涉及配置参数选择与benchmark实验设计。",
@@ -102,125 +89,9 @@
         ],
         "readingTime": 5,
         "relevance": "high"
-      },
-      {
-        "title": "Systematic Capability Benchmarking of Frontier Large Language Models for Offensive Cyber Tasks",
-        "url": "http://arxiv.org/abs/2604.17159v1",
-        "summary": "本文对10个前沿LLM模型在进攻性网络安全任务上的能力进行全面基准测试，使用NYU CTF Bench的200个挑战，基于D-CIPHER多智能体框架，集成自定义Kali Linux环境（含100+渗透测试工具）。研究聚焦于LLM在CTF夺旗比赛中的自动化攻击能力评估，涵盖Web漏洞利用、密码破解、逆向工程等任务。虽然涉及系统级安全测试，但核心主题是AI能力评测，而非Linux内核网络子系统的技术细节。",
-        "summary_en": "We present, to our knowledge, the most comprehensive cross-model evaluation of LLM agents on offensive cybersecurity tasks, benchmarking 10 frontier m...",
-        "source": "arXiv",
-        "tags": [
-          "LLM基准测试",
-          "CTF竞赛",
-          "AI安全代理",
-          "渗透测试自动化"
-        ],
-        "readingTime": 6,
-        "relevance": "low"
-      },
-      {
-        "title": "SCENIC: Stream Computation-Enhanced SmartNIC",
-        "url": "http://arxiv.org/abs/2604.15128v1",
-        "summary": "本文提出SCENIC架构，旨在解决现代AI数据中心中SmartNIC设计的权衡问题。论文指出商业SmartNIC虽然提供高带宽和良好软件兼容性，但定制化支持有限；而研究用SmartNIC则面临带宽低、功能受限和软件兼容性差的问题。SCENIC通过流计算增强来改进SmartNIC设计。然而，本文主要聚焦于SmartNIC硬件架构设计与数据面卸载策略，不直接涉及Linux内核网络子系统的核心组件如协议栈、Socket API、eBPF/XDP或容器网络等热点领域，偏向计算机体系结构而非内核网络软件实现。",
-        "summary_en": "Although modern, AI-centric datacenters heavily rely on SmartNICs, existing devices impose a hard trade-off. Commercial SmartNICs provide high bandwid...",
-        "source": "arXiv",
-        "tags": [
-          "SmartNIC硬件架构",
-          "网络卸载",
-          "数据中心网络"
-        ],
-        "readingTime": 8,
-        "relevance": "low"
-      },
-      {
-        "title": "KMonPro: A Kernel-Level Module for Comprehensive Resource Monitoring and Process Insights in Linux Systems",
-        "url": "https://www.semanticscholar.org/paper/2797afe3564abd7cdb492690b953b985890c7003",
-        "summary": "KMonPro是一个Linux内核级监控系统模块，旨在通过直接与内核交互实现对CPU使用率、内存统计、网络活动和进程详情的实时监控。与典型的用户态监控工具不同，其100%捕获率的设计目标主要针对通用系统资源监控，而非聚焦于内核网络子系统的深度机制或性能优化。该工作未涉及TCP/IP协议栈、eBPF/XDP、Netfilter、路由等网络核心技术，也不属于容器网络或网络性能调优的研究范畴，判定为与Linux内核网络子系统直接相关性较低。",
-        "summary_en": "This paper introduces a new kernel module, KMonPro. Design elements of the Linux-based operating system consider bringing perfectly accurate real-time...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "内核监控",
-          "系统资源",
-          "进程管理"
-        ],
-        "readingTime": 3,
-        "relevance": "low"
-      },
-      {
-        "title": "Malware Detection and Analysis Using YARA Tool",
-        "url": "https://www.semanticscholar.org/paper/f5cd6470943bc744a046165f9af251266bb66d71",
-        "summary": "该论文讨论使用YARA工具进行恶意软件检测与分析，属于安全/恶意软件检测领域。论文涉及文件和网络数据包的模式匹配，但重点是YARA规则编写和病毒引擎集成，并未涉及Linux内核网络子系统的底层实现、协议栈开发或内核级网络性能优化。虽然提到网络数据包分析，但主要是作为恶意软件检测的样本来源，而非Linux内核网络功能研究。",
-        "summary_en": "Malicious software, or malware, is one of the biggest threats to the vast amounts of data and files handled today. One widely used tool for malware de...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "恶意软件检测",
-          "YARA工具",
-          "安全分析"
-        ],
-        "readingTime": 5,
-        "relevance": "low"
-      },
-      {
-        "title": "EvoPatch-IoT: Evolution-Aware Cross-Architecture Vulnerability Retrieval and Patch-State Profiling for BusyBox-Based IoT Firmware",
-        "url": "http://arxiv.org/abs/2604.19496v1",
-        "summary": "本文提出EvoPatch-IoT框架，针对BusyBox-based IoT固件进行跨架构漏洞检索和补丁状态分析。研究解决固件strip化、厂商补丁不一致、跨架构编译等安全评估难题。BusyBox是Linux用户空间工具集（非内核组件），论文聚焦于二进制安全分析、固件成分识别和漏洞检索技术，属于软件供应链安全和固件安全分析领域，与Linux内核网络子系统的TCP/IP协议栈、网络驱动、eBPF、Netfilter等核心技术无直接关联。",
-        "summary_en": "BusyBox is one of the most widely reused userland components in Linux-based Internet-of-Things (IoT) firmware, yet its security assessment remains dif...",
-        "source": "arXiv",
-        "tags": [
-          "IoT固件安全",
-          "二进制漏洞分析",
-          "BusyBox",
-          "固件成分识别"
-        ],
-        "readingTime": 12,
-        "relevance": "low"
-      },
-      {
-        "title": "Optimizing Network Latency: Unveiling the Impact of Reflection Server Tuning",
-        "url": "https://www.semanticscholar.org/paper/e7eeca9111ecc28e185c7310ca2cbfe9a4fefed2",
-        "summary": "该论文专注于网络延迟优化，涉及反射服务器调优（Reflection Server Tuning）。反射服务器通常指负载均衡代理或反向代理服务器，用于流量转发和请求处理。虽然网络延迟优化是Linux内核网络的重要研究方向，但反射服务器调优更多属于应用层服务器配置和中间件优化范畴，而非直接涉及内核网络子系统的底层实现（如TCP/IP协议栈、eBPF/XDP、Netfilter等）。该主题可能与网络性能评估和benchmark相关，但缺乏与Linux内核网络核心机制的直接关联。",
-        "summary_en": "...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "网络延迟优化",
-          "服务器调优",
-          "性能基准测试"
-        ],
-        "readingTime": 12,
-        "relevance": "medium"
       }
     ],
     "news": [
-      {
-        "title": "LWN.net Weekly Edition for April 9, 2026",
-        "url": "https://lwn.net/Articles/1065979/",
-        "abstract": " LWN.net Weekly Edition for April 9, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pa",
-        "summary": "本期LWN.net周报聚焦多个内核与系统安全主题。TPM（可信平台模块）安全成为焦点，James Bottomley在SCALE会议介绍了防止TPM与内核间通信遭受interposer攻击的解决方案。内核开发者正推进整数溢出安全API，以实现更安全的整数运算。IPC领域有新进展：消息队列peek功能、io_uring持续演进以及bus1新IPC机制提案。Ubuntu精简GRUB的计划引发社区讨论。此外还介绍了fre:ac音频工具和Scuttlebutt去中心化社交平台。",
-        "source": "LWN.net",
-        "tags": [
-          "TPM安全",
-          "io_uring",
-          "IPC机制",
-          "内核安全"
-        ],
-        "readingTime": 5,
-        "relevance": "high"
-      },
-      {
-        "title": "LWN.net Weekly Edition for April 2, 2026",
-        "url": "https://lwn.net/Articles/1064762/",
-        "abstract": " LWN.net Weekly Edition for April 2, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pa",
-        "summary": "LWN.net 2026年4月2日周报重点关注软件供应链安全：LiteLLM库在PyPI被植入信息窃取恶意软件，数千次下载暴露供应链脆弱性。同时Linux内核社区对AI工具有新争议——维护者反对使用LLM进行补丁审查和systemd年龄验证的强制性要求。Rust语言方面，新一代trait solver正在取得进展。Pandoc文档转换工具发布新版本。整体反映出开源社区在AI时代面临的安全威胁、工具整合压力和语言演进等多重挑战。",
-        "source": "LWN.net",
-        "tags": [
-          "软件供应链安全",
-          "AI工具争议",
-          "Rust语言发展",
-          "开源社区治理"
-        ],
-        "readingTime": 5,
-        "relevance": "high"
-      },
       {
         "title": "LWN.net Weekly Edition for March 26, 2026",
         "url": "https://lwn.net/Articles/1063660/",
@@ -270,15 +141,14 @@
   "tagStats": {
     "Kubernetes": 2,
     "容器网络/CNI": 1,
-    "性能优化": 1,
+    "性能优化": 3,
     "Linux tc": 1,
     "边缘计算": 1,
     "网络性能优化": 1,
     "eBPF": 2,
     "TCP/IP": 2,
     "Linux内核网络": 2,
-    "网络优化": 2,
-    "路由": 1,
+    "网络优化": 1,
     "性能调优": 1,
     "benchmark": 1,
     "TCP协议": 1,
@@ -286,38 +156,12 @@
     "延迟降低": 1,
     "Socket": 1,
     "Netfilter": 1,
-    "LLM基准测试": 1,
-    "CTF竞赛": 1,
-    "AI安全代理": 1,
-    "渗透测试自动化": 1,
-    "SmartNIC硬件架构": 1,
-    "网络卸载": 1,
-    "数据中心网络": 1,
-    "内核监控": 1,
-    "系统资源": 1,
-    "进程管理": 1,
-    "恶意软件检测": 1,
-    "YARA工具": 1,
-    "安全分析": 1,
-    "IoT固件安全": 1,
-    "二进制漏洞分析": 1,
-    "BusyBox": 1,
-    "固件成分识别": 1,
-    "网络延迟优化": 1,
-    "服务器调优": 1,
-    "性能基准测试": 1,
-    "TPM安全": 1,
-    "io_uring": 2,
-    "IPC机制": 1,
-    "内核安全": 2,
-    "软件供应链安全": 1,
-    "AI工具争议": 1,
-    "Rust语言发展": 1,
-    "开源社区治理": 1,
     "BPF": 2,
     "内核内存管理": 1,
     "direct map": 1,
     "安全事件处理": 1,
+    "io_uring": 1,
+    "内核安全": 1,
     "内存管理": 1,
     "Linux内核": 1,
     "网络子系统": 1,

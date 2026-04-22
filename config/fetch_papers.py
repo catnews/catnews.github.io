@@ -136,6 +136,18 @@ NEGATIVE_KEYWORDS = [
     "iot application",
 ]
 
+HARD_EXCLUDE_KEYWORDS = [
+    "malware",
+    "ctf",
+    "offensive cyber",
+    "firmware vulnerability",
+    "busybox",
+    "supply chain security",
+    "neural network",
+    "llm benchmark",
+    "image classification",
+]
+
 MIN_YEAR = 2020
 MAX_PAPERS = 16
 MAX_NEWS = 12
@@ -261,6 +273,8 @@ def keyword_hit_count(text):
 
 def heuristic_relevance(title, abstract):
     merged_text = f"{title} {abstract}".lower()
+    if is_hard_excluded(merged_text):
+        return "none"
     hit_count = keyword_hit_count(merged_text)
     penalty = sum(1 for keyword in NEGATIVE_KEYWORDS if keyword in merged_text)
     hot_score = hot_topic_score(merged_text)
@@ -285,6 +299,10 @@ def hot_topic_score(text):
     if hits >= 2:
         return 1
     return 0
+
+def is_hard_excluded(text):
+    text_lower = (text or "").lower()
+    return any(keyword in text_lower for keyword in HARD_EXCLUDE_KEYWORDS)
 
 def prioritize_items(items, content_field="abstract"):
     def score(item):
@@ -713,6 +731,10 @@ def main():
     for i, paper in enumerate(paper_candidates[:MAX_CANDIDATES]):
         print(f"  [{i+1}] {paper['title'][:40]}...")
         random_delay(2, 3)
+
+        if is_hard_excluded(f"{paper['title']} {paper['abstract']}"):
+            print("    -> excluded by hard rules")
+            continue
         
         relevance = quick_filter_relevance(paper['title'], paper['abstract'])
         print(f"    -> {relevance}")
@@ -770,6 +792,10 @@ def main():
         else:
             print(f"  [{i+1}] {item['title'][:40]}...")
             random_delay(2, 3)
+
+            if is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}"):
+                print("    -> excluded by hard rules")
+                continue
             
             relevance = quick_filter_relevance(item['title'], item.get('abstract', item['title']))
             print(f"    -> {relevance}")
@@ -815,8 +841,13 @@ def main():
         
         analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
         
-        if analysis and analysis.get('relevance') in ['high', 'medium', 'low']:
-            if hot_topic_score(f"{paper['title']} {paper['abstract']}") > 0:
+        paper_hot_score = hot_topic_score(f"{paper['title']} {paper['abstract']}")
+        if (
+            analysis
+            and analysis.get('relevance') in ['high', 'medium']
+            and not is_hard_excluded(f"{paper['title']} {paper['abstract']}")
+        ):
+            if paper_hot_score > 0:
                 stats["paper_hotspot_in_final"] += 1
             selected_papers.append({
                 "title": paper['title'],
@@ -829,6 +860,24 @@ def main():
                 "relevance": analysis.get('relevance', 'high')
             })
             print(f"  ✓ Processed")
+        elif (
+            analysis
+            and analysis.get('relevance') == 'low'
+            and paper_hot_score >= 2
+            and not is_hard_excluded(f"{paper['title']} {paper['abstract']}")
+        ):
+            stats["paper_hotspot_in_final"] += 1
+            selected_papers.append({
+                "title": paper['title'],
+                "url": paper['url'],
+                "summary": analysis.get('summary', ''),
+                "summary_en": paper['abstract'][:150] + "...",
+                "source": paper['source'],
+                "tags": analysis.get('tags', [])[:4],
+                "readingTime": analysis.get('readingTime', 5),
+                "relevance": "low"
+            })
+            print(f"  ✓ Processed (hotspot low)")
         
         if len(selected_papers) >= MAX_PAPERS:
             break
@@ -847,8 +896,13 @@ def main():
             
             analysis = analyze_item_with_llm(item['title'], item.get('abstract', item['title']), is_news=True)
             
-            if analysis and analysis.get('relevance') in ['high', 'medium', 'low']:
-                if hot_topic_score(f"{item['title']} {item.get('abstract', item['title'])}") > 0:
+            news_hot_score = hot_topic_score(f"{item['title']} {item.get('abstract', item['title'])}")
+            if (
+                analysis
+                and analysis.get('relevance') in ['high', 'medium']
+                and not is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}")
+            ):
+                if news_hot_score > 0:
                     stats["news_hotspot_in_final"] += 1
                 selected_news.append({
                     "title": item['title'],
@@ -860,6 +914,23 @@ def main():
                     "relevance": analysis.get('relevance', 'high')
                 })
                 print(f"    ✓ Processed")
+            elif (
+                analysis
+                and analysis.get('relevance') == 'low'
+                and news_hot_score >= 2
+                and not is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}")
+            ):
+                stats["news_hotspot_in_final"] += 1
+                selected_news.append({
+                    "title": item['title'],
+                    "url": item['url'],
+                    "summary": analysis.get('summary', ''),
+                    "source": item['source'],
+                    "tags": analysis.get('tags', [])[:4],
+                    "readingTime": analysis.get('readingTime', 3),
+                    "relevance": "low"
+                })
+                print(f"    ✓ Processed (hotspot low)")
     
     paper_tags = count_tags(selected_papers)
     news_tags = count_tags(selected_news)
