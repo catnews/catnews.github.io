@@ -33,7 +33,7 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          git add docs/*.json
+          git add docs/*.json docs/.hashes.json
           if git diff --staged --quiet; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else

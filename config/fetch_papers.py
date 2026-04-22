@@ -415,28 +415,36 @@ def fetch_kernel_newbies():
     
     return news[:3]
 
+HASH_FILE = ".hashes.json"
+
 def get_hash(title):
     normalized = re.sub(r'[^\w]', '', title.lower())
     return hashlib.md5(normalized.encode()).hexdigest()
 
 def load_existing_hashes(docs_dir):
     hashes = {"papers": set(), "news": set()}
-    if not os.path.exists(docs_dir):
-        return hashes
+    hash_file = os.path.join(docs_dir, HASH_FILE)
     
-    for filename in os.listdir(docs_dir):
-        if filename.endswith('.json'):
-            filepath = os.path.join(docs_dir, filename)
-            try:
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    for paper in data.get('categories', {}).get('papers', []):
-                        hashes["papers"].add(get_hash(paper['title']))
-                    for item in data.get('categories', {}).get('news', []):
-                        hashes["news"].add(get_hash(item['title']))
-            except:
-                pass
+    if os.path.exists(hash_file):
+        try:
+            with open(hash_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                hashes["papers"] = set(data.get("papers", []))
+                hashes["news"] = set(data.get("news", []))
+        except:
+            pass
+    
     return hashes
+
+def save_hashes(docs_dir, hashes):
+    hash_file = os.path.join(docs_dir, HASH_FILE)
+    data = {
+        "papers": list(hashes["papers"]),
+        "news": list(hashes["news"]),
+        "lastUpdate": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    }
+    with open(hash_file, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
 def deduplicate(items, existing_hashes, hash_key="papers"):
     seen = set()
@@ -600,6 +608,14 @@ def main():
     output_path = os.path.join(docs_dir, f"{today}.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
+    
+    for paper in selected_papers:
+        existing_hashes["papers"].add(get_hash(paper['title']))
+    for item in selected_news:
+        existing_hashes["news"].add(get_hash(item['title']))
+    
+    save_hashes(docs_dir, existing_hashes)
+    print(f"Updated hash file: {len(existing_hashes['papers'])} papers, {len(existing_hashes['news'])} news")
     
     print(f"Output: {output_path}")
 
