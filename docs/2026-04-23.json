@@ -1,0 +1,45 @@
+{
+  "date": "2026-04-23",
+  "categories": {
+    "papers": [
+      {
+        "title": "Parallel-SFT: Improving Zero-Shot Cross-Programming-Language Transfer for Code RL",
+        "url": "http://arxiv.org/abs/2604.20835v1",
+        "summary": "Modern language models demonstrate impressive coding capabilities in common programming languages (PLs), such as C++ and Python, but their performance in lower-resource PLs is often limited by training data availability....",
+        "summary_en": "Modern language models demonstrate impressive coding capabilities in common programming languages (PLs), such as C++ and Python, but their performance...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for April 16, 2026",
+        "url": "https://lwn.net/Articles/1066922/",
+        "abstract": " LWN.net Weekly Edition for April 16, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: P",
+        "summary": "LWN.net 2026年4月16日周刊重点内容：AI安全研究迎来爆发期，LLM工具已能快速发现真实安全漏洞，但维护者面临处理大量报告的压力；Vim因新AI政策出现两个分支项目，旨在避免使用LLM生成的代码；Linux内核透明大页(THP)相关变更，取消page cache的只读透明大页支持；此外还包括OpenWrt One路由器的许可证合规构建系统、7.0内核开发统计等话题。",
+        "source": "LWN.net",
+        "tags": [
+          "AI安全",
+          "LLM应用",
+          "内核开发",
+          "开源治理"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "性能": 1,
+    "AI安全": 1,
+    "LLM应用": 1,
+    "内核开发": 1,
+    "开源治理": 1
+  }
+}
