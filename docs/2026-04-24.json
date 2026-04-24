@@ -1,0 +1,272 @@
+{
+  "date": "2026-04-24",
+  "categories": {
+    "papers": [
+      {
+        "title": "Understanding Network Startup for Secure Containers in Multi-Tenant Clouds: Performance, Bottleneck and Optimization",
+        "url": "https://www.semanticscholar.org/paper/d2163f12daf165af513c9286e44dc4030e7d1360",
+        "summary": "In this paper, we use empirical measurements to show that container network startup is a key factor that contributes to the slow startup of secure containers in multi-tenant clouds, especially in the scenario of serverle...",
+        "summary_en": "In this paper, we use empirical measurements to show that container network startup is a key factor that contributes to the slow startup of secure con...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "路由",
+          "Linux内核网络",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Integrating Netfilter into SRv6 Routing Infrastructure of Linux as an SR-Aware Network Function",
+        "url": "https://www.semanticscholar.org/paper/fec2e1b3e873db624ac12cddb552476a1b8ef302",
+        "summary": "该论文提出在Linux中为SRv6（Segment Routing over IPv6）基础设施集成Netfilter框架，作为SR感知的网络功能。通过设计新的SRv6 End行为End.AN.NF，在执行基本SRv6转发的同时，对封装在SRv6隧道内的内部数据包应用Netfilter规则，实现服务功能链（SFC）而无需修改现有基于Netfilter的应用。这是Linux内核网络协议栈与SDN/NFV技术深度结合的创新研究，聚焦于SRv6 End行为扩展和内核数据包处理能力提升。",
+        "summary_en": "This paper proposes a new SRv6 End behavior, called End.AN.NF, integrating Linux netfilter as a network function for service function chaining by Segm...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SRv6",
+          "Netfilter",
+          "Service Function Chaining",
+          "Linux Kernel"
+        ],
+        "readingTime": 15,
+        "relevance": "high"
+      },
+      {
+        "title": "Enable Time-Sensitive Applications in Kubernetes with Container Network Interface Plugin Agnostic Metadata Proxy",
+        "url": "https://www.semanticscholar.org/paper/ac4e5037bdd6e5ab41b2304870fcafb72c8128b9",
+        "summary": "本文探讨在Kubernetes中启用时间敏感应用(TSA)的网络支持方案。文章提出一种与CNI插件无关的元数据代理方案，旨在解决TSA应用在容器化环境中的特殊网络需求（如低延迟确定性网络）。虽然涉及Kubernetes网络和CNI插件，但论文更偏向于应用层编排和元数据管理层面，未深入涉及Linux内核网络协议栈、TCP/IP优化、eBPF/XDP等内核级网络技术。对于需要理解TSA在K8s中部署挑战的场景有一定参考价值，但与内核网络子系统的直接关联有限。",
+        "summary_en": "Application deployment in cloud environment is dominated by Kubernetes-orchestrated microservices. Provides a secure environment, networking, storage,...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Kubernetes网络",
+          "容器网络(CNI)",
+          "时间敏感网络",
+          "元数据管理"
+        ],
+        "readingTime": 15,
+        "relevance": "medium"
+      },
+      {
+        "title": "Optimizing Container CNI Metrics for Improved Service LevelIndicators and Objectives in Container Networking",
+        "url": "https://www.semanticscholar.org/paper/826d444d2212257ff64427f6cf8c6588daa6c7cd",
+        "summary": "本文探讨了容器网络CNI（容器网络接口）的指标优化，旨在提升服务级别指标（SLI）和服务级别目标（SLO）。论文针对容器网络架构的复杂性和相关性能指标的挑战，提出了优化方案。内容涉及云原生环境下的容器网络性能、可靠性以及可扩展性问题的解决思路，属于当前容器生态和Kubernetes领域的热点研究方向。",
+        "summary_en": "Container networking is a critical component of cloud computing, providing the infrastructure for the deployment andscaling of containerized applicati...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "容器网络",
+          "CNI",
+          "性能优化",
+          "云原生"
+        ],
+        "readingTime": 10,
+        "relevance": "high"
+      },
+      {
+        "title": "Impacts of Replace Venerable Iptables and Embrace Nftables in a new futuristic Linux firewall framework",
+        "url": "https://www.semanticscholar.org/paper/cd836f804926e8f4a10cf37b1b2a082e12f0ba60",
+        "summary": "本文探讨了Linux防火墙技术的演进，重点比较了传统的iptables与新一代nftables框架。指出iptables作为Linux最流行的防火墙解决方案，虽然功能强大且应用广泛，但经过多年扩展后变得过于复杂，存在基本设计限制，影响其可扩展性和性能。文章倡导采用nftables作为未来Linux防火墙框架，认为nftables提供了更现代的架构设计、更好的性能以及更简洁的配置语法。该研究直接涉及Linux内核网络子系统的核心组件Netfilter框架，是网络基础设施安全领域的重要技术演进话题。",
+        "summary_en": "Firewall is a cardinal element in network security paradigm, where it is a measure for providing network access control. Iptables/netfilter is the mos...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Netfilter/nftables",
+          "Linux防火墙",
+          "iptables迁移",
+          "网络安全"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "LinuxFP: Transparently Accelerating Linux Networking",
+        "url": "https://www.semanticscholar.org/paper/bd050e7dba1f6217b8f9f07fc562fc05a2d7a740",
+        "summary": "该论文介绍了一种对Linux网络栈进行透明加速的方法。研究者基于多年高性能软件包处理系统的研究成果，提出不将这些技术作为替代管道，而是利用它们在Linux内核中创建显式快速路径（fast paths）。这样Linux仍然作为完整的协议栈实现，同时通过透明加速机制提升网络数据包处理性能。该工作直接涉及Linux内核网络子系统的性能优化，属于网络栈加速领域的重要研究。",
+        "summary_en": "This paper introduces transparent acceleration into the Linux networking stack. To do so, we build on years of research in creating high-performance s...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux内核网络",
+          "包处理加速",
+          "网络性能优化"
+        ],
+        "readingTime": 20,
+        "relevance": "high"
+      },
+      {
+        "title": "DDOS АТАКА НА ПЕРЕПОВНЕННЯ ТАБЛИЦІ CONNTRACK",
+        "url": "https://www.semanticscholar.org/paper/b5f944ecf4bff5ba62f28851c8cfe4c98e83697b",
+        "summary": "本文深入探讨DDoS攻击中针对Linux内核Conntrack（连接跟踪）表溢出的攻击技术。Conntrack是Linux内核netfilter框架的核心组件，负责维护网络连接状态跟踪表，当DDoS攻击产生大量新建连接时，Conntrack表会被迅速填满，导致内存耗尽。一旦表满，内核将无法跟踪新连接，进而触发DoS（拒绝服务）状态，使正常用户的网络请求被阻断。文章分析了此类攻击的原理、危害及可能的缓解策略，对于理解和防御基于Conntrack溢出的DDoS攻击具有重要参考价值。",
+        "summary_en": "The article addresses the issue of DDoS attacks, which represent one of the most severe threats to the stable operation of network services. Particula...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Conntrack连接跟踪",
+          "DDoS攻击",
+          "Linux内核网络",
+          "DoS防御"
+        ],
+        "readingTime": 12,
+        "relevance": "high"
+      },
+      {
+        "title": "On eBPF extensions to Kubernetes CNI datapath#",
+        "url": "https://www.semanticscholar.org/paper/44fa07d6b70f183c7b0109bf2ed0021134863816",
+        "summary": "该论文探讨了将eBPF技术扩展到Kubernetes CNI数据路径的方案。作者指出eBPF因其强大的表达能力及对Linux内核原生能力的访问能力，已成为实现内核网络功能的实际标准。然而，完全抛弃现有内核网络基础设施并立即切换到eBPF方案是不现实的。因此，论文提出一种折中方案，在保留现有内核网络基础设施的同时，利用eBPF扩展Kubernetes CNI的数据路径。这是一个典型的将eBPF与容器网络（Kubernetes/CNI）结合的热点研究，属于Linux内核网络性能优化的重要方向。",
+        "summary_en": "The combination of expressiveness and access to native Linux kernel capabilities explains the wide adoption of extended Berkeley Packet Filter (eBPF) ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "Kubernetes/CNI",
+          "容器网络",
+          "内核网络"
+        ],
+        "readingTime": 10,
+        "relevance": "high"
+      },
+      {
+        "title": "Design and Implementation of TLS Traffic Packet Filtering Technology Based on Netfilter Framework",
+        "url": "https://www.semanticscholar.org/paper/a7b2e5277e5720004c90d9681bceb474980c3ba1",
+        "summary": "本文提出基于SNI（Server Name Indication）信息的TLS流量过滤技术，解决传统防火墙按IP过滤时因虚拟主机导致误拦的问题。研究基于Netfilter/Iptables框架开发Linux内核模块，在TLS握手阶段提取SNI字段进行域名级别的精确过滤。相比传统IP黑名单方法，可区分托管在同一IP上的不同域名服务，提升防火墙准确性。该方案直接利用Linux内核网络子系统的Netfilter钩子点实现数据包过滤，属于内核级网络包处理技术，与TCP/IP协议栈和网络安全机制紧密相关。",
+        "summary_en": "When using firewall technology to block network traffic, unexpected blocking often occurs. The main reason is that one IP will correspond to multiple ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Netfilter/Iptables",
+          "TLS/SNI",
+          "Linux内核模块",
+          "防火墙"
+        ],
+        "readingTime": 4,
+        "relevance": "high"
+      },
+      {
+        "title": "Overcoming the IOTLB wall for multi-100-Gbps Linux-based networking",
+        "url": "https://www.semanticscholar.org/paper/142e9e2ad3f24f16bee059e66fc5bd8b529cbf38",
+        "summary": "本文研究IOMMU的IOTLB（I/O转换后备缓冲区）对Linux高速网络性能的影响。研究者针对Intel Xeon Scalable和AMD EPYC处理器在200 Gbps网络速率下，量化分析了IOTLB miss导致的性能下降（相比无IOMMU场景最高达20%），并探索了优化策略。虽然核心研究对象是硬件层面的IOMMU行为，但其成果直接影响Linux网络驱动、DMA地址转换和高速网卡数据路径的性能优化，与Linux内核网络子系统的底层性能密切相关。",
+        "summary_en": "This article explores opportunities to mitigate the performance impact of IOMMU on high-speed network traffic, as used in the Linux kernel. We first c...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "IOMMU/IOTLB",
+          "高速网络性能",
+          "Linux内核网络"
+        ],
+        "readingTime": 8,
+        "relevance": "medium"
+      },
+      {
+        "title": "A Bidirectional data packet tampering method for Linux system",
+        "url": "https://www.semanticscholar.org/paper/f12efd26c7825d234546e442789d651c9ec61bdb",
+        "summary": "Network data security is very important for each user and service provider, and every process of network data transmission is at risk of being tampered with. In this paper, we proposed a bidirectional tampering method of...",
+        "summary_en": "Network data security is very important for each user and service provider, and every process of network data transmission is at risk of being tampere...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "Netfilter",
+          "包处理",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Analysis of Linux kernel tools for detecting DDOS and SYN flood attacks",
+        "url": "https://www.semanticscholar.org/paper/3ab59393aed213696efde5209277092209af72f0",
+        "summary": "本文分析了Linux内核中用于检测DDoS攻击和SYN洪泛攻击的工具。研究涵盖了SYN数据包处理相关的内核结构，进行了现有检测工具的对比分析，包括用户态工具、内核结构、Netfilter框架以及ksoftirq守护进程。重点在于如何通过监控内核结构的字段值来识别攻击行为。该研究对理解Linux内核网络子系统在安全监控方面的能力具有参考价值。",
+        "summary_en": "The types of DDoS and principles of SYN-flood attacks are considered. The kernel structures involved in SYN-packet processing are presented. А compara...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "内核网络",
+          "DDoS检测",
+          "Netfilter",
+          "网络安全"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      },
+      {
+        "title": "Software Architecture for an Intelligent Firewall Based on Linux Netfilter",
+        "url": "https://www.semanticscholar.org/paper/f84e7bf1439508fff254cf3691e33399b5b74294",
+        "summary": "本文讨论基于Linux Netfilter构建智能防火墙的软件架构。传统防火墙依赖静态规则（基于地址、端口、协议）进行流量过滤，已难以应对现代IoT系统中复杂且分布式的嵌入式控制器带来的安全挑战。Netfilter作为Linux内核网络子系统的核心框架，提供hook机制支持数据包在协议栈各阶段的拦截与处理。本文提出的智能防火墙架构旨在结合动态规则、上下文感知等技术提升防火墙的智能化水平。直接使用Linux内核网络子系统核心组件Netfilter，与内核网络栈优化紧密相关。",
+        "summary_en": "A firewall is a tool for filtering network traffic passing through a given router or network endpoint. Initially, such systems used to have only stati...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Netfilter",
+          "Firewall",
+          "Linux Kernel",
+          "IoT Security"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      },
+      {
+        "title": "Poster: Towards Open Wireless Time-sensitive Networking in Linux",
+        "url": "https://www.semanticscholar.org/paper/8d8756f70047fd25e7963917a6258d3e323f3de4",
+        "summary": "The integration of IEEE 802.1 Time-sensitive Networking (TSN) with wireless technologies promises to support realtime applications over hybrid networks. Although TSN over Ethernet is well established, extending its capab...",
+        "summary_en": "The integration of IEEE 802.1 Time-sensitive Networking (TSN) with wireless technologies promises to support realtime applications over hybrid network...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "驱动",
+          "Linux内核网络",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "Efficiency Analysis of Network Traffic Processing by the Netfilter Subsystem in Linux Depending on Available CPU Processing Power",
+        "url": "https://www.semanticscholar.org/paper/e39158ca19fbb6109a4fef12649eff8881cd168a",
+        "summary": "该论文深入分析Linux内核Netfilter子系统在不同CPU处理能力下的网络流量处理效率。Netfilter是Linux内核网络子系统的核心组件，负责网络包过滤、NAT和连接跟踪等关键功能。研究通过系统性的性能基准测试，评估Netfilter在CPU资源受限和充足场景下的吞吐量、延迟和CPU利用率等指标，揭示了内核网络包处理流程的性能瓶颈与CPU资源分配的关联性。该研究对于理解和优化Linux内核网络数据路径具有重要参考价值，可为网络子系统调优和系统架构设计提供数据支撑。",
+        "summary_en": "...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Netfilter/nftables",
+          "性能基准测试",
+          "内核网络优化"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 2,
+    "路由": 1,
+    "Linux内核网络": 5,
+    "网络优化": 3,
+    "SRv6": 1,
+    "Netfilter": 4,
+    "Service Function Chaining": 1,
+    "Linux Kernel": 2,
+    "Kubernetes网络": 1,
+    "容器网络(CNI)": 1,
+    "时间敏感网络": 1,
+    "元数据管理": 1,
+    "容器网络": 2,
+    "CNI": 1,
+    "性能优化": 1,
+    "云原生": 1,
+    "Netfilter/nftables": 2,
+    "Linux防火墙": 1,
+    "iptables迁移": 1,
+    "网络安全": 2,
+    "包处理加速": 1,
+    "网络性能优化": 1,
+    "Conntrack连接跟踪": 1,
+    "DDoS攻击": 1,
+    "DoS防御": 1,
+    "eBPF": 1,
+    "Kubernetes/CNI": 1,
+    "内核网络": 2,
+    "Netfilter/Iptables": 1,
+    "TLS/SNI": 1,
+    "Linux内核模块": 1,
+    "防火墙": 1,
+    "IOMMU/IOTLB": 1,
+    "高速网络性能": 1,
+    "包处理": 1,
+    "DDoS检测": 1,
+    "Firewall": 1,
+    "IoT Security": 1,
+    "驱动": 1,
+    "性能基准测试": 1,
+    "内核网络优化": 1
+  }
+}
