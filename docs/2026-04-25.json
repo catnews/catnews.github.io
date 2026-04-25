@@ -1,0 +1,26 @@
+{
+  "date": "2026-04-25",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "Farewell ISDN, Ham Radio &amp; Old Network Drivers: Linus Torvalds Merges 138k L.O.C. Removal",
+        "url": "https://www.phoronix.com/news/Linux-7.1-Removes-Old-Net",
+        "summary": "Linus Torvalds 在 Linux 6.8 合并窗口中接受了大规模代码清理，移除了约 13.8 万行代码。主要涉及已废弃的 ISDN 数字通信系统、业余无线电（Ham Radio）相关驱动以及老旧的网络驱动程序。这是内核对过时技术的例行清理工作，反映了内核维护中对废弃代码的持续优化。",
+        "source": "Phoronix",
+        "tags": [
+          "内核清理",
+          "旧驱动移除",
+          "代码维护"
+        ],
+        "readingTime": 2,
+        "relevance": "medium"
+      }
+    ]
+  },
+  "tagStats": {
+    "内核清理": 1,
+    "旧驱动移除": 1,
+    "代码维护": 1
+  }
+}
