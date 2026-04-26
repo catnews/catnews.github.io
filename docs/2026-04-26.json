@@ -1,0 +1,163 @@
+{
+  "date": "2026-04-26",
+  "categories": {
+    "papers": [
+      {
+        "title": "Takeaways of Implementing a Native Rust UDP Tunneling Network Driver in the Linux Kernel",
+        "url": "https://www.semanticscholar.org/paper/aec97257033a4bb81bf0b5eba3cd68787e907d4d",
+        "summary": "本文介绍了在Linux内核中用Rust语言实现原生UDP隧道网络驱动的经验总结。UDP tunneling是网络隧道技术的一种，在容器网络、VPN、负载均衡等场景中广泛应用。该研究直接涉及Linux内核网络子系统，展示了Rust语言在内核网络驱动开发中的应用潜力。论文讨论了内存安全性和性能优化这两个在内核网络开发中至关重要的因素，这对于探索Linux内核网络性能优化和未来内核开发范式转换具有重要参考价值。",
+        "summary_en": "C is the primary programming language used in the Linux kernel. Recently, the Linux developer community oversaw the experimental addition of Rust into...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux内核网络驱动",
+          "Rust内核编程",
+          "UDP隧道/网络隧道"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      },
+      {
+        "title": "Sapo-boi: Bypassing Linux Kernel Network Stack in the Implementation of an XDP-based NIDS",
+        "url": "https://www.semanticscholar.org/paper/2db6a34d9fef96c7f5869564239dc15249b9ac96",
+        "summary": "这篇论文提出了一种名为Sapo-boi的NIDS（网络入侵检测系统）解决方案，采用XDP（eXpress Data Path）技术实现。系统由两个模块组成：Suspicion Module（使用XDP程序在网卡驱动层进行可疑流量检测）和Second Module（在用户空间进行深度检测）。核心创新点在于利用XDP实现内核网络栈bypass，直接在网卡驱动层处理数据包，显著提升检测性能。该研究直接涉及Linux内核网络子系统的核心热点——XDP/eBPF技术和内核bypass方案，对理解Linux内核网络性能优化具有重要参考价值。论文展示了如何通过XDP提升NIDS的处理能力和检测效率。",
+        "summary_en": "Network intrusion detection systems (NIDS) must inspect multiple parts of a packet to detect patterns of known attacks. With the advent of XDP, it has...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "XDP/eBPF",
+          "NIDS/网络安全",
+          "内核网络栈bypass",
+          "Linux内核网络性能"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      },
+      {
+        "title": "FG-RCA: Kernel-Anchored Post-Exploitation Containment for IoT with Policy Synthesis and Mitigation of Zero-Day Attacks",
+        "url": "https://www.semanticscholar.org/paper/32ee09c3c6442f174c2d3b2e6cc425cd3aef4f74",
+        "summary": "Zero-day intrusions on IoT endpoints demand defenses that curtail attacker impact and persistence after breach. This article presents Fine-Grained Runtime Containment Agent (FG-RCA), a lightweight post-exploitation conta...",
+        "summary_en": "Zero-day intrusions on IoT endpoints demand defenses that curtail attacker impact and persistence after breach. This article presents Fine-Grained Run...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "Socket",
+          "网络优化",
+          "容器网络"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Tron: Fuzzing Linux Network Stack via Protocol-System Call Payload Synthesis",
+        "url": "https://www.semanticscholar.org/paper/ff1b66cf197f263b38b0e6ecfb3fc826c60503f7",
+        "summary": "本文介绍Tron工具，一个针对Linux内核网络栈的模糊测试框架。论文针对网络栈复杂且有状态的特点，通过协议与系统调用payload合成来进行fuzzing测试。内容明确涉及Linux内核网络栈的测试方法论，使用syzkaller作为baseline进行比较研究。这项工作直接面向Linux内核网络子系统的安全性测试，对于网络协议栈的正确性验证具有重要价值，属于Linux内核网络性能与安全领域的热点研究方向。",
+        "summary_en": "The Linux kernel network stack is a critical component of modern operating systems, widely deployed across platforms and often exposed to untrusted in...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Fuzzing/模糊测试",
+          "Linux网络栈",
+          "协议测试",
+          "内核安全"
+        ],
+        "readingTime": 12,
+        "relevance": "high"
+      },
+      {
+        "title": "Assessing the Cloud-RAN in the Linux Kernel: Sharing Computing and Network Resources",
+        "url": "https://www.semanticscholar.org/paper/09b592037a740fdb1035bd6ce8be57f65a77d01a",
+        "summary": "Cloud-based Radio Access Network (Cloud-RAN) leverages virtualization to enable the coexistence of multiple virtual Base Band Units (vBBUs) with collocated workloads on a single edge computer, aiming for economic and ope...",
+        "summary_en": "Cloud-based Radio Access Network (Cloud-RAN) leverages virtualization to enable the coexistence of multiple virtual Base Band Units (vBBUs) with collo...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "Linux内核网络",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "SPAC: Automating FPGA-based Network Switches with Protocol Adaptive Customization",
+        "url": "http://arxiv.org/abs/2604.21881v1",
+        "summary": "With network requirements diverging across emerging applications, latency-critical services demand minimal logic delay, while hyperscale training and collectives require sustained line-rate throughput for synchronized bu...",
+        "summary_en": "With network requirements diverging across emerging applications, latency-critical services demand minimal logic delay, while hyperscale training and ...",
+        "source": "arXiv",
+        "tags": [
+          "包处理",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Development of a Linux Kernel Driver for the SBNI Network Interface Using Remote Real-Time Processing Units",
+        "url": "https://www.semanticscholar.org/paper/34a6515b76c475885c397123f1fe5ca0915a5cb4",
+        "summary": "本文介绍为SBNI（Siberian Board Network Interface）网络接口开发Linux内核驱动程序。SBNI是由俄罗斯Granch公司于90年代末开发的专用网络接口，用于双绞线租用线路的长距离数据传输，常见于地下采矿等危险工业环境。论文主要聚焦于针对这一特定工业网络硬件的Linux内核驱动开发，涉及内核模块编写、网络设备注册、数据收发等基础驱动框架。虽然确实属于Linux内核网络驱动开发范畴，但SBNI是相对小众的专用工业网络技术，与当前主流的容器网络、云原生网络、内核网络性能优化等热点研究方向关联度较低。",
+        "summary_en": "This article covers the subject of developing a Linux kernel driver for the existing SBNI network interface for twisted-pair leased lines, which is us...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux内核驱动",
+          "工业网络",
+          "网络设备驱动",
+          "嵌入式系统"
+        ],
+        "readingTime": 12,
+        "relevance": "medium"
+      },
+      {
+        "title": "Scheduling Analysis of UAV Flight Control Workloads using Raspberry Pi 5 Using PREEMPT_RT Linux",
+        "url": "http://arxiv.org/abs/2604.19275v1",
+        "summary": "Modern UAV architectures increasingly aim to unify high-level autonomy and low-level flight control on a single General-Purpose Operating System (GPOS). However, complex multi-core System-on-Chips (SoCs) introduce signif...",
+        "summary_en": "Modern UAV architectures increasingly aim to unify high-level autonomy and low-level flight control on a single General-Purpose Operating System (GPOS...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "Linux内核网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "Infrastructure-as-Code in Open-Networking: Git, Ansible, and Cumulus-Linux Case Study",
+        "url": "https://www.semanticscholar.org/paper/622a009ad02f07c9e19e6a4baa7f9a66fdfcbe1b",
+        "summary": "One of the necessities for modern connectivity infrastructures is decreasing devices setup-times and giving configuration visibility to troubleshoot complex scenarios more easily. This proof-of-concept and case study sce...",
+        "summary_en": "One of the necessities for modern connectivity infrastructures is decreasing devices setup-times and giving configuration visibility to troubleshoot c...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "Linux内核网络驱动": 1,
+    "Rust内核编程": 1,
+    "UDP隧道/网络隧道": 1,
+    "XDP/eBPF": 1,
+    "NIDS/网络安全": 1,
+    "内核网络栈bypass": 1,
+    "Linux内核网络性能": 1,
+    "eBPF": 1,
+    "Socket": 1,
+    "网络优化": 4,
+    "容器网络": 1,
+    "Fuzzing/模糊测试": 1,
+    "Linux网络栈": 1,
+    "协议测试": 1,
+    "内核安全": 1,
+    "TCP/IP": 3,
+    "Linux内核网络": 2,
+    "性能": 3,
+    "包处理": 1,
+    "Linux内核驱动": 1,
+    "工业网络": 1,
+    "网络设备驱动": 1,
+    "嵌入式系统": 1
+  }
+}
