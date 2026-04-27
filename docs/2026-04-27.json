@@ -1,0 +1,29 @@
+{
+  "date": "2026-04-27",
+  "categories": {
+    "papers": [
+      {
+        "title": "Chamelio: A Fast Shared Cloud Network Stack for Isolated Tenant-Defined Protocols",
+        "url": "http://arxiv.org/abs/2604.22603v1",
+        "summary": "Chamelio是一种面向云环境的高速共享网络栈，旨在解决传统云网络虚拟化中多层guest和host导致CPU开销大、尾延迟高的问题。该方案利用eBPF技术实现可编程的共享数据路径，允许租户自定义协议的同时保持多租户隔离。与传统固定功能的共享栈不同，Chamelio通过eBPF提供灵活性，支持租户定义特定协议，同时优化数据包处理路径以提升性能。该研究对理解Linux内核eBPF在云网络优化中的应用具有重要参考价值。",
+        "summary_en": "Conventional cloud network virtualization sends packets through multiple guest and host layers, inflating CPU cost and tail latency. Shared host datap...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF/XDP",
+          "云网络虚拟化",
+          "性能优化",
+          "多租户隔离"
+        ],
+        "readingTime": 6,
+        "relevance": "high"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF/XDP": 1,
+    "云网络虚拟化": 1,
+    "性能优化": 1,
+    "多租户隔离": 1
+  }
+}
