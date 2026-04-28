@@ -1,0 +1,131 @@
+{
+  "date": "2026-04-28",
+  "categories": {
+    "papers": [
+      {
+        "title": "TCP Wave over Linux: A disruptive alternative to the traditional TCP window approach",
+        "url": "https://www.semanticscholar.org/paper/45b7e6b7366d3a33794ba8b85bab83491c3d9534",
+        "summary": "本文介绍了TCP Wave协议在Linux内核中的完整实现。TCP Wave是一种颠覆性的TCP改进方案，采用基于burst（突发）的通信范式取代传统的滑动窗口机制，旨在解决传统TCP在现代应用和高挑战网络场景下的性能瓶颈。文章详细阐述了将模拟环境中的协议移植到真实Linux网络系统时所需的内核适配工作，包括协议栈集成、性能调优和实际部署中的关键挑战。作为直接涉及Linux内核网络协议栈实现的论文，该工作对理解TCP协议演进和内核网络子系统优化具有重要参考价值。",
+        "summary_en": "Abstract TCP Wave relies on a disruptive communication paradigm based on bursts, to overcome limitations of legacy TCP with modern applications and ch...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP协议",
+          "Linux内核网络",
+          "协议栈优化",
+          "网络性能"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      },
+      {
+        "title": "TCP Acknowledgment Optimization in Low Power and Embedded Devices",
+        "url": "https://www.semanticscholar.org/paper/689360ee4a5fa5ef7560e28d151bd67c4cf768ab",
+        "summary": "本文研究TCP确认(ACK)优化技术，针对低功耗或嵌入式设备在高速链路上的性能问题，提出通过限制ACK速率来减少设备处理负担的方法。虽然TCP ACK优化属于Linux内核网络子系统中TCP/IP协议栈的范畴，但本文主要聚焦于嵌入式设备和IoT场景的特定应用，与通用Linux内核网络性能优化的关联度有限。文章更适合归类为嵌入式系统网络优化研究，而非内核子系统层面的深度探讨。",
+        "summary_en": "Paper investigates transport control protocol (TCP) acknowledgment (ACK) optimization in low power or embedded devices to improve their performance on...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP协议栈",
+          "网络性能优化",
+          "嵌入式/IoT网络"
+        ],
+        "readingTime": 3,
+        "relevance": "medium"
+      },
+      {
+        "title": "ACCeSS: Adaptive QoS-aware Congestion Control for Multipath TCP",
+        "url": "https://www.semanticscholar.org/paper/0de0a871c5c9a7db667f8930350fd5790bfbe538",
+        "summary": "Multipath TCP (MPTCP) enables multi-home devices to establish multiple paths for simultaneous data transmission. However, due to diverse Quality of Service (QoS) requirements in real network, existing multipath congestio...",
+        "summary_en": "Multipath TCP (MPTCP) enables multi-home devices to establish multiple paths for simultaneous data transmission. However, due to diverse Quality of Se...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "Linux内核网络",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Research on TCP transmission performance optimization based on satellite communication conditions",
+        "url": "https://www.semanticscholar.org/paper/22b284ceaa9c87566baa641b146b53c5e57a8abb",
+        "summary": "This article proposes directions for improving TCP transmission performance by analyzing the impact of satellite communication link characteristics on TCP. We conducted in-depth research on the application of various TCP...",
+        "summary_en": "This article proposes directions for improving TCP transmission performance by analyzing the impact of satellite communication link characteristics on...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Enhanced TCP Security and Dockerized MQTT Implementation and Performance Parameters Analysis Using Kali Linux",
+        "url": "https://www.semanticscholar.org/paper/fd7a6ff36453af3f0f8820ec1a0da23bf1352f5b",
+        "summary": "本文研究TCP安全增强（密码保护与数据加密）以及Docker容器化环境中MQTT协议的部署与性能分析，使用Kali Linux作为实验平台。研究内容包括TCP通信的安全加固、MQTT在Docker中的实现部署、以及相关性能指标测量。该文侧重于应用层网络安全与容器化应用实践，而非Linux内核网络子系统的核心机制研究，与容器网络实践有一定关联但不涉及内核级网络优化。",
+        "summary_en": "Securing communication protocols and ensuring efficient performance are critical in modern network environments. This paper presents a comprehensive s...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP安全",
+          "MQTT",
+          "Docker容器",
+          "网络性能分析"
+        ],
+        "readingTime": 8,
+        "relevance": "medium"
+      },
+      {
+        "title": "Empirical Evaluation of DASH Streaming over Multipath TCP in a Mixed Traffic Environment",
+        "url": "https://www.semanticscholar.org/paper/e436a83137d0f27a7c9df346afbbab71d77d66c4",
+        "summary": "本文评估了在混合流量环境下，MPTCP（多路径TCP）传输DASH（HTTP动态自适应流）视频的性能。研究关注MPTCP这一Linux内核已支持的传输层协议在多接口设备上的带宽聚合和故障恢复能力，及其对实时流媒体应用的影响。论文主要通过实验测试来分析MPTCP在并发流量场景下对视频流质量、吞吐量和延迟的影响，属于传输层协议与视频应用结合的性能评估研究。",
+        "summary_en": "Multipath TCP (MPTCP) is a transport layer protocol that enables multi-homed devices to simultaneously use more than one interface. As a result, MPTCP...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "MPTCP",
+          "DASH流媒体",
+          "传输层协议",
+          "性能评估"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "On the Informativeness of Security Commit Messages: A Large-scale Replication Study",
+        "url": "http://arxiv.org/abs/2604.20461v1",
+        "summary": "The informativeness of security-related commit messages is crucial for patch triage: when high, it enables the rapid distribution and deployment of security fixes. Prior research (Reis et al., 2023) reported, however, th...",
+        "summary_en": "The informativeness of security-related commit messages is crucial for patch triage: when high, it enables the rapid distribution and deployment of se...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "Linux内核网络"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP协议": 1,
+    "Linux内核网络": 3,
+    "协议栈优化": 1,
+    "网络性能": 1,
+    "TCP/IP协议栈": 1,
+    "网络性能优化": 1,
+    "嵌入式/IoT网络": 1,
+    "TCP/IP": 3,
+    "网络优化": 2,
+    "性能": 2,
+    "驱动": 1,
+    "TCP安全": 1,
+    "MQTT": 1,
+    "Docker容器": 1,
+    "网络性能分析": 1,
+    "MPTCP": 1,
+    "DASH流媒体": 1,
+    "传输层协议": 1,
+    "性能评估": 1
+  }
+}
