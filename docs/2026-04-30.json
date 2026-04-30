@@ -1,0 +1,174 @@
+{
+  "date": "2026-04-30",
+  "categories": {
+    "papers": [
+      {
+        "title": "FLASH: Fast Linked AF_XDP Sockets for High Performance Network Function Chains",
+        "url": "https://www.semanticscholar.org/paper/980073261eea8ebd787c0f752c9ca6c25546d5e7",
+        "summary": "Recent advances in the Linux kernel, such as eXpress Data Path (XDP) and AF_XDP sockets, enable high-speed packet processing for software NFs while preserving access to kernel features. However, the default AF_XDP implem...",
+        "summary_en": "Recent advances in the Linux kernel, such as eXpress Data Path (XDP) and AF_XDP sockets, enable high-speed packet processing for software NFs while pr...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "XDP",
+          "Socket",
+          "驱动",
+          "包处理"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "ChainIO: Bridging Disk and Network Domains with eBPF",
+        "url": "https://www.semanticscholar.org/paper/0488fdf74ba3b385e59fb3a796a5010131d1a7cb",
+        "summary": "Modern data-driven services from analytical databases and key-value stores to stream processors suffer high tail-latencies because each disk read and subsequent packet send/recv incurs a separate user-kernel crossing and...",
+        "summary_en": "Modern data-driven services from analytical databases and key-value stores to stream processors suffer high tail-latencies because each disk read and ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "TCP/IP",
+          "Socket"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Are Kernel Drivers Ready For Accelerated Packet Processing Using AF_XDP?",
+        "url": "https://www.semanticscholar.org/paper/e81d89a5ebb2e41b37c11cde3f9989c5758b9aa8",
+        "summary": "本文探讨了Linux内核4.18引入的AF_XDP加速包处理技术的内核驱动就绪状态。AF_XDP作为新型内核旁路方案，与DPDK等传统方案不同，它无需特殊执行环境，依赖内核驱动实现高性能。论文通过对比测试评估不同厂商内核驱动对AF_XDP的支持程度和性能表现，关注驱动实现的成熟度和实际部署可行性。研究涉及Linux内核网络栈、零拷贝技术、驱动与用户空间的高效数据传输等核心议题，对理解现代高速网络处理技术具有重要参考价值。",
+        "summary_en": "AF_XDP is a new technology for accelerated packet processing that was introduced in Linux kernel 4.18. Unlike other kernel bypassing technologies, AF_...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "AF_XDP",
+          "内核驱动",
+          "高速包处理",
+          "性能评估"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "An In-Kernel Inline Crypto Solution for eXpress Data Path With QuickAssist Technology: Design, Prototyping and Performance Evaluation",
+        "url": "https://www.semanticscholar.org/paper/11e70207a0e117751d08b9670135e7f9c7465396",
+        "summary": "该论文针对Linux内核XDP（eXpress Data Path）框架无法解析和处理加密数据包的问题，提出了一种基于Intel QuickAssist硬件加速技术的内核内联加密解决方案。XDP作为Linux主线的高性能可编程数据包处理框架，在DDoS防护、路由、负载均衡等场景表现优异，但面对日益增长的加密流量时能力受限。本文设计并原型实现了在XDP层直接进行加解密处理的方案，既保持了XDP的高性能优势，又扩展了其处理加密数据的能力，并进行了详尽的性能评估验证。",
+        "summary_en": "The eXpress Data Path (XDP) has been part of mainline Linux kernel as an approach of high-performance programmable packet processing. It has demonstra...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "XDP/eBPF",
+          "Inline Crypto",
+          "QuickAssist",
+          "Kernel Network Optimization"
+        ],
+        "readingTime": 20,
+        "relevance": "high"
+      },
+      {
+        "title": "Understanding Delays in AF_XDP-based Applications",
+        "url": "https://www.semanticscholar.org/paper/f29ca1f75a76ef8aa15797aa474580d7a1917485",
+        "summary": "本文研究AF_XDP应用中延迟问题的根源。AF_XDP是一种Linux内核提供的高性能数据包处理机制，允许应用直接在网络驱动层接收数据包，绕过传统复杂网络栈。内容涉及XDP（eXpress Data Path）与DPDK两种主流内核旁路方案的性能对比，探讨AF_XDP在生产环境中的延迟表现及优化方向。该研究对理解Linux内核网络性能优化、eBPF/XDP技术实践具有重要参考价值，属于Linux内核网络子系统的核心热点领域。",
+        "summary_en": "Packet processing on Linux can be slow due to its complex network stack. To solve this problem, there are two main solutions: eXpress Data Path (XDP) ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "AF_XDP",
+          "XDP/eBPF",
+          "内核旁路",
+          "网络性能优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "SRA: Leveraging AF_XDP for Programmable Network Functions with IPv6 Segment Routing",
+        "url": "https://www.semanticscholar.org/paper/e86153967b512ed383cc3f9126d6ab45755ce8b5",
+        "summary": "The IPv6 Segment Routing (SRv6) is a promising solution to support services such as service function chain (SFC) and network function virtualization (NFV). But the SRv6 implementation in the Linux kernel is being critici...",
+        "summary_en": "The IPv6 Segment Routing (SRv6) is a promising solution to support services such as service function chain (SFC) and network function virtualization (...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "XDP",
+          "TCP/IP",
+          "路由",
+          "包处理"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "100-Gbit/s UDP Data Acquisition on Linux Using AF_XDP: The TRISTAN Detector",
+        "url": "https://www.semanticscholar.org/paper/289d7478c96f7c59be377c703d594652dd526414",
+        "summary": "本文介绍在Linux系统上使用AF_XDP实现100-Gbit/s高速UDP数据采集的方案，用于TRISTAN粒子探测器。AF_XDP是Linux内核网络栈中的重要技术，允许绕过传统网络路径实现高速数据包处理，直接将数据传递到用户空间。文章展示了在核物理实验场景下如何通过AF_XDP技术突破传统POSIX socket的性能瓶颈，实现亚微秒级延迟的超高速数据采集。",
+        "summary_en": "A growing number of detectors produce data rates of more than 100 Gb/s, which often necessitate software-defined data processing to operate. Because o...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "AF_XDP/XDP",
+          "高性能网络",
+          "eBPF",
+          "数据采集"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Startup Delay Performance Evaluation for SOME/IP: A Comparative Analysis on Linux Network API",
+        "url": "https://www.semanticscholar.org/paper/e73b5d976ff5c4f1d2c6a65c428cefe43d0ac19a",
+        "summary": "本文研究软件定义车辆中车内通信的早期可用性问题，重点比较了两种Linux底层网络API（Raw Socket和PCAP）对SOME/IP服务启动延迟的影响。实验在NXP S32G嵌入式Linux平台上进行，结果显示Raw Socket始终实现最小延迟（13-15 ms），而PCAP延迟更长。论文直接涉及Linux网络编程接口的性能对比，但主要服务于汽车以太网场景下的SOME/IP中间件优化，而非通用内核网络子系统的深度研究。内容偏重嵌入式平台性能测试与汽车软件架构，对内核网络协议栈本身的研究有限。",
+        "summary_en": "In software-defined vehicles, early availability of in-vehicle communication is critical. This paper investigates how two low-level networking methods...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Raw Socket",
+          "PCAP",
+          "SOME/IP",
+          "嵌入式Linux"
+        ],
+        "readingTime": 4,
+        "relevance": "medium"
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for April 23, 2026",
+        "url": "https://lwn.net/Articles/1067989/",
+        "abstract": " LWN.net Weekly Edition for April 23, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: P",
+        "summary": "这是2026年4月23日的LWN.net周刊摘要，包含多个技术话题的预告。文章提到7.1内核合并窗口的第一部分内容即将发布，但未提供具体的网络开发细节。周刊还包括使用LLM发现Python C扩展bug、7.0调度器回归问题、Rust Sized trait层次结构提案、供应链攻击防御讨论等话题。本期内容仅为周刊目录介绍，缺少Linux内核网络相关的具体技术细节。",
+        "source": "LWN.net",
+        "tags": [
+          "LWN周刊",
+          "Linux内核",
+          "合并窗口",
+          "LLM应用"
+        ],
+        "readingTime": 2,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "XDP": 3,
+    "Socket": 2,
+    "驱动": 1,
+    "包处理": 2,
+    "eBPF": 2,
+    "TCP/IP": 2,
+    "AF_XDP": 2,
+    "内核驱动": 1,
+    "高速包处理": 1,
+    "性能评估": 1,
+    "XDP/eBPF": 2,
+    "Inline Crypto": 1,
+    "QuickAssist": 1,
+    "Kernel Network Optimization": 1,
+    "内核旁路": 1,
+    "网络性能优化": 1,
+    "路由": 1,
+    "AF_XDP/XDP": 1,
+    "高性能网络": 1,
+    "数据采集": 1,
+    "Raw Socket": 1,
+    "PCAP": 1,
+    "SOME/IP": 1,
+    "嵌入式Linux": 1,
+    "LWN周刊": 1,
+    "Linux内核": 1,
+    "合并窗口": 1,
+    "LLM应用": 1
+  }
+}
