@@ -1,0 +1,134 @@
+{
+  "date": "2026-05-01",
+  "categories": {
+    "papers": [
+      {
+        "title": "ClariNet: Optimizing Cross-Workload Connectivity in VM-Container Hybrid Environments",
+        "url": "https://www.semanticscholar.org/paper/2c2141cf5df99f429f2884b8d706d09b60e7a46b",
+        "summary": "Container and VM workloads frequently coexist in modern environments but operate on distinct networking architectures: containers rely on network namespaces, veth pairs, and iptables, whereas VMs use virtual NICs connect...",
+        "summary_en": "Container and VM workloads frequently coexist in modern environments but operate on distinct networking architectures: containers rely on network name...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "Netfilter",
+          "路由"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Accelerating container networking with eBPF: performance characterization, evaluation, and optimization. (Accélération des réseaux de conteneurs avec eBPF: caractérisation des performances, évaluation et optimisation)",
+        "url": "https://www.semanticscholar.org/paper/e80065cd1e2b6f6ce4460be33c8836bc94c64066",
+        "summary": "本文研究现代微服务架构下网络通信开销高达执行时间36%的问题，探讨如何利用eBPF和XDP技术突破传统Linux网络协议栈的性能瓶颈。研究聚焦于容器化环境中的网络性能表征、评估与优化，通过eBPF在内核中实现可编程的数据包处理，结合XDP高速数据路径绕过传统协议栈开销，显著提升容器网络的吞吐量和降低延迟。该工作对理解Linux内核网络性能优化、Cilium等基于eBPF的容器网络方案具有重要参考价值。",
+        "summary_en": "\n Les architectures microservices modernes créent des exigences réseau sans précédent, la surcharge de communication consommant jusqu'à 36% du temps d...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF/XDP",
+          "容器网络",
+          "性能优化",
+          "Linux内核"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      },
+      {
+        "title": "KBP: Kernel Enhancements for Low-Latency Networking for Virtual Machine and Container without Application Customization",
+        "url": "https://www.semanticscholar.org/paper/d1db055e0379b56771a3357bebcbd66107f21582",
+        "summary": "本文提出KBP（Kernel Bypass Path）方案，通过内核增强实现VM和容器环境下的低延迟网络，无需应用程序定制。核心优化点在于绕过传统虚拟化网络栈的路径，通过优化hypervisor与guest之间或容器与宿主机之间的数据传输路径来降低延迟和提升吞吐量。涉及virtio/vhost机制、共享内存、零拷贝等内核网络虚拟化技术，针对当前虚拟化网络面临的性能开销问题提出解决方案。",
+        "summary_en": "SUMMARY Packet processing on commodity hardware is a cost-eﬃcient and ﬂexible alternative to specialized networking hardware. However, virtualizing de...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "虚拟化网络",
+          "低延迟网络",
+          "内核网络优化"
+        ],
+        "readingTime": 15,
+        "relevance": "high"
+      },
+      {
+        "title": "Libra: Accelerating Socket I/O via Programmable Selective Data Copying",
+        "url": "http://arxiv.org/abs/2604.27686v1",
+        "summary": "本文提出了Libra系统，旨在加速L7代理中套接字I/O的数据复制性能。核心问题是传统OS在将数据从内核复制到用户态时需要复制整个payload，造成显著性能开销。作者提出可编程的选择性数据复制方案，在保持POSIX兼容性的前提下减少不必要的数据拷贝。该工作直接涉及Linux内核的Socket API和内核-用户态数据传输机制，是典型的内核网络性能优化研究，与Linux内核网络子系统高度相关。",
+        "summary_en": "Layer-7 (L7) proxies are critical to modern cloud-native systems, yet their performance is increasingly bottlenecked by copying entire payloads across...",
+        "source": "arXiv",
+        "tags": [
+          "Socket I/O",
+          "Kernel-User Copy",
+          "L7 Proxy"
+        ],
+        "readingTime": 12,
+        "relevance": "high"
+      },
+      {
+        "title": "An Analysis of Host Stack Overheads in Cloud Container Overlay Networking",
+        "url": "https://www.semanticscholar.org/paper/5313fa0741c8154392e1ae08825dbd0d931ff90b",
+        "summary": "该论文分析了云原生容器overlay网络中的host-stack性能开销问题。容器overlay网络是实现跨节点微服务通信的关键技术，但其VXLAN等封装/解封装机制会带来显著的性能瓶颈。论文聚焦于host侧的处理开销，包括overlay封装逻辑、CPU开销、内存拷贝等对网络延迟和吞吐量的影响。这类研究直接关联Linux内核网络栈的优化，对理解Cilium/eBPF等现代容器网络方案的性能优势具有重要参考价值。",
+        "summary_en": "Container overlay networks are a fundamental component of cloud-native infrastructures, enabling seamless communication between microservices across d...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "容器网络",
+          "Overlay网络",
+          "性能分析",
+          "网络栈开销"
+        ],
+        "readingTime": 6,
+        "relevance": "high"
+      },
+      {
+        "title": "Comparative experimental analysis of Docker container networking drivers",
+        "url": "https://www.semanticscholar.org/paper/4161415df284df928c972cd21ef1ac870915df89",
+        "summary": "本文对Docker容器网络驱动进行实验对比分析，属于容器网络性能测试研究。Docker网络驱动（bridge、host、overlay、macvlan等）直接依赖Linux内核网络机制实现，包括veth虚拟以太网对、网桥、网络命名空间（netns）、overlay隧道等技术。相比传统VM，容器因共享宿主机内核而具有更低网络开销。本文通过benchmark测试对比各驱动的吞吐量、延迟等性能指标，是典型的容器网络基础设施研究，与Linux内核网络子系统直接相关。",
+        "summary_en": "Virtualization allows for more efficient hardware usage by allowing several instances of Operating Systems (OSs) or Virtual Machines (VMs) to run on a...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "容器网络",
+          "Docker网络驱动",
+          "性能benchmark",
+          "veth/网桥"
+        ],
+        "readingTime": 6,
+        "relevance": "high"
+      },
+      {
+        "title": "NetSatBench: A Distributed LEO Constellation Emulator with an SRv6 Case Study",
+        "url": "http://arxiv.org/abs/2604.27854v1",
+        "summary": "NetSatBench is a distributed emulation platform for evaluating communication protocols and application workloads over large-scale LEO satellite systems. Satellites, gateways, and user terminals are implemented as Linux c...",
+        "summary_en": "NetSatBench is a distributed emulation platform for evaluating communication protocols and application workloads over large-scale LEO satellite system...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "路由",
+          "驱动",
+          "容器网络"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "TCP/IP": 2,
+    "Netfilter": 1,
+    "路由": 2,
+    "eBPF/XDP": 1,
+    "容器网络": 4,
+    "性能优化": 1,
+    "Linux内核": 1,
+    "虚拟化网络": 1,
+    "低延迟网络": 1,
+    "内核网络优化": 1,
+    "Socket I/O": 1,
+    "Kernel-User Copy": 1,
+    "L7 Proxy": 1,
+    "Overlay网络": 1,
+    "性能分析": 1,
+    "网络栈开销": 1,
+    "Docker网络驱动": 1,
+    "性能benchmark": 1,
+    "veth/网桥": 1,
+    "驱动": 1
+  }
+}
