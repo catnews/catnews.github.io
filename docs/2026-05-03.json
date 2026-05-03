@@ -1,0 +1,80 @@
+{
+  "date": "2026-05-03",
+  "categories": {
+    "papers": [
+      {
+        "title": "TCP Pacing in the Linux Kernel",
+        "url": "https://www.semanticscholar.org/paper/7c307a682635ca9072a761330a6bfb3368363c75",
+        "summary": "本文深入探讨Linux内核中TCP Pacing的实现机制。TCP Pacing通过在数据包传输之间引入短暂间隔来优化网络性能，其核心优势包括降低丢包概率和改善短队列网络环境下的运行效果。文章详细分析了该机制在Linux内核中的实现细节，指出其适用于所有不自行控制pacing速率的TCP拥塞控制算法。作为内核网络栈的核心功能，TCP Pacing直接影响TCP的流量控制和拥塞管理，是网络性能优化的关键技术之一。",
+        "summary_en": "Pacing introduces short pauses in between data packets upon transmission; this is often beneficial. For example, pacing can reduce the chance of packe...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP Pacing",
+          "TCP拥塞控制",
+          "Linux内核网络",
+          "网络性能优化"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      },
+      {
+        "title": "Achieving Hard Real-Time Networking on PREEMPT_RT Linux with RTnet",
+        "url": "https://www.semanticscholar.org/paper/87f3614e1d9e7b9bf25ff5ae1e968da6ee26bb16",
+        "summary": "该论文研究如何在PREEMPT_RT实时Linux补丁环境下集成RTnet硬实时网络栈，以实现确定性的网络通信。PREEMPT_RT为Linux提供硬实时能力，但缺乏专用实时网络协议栈；RTnet作为成熟的硬实时开源网络栈填补了这一空白。论文探讨了实时网络的关键技术挑战，包括中断延迟、上下文切换开销及调度确定性等问题。这是Linux内核网络子系统在工业控制、机器人等硬实时场景的重要扩展研究。",
+        "summary_en": "There are many operating systems on the market, but, being free and having great user interface, connectivity and graphics features, Linux can be used...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "PREEMPT_RT",
+          "RTnet",
+          "实时网络",
+          "Linux内核网络栈"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Enterprise Linux Administration at Scale: Strategies for Efficient Installation, Migration, Performance Optimization, and Production Support",
+        "url": "https://www.semanticscholar.org/paper/45c03c8dabdcf5fdc07e43b04b4af7aba76d5a3d",
+        "summary": "This paper aims to develop a structured framework for managing large scale Enterprise Linux environments. It focuses on reducing operational friction during installation, migration, performance tuning, and ongoing produc...",
+        "summary_en": "This paper aims to develop a structured framework for managing large scale Enterprise Linux environments. It focuses on reducing operational friction ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "容器网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Affinity Tailor: Dynamic Locality-Aware Scheduling at Scale",
+        "url": "http://arxiv.org/abs/2604.27915v1",
+        "summary": "Modern large multicore systems often run multiple workloads that share CPUs under schedulers such as Linux CFS. To keep CPUs busy, these schedulers load-balance runnable work, causing each workload to execute on many cor...",
+        "summary_en": "Modern large multicore systems often run multiple workloads that share CPUs under schedulers such as Linux CFS. To keep CPUs busy, these schedulers lo...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP Pacing": 1,
+    "TCP拥塞控制": 1,
+    "Linux内核网络": 1,
+    "网络性能优化": 1,
+    "PREEMPT_RT": 1,
+    "RTnet": 1,
+    "实时网络": 1,
+    "Linux内核网络栈": 1,
+    "eBPF": 1,
+    "TCP/IP": 2,
+    "容器网络": 1,
+    "性能": 2
+  }
+}
