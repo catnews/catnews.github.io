@@ -1,0 +1,29 @@
+{
+  "date": "2026-05-04",
+  "categories": {
+    "papers": [
+      {
+        "title": "AdvNet: Revealing Performance Issues in Network Protocols by Generating Adversarial Environments",
+        "url": "http://arxiv.org/abs/2605.00755v1",
+        "summary": "AdvNet提出使用对抗性环境生成技术来评估网络协议（如拥塞控制算法）的性能问题。该研究指出当前协议评估依赖手工设计的测试用例或真实环境捕获的数据集，可能遗漏算法在意外网络环境下的关键行为。通过生成对抗性网络环境，可以更全面地发现协议设计的潜在缺陷。这与协议栈优化相关，但更侧重于测试方法论而非内核实现层面。",
+        "summary_en": "Infrastructure protocols like Congestion Control (CC) seek to provide reliable performance across a wide range of Internet environments. Currently, pr...",
+        "source": "arXiv",
+        "tags": [
+          "网络协议测试",
+          "对抗性环境",
+          "拥塞控制",
+          "性能评估"
+        ],
+        "readingTime": 12,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "网络协议测试": 1,
+    "对抗性环境": 1,
+    "拥塞控制": 1,
+    "性能评估": 1
+  }
+}
