@@ -1,0 +1,60 @@
+{
+  "date": "2026-05-05",
+  "categories": {
+    "papers": [
+      {
+        "title": "IteRate: Autonomous AI Synthesis of In-Kernel eBPF Wi-Fi Rate Control Algorithms",
+        "url": "http://arxiv.org/abs/2605.02542v1",
+        "summary": "Wi-Fi rate adaptation remains a persistent challenge in wireless networking. Deployed algorithms like Minstrel-HT have remained largely stagnant for over a decade, relying on hand-tuned heuristics that fail to generalize...",
+        "summary_en": "Wi-Fi rate adaptation remains a persistent challenge in wireless networking. Deployed algorithms like Minstrel-HT have remained largely stagnant for o...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "Linux内核网络",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Tool Use as Action: Towards Agentic Control in Mobile Core Networks",
+        "url": "http://arxiv.org/abs/2605.02811v1",
+        "summary": "Artificial Intelligence (AI) will play an essential role in 6G. It will fundamentally reshape the network architecture itself and drive major changes in the design of network entities, interfaces, and procedures. The ado...",
+        "summary_en": "Artificial Intelligence (AI) will play an essential role in 6G. It will fundamentally reshape the network architecture itself and drive major changes ...",
+        "source": "arXiv",
+        "tags": [
+          "包处理",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "The Activist's Guide to the Decentralized Social Universe: A Framework for Exploring How Decentralized Social Networks Can Support Collective Action",
+        "url": "http://arxiv.org/abs/2605.02800v1",
+        "summary": "The overreaches of mainstream social media platforms have been extensively reported and studied. For activist communities, these platforms pose risks of surveillance, censorship, or erasure. Decentralized social networks...",
+        "summary_en": "The overreaches of mainstream social media platforms have been extensively reported and studied. For activist communities, these platforms pose risks ...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "TCP/IP": 2,
+    "Linux内核网络": 1,
+    "网络优化": 3,
+    "包处理": 1,
+    "性能": 1,
+    "驱动": 1
+  }
+}
