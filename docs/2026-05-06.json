@@ -1,0 +1,170 @@
+{
+  "date": "2026-05-06",
+  "categories": {
+    "papers": [
+      {
+        "title": "Traffic Control Optimization for SOME/IP: Evaluating Queuing Disciplines in Vehicular Networks",
+        "url": "https://www.semanticscholar.org/paper/5173a237ef583864b9169c91c4f807e2a8a9d12f",
+        "summary": "As automotive systems become more complex, the flexibility and scalability of vehicle software components are required. Scalable service-oriented middleware over IP (SOME/IP) has emerged as a middleware solution for scal...",
+        "summary_en": "As automotive systems become more complex, the flexibility and scalability of vehicle software components are required. Scalable service-oriented midd...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "Netfilter",
+          "驱动",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "QoS-Aware Congestion Control using SRv6",
+        "url": "https://www.semanticscholar.org/paper/09c436479c1ec8f2e1bdea982b87ceb0212844aa",
+        "summary": "该论文提出\"Sepitto v2\"，一种利用SRv6（IPv6分段路由）实现面向QoS类别的拥塞控制机制。在现代网络流量爆炸式增长和服务需求多样化的背景下，通过SRv6报文携带拥塞控制信息，实现差异化QoS服务。论文核心是网络协议层面的拥塞控制与流量工程设计，属于TCP/IP协议栈优化范畴。SRv6在Linux 5.x+内核中有相关实现（如基于telemetry的拥塞反馈），但该论文侧重于网络架构设计与仿真验证，未明确涉及Linux内核实现细节，更偏向纯网络研究。",
+        "summary_en": "In the context of modern networks struggling with escalating traffic volumes and diverse service demands, advanced routing decisions and traffic engin...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SRv6",
+          "Congestion Control",
+          "QoS",
+          "Traffic Engineering"
+        ],
+        "readingTime": 6,
+        "relevance": "medium"
+      },
+      {
+        "title": "Introducing P4TC - A P4 implementation on Linux Kernel using Traffic Control",
+        "url": "https://www.semanticscholar.org/paper/5a5648acf9c5ae2a0db8a963dce4bad1c57bf2a7",
+        "summary": "P4TC是Linux内核原生的P4语言实现，构建在Traffic Control(TC)基础设施之上。该项目旨在为Linux内核提供协议无关的数据包处理能力，使开发者能够使用P4语言定义数据包解析、匹配和动作逻辑，并编译为内核eBPF程序执行。P4TC弥合了P4可编程网络语言与Linux内核网络栈之间的鸿沟，为软件定义网络、容器网络和内核数据包处理提供了新的编程范式。其核心价值在于将硬件ASIC的可编程性带到Linux软件数据平面，与eBPF/XDP形成互补，共同构成Linux内核网络可编程性的两大支柱。",
+        "summary_en": "The networking industry is at an inflection point with ever increasing network link capacities coupled with the presence of programmable hardware ASIC...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "P4TC",
+          "Linux Traffic Control",
+          "网络可编程性",
+          "eBPF"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Improved A* search: A bandwidth allocation algorithm for Linux traffic control based on Hierarchical Token Bucket",
+        "url": "https://www.semanticscholar.org/paper/07250c212dc42b3f573b02b285691df5a2a841b6",
+        "summary": "该论文提出了一种基于改进A*搜索算法的带宽分配方案，专门针对Linux流量控制（tc）中的Hierarchical Token Bucket (HTB)队列规则进行优化。HTB是Linux内核qdisc的重要组成部分，广泛应用于带宽整形和流量控制场景。研究旨在通过A*搜索算法优化HTB的带宽分配决策，提升网络资源利用率。论文主题直接涉及Linux内核网络子系统的流量控制机制，属于带宽管理和网络QoS优化范畴。关键词覆盖流量控制、带宽分配、HTB队列规则，均为Linux内核网络领域的重要技术点。",
+        "summary_en": "...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux流量控制",
+          "HTB队列规则",
+          "带宽分配算法",
+          "QoS优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Exploiting a 0day in Linux’s Traffic control",
+        "url": "https://www.semanticscholar.org/paper/1b4f36c0f74f9d30e1c6f94fe0f61b0b2bcf1683",
+        "summary": "本文深入分析Linux内核Traffic Control（流量控制）子系统中的一个0day漏洞利用技术。Traffic Control是Linux网络子系统的核心组件，负责数据包的调度、整形和优先级处理。文章详细剖析了漏洞的成因、利用方法及对系统安全的影响，展示了攻击者如何通过精心构造的网络数据包触发内核态的内存破坏。这类漏洞直接影响Linux内核网络栈的稳定性，对服务器和容器环境构成严重威胁，是内核安全研究领域的重要议题。",
+        "summary_en": "...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux内核安全",
+          "Traffic Control",
+          "0day漏洞利用",
+          "网络子系统"
+        ],
+        "readingTime": 30,
+        "relevance": "high"
+      },
+      {
+        "title": "Linux Traffic Control in Virtual Environment",
+        "url": "https://www.semanticscholar.org/paper/b5d800f18046b9bb8dc516999dade43bcb3e1a45",
+        "summary": "本文聚焦于Linux内核网络子系统中的Traffic Control（流量控制）机制在虚拟化环境下的应用与性能优化。Linux TC是内核网络栈的核心组件，通过qdisc（队列规则）实现流量整形、QoS调度和带宽管理。在虚拟化场景中（如KVM/QEMU、容器虚拟化），TC需要与virtio、vhost等虚拟化网络技术配合工作，涉及虚拟网桥、netns网络命名空间、vethpair等虚拟网络设备的协同。该论文很可能探讨虚拟化环境中TC的配置策略、性能影响以及与虚拟网络栈的交互机制，属于内核网络性能优化的重要研究方向。",
+        "summary_en": "...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux Traffic Control",
+          "虚拟化网络",
+          "流量整形/QoS"
+        ],
+        "readingTime": 15,
+        "relevance": "high"
+      },
+      {
+        "title": "QUIC Steps: Evaluating Pacing Strategies in QUIC Implementations",
+        "url": "https://www.semanticscholar.org/paper/4fe113ef980212b4e657f025dbf0db0c656eee2e",
+        "summary": "本文评估QUIC协议实现中的pacing（速率控制）策略。QUIC是基于UDP的用户空间传输协议，设计用于改进TCP/TLS性能。论文讨论了pacing机制在减少流量突发性、降低延迟和减少丢包中的作用，并评估了不同QUIC实现（如quiche、aioquic、msquic等）的pacing表现。虽然提到了BBR等拥塞控制算法依赖pacing，但研究主要针对用户空间QUIC实现，非内核网络子系统本身。内容偏向协议性能评估与测量，而非Linux内核网络栈的内部实现或优化。",
+        "summary_en": "Pacing is a key mechanism in modern transport protocols, used to regulate packet transmission timing to minimize traffic burstiness, lower latency, an...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "QUIC协议",
+          "传输层性能",
+          "拥塞控制",
+          "协议评估"
+        ],
+        "readingTime": 8,
+        "relevance": "low"
+      },
+      {
+        "title": "Unfair by design: eBPF-based scheduling of mixed database workloads",
+        "url": "http://arxiv.org/abs/2605.02377v1",
+        "summary": "Modern database systems increasingly co-schedule time-sensitive and background tasks. In such mixed workloads, background tasks should ideally utilize only spare CPU capacity without interfering with latency-critical req...",
+        "summary_en": "Modern database systems increasingly co-schedule time-sensitive and background tasks. In such mixed workloads, background tasks should ideally utilize...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "Linux内核网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Decentralized Edge Caching under Budget and Storage Constraints: A Game-Theoretic Approach",
+        "url": "http://arxiv.org/abs/2605.04023v1",
+        "summary": "The rapid growth of mobile social networks (MSNs) has significantly increased the demand for low-latency and reliable content delivery, motivating the deployment of edge caching systems. In practice, multiple content pro...",
+        "summary_en": "The rapid growth of mobile social networks (MSNs) has significantly increased the demand for low-latency and reliable content delivery, motivating the...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 2,
+    "Netfilter": 1,
+    "驱动": 1,
+    "网络优化": 2,
+    "SRv6": 1,
+    "Congestion Control": 1,
+    "QoS": 1,
+    "Traffic Engineering": 1,
+    "P4TC": 1,
+    "Linux Traffic Control": 2,
+    "网络可编程性": 1,
+    "eBPF": 2,
+    "Linux流量控制": 1,
+    "HTB队列规则": 1,
+    "带宽分配算法": 1,
+    "QoS优化": 1,
+    "Linux内核安全": 1,
+    "Traffic Control": 1,
+    "0day漏洞利用": 1,
+    "网络子系统": 1,
+    "虚拟化网络": 1,
+    "流量整形/QoS": 1,
+    "QUIC协议": 1,
+    "传输层性能": 1,
+    "拥塞控制": 1,
+    "协议评估": 1,
+    "Linux内核网络": 1,
+    "性能": 2
+  }
+}
