@@ -1,0 +1,72 @@
+{
+  "date": "2026-05-07",
+  "categories": {
+    "papers": [
+      {
+        "title": "APIOT: Autonomous Vulnerability Management Across Bare-Metal Industrial OT Networks",
+        "url": "http://arxiv.org/abs/2605.02346v1",
+        "summary": "Bare-metal operational technology (OT) devices -- especially the microcontrollers running Modbus/TCP and CoAP at the base of industrial control systems -- have remained outside the reach of autonomous security attacks. P...",
+        "summary_en": "Bare-metal operational technology (OT) devices -- especially the microcontrollers running Modbus/TCP and CoAP at the base of industrial control system...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "Geometry-Aware State Space Model: A New Paradigm for Whole-Slide Image Representation",
+        "url": "http://arxiv.org/abs/2605.05164v1",
+        "summary": "Accurate analysis of histopathological images is critical for disease diagnosis and treatment planning. Whole-slide images (WSIs), which digitize tissue specimens at gigapixel resolution, are fundamental to this process ...",
+        "summary_en": "Accurate analysis of histopathological images is critical for disease diagnosis and treatment planning. Whole-slide images (WSIs), which digitize tiss...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "Survey of Real-World Process Sandboxing",
+        "url": "https://www.semanticscholar.org/paper/2c538e65bd19e831fbb0d9a81739594a5cfbff9c",
+        "summary": "Attackers often exploit vulnerabilities in network-facing processes to gain access to the rest of the system. To combat this, modern operating systems such as Android, iOS and major Linux distributions allow running vuln...",
+        "summary_en": "Attackers often exploit vulnerabilities in network-facing processes to gain access to the rest of the system. To combat this, modern operating systems...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "网络优化",
+          "容器网络"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for April 30, 2026",
+        "url": "https://lwn.net/Articles/1069206/",
+        "abstract": " LWN.net Weekly Edition for April 30, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: P",
+        "summary": "LWN.net 2026年4月30日周刊主要报道了Linux内核开发的重要进展。famfs文件系统经历两年多讨论后在LSFMM+BPF峰会上获得关注，但因需要进一步重写而继续延迟合并。内核7.1版本的合并窗口带来多项重要变更。BPF作为内核扩展机制持续演进，在文件系统、网络监控等领域发挥关键作用。文章还涉及内核内存管理系统从页面到folio的过渡，以及Python打包治理结构的新进展。",
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核",
+          "BPF",
+          "文件系统",
+          "内核合并窗口"
+        ],
+        "readingTime": 3,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "TCP/IP": 2,
+    "网络优化": 3,
+    "容器网络": 1,
+    "Linux内核": 1,
+    "BPF": 1,
+    "文件系统": 1,
+    "内核合并窗口": 1
+  }
+}
