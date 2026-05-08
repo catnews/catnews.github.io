@@ -1,0 +1,75 @@
+{
+  "date": "2026-05-08",
+  "categories": {
+    "papers": [
+      {
+        "title": "Indoor 60 GHz Radio Channel Dataset Enabling Digital Twin Construction",
+        "url": "http://arxiv.org/abs/2605.05824v1",
+        "summary": "The ambitious performance targets of modern wireless networks, including 6G and Industrial IoT (IIoT) systems, necessitate advanced hardware platforms utilizing millimeter-wave (mmWave) technology. High-frequency signals...",
+        "summary_en": "The ambitious performance targets of modern wireless networks, including 6G and Industrial IoT (IIoT) systems, necessitate advanced hardware platforms...",
+        "source": "arXiv",
+        "tags": [
+          "驱动",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "SyzSpec: Specification Generation for Linux Kernel Fuzzing via Under-Constrained Symbolic Execution",
+        "url": "https://www.semanticscholar.org/paper/2c0b7c7a1796e7753192caa2f447679296792186",
+        "summary": "本文介绍SyzSpec，一个通过欠约束符号执行为Linux内核fuzzing生成规范的工具。论文主要贡献是改进syzkaller（已发现6800+内核bug的fuzzer）的测试用例生成效率，而非针对特定内核子系统。虽然syzkaller可应用于包括网络协议栈在内的所有内核模块，但本文核心是fuzzing技术方法论（符号执行、规范生成），属于内核测试基础设施研究，非网络协议实现或性能优化直接相关。适合了解内核fuzzing技术的背景知识，但不属于网络子系统专项研究。",
+        "summary_en": "Fuzzing has become one of the most effective and widely used techniques for discovering bugs and vulnerabilities, particularly in large-scale and comp...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux内核",
+          "Fuzzing技术",
+          "syzkaller"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "LiVeAction: a Lightweight, Versatile, and Asymmetric Neural Codec Design for Real-time Operation",
+        "url": "http://arxiv.org/abs/2605.06628v1",
+        "summary": "Modern sensors generate rich, high-fidelity data, yet applications operating on wearable or remote sensing devices remain constrained by bandwidth and power budgets. Standardized codecs such as JPEG and MPEG achieve effi...",
+        "summary_en": "Modern sensors generate rich, high-fidelity data, yet applications operating on wearable or remote sensing devices remain constrained by bandwidth and...",
+        "source": "arXiv",
+        "tags": [
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": [
+      {
+        "title": "Linux 7.2 To Support Realtek RTL8159 10GbE USB Ethernet",
+        "url": "https://www.phoronix.com/news/Realtek-RTL8159-Linux-7.2",
+        "summary": "Linux 7.2 内核即将支持 Realtek RTL8159 10GbE USB 以太网适配器。这是 Linux 内核网络驱动的重大更新，意味着用户可以在 Linux 系统上使用这款高性能的 Realtek USB 10GbE 网卡。该驱动将被纳入内核主线，为高速网络连接提供原生支持。",
+        "source": "Phoronix",
+        "tags": [
+          "Linux内核",
+          "网络驱动",
+          "USB网络",
+          "Realtek"
+        ],
+        "readingTime": 1,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "驱动": 1,
+    "网络优化": 2,
+    "性能": 2,
+    "Linux内核": 1,
+    "Fuzzing技术": 1,
+    "syzkaller": 1,
+    "网络驱动": 1,
+    "USB网络": 1,
+    "Realtek": 1
+  }
+}
