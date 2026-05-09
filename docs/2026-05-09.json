@@ -1,0 +1,79 @@
+{
+  "date": "2026-05-09",
+  "categories": {
+    "papers": [
+      {
+        "title": "eBPF: A New Approach to Cloud-Native Observability, Networking and Security for Current (5G) and Future Mobile Networks (6G and Beyond)",
+        "url": "https://www.semanticscholar.org/paper/a57b1120576bc12851632d20bd800d217ff431be",
+        "summary": "本文探讨eBPF在云原生环境中的应用，重点面向5G/6G移动通信网络场景。论文指出Kubernetes作为容器编排系统，eBPF正改变云原生的网络、安全和可观测性方法。但本文核心聚焦于电信移动网络基础设施，而非通用Linux内核网络栈或容器网络性能优化，eBPF在此更多作为移动网络赋能技术而非内核网络技术被讨论。",
+        "summary_en": "Modern mobile communication networks and new service applications are deployed on cloud-native platforms. Kubernetes (K8s) is the de facto distributed...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "5G/6G移动网络",
+          "云原生"
+        ],
+        "readingTime": 8,
+        "relevance": "medium"
+      },
+      {
+        "title": "HeteroPod: XPU-Accelerated Infrastructure Offloading for Commodity Cloud-Native Applications",
+        "url": "https://www.semanticscholar.org/paper/e7e45406253724ecfc01400f3e299f5323ab8d71",
+        "summary": "HeteroPod提出将云原生基础设施服务（服务网格、监控代理）卸载到DPU（数据处理单元）以减少主机资源争用和成本。论文主要关注DPU硬件加速器上的基础设施隔离和卸载架构设计，而非深入Linux内核网络子系统的具体实现。虽然涉及云原生网络场景，但核心是DPU/XPU硬件层面的资源调度，对TCP/IP协议栈、Socket API、eBPF、Netfilter等内核网络组件无直接贡献。",
+        "summary_en": "Cloud-native systems increasingly rely on infrastructure services (e.g., service meshes, monitoring agents), which compete for resources with user app...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "DPU卸载",
+          "云原生基础设施",
+          "资源隔离"
+        ],
+        "readingTime": 15,
+        "relevance": "low"
+      },
+      {
+        "title": "Offloading Cloud-Native Infrastructure with XpuPod",
+        "url": "https://www.semanticscholar.org/paper/0f630a821bfd65ada49e71611bd2a031e01ed991",
+        "summary": "论文提出XpuPod架构，将云原生基础设施服务（如service mesh、监控agents）卸载到DPU（数据处理单元）上，以解决这些服务与用户应用竞争主机资源导致的性能和可扩展性下降问题。核心思路是通过DPU实现严格隔离，减少资源争用。虽然涉及DPU/硬件卸载而非直接的内核网络协议栈修改，但与容器网络性能优化（service mesh加速）密切相关，属于Linux内核网络性能优化的硬件加速方向。XpuPod作为新的抽象层，为云原生环境下的基础设施卸载提供了系统性方案。",
+        "summary_en": "Cloud-native systems increasingly rely on infrastructure services (e.g., service meshes, monitoring agents), which compete for resources with user app...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "DPU卸载",
+          "云原生网络",
+          "Service Mesh",
+          "性能优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "iDynamics: A Configurable Emulation Framework for Evaluating Microservice Scheduling Policies under Controllable Cloud-Edge Dynamics",
+        "url": "https://www.semanticscholar.org/paper/2dc1c2ef72c71e176365a682584e650661641b8c",
+        "summary": "This paper presents iDynamics, a configurable emulation framework that exposes these dynamics as controllable experimental factors while running real microservice code on a Kubernetes-based cloud-edge cluster. iDynamics ...",
+        "summary_en": "This paper presents iDynamics, a configurable emulation framework that exposes these dynamics as controllable experimental factors while running real ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "网络优化",
+          "容器网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "5G/6G移动网络": 1,
+    "云原生": 1,
+    "DPU卸载": 2,
+    "云原生基础设施": 1,
+    "资源隔离": 1,
+    "云原生网络": 1,
+    "Service Mesh": 1,
+    "性能优化": 1,
+    "网络优化": 1,
+    "容器网络": 1,
+    "性能": 1
+  }
+}
