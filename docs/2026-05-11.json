@@ -1,0 +1,26 @@
+{
+  "date": "2026-05-11",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "Linux 7.1-rc3 Released With Many Networking Changes",
+        "url": "https://www.phoronix.com/news/Linux-7.1-rc3-Released",
+        "summary": "Linux 7.1-rc3 是 Linux 7.1 稳定版的第三个候选发布版本，该版本重点提及包含许多网络（Networking）变更。这是 Linux 内核正常开发周期中的例行发布公告，标志着内核7.1版本正进入最终测试阶段。网络变更涉及内核网络子系统的各个方面，符合 Linux 持续优化网络功能的开发趋势。",
+        "source": "Phoronix",
+        "tags": [
+          "Linux内核",
+          "内核发布",
+          "网络变更"
+        ],
+        "readingTime": 1,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "Linux内核": 1,
+    "内核发布": 1,
+    "网络变更": 1
+  }
+}
