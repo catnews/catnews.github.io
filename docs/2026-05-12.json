@@ -1,0 +1,42 @@
+{
+  "date": "2026-05-12",
+  "categories": {
+    "papers": [
+      {
+        "title": "Shepherd: A Runtime Substrate Empowering Meta-Agents with a Formalized Execution Trace",
+        "url": "http://arxiv.org/abs/2605.10913v1",
+        "summary": "We introduce Shepherd, a functional programming model that formalizes meta-agent operations on target agents as functions, with core operations mechanized in Lean. Shepherd records every agent-environment interaction as ...",
+        "summary_en": "We introduce Shepherd, a functional programming model that formalizes meta-agent operations on target agents as functions, with core operations mechan...",
+        "source": "arXiv",
+        "tags": [
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "Pomegranate: A Lightweight Compartmentalization Architecture using Virtualization Extensions",
+        "url": "http://arxiv.org/abs/2605.07008v1",
+        "summary": "The monolithic nature of widely used commodity operating systems means that vulnerabilities in one software component potentially compromise the entire kernel. Formally verifying these systems, or redesigning them altoge...",
+        "summary_en": "The monolithic nature of widely used commodity operating systems means that vulnerabilities in one software component potentially compromise the entir...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "包处理",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "性能": 1,
+    "TCP/IP": 1,
+    "驱动": 1,
+    "包处理": 1,
+    "网络优化": 1
+  }
+}
