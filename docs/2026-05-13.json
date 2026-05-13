@@ -1,0 +1,27 @@
+{
+  "date": "2026-05-13",
+  "categories": {
+    "papers": [
+      {
+        "title": "Enabling AI-Native Mobility in 6G: A Real-World Dataset for Handover, Beam Management, and Timing Advance",
+        "url": "http://arxiv.org/abs/2605.12453v1",
+        "summary": "To address the issues of high interruption time and measurement report overhead under user equipment (UE) mobility especially in high speed 5G use cases the use of AI/ML techniques (AI/ML beam management and mobility pro...",
+        "summary_en": "To address the issues of high interruption time and measurement report overhead under user equipment (UE) mobility especially in high speed 5G use cas...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "网络优化": 1,
+    "性能": 1
+  }
+}
