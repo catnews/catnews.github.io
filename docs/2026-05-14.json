@@ -1,0 +1,42 @@
+{
+  "date": "2026-05-14",
+  "categories": {
+    "papers": [
+      {
+        "title": "Zero-consistency root emulation for unprivileged container image build",
+        "url": "https://www.semanticscholar.org/paper/5de988f5c960db4b2a8d6f5476f1474d6ffdbfbc",
+        "summary": "Do Linux distribution package managers need the privileged operations they request to actually happen? Apparently not, at least when building container images for HPC applications. We use this observation to implement a ...",
+        "summary_en": "Do Linux distribution package managers need the privileged operations they request to actually happen? Apparently not, at least when building containe...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "容器网络"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      }
+    ],
+    "news": [
+      {
+        "title": "Linux Driver Posted For Intel Silicon Security Engine Interface &quot;ISSEI&quot;",
+        "url": "https://www.phoronix.com/news/Intel-ISSEI-Linux-Driver",
+        "summary": "Intel发布了面向硅安全引擎接口(ISSEI)的Linux驱动补丁。这是一个用于访问Intel芯片安全功能的硬件接口驱动，可能涉及数据加密/解密操作。虽然不直接属于网络子系统，但安全引擎常用于网络流量的加密处理，该驱动对Intel平台的安全功能支持具有参考价值。",
+        "source": "Phoronix",
+        "tags": [
+          "Intel驱动",
+          "硬件安全",
+          "Linux内核驱动",
+          "安全引擎"
+        ],
+        "readingTime": 1,
+        "relevance": "medium"
+      }
+    ]
+  },
+  "tagStats": {
+    "容器网络": 1,
+    "Intel驱动": 1,
+    "硬件安全": 1,
+    "Linux内核驱动": 1,
+    "安全引擎": 1
+  }
+}
