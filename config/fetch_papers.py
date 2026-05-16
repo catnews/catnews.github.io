@@ -126,6 +126,62 @@ DOMAIN_KEYWORDS = {
     "performance": "性能",
 }
 
+CANONICAL_TAGS = {
+    "ebpf": "eBPF",
+    "bpf": "eBPF",
+    "xdp": "XDP",
+    "af_xdp": "XDP",
+    "tcp/ip": "TCP/IP",
+    "tcp": "TCP/IP",
+    "tcp协议": "TCP/IP",
+    "tcp/ip协议栈": "TCP/IP",
+    "socket": "Socket",
+    "netfilter": "Netfilter",
+    "iptables": "Netfilter",
+    "nftables": "Netfilter",
+    "routing": "路由",
+    "forwarding": "路由",
+    "路由": "路由",
+    "bridge": "网桥",
+    "bridging": "网桥",
+    "网桥": "网桥",
+    "driver": "驱动",
+    "nic": "驱动",
+    "驱动": "驱动",
+    "packet": "包处理",
+    "skb": "包处理",
+    "包处理": "包处理",
+    "virtio": "虚拟化",
+    "vhost": "虚拟化",
+    "sriov": "虚拟化",
+    "虚拟化": "虚拟化",
+    "kernel bypass": "旁路",
+    "dpdk": "旁路",
+    "旁路": "旁路",
+    "performance": "性能",
+    "optimization": "性能",
+    "latency": "性能",
+    "throughput": "性能",
+    "benchmark": "性能",
+    "性能优化": "性能",
+    "性能调优": "性能",
+    "network optimization": "性能",
+    "linux内核": "Linux内核网络",
+    "linux内核网络": "Linux内核网络",
+    "内核网络": "Linux内核网络",
+    "kubernetes": "容器网络",
+    "k8s": "容器网络",
+    "cni": "容器网络",
+    "容器网络/cni": "容器网络",
+    "容器网络": "容器网络",
+    "namespace": "容器网络",
+    "netns": "容器网络",
+    "veth": "容器网络",
+    "ovs": "容器网络",
+    "cilium": "容器网络",
+    "service mesh": "容器网络",
+}
+
 NEGATIVE_KEYWORDS = [
     "wireless sensor",
     "social network",
@@ -146,6 +202,53 @@ HARD_EXCLUDE_KEYWORDS = [
     "neural network",
     "llm benchmark",
     "image classification",
+]
+
+KERNEL_ANCHOR_KEYWORDS = [
+    "linux kernel",
+    "kernel",
+    "netdev",
+    "skb",
+    "sock",
+    "netfilter",
+    "nftables",
+    "iptables",
+    "xdp",
+    "ebpf",
+    "bpf",
+    "tcp",
+    "socket",
+    "qdisc",
+    "conntrack",
+    "virtio",
+    "vhost",
+]
+
+NETWORK_ANCHOR_KEYWORDS = [
+    "network",
+    "networking",
+    "packet",
+    "tcp",
+    "ip",
+    "socket",
+    "routing",
+    "forwarding",
+    "bridge",
+    "latency",
+    "throughput",
+    "cni",
+    "kubernetes",
+]
+
+NON_KERNEL_CONTEXT_KEYWORDS = [
+    "social network",
+    "neural network",
+    "wireless sensor",
+    "blockchain",
+    "5g application",
+    "iot application",
+    "video streaming",
+    "recommendation system",
 ]
 
 MIN_YEAR = 2020
@@ -244,6 +347,9 @@ Linux内核网络：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter、Kernel
 返回JSON：{"relevance": "high/medium/low/none"}"""
 
 def quick_filter_relevance(title, abstract):
+    if not passes_domain_gate(title, abstract):
+        return "none"
+
     prompt = f"""标题：{title}
 摘要：{abstract[:600]}
 
@@ -303,6 +409,31 @@ def hot_topic_score(text):
 def is_hard_excluded(text):
     text_lower = (text or "").lower()
     return any(keyword in text_lower for keyword in HARD_EXCLUDE_KEYWORDS)
+
+def passes_domain_gate(title, abstract, source=""):
+    merged = f"{title} {abstract}".lower()
+    if is_hard_excluded(merged):
+        return False
+
+    if any(keyword in merged for keyword in NON_KERNEL_CONTEXT_KEYWORDS):
+        if "linux" not in merged and "kernel" not in merged:
+            return False
+
+    kernel_hit = any(keyword in merged for keyword in KERNEL_ANCHOR_KEYWORDS)
+    network_hit = any(keyword in merged for keyword in NETWORK_ANCHOR_KEYWORDS)
+
+    if not kernel_hit or not network_hit:
+        return False
+
+    if source == "LWN.net":
+        return True
+
+    hot_score = hot_topic_score(merged)
+    keyword_hits = keyword_hit_count(merged)
+    if hot_score <= 0 and keyword_hits < 2:
+        return False
+
+    return True
 
 def prioritize_items(items, content_field="abstract"):
     def score(item):
@@ -675,10 +806,109 @@ def count_tags(items):
             counts[tag] = counts.get(tag, 0) + 1
     return counts
 
+def normalize_tag(tag):
+    if not isinstance(tag, str):
+        return None
+    cleaned = re.sub(r"\s+", " ", tag.strip())
+    if not cleaned:
+        return None
+    canonical = CANONICAL_TAGS.get(cleaned.lower())
+    return canonical if canonical else cleaned
+
+def normalize_tags(tags, max_tags=4):
+    normalized = []
+    for tag in tags or []:
+        converted = normalize_tag(tag)
+        if converted and converted not in normalized:
+            normalized.append(converted)
+        if len(normalized) >= max_tags:
+            break
+    return normalized
+
+def validate_output_item(item, category):
+    if not isinstance(item, dict):
+        return False, f"{category}: item is not object"
+
+    required = ["title", "url", "summary", "source"]
+    for field in required:
+        value = item.get(field)
+        if not isinstance(value, str) or not value.strip():
+            return False, f"{category}: invalid field '{field}'"
+
+    tags = item.get("tags", [])
+    if not isinstance(tags, list):
+        return False, f"{category}: invalid tags type"
+
+    if "readingTime" in item and not isinstance(item.get("readingTime"), int):
+        return False, f"{category}: readingTime must be int"
+
+    if "relevance" in item and item.get("relevance") not in ["high", "medium", "low", "none"]:
+        return False, f"{category}: invalid relevance"
+
+    return True, ""
+
+def validate_output_payload(payload):
+    if not isinstance(payload, dict):
+        return False, "payload is not object"
+    if not isinstance(payload.get("date"), str) or not payload.get("date"):
+        return False, "invalid date"
+
+    categories = payload.get("categories")
+    if not isinstance(categories, dict):
+        return False, "invalid categories"
+
+    papers = categories.get("papers", [])
+    news = categories.get("news", [])
+    if not isinstance(papers, list) or not isinstance(news, list):
+        return False, "papers/news must be list"
+
+    for paper in papers:
+        ok, msg = validate_output_item(paper, "paper")
+        if not ok:
+            return False, msg
+
+    for item in news:
+        ok, msg = validate_output_item(item, "news")
+        if not ok:
+            return False, msg
+
+    if not isinstance(payload.get("tagStats", {}), dict):
+        return False, "invalid tagStats"
+
+    return True, ""
+
 def safe_ratio(part, total):
     if total <= 0:
         return "0.0%"
     return f"{(part * 100.0 / total):.1f}%"
+
+def build_metrics(today, stats, selected_papers, selected_news):
+    return {
+        "date": today,
+        "papers": {
+            "raw": stats["paper_candidates_raw"],
+            "dedup": stats["paper_candidates_dedup"],
+            "quick_high_medium": stats["paper_quick_high_medium"],
+            "fill_medium_high": stats["paper_fill_medium_high"],
+            "fill_low": stats["paper_fill_low"],
+            "hotspot_final": stats["paper_hotspot_in_final"],
+            "final": len(selected_papers),
+            "dedup_rate": safe_ratio(stats["paper_candidates_dedup"], stats["paper_candidates_raw"]),
+            "final_rate": safe_ratio(len(selected_papers), stats["paper_candidates_dedup"]),
+        },
+        "news": {
+            "raw": stats["news_candidates_raw"],
+            "dedup": stats["news_candidates_dedup"],
+            "preprocessed": stats["news_preprocessed"],
+            "quick_high_medium": stats["news_quick_high_medium"],
+            "fill_medium_high": stats["news_fill_medium_high"],
+            "fill_low": stats["news_fill_low"],
+            "hotspot_final": stats["news_hotspot_in_final"],
+            "final": len(selected_news),
+            "dedup_rate": safe_ratio(stats["news_candidates_dedup"], stats["news_candidates_raw"]),
+            "final_rate": safe_ratio(len(selected_news), stats["news_candidates_dedup"]),
+        },
+    }
 
 def main():
     print("Starting Linux kernel networking content fetch...")
@@ -735,6 +965,10 @@ def main():
         if is_hard_excluded(f"{paper['title']} {paper['abstract']}"):
             print("    -> excluded by hard rules")
             continue
+
+        if not passes_domain_gate(paper['title'], paper['abstract'], paper.get('source', '')):
+            print("    -> excluded by domain gate")
+            continue
         
         relevance = quick_filter_relevance(paper['title'], paper['abstract'])
         print(f"    -> {relevance}")
@@ -751,6 +985,8 @@ def main():
         low_pool = []
         for paper in paper_candidates[:MAX_CANDIDATES]:
             if paper in filtered_candidates:
+                continue
+            if not passes_domain_gate(paper['title'], paper['abstract'], paper.get('source', '')):
                 continue
             fallback_relevance = heuristic_relevance(paper['title'], paper['abstract'])
             if fallback_relevance in ['medium', 'high']:
@@ -796,6 +1032,10 @@ def main():
             if is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}"):
                 print("    -> excluded by hard rules")
                 continue
+
+            if not passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', '')):
+                print("    -> excluded by domain gate")
+                continue
             
             relevance = quick_filter_relevance(item['title'], item.get('abstract', item['title']))
             print(f"    -> {relevance}")
@@ -812,6 +1052,8 @@ def main():
         low_pool = []
         for item in news_candidates[:20]:
             if item in filtered_news:
+                continue
+            if not passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', '')):
                 continue
             fallback_relevance = heuristic_relevance(item['title'], item.get('abstract', item['title']))
             if fallback_relevance in ['medium', 'high']:
@@ -846,6 +1088,7 @@ def main():
             analysis
             and analysis.get('relevance') in ['high', 'medium']
             and not is_hard_excluded(f"{paper['title']} {paper['abstract']}")
+            and passes_domain_gate(paper['title'], paper['abstract'], paper.get('source', ''))
         ):
             if paper_hot_score > 0:
                 stats["paper_hotspot_in_final"] += 1
@@ -855,7 +1098,7 @@ def main():
                 "summary": analysis.get('summary', ''),
                 "summary_en": paper['abstract'][:150] + "...",
                 "source": paper['source'],
-                "tags": analysis.get('tags', [])[:4],
+                "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                 "readingTime": analysis.get('readingTime', 5),
                 "relevance": analysis.get('relevance', 'high')
             })
@@ -865,6 +1108,7 @@ def main():
             and analysis.get('relevance') == 'low'
             and paper_hot_score >= 2
             and not is_hard_excluded(f"{paper['title']} {paper['abstract']}")
+            and passes_domain_gate(paper['title'], paper['abstract'], paper.get('source', ''))
         ):
             stats["paper_hotspot_in_final"] += 1
             selected_papers.append({
@@ -873,7 +1117,7 @@ def main():
                 "summary": analysis.get('summary', ''),
                 "summary_en": paper['abstract'][:150] + "...",
                 "source": paper['source'],
-                "tags": analysis.get('tags', [])[:4],
+                "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                 "readingTime": analysis.get('readingTime', 5),
                 "relevance": "low"
             })
@@ -888,6 +1132,7 @@ def main():
             break
         
         if item.get('source') == 'LWN.net' and item.get('summary'):
+            item['tags'] = normalize_tags(item.get('tags', []), max_tags=4)
             selected_news.append(item)
             print(f"  [{i+1}] {item['title'][:40]}... -> ✓ pre-processed")
         else:
@@ -901,6 +1146,7 @@ def main():
                 analysis
                 and analysis.get('relevance') in ['high', 'medium']
                 and not is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}")
+                and passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', ''))
             ):
                 if news_hot_score > 0:
                     stats["news_hotspot_in_final"] += 1
@@ -909,7 +1155,7 @@ def main():
                     "url": item['url'],
                     "summary": analysis.get('summary', ''),
                     "source": item['source'],
-                    "tags": analysis.get('tags', [])[:4],
+                    "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                     "readingTime": analysis.get('readingTime', 3),
                     "relevance": analysis.get('relevance', 'high')
                 })
@@ -919,6 +1165,7 @@ def main():
                 and analysis.get('relevance') == 'low'
                 and news_hot_score >= 2
                 and not is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}")
+                and passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', ''))
             ):
                 stats["news_hotspot_in_final"] += 1
                 selected_news.append({
@@ -926,7 +1173,7 @@ def main():
                     "url": item['url'],
                     "summary": analysis.get('summary', ''),
                     "source": item['source'],
-                    "tags": analysis.get('tags', [])[:4],
+                    "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                     "readingTime": analysis.get('readingTime', 3),
                     "relevance": "low"
                 })
@@ -975,10 +1222,19 @@ def main():
         },
         "tagStats": all_tags
     }
+
+    ok, err = validate_output_payload(output)
+    if not ok:
+        raise ValueError(f"Output validation failed: {err}")
     
     output_path = os.path.join(docs_dir, f"{today}.json")
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
+
+    metrics = build_metrics(today, stats, selected_papers, selected_news)
+    metrics_path = os.path.join(docs_dir, f"{today}.metrics.json")
+    with open(metrics_path, "w", encoding="utf-8") as f:
+        json.dump(metrics, f, ensure_ascii=False, indent=2)
     
     for paper in selected_papers:
         existing_hashes["papers"].add(get_hash(paper['title']))
@@ -989,6 +1245,7 @@ def main():
     print(f"Updated hash file: {len(existing_hashes['papers'])} papers, {len(existing_hashes['news'])} news")
     
     print(f"Output: {output_path}")
+    print(f"Metrics: {metrics_path}")
 
 if __name__ == "__main__":
     main()

@@ -355,33 +355,39 @@
             }
             
             const sortedTags = Object.entries(tagStats).sort((a, b) => b[1] - a[1]);
-            
-            let html = '';
+            container.innerHTML = '';
+
             sortedTags.forEach(([tag, count]) => {
-                const isActive = selectedFilter === tag ? 'active' : '';
-                html += `<div class="tag-stat-item ${isActive}" data-tag="${tag}">`;
-                html += `<span class="tag-stat-name">${tag}</span>`;
-                html += `<span class="tag-stat-count">${count}</span>`;
-                html += '</div>';
-            });
-            
-            if (selectedFilter) {
-                html += '<div class="clear-filter" id="clearFilter">清除筛选</div>';
-            }
-            
-            container.innerHTML = html;
-            
-            container.querySelectorAll('.tag-stat-item').forEach(item => {
+                const item = document.createElement('div');
+                item.className = `tag-stat-item ${selectedFilter === tag ? 'active' : ''}`;
+                item.dataset.tag = tag;
+
+                const name = document.createElement('span');
+                name.className = 'tag-stat-name';
+                name.textContent = tag;
+
+                const countEl = document.createElement('span');
+                countEl.className = 'tag-stat-count';
+                countEl.textContent = String(count);
+
+                item.appendChild(name);
+                item.appendChild(countEl);
+                container.appendChild(item);
+
                 item.addEventListener('click', () => {
-                    const tag = item.dataset.tag;
                     selectedFilter = selectedFilter === tag ? null : tag;
                     renderTagStats(currentData?.tagStats || {});
                     renderItems(currentData);
                 });
             });
             
-            const clearBtn = container.querySelector('#clearFilter');
-            if (clearBtn) {
+            if (selectedFilter) {
+                const clearBtn = document.createElement('div');
+                clearBtn.className = 'clear-filter';
+                clearBtn.id = 'clearFilter';
+                clearBtn.textContent = '清除筛选';
+                container.appendChild(clearBtn);
+
                 clearBtn.addEventListener('click', () => {
                     selectedFilter = null;
                     renderTagStats(currentData?.tagStats || {});
@@ -398,10 +404,85 @@
                 return;
             }
             
-            let html = '';
+            content.innerHTML = '';
             
             const papers = data.categories.papers || [];
             const news = data.categories.news || [];
+            let hasContent = false;
+
+            function createItemNode(item, defaultReadingTime) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'paper-item';
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'paper-title';
+
+                const link = document.createElement('a');
+                link.href = item.url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = item.title;
+                titleDiv.appendChild(link);
+
+                const summaryDiv = document.createElement('div');
+                summaryDiv.className = 'paper-summary';
+                summaryDiv.textContent = item.summary || '';
+
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'paper-meta';
+
+                const sourceTag = document.createElement('span');
+                const sourceClass = (item.source || '').toLowerCase().replace(/[^a-z]/g, '');
+                sourceTag.className = `source-tag ${sourceClass}`;
+                sourceTag.textContent = item.source || '';
+                metaDiv.appendChild(sourceTag);
+
+                const tags = Array.isArray(item.tags) ? item.tags : [];
+                if (tags.length > 0) {
+                    const tagsContainer = document.createElement('div');
+                    tagsContainer.className = 'tags-container';
+                    tags.forEach(tag => {
+                        const tagEl = document.createElement('span');
+                        tagEl.className = 'feature-tag';
+                        if (tag === selectedFilter) {
+                            tagEl.style.fontWeight = 'bold';
+                        }
+                        tagEl.textContent = tag;
+                        tagsContainer.appendChild(tagEl);
+                    });
+                    metaDiv.appendChild(tagsContainer);
+                }
+
+                const readingTime = document.createElement('span');
+                readingTime.className = 'reading-time';
+                readingTime.textContent = `约 ${item.readingTime || defaultReadingTime} 分钟`;
+                metaDiv.appendChild(readingTime);
+
+                wrapper.appendChild(titleDiv);
+                wrapper.appendChild(summaryDiv);
+                wrapper.appendChild(metaDiv);
+                return wrapper;
+            }
+
+            function createSection(titleText, list, defaultReadingTime, extraClass) {
+                const section = document.createElement('section');
+                section.className = extraClass ? `category-section ${extraClass}` : 'category-section';
+
+                const heading = document.createElement('h2');
+                heading.className = 'category-title';
+                heading.appendChild(document.createTextNode(titleText));
+
+                const count = document.createElement('span');
+                count.className = 'paper-count';
+                count.textContent = `共 ${list.length} ${titleText === '资讯' ? '条' : '篇'}`;
+                heading.appendChild(count);
+
+                section.appendChild(heading);
+                list.forEach(item => {
+                    section.appendChild(createItemNode(item, defaultReadingTime));
+                });
+                return section;
+            }
             
             if (papers.length > 0) {
                 let filteredPapers = selectedFilter 
@@ -409,31 +490,8 @@
                     : papers;
                 
                 if (filteredPapers.length > 0) {
-                    html += '<section class="category-section">';
-                    html += `<h2 class="category-title">论文 <span class="paper-count">共 ${filteredPapers.length} 篇</span></h2>`;
-                    
-                    filteredPapers.forEach(paper => {
-                        const readingTime = paper.readingTime || 5;
-                        const sourceClass = paper.source.toLowerCase().replace(/[^a-z]/g, '');
-                        const tags = paper.tags || [];
-                        
-                        html += '<div class="paper-item">';
-                        html += `<div class="paper-title"><a href="${paper.url}" target="_blank">${paper.title}</a></div>`;
-                        html += `<div class="paper-summary">${paper.summary}</div>`;
-                        html += '<div class="paper-meta">';
-                        html += `<span class="source-tag ${sourceClass}">${paper.source}</span>`;
-                        if (tags.length > 0) {
-                            html += '<div class="tags-container">';
-                            tags.forEach(tag => {
-                                const highlight = tag === selectedFilter ? 'font-weight: bold;' : '';
-                                html += `<span class="feature-tag" style="${highlight}">${tag}</span>`;
-                            });
-                            html += '</div>';
-                        }
-                        html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
-                        html += '</div></div>';
-                    });
-                    html += '</section>';
+                    content.appendChild(createSection('论文', filteredPapers, 5, ''));
+                    hasContent = true;
                 }
             }
             
@@ -443,39 +501,17 @@
                     : news;
                 
                 if (filteredNews.length > 0) {
-                    html += '<section class="category-section news-section">';
-                    html += `<h2 class="category-title">资讯 <span class="paper-count">共 ${filteredNews.length} 条</span></h2>`;
-                    
-                    filteredNews.forEach(item => {
-                        const readingTime = item.readingTime || 3;
-                        const sourceClass = item.source.toLowerCase().replace(/[^a-z]/g, '');
-                        const tags = item.tags || [];
-                        
-                        html += '<div class="paper-item">';
-                        html += `<div class="paper-title"><a href="${item.url}" target="_blank">${item.title}</a></div>`;
-                        html += `<div class="paper-summary">${item.summary}</div>`;
-                        html += '<div class="paper-meta">';
-                        html += `<span class="source-tag ${sourceClass}">${item.source}</span>`;
-                        if (tags.length > 0) {
-                            html += '<div class="tags-container">';
-                            tags.forEach(tag => {
-                                const highlight = tag === selectedFilter ? 'font-weight: bold;' : '';
-                                html += `<span class="feature-tag" style="${highlight}">${tag}</span>`;
-                            });
-                            html += '</div>';
-                        }
-                        html += `<span class="reading-time">约 ${readingTime} 分钟</span>`;
-                        html += '</div></div>';
-                    });
-                    html += '</section>';
+                    content.appendChild(createSection('资讯', filteredNews, 3, 'news-section'));
+                    hasContent = true;
                 }
             }
             
-            if (!html) {
-                html = `<div class="empty-message">${selectedFilter ? '当前筛选无匹配内容' : '暂无数据'}</div>`;
+            if (!hasContent) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-message';
+                empty.textContent = selectedFilter ? '当前筛选无匹配内容' : '暂无数据';
+                content.appendChild(empty);
             }
-            
-            content.innerHTML = html;
         }
         
         function renderContent(data) {
