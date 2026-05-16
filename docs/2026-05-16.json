@@ -1,0 +1,59 @@
+{
+  "date": "2026-05-16",
+  "categories": {
+    "papers": [
+      {
+        "title": "VISTA: A Benchmark for Real-Time Video Streaming under Network Impairments in Surgical Teleoperation",
+        "url": "http://arxiv.org/abs/2605.08886v1",
+        "summary": "Real-time video streaming is crucial in surgical teleoperation, yet reproducible evaluation under realistic network impairments remains limited. This paper presents VISTA, a benchmark designed to study how impairments al...",
+        "summary_en": "Real-time video streaming is crucial in surgical teleoperation, yet reproducible evaluation under realistic network impairments remains limited. This ...",
+        "source": "arXiv",
+        "tags": [
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      },
+      {
+        "title": "CrashFixer: A crash resolution agent for the Linux kernel",
+        "url": "https://www.semanticscholar.org/paper/d5c2df0b28b29d256d93bf43a12935a656396987",
+        "summary": "Code large language models (LLMs) have shown impressive capabilities on a multitude of software engineering tasks. In particular, they have demonstrated remarkable utility in the task of code repair. However, common benc...",
+        "summary_en": "Code large language models (LLMs) have shown impressive capabilities on a multitude of software engineering tasks. In particular, they have demonstrat...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "Linux内核网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for May 7, 2026",
+        "url": "https://lwn.net/Articles/1070466/",
+        "abstract": " LWN.net Weekly Edition for May 7, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pass",
+        "summary": "LWN.net 2026年5月7日周报内容概要：本期刊载了多篇重要技术文章。核心主题之一是LLM工具驱动的安全报告正在扰乱传统的协调漏洞披露流程，导致安全维护者处理报告的工作量激增。Linus Torvalds强调回归测试规则适用于违反文档化ABI的程序。文章还涵盖s390架构上运行Arm虚拟机的硬件辅助虚拟化工作、Fedora GNOME包修复策略、基于Prolly trees的版本控制数据库技术，以及可重启序列( Restartable sequences)与TCmalloc的讨论。需要注意的是，提供的内容片段中未发现与Linux内核网络栈、网卡驱动、网络协议(如TCP/UDP)、网络子系统等直接相关的技术信息。",
+        "source": "LWN.net",
+        "tags": [
+          "安全漏洞披露",
+          "LLM人工智能",
+          "虚拟化技术",
+          "ABI兼容性"
+        ],
+        "readingTime": 3,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "网络优化": 1,
+    "性能": 2,
+    "Linux内核网络": 1,
+    "安全漏洞披露": 1,
+    "LLM人工智能": 1,
+    "虚拟化技术": 1,
+    "ABI兼容性": 1
+  }
+}
