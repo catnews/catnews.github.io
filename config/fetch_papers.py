@@ -15,6 +15,8 @@ ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 OPENALEX_API = "https://api.openalex.org/works"
 CROSSREF_API = "https://api.crossref.org/works"
+DBLP_API = "https://dblp.org/search/publ/api"
+OPENREVIEW_API = "https://api2.openreview.net/notes"
 MINIMAX_API = "https://api.minimaxi.com/v1/chat/completions"
 
 REQUEST_DELAY_MIN = 3
@@ -711,6 +713,90 @@ def fetch_crossref_papers(query, max_results=8):
         print(f"Crossref fetch error: {e}")
     return papers
 
+def fetch_dblp_papers(query, max_results=8):
+    papers = []
+    try:
+        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+        params = {
+            "q": query,
+            "h": max_results,
+            "format": "json",
+        }
+        url = f"{DBLP_API}?{urllib.parse.urlencode(params)}"
+        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            data = json.loads(response.read().decode("utf-8"))
+
+        hits = data.get("result", {}).get("hits", {}).get("hit", [])
+        if isinstance(hits, dict):
+            hits = [hits]
+
+        for hit in hits:
+            info = hit.get("info", {})
+            title = info.get("title", "")
+            year = int(info.get("year", 0) or 0)
+            url_val = info.get("ee", "") or info.get("url", "")
+            venue = info.get("venue", "")
+            abstract = f"Venue: {venue}" if venue else ""
+            if title and url_val and year >= MIN_YEAR:
+                papers.append({
+                    "title": re.sub(r"<[^>]+>", " ", title),
+                    "url": url_val,
+                    "abstract": abstract,
+                    "source": "DBLP",
+                    "year": year,
+                })
+    except Exception as e:
+        print(f"DBLP fetch error: {e}")
+    return papers
+
+def fetch_openreview_papers(query, max_results=8):
+    papers = []
+    try:
+        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+        params = {
+            "query": query,
+            "limit": max_results,
+        }
+        url = f"{OPENREVIEW_API}?{urllib.parse.urlencode(params)}"
+        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            data = json.loads(response.read().decode("utf-8"))
+
+        notes = data.get("notes", [])
+        for note in notes:
+            content = note.get("content", {})
+            title = content.get("title", {}).get("value", "") if isinstance(content.get("title"), dict) else content.get("title", "")
+            abstract = content.get("abstract", {}).get("value", "") if isinstance(content.get("abstract"), dict) else content.get("abstract", "")
+            cdate = note.get("cdate", 0)
+            year = datetime.fromtimestamp(cdate / 1000, tz=timezone.utc).year if cdate else 0
+            forum = note.get("forum", "")
+            url_val = f"https://openreview.net/forum?id={forum}" if forum else ""
+            if title and url_val and year >= MIN_YEAR:
+                papers.append({
+                    "title": title,
+                    "url": url_val,
+                    "abstract": abstract,
+                    "source": "OpenReview",
+                    "year": year,
+                })
+    except Exception as e:
+        print(f"OpenReview fetch error: {e}")
+    return papers
+
+def innovation_score(title, abstract, tags):
+    text = f"{title} {abstract} {' '.join(tags or [])}".lower()
+    score = 0
+    novelty_terms = ["novel", "new", "first", "innovative", "improve", "optimization", "accelerat"]
+    kernel_terms = ["linux kernel", "tcp", "xdp", "ebpf", "netfilter", "qdisc", "driver", "skb", "socket"]
+    eval_terms = ["benchmark", "latency", "throughput", "evaluation", "experiment", "trace"]
+
+    score += sum(1 for t in novelty_terms if t in text)
+    score += sum(2 for t in kernel_terms if t in text)
+    score += sum(1 for t in eval_terms if t in text)
+
+    return min(score, 10)
+
 def fetch_lwn_article_content(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
@@ -1082,12 +1168,14 @@ def main():
         print(f"  Keyword: {keyword}")
         paper_candidates.extend(fetch_arxiv_papers(keyword, 8))
     
-    print("\n[Phase 2] Fetching papers from Semantic Scholar/OpenAlex/Crossref...")
+    print("\n[Phase 2] Fetching papers from Semantic Scholar/OpenAlex/Crossref/DBLP/OpenReview...")
     for keyword in SEARCH_KEYWORDS[split_idx:]:
         print(f"  Keyword: {keyword}")
         paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 8))
         paper_candidates.extend(fetch_openalex_papers(keyword, 6))
         paper_candidates.extend(fetch_crossref_papers(keyword, 4))
+        paper_candidates.extend(fetch_dblp_papers(keyword, 4))
+        paper_candidates.extend(fetch_openreview_papers(keyword, 4))
 
     stats["paper_candidates_raw"] = len(paper_candidates)
     
@@ -1240,7 +1328,8 @@ def main():
                 "source": paper['source'],
                 "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                 "readingTime": analysis.get('readingTime', 5),
-                "relevance": analysis.get('relevance', 'high')
+                "relevance": analysis.get('relevance', 'high'),
+                "innovationScore": innovation_score(paper['title'], paper['abstract'], analysis.get('tags', [])),
             })
             selected_papers[-1] = sanitize_item(selected_papers[-1], is_news=False)
             print(f"  ✓ Processed")
@@ -1260,7 +1349,8 @@ def main():
                 "source": paper['source'],
                 "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                 "readingTime": analysis.get('readingTime', 5),
-                "relevance": "low"
+                "relevance": "low",
+                "innovationScore": innovation_score(paper['title'], paper['abstract'], analysis.get('tags', [])),
             })
             selected_papers[-1] = sanitize_item(selected_papers[-1], is_news=False)
             print(f"  ✓ Processed (hotspot low)")

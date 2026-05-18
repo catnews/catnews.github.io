@@ -109,6 +109,10 @@
             border-top: 4px solid #16a34a;
         }
 
+        .innovation-section {
+            border-top: 4px solid #ea580c;
+        }
+
         .weekly-note {
             font-size: 12px;
             color: #6b7280;
@@ -320,6 +324,12 @@
         <section class="category-section weekly-section" id="weeklyPicks">
             <h2 class="category-title">本周精选论文 <span class="paper-count" id="weeklyCount">加载中...</span></h2>
             <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
+            <div class="loading">加载中...</div>
+        </section>
+
+        <section class="category-section innovation-section" id="weeklyInnovation">
+            <h2 class="category-title">本周创新论文 <span class="paper-count" id="innovationCount">加载中...</span></h2>
+            <div class="weekly-note">基于创新评分与相关性综合排序，突出可用于内核网络优化创新的论文。</div>
             <div class="loading">加载中...</div>
         </section>
         
@@ -611,7 +621,8 @@
 
             const day = document.createElement('span');
             day.className = 'reading-time';
-            day.textContent = `收录日期 ${dateStr}`;
+            const innovation = Number.isFinite(Number(paper.innovationScore)) ? Number(paper.innovationScore) : 0;
+            day.textContent = `收录日期 ${dateStr} | 创新分 ${innovation}`;
             meta.appendChild(day);
 
             item.appendChild(title);
@@ -663,6 +674,52 @@
             weeklyTop.forEach(p => {
                 weekly.appendChild(createWeeklyCard(p, p._date));
             });
+        }
+
+        async function loadWeeklyInnovation() {
+            const panel = document.getElementById('weeklyInnovation');
+            const count = document.getElementById('innovationCount');
+            panel.querySelector('.loading')?.remove();
+
+            const papers = [];
+            for (let i = 0; i < 7; i++) {
+                const dateStr = safeDateString(dateOffset(-i));
+                const dayData = await tryLoadDay(dateStr);
+                if (!dayData || !dayData.categories || !Array.isArray(dayData.categories.papers)) {
+                    continue;
+                }
+                dayData.categories.papers.forEach(p => {
+                    papers.push({ ...p, _date: dateStr });
+                });
+            }
+
+            const dedup = new Map();
+            papers.forEach(p => {
+                const key = (p.title || '').trim().toLowerCase();
+                if (!key) return;
+                const old = dedup.get(key);
+                const curScore = Number(p.innovationScore || 0) + paperHotScore(p);
+                const oldScore = old ? Number(old.innovationScore || 0) + paperHotScore(old) : -1;
+                if (!old || curScore > oldScore) {
+                    dedup.set(key, p);
+                }
+            });
+
+            const top = Array.from(dedup.values())
+                .sort((a, b) => (Number(b.innovationScore || 0) + paperHotScore(b)) - (Number(a.innovationScore || 0) + paperHotScore(a)))
+                .slice(0, 6);
+
+            count.textContent = `共 ${top.length} 篇`;
+
+            if (top.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-message';
+                empty.textContent = '最近 7 天暂无可展示的创新论文';
+                panel.appendChild(empty);
+                return;
+            }
+
+            top.forEach(p => panel.appendChild(createWeeklyCard(p, p._date)));
         }
         
         function renderContent(data) {
@@ -723,6 +780,7 @@
         
         loadData(currentDate);
         loadWeeklyPicks();
+        loadWeeklyInnovation();
     </script>
 </body>
 </html>
