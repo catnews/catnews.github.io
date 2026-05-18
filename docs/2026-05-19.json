@@ -1,0 +1,227 @@
+{
+  "date": "2026-05-19",
+  "categories": {
+    "papers": [
+      {
+        "title": "Accélération des réseaux de conteneurs avec eBPF : caractérisation des performances, évaluation et optimisation",
+        "url": "https://theses.hal.science/tel-05467830",
+        "summary": "本论文研究eBPF与XDP技术如何加速容器网络性能，聚焦于解决传统Linux网络栈在现代微服务架构下的性能瓶颈。论文指出容器间通信开销可高达执行时间的36%，而传统网络栈严重制约了高性能容器化环境的吞吐量和延迟。研究者通过性能表征、评估和优化的系统方法，展示了eBPF/XDP在内核网络绕过、零拷贝、智能负载均衡等方面的优化潜力。该研究直接契合当前Linux内核网络与容器网络两大热点领域的技术交汇点。",
+        "summary_en": "Modern microservice architectures create unprecedented networking demands, with communication overhead consuming up to 36% of execution time. This the...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF/XDP",
+          "容器网络",
+          "网络性能优化",
+          "Linux内核网络栈"
+        ],
+        "readingTime": 35,
+        "relevance": "high",
+        "innovationScore": 10
+      },
+      {
+        "title": "High IO Performance User Space Networking with eBPF/XDP and AF_XDP: Design, Tuning, and Architectural Insights",
+        "url": "https://doi.org/10.55248/gengpi.6.0825.3072",
+        "summary": "本文深入探讨在Linux 6.4内核中利用eBPF/XDP和AF_XDP零拷贝模式实现高IO性能用户空间网络方案。针对边缘计算、5G部署和高吞吐服务场景，平衡kernel-bypass性能优势与Linux网络生态集成需求。论文涵盖XDP数据路径设计、AF_XDP套接字架构、零拷贝机制调优策略，以及与Virtio、传统内核网络栈的协同工作模式。内容涉及容器网络、NFV等热点应用场景，为高性能数据包处理提供系统性技术指南。",
+        "summary_en": "The growth of edge computing, 5G deployments, and high IO services has intensified the demand for packet processing methods that combine raw throughpu...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF/XDP",
+          "XDP",
+          "高性能网络",
+          "kernel-bypass"
+        ],
+        "readingTime": 18,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "The Impact of Kernel Asynchronous APIs on the Performance of a Kernel VPN",
+        "url": "https://doi.org/10.1145/3757347.3759133",
+        "summary": "该研究聚焦于Linux内核VPN在高负载下的性能衰退问题，发现了数据包重组函数抢占更早流水线阶段的执行顺序反转(EoI)现象，这是导致严重延迟抖动和吞吐量下降的根本原因。研究采用内核线程和workqueues作为替代内核异步API方案，通过重新设计流水线执行顺序来缓解EoI问题，最终实现最高4.7倍性能提升。这项工作对理解Linux内核网络栈的调度机制和优化高吞吐网络应用具有重要参考价值。",
+        "summary_en": "Linux kernel VPNs suffer from severe performance degradation under high load due to execution order inversion (EoI), a phenomenon where packet recombi...",
+        "source": "OpenAlex",
+        "tags": [
+          "内核VPN性能优化",
+          "异步API调度",
+          "延迟/吞吐量优化",
+          "Linux网络栈"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 4
+      },
+      {
+        "title": "Netfilter in Linux: Configuration of NAT capabale firewalls using nftables",
+        "url": "https://trepo.tuni.fi/handle/10024/228303",
+        "summary": "论文介绍Linux内核Netfilter框架以及使用nftables配置具备NAT功能的防火墙。Netfilter是Linux内核网络协议栈的核心组件，提供了数据包过滤、网络地址转换（NAT）、连接跟踪等关键功能。nftables作为新一代防火墙工具，取代了iptables，提供更高效的规则配置方式。本文内容直接涉及Linux内核网络子系统的核心机制，属于内核网络安全的重点研究领域。",
+        "summary_en": "A firewall acts as a security checkpoint between a broader untrusted world and a smaller, more trusted world.This is a general definition which can be...",
+        "source": "OpenAlex",
+        "tags": [
+          "Netfilter/nftables",
+          "防火墙/NAT",
+          "Linux内核网络"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 2
+      },
+      {
+        "title": "Generic XDP Under Embedded SoC Constraints: A Lightweight L2 Data Plane with Cost Decomposition Analysis",
+        "url": "https://doi.org/10.3390/electronics15061281",
+        "summary": "本文针对资源受限的嵌入式SoC平台，研究如何利用XDP（eXpress Data Path）技术实现轻量级L2数据平面。研究目标是替代传统Linux Bridge转发路径，以降低延迟和资源消耗。文章包含成本分解分析（Cost Decomposition Analysis），系统性地评估了在嵌入式硬件上运行XDP的性能开销和收益。作为Linux内核网络子系统的重要旁路技术，XDP允许在网卡驱动层直接处理数据包，避免了传统协议栈的开销，这对于边缘计算和IoT场景具有重要意义。",
+        "summary_en": "With the proliferation of edge computing and the Internet of Things (IoT), embedded SoC devices are increasingly expected to provide data-plane functi...",
+        "source": "OpenAlex",
+        "tags": [
+          "XDP/eBPF",
+          "嵌入式系统网络",
+          "L2转发/数据平面",
+          "性能"
+        ],
+        "readingTime": 18,
+        "relevance": "high",
+        "innovationScore": 7
+      },
+      {
+        "title": "Toward Industry 5.0: A WebSocket–S7 Bridge for Low-Latency, IEC 61588-Compliant Digital Twins in Remote Industrial Automation",
+        "url": "https://doi.org/10.1371/journal.pone.0342004",
+        "summary": "这篇研究工作《Toward Industry 5.0: A WebSocket–S7 Bridge for Low-Latency, IEC 61588-Compliant Digital Twins in Remote Industrial Automation》与TCP/IP、Socket、网桥相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Toward Industry 5.0: A WebSocket–S7 Bridge for Low-Latency, IEC 61588-Compliant ...",
+        "summary_en": "While Industry 4.0 established connectivity and automation as foundations of smart factories, the emerging vision of Industry 5.0 emphasizes human-cen...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "Socket",
+          "网桥",
+          "驱动"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 9
+      },
+      {
+        "title": "A Light Application Level Virtualization Framework with Zero-Copy and Migration Agent",
+        "url": "https://doi.org/10.26599/tst.2024.9010238",
+        "summary": "这篇研究工作《A Light Application Level Virtualization Framework with Zero-Copy and Migration Agent》与驱动、虚拟化、性能相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：A Light Application Level Virtualization Framework with Zero-Copy and Migration ...",
+        "summary_en": "Virtualization improves physical hardware utilization of cloud computing by over-committing hardware in the virtual machine. However, applications run...",
+        "source": "OpenAlex",
+        "tags": [
+          "驱动",
+          "虚拟化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 5
+      },
+      {
+        "title": "SemaTune: Semantic-Aware Online OS Tuning with Large Language Models",
+        "url": "http://arxiv.org/abs/2605.15026v1",
+        "summary": "这篇研究工作《SemaTune: Semantic-Aware Online OS Tuning with Large Language Models》与性能相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：SemaTune: Semantic-Aware Online OS Tuning with Large Language Models Online OS t...",
+        "summary_en": "Online OS tuning can improve long-running services, but existing controllers are poorly matched to live hosts. They treat scheduler, power, memory, an...",
+        "source": "arXiv",
+        "tags": [
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 3
+      },
+      {
+        "title": "Reconfigurable SmartNICs: A Comprehensive Review of FPGA Shells and Heterogeneous Offloading Architectures",
+        "url": "https://doi.org/10.3390/app16031476",
+        "summary": "这篇研究工作《Reconfigurable SmartNICs: A Comprehensive Review of FPGA Shells and Heterogeneous Offloading Architectures》与TCP/IP、驱动、包处理相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Reconfigurable SmartNICs: A Comprehensive Review of FPGA Shells and Heterogeneou...",
+        "summary_en": "Smart Network Interface Cards (SmartNICs) represent a paradigm shift in system architecture by offloading packet processing and selected application l...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "包处理",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "Network Basics and Management",
+        "url": "https://doi.org/10.1007/978-981-95-2185-2_7",
+        "summary": "本文探讨现代网络发展趋势和TCP/IP网络范式。文章介绍了TCP/IP的分层架构设计，将其视为工业软件设计的基准，并强调其在UNIX系统上的良好实现对互联网增长的推动作用，以及催化现代操作系统集成网络连接能力。内容偏向计算机网络基础概念教学，涉及TCP/IP协议栈的层级模型和OS网络集成的基本原理，但未深入Linux内核网络子系统的具体实现细节或性能优化话题。适合作为网络基础知识回顾，但对Linux内核网络开发人员参考价值有限。",
+        "summary_en": "Our modern world is moving closer to pervasive networking and the Internet of Everything. TCP/IP networks represent the predominant networking paradig...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "分层架构",
+          "UNIX系统"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 3
+      },
+      {
+        "title": "An Empirical Study of eBPF Overheads in Ultra-Low-Latency Storage Stacks",
+        "url": "https://doi.org/10.1587/transinf.2025edl8063",
+        "summary": "本文实证研究了eBPF在超低延迟存储系统中的开销情况。研究发现，eBPF的验证和运行时开销通常较小，但在接近DRAM速度的设备和动态多租户环境下会变得显著。研究结论确认了eBPF用于可编程存储的可行性，同时强调了存储特定场景和超低延迟上下文下的性能影响。该工作为在存储系统中部署eBPF提供了重要的性能基准参考。",
+        "summary_en": "This paper evaluates eBPF overheads in ultra-low-latency storage systems. The results show that verification and runtime costs are generally small, bu...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "超低延迟存储",
+          "性能开销",
+          "Linux内核网络"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 3
+      },
+      {
+        "title": "What Do They Fix? LLM-Aided Categorization of Security Patches for Critical Memory Bugs",
+        "url": "https://doi.org/10.14722/ndss.2026.230328",
+        "summary": "论文研究使用LLM辅助对Linux内核安全补丁进行分类，特别是针对关键内存bug。研究关注Linux内核安全补丁从主线到下游的延迟采用问题。该论文直接涉及Linux内核代码维护和漏洞修复流程，属于内核软件工程与安全研究范畴。虽然研究对象是Linux内核，但侧重于安全补丁管理和分类方法，而非内核网络子系统的具体技术实现。",
+        "summary_en": "Open-source software projects are foundational to modern software ecosystems, with the Linux kernel standing out as a critical exemplar due to its ubi...",
+        "source": "OpenAlex",
+        "tags": [
+          "Linux内核网络",
+          "安全补丁",
+          "内存安全"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 3
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF/XDP": 2,
+    "容器网络": 1,
+    "网络性能优化": 1,
+    "Linux内核网络栈": 1,
+    "XDP": 1,
+    "高性能网络": 1,
+    "kernel-bypass": 1,
+    "内核VPN性能优化": 1,
+    "异步API调度": 1,
+    "延迟/吞吐量优化": 1,
+    "Linux网络栈": 1,
+    "Netfilter/nftables": 1,
+    "防火墙/NAT": 1,
+    "Linux内核网络": 3,
+    "XDP/eBPF": 1,
+    "嵌入式系统网络": 1,
+    "L2转发/数据平面": 1,
+    "性能": 3,
+    "TCP/IP": 3,
+    "Socket": 1,
+    "网桥": 1,
+    "驱动": 3,
+    "虚拟化": 1,
+    "包处理": 1,
+    "网络优化": 1,
+    "分层架构": 1,
+    "UNIX系统": 1,
+    "eBPF": 1,
+    "超低延迟存储": 1,
+    "性能开销": 1,
+    "安全补丁": 1,
+    "内存安全": 1
+  }
+}
