@@ -1,10 +1,10 @@
 # CatNews
 
-CatNews 是一个基于 GitHub Pages 的每日内容精选站点，聚焦 Linux 内核网络方向的论文与资讯。
+CatNews 是一个基于 GitHub Pages 的学术内容精选站点，聚焦 Linux 内核网络方向的论文与期刊研究。
 
 ## 项目目标
 
-- 每日聚合 Linux 内核网络相关论文与技术资讯
+- 聚合 Linux 内核网络相关论文、期刊与会议研究
 - 对候选内容做自动筛选、摘要生成和标签归类
 - 以静态页面形式展示，低成本部署与维护
 
@@ -24,12 +24,21 @@ catnews.github.io/
 
 ## 数据流
 
-1. `fetch_papers.py` 从 arXiv / Semantic Scholar / LWN / Phoronix / Kernel Newbies 抓取候选内容。
+1. `fetch_papers.py` 从 arXiv / Semantic Scholar / OpenAlex / Crossref 抓取论文候选内容。
 2. 对候选项执行去重、关键词打分、热点加权与领域硬门槛过滤。
 3. 调用 LLM 生成中文摘要、相关性评级、标签与阅读时长。
 4. 写入 `docs/YYYY-MM-DD.json` 并更新 `docs/.hashes.json`。
 5. 同时输出 `docs/YYYY-MM-DD.metrics.json` 用于记录筛选质量指标。
-6. `index.html` 按日期加载 JSON 并展示论文、资讯和标签统计。
+6. `index.html` 按日期加载 JSON 并展示论文与标签统计。
+
+## 数据来源（论文/期刊）
+
+- `arXiv`：系统与网络方向预印本，更新快。
+- `Semantic Scholar`：跨会议/期刊聚合，便于补充高相关候选。
+- `OpenAlex`：学术索引数据源，覆盖期刊与会议论文。
+- `Crossref`：DOI 元数据源，偏向正式发表论文（当前优先 `journal-article`）。
+
+说明：资讯抓取默认开启（可通过脚本配置关闭），主流程优先保证论文与期刊研究质量。
 
 ## 当前筛选策略（已优化）
 
@@ -41,7 +50,7 @@ catnews.github.io/
 
 ## 展示策略（已优化）
 
-- **每日内容区**：按日期展示当天论文与资讯。
+- **每日内容区**：按日期展示当天论文。
 - **本周精选论文区**：固定展示最近 7 天内高匹配论文，缓解论文非日更导致的空档。
 
 ## 前端安全策略（已优化）

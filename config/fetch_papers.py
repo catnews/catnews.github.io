@@ -13,6 +13,8 @@ import random
 
 ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
+OPENALEX_API = "https://api.openalex.org/works"
+CROSSREF_API = "https://api.crossref.org/works"
 MINIMAX_API = "https://api.minimaxi.com/v1/chat/completions"
 
 REQUEST_DELAY_MIN = 3
@@ -257,6 +259,7 @@ MAX_NEWS = 12
 MAX_CANDIDATES = 80
 MIN_PAPERS_TARGET = 12
 MIN_NEWS_TARGET = 8
+ENABLE_NEWS = True
 
 PAPER_PROMPT = """你是一个专业的论文筛选助手。分析论文是否与 Linux 内核网络子系统直接相关。
 
@@ -626,6 +629,86 @@ def fetch_semantic_scholar_papers(query, max_results=8):
     except Exception as e:
         print(f"Semantic Scholar fetch error: {e}")
     
+    return papers
+
+def fetch_openalex_papers(query, max_results=8):
+    papers = []
+    try:
+        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+        params = {
+            "search": query,
+            "filter": f"from_publication_date:{MIN_YEAR}-01-01,language:en",
+            "per-page": max_results,
+            "sort": "publication_date:desc",
+        }
+        url = f"{OPENALEX_API}?{urllib.parse.urlencode(params)}"
+        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            data = json.loads(response.read().decode("utf-8"))
+
+        for item in data.get("results", []):
+            title = item.get("title", "")
+            abstract_inverted = item.get("abstract_inverted_index") or {}
+            abstract = ""
+            if abstract_inverted:
+                pairs = []
+                for word, positions in abstract_inverted.items():
+                    for pos in positions:
+                        pairs.append((pos, word))
+                pairs.sort(key=lambda x: x[0])
+                abstract = " ".join([w for _, w in pairs])
+            year = item.get("publication_year", 0) or 0
+            url_val = item.get("primary_location", {}).get("landing_page_url") or item.get("id", "")
+
+            if title and url_val and year >= MIN_YEAR:
+                papers.append({
+                    "title": title,
+                    "url": url_val,
+                    "abstract": abstract,
+                    "source": "OpenAlex",
+                    "year": year,
+                })
+    except Exception as e:
+        print(f"OpenAlex fetch error: {e}")
+    return papers
+
+def fetch_crossref_papers(query, max_results=8):
+    papers = []
+    try:
+        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+        params = {
+            "query": query,
+            "filter": f"from-pub-date:{MIN_YEAR}-01-01,type:journal-article",
+            "rows": max_results,
+            "sort": "published",
+            "order": "desc",
+        }
+        url = f"{CROSSREF_API}?{urllib.parse.urlencode(params)}"
+        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
+        with urllib.request.urlopen(req, timeout=30) as response:
+            data = json.loads(response.read().decode("utf-8"))
+
+        for item in data.get("message", {}).get("items", []):
+            titles = item.get("title", [])
+            title = titles[0] if titles else ""
+            abstract = re.sub(r"<[^>]+>", " ", item.get("abstract", "") or "")
+            year = 0
+            date_parts = item.get("published-print", {}).get("date-parts") or item.get("published-online", {}).get("date-parts") or []
+            if date_parts and date_parts[0]:
+                year = int(date_parts[0][0])
+            doi = item.get("DOI", "")
+            url_val = f"https://doi.org/{doi}" if doi else item.get("URL", "")
+
+            if title and url_val and year >= MIN_YEAR:
+                papers.append({
+                    "title": title,
+                    "url": url_val,
+                    "abstract": abstract,
+                    "source": "Crossref",
+                    "year": year,
+                })
+    except Exception as e:
+        print(f"Crossref fetch error: {e}")
     return papers
 
 def fetch_lwn_article_content(url):
@@ -999,10 +1082,12 @@ def main():
         print(f"  Keyword: {keyword}")
         paper_candidates.extend(fetch_arxiv_papers(keyword, 8))
     
-    print("\n[Phase 2] Fetching papers from Semantic Scholar...")
+    print("\n[Phase 2] Fetching papers from Semantic Scholar/OpenAlex/Crossref...")
     for keyword in SEARCH_KEYWORDS[split_idx:]:
         print(f"  Keyword: {keyword}")
         paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 8))
+        paper_candidates.extend(fetch_openalex_papers(keyword, 6))
+        paper_candidates.extend(fetch_crossref_papers(keyword, 4))
 
     stats["paper_candidates_raw"] = len(paper_candidates)
     
@@ -1060,11 +1145,12 @@ def main():
 
     print(f"  Filtered: {len(filtered_candidates)} relevant/near-relevant papers")
     
-    print("\n[Phase 4] Fetching news from LWN/Phoronix...")
     news_candidates = []
-    news_candidates.extend(fetch_lwn_news())
-    news_candidates.extend(fetch_phoronix_news())
-    news_candidates.extend(fetch_kernel_newbies())
+    if ENABLE_NEWS:
+        print("\n[Phase 4] Fetching news from LWN/Phoronix...")
+        news_candidates.extend(fetch_lwn_news())
+        news_candidates.extend(fetch_phoronix_news())
+        news_candidates.extend(fetch_kernel_newbies())
 
     stats["news_candidates_raw"] = len(news_candidates)
     
