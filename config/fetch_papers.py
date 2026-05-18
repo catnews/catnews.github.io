@@ -465,6 +465,24 @@ def fallback_summary(content, min_len=90):
         return clipped
     return f"{clipped}..."
 
+def contains_chinese(text):
+    if not isinstance(text, str):
+        return False
+    return re.search(r"[\u4e00-\u9fff]", text) is not None
+
+def chinese_fallback_summary(title, content, tags, is_news=False):
+    topic = "技术资讯" if is_news else "研究工作"
+    tag_text = "、".join(tags[:3]) if tags else "Linux内核网络"
+    brief = re.sub(r"\s+", " ", (content or "").strip())
+    if len(brief) > 80:
+        brief = brief[:80] + "..."
+    if not brief:
+        brief = "原文摘要信息有限，建议结合论文或文章原文进一步确认实现细节。"
+    return (
+        f"这篇{topic}《{title}》与{tag_text}相关，内容聚焦 Linux 内核网络场景下的"
+        f"实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：{brief}"
+    )
+
 def analyze_item_with_llm(title, content, is_news=False):
     prompt = f"""标题：{title}
 内容：{content[:400]}
@@ -816,14 +834,50 @@ def normalize_tag(tag):
     return canonical if canonical else cleaned
 
 def normalize_tags(tags, max_tags=4):
+    if not isinstance(tags, list):
+        return []
     normalized = []
-    for tag in tags or []:
+    for tag in tags:
         converted = normalize_tag(tag)
         if converted and converted not in normalized:
             normalized.append(converted)
         if len(normalized) >= max_tags:
             break
     return normalized
+
+def to_int(value, default_value):
+    try:
+        converted = int(value)
+        if converted <= 0:
+            return default_value
+        return converted
+    except Exception:
+        return default_value
+
+def ensure_non_empty_summary(text, fallback_text):
+    if isinstance(text, str) and text.strip():
+        return text.strip()
+    return fallback_text
+
+def sanitize_item(item, is_news=False):
+    default_minutes = 3 if is_news else 5
+    merged_for_fallback = f"{item.get('title', '')} {item.get('summary', '')}"
+    item["tags"] = normalize_tags(item.get("tags", []), max_tags=4)
+    item["summary"] = ensure_non_empty_summary(
+        item.get("summary", ""),
+        fallback_summary(merged_for_fallback, min_len=80 if is_news else 120),
+    )
+    if not contains_chinese(item["summary"]):
+        item["summary"] = chinese_fallback_summary(
+            item.get("title", ""),
+            merged_for_fallback,
+            item["tags"],
+            is_news=is_news,
+        )
+    item["readingTime"] = to_int(item.get("readingTime", default_minutes), default_minutes)
+    if item.get("relevance") not in ["high", "medium", "low", "none"]:
+        item["relevance"] = "low"
+    return item
 
 def validate_output_item(item, category):
     if not isinstance(item, dict):
@@ -1102,6 +1156,7 @@ def main():
                 "readingTime": analysis.get('readingTime', 5),
                 "relevance": analysis.get('relevance', 'high')
             })
+            selected_papers[-1] = sanitize_item(selected_papers[-1], is_news=False)
             print(f"  ✓ Processed")
         elif (
             analysis
@@ -1121,6 +1176,7 @@ def main():
                 "readingTime": analysis.get('readingTime', 5),
                 "relevance": "low"
             })
+            selected_papers[-1] = sanitize_item(selected_papers[-1], is_news=False)
             print(f"  ✓ Processed (hotspot low)")
         
         if len(selected_papers) >= MAX_PAPERS:
@@ -1133,6 +1189,7 @@ def main():
         
         if item.get('source') == 'LWN.net' and item.get('summary'):
             item['tags'] = normalize_tags(item.get('tags', []), max_tags=4)
+            item = sanitize_item(item, is_news=True)
             selected_news.append(item)
             print(f"  [{i+1}] {item['title'][:40]}... -> ✓ pre-processed")
         else:
@@ -1159,6 +1216,7 @@ def main():
                     "readingTime": analysis.get('readingTime', 3),
                     "relevance": analysis.get('relevance', 'high')
                 })
+                selected_news[-1] = sanitize_item(selected_news[-1], is_news=True)
                 print(f"    ✓ Processed")
             elif (
                 analysis
@@ -1177,6 +1235,7 @@ def main():
                     "readingTime": analysis.get('readingTime', 3),
                     "relevance": "low"
                 })
+                selected_news[-1] = sanitize_item(selected_news[-1], is_news=True)
                 print(f"    ✓ Processed (hotspot low)")
     
     paper_tags = count_tags(selected_papers)

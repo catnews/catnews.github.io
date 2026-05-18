@@ -104,6 +104,16 @@
             margin-bottom: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+
+        .weekly-section {
+            border-top: 4px solid #16a34a;
+        }
+
+        .weekly-note {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
         
         .category-title {
             font-size: 16px;
@@ -306,6 +316,12 @@
                 <button id="nextDay">后一天 &rarr;</button>
             </div>
         </header>
+
+        <section class="category-section weekly-section" id="weeklyPicks">
+            <h2 class="category-title">本周精选论文 <span class="paper-count" id="weeklyCount">加载中...</span></h2>
+            <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
+            <div class="loading">加载中...</div>
+        </section>
         
         <div class="layout">
             <aside class="sidebar" id="sidebar">
@@ -331,6 +347,7 @@
         let currentDate = new Date();
         let selectedFilter = null;
         let currentData = null;
+        const weeklyCache = new Map();
         
         function formatDate(date) {
             const year = date.getFullYear();
@@ -513,6 +530,140 @@
                 content.appendChild(empty);
             }
         }
+
+        function normalizeRelevanceScore(relevance) {
+            if (relevance === 'high') return 3;
+            if (relevance === 'medium') return 2;
+            if (relevance === 'low') return 1;
+            return 0;
+        }
+
+        function paperHotScore(paper) {
+            const tags = Array.isArray(paper.tags) ? paper.tags : [];
+            const hotTags = ['eBPF', 'XDP', 'TCP/IP', 'Netfilter', '容器网络', '性能', 'Linux内核网络'];
+            let score = normalizeRelevanceScore(paper.relevance);
+            tags.forEach(tag => {
+                if (hotTags.includes(tag)) {
+                    score += 1;
+                }
+            });
+            return score;
+        }
+
+        function parseDateFromFilename(path) {
+            const m = path.match(/(\d{4}-\d{2}-\d{2})\.json$/);
+            return m ? m[1] : null;
+        }
+
+        function dateOffset(days) {
+            const d = new Date();
+            d.setDate(d.getDate() + days);
+            return d;
+        }
+
+        function safeDateString(dateObj) {
+            return formatDate(dateObj);
+        }
+
+        async function tryLoadDay(dateStr) {
+            if (weeklyCache.has(dateStr)) {
+                return weeklyCache.get(dateStr);
+            }
+            try {
+                const res = await fetch(`docs/${dateStr}.json`);
+                if (!res.ok) {
+                    weeklyCache.set(dateStr, null);
+                    return null;
+                }
+                const data = await res.json();
+                weeklyCache.set(dateStr, data);
+                return data;
+            } catch (e) {
+                weeklyCache.set(dateStr, null);
+                return null;
+            }
+        }
+
+        function createWeeklyCard(paper, dateStr) {
+            const item = document.createElement('div');
+            item.className = 'paper-item';
+
+            const title = document.createElement('div');
+            title.className = 'paper-title';
+            const a = document.createElement('a');
+            a.href = paper.url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = paper.title;
+            title.appendChild(a);
+
+            const summary = document.createElement('div');
+            summary.className = 'paper-summary';
+            summary.textContent = paper.summary || '';
+
+            const meta = document.createElement('div');
+            meta.className = 'paper-meta';
+
+            const src = document.createElement('span');
+            src.className = `source-tag ${(paper.source || '').toLowerCase().replace(/[^a-z]/g, '')}`;
+            src.textContent = paper.source || '';
+            meta.appendChild(src);
+
+            const day = document.createElement('span');
+            day.className = 'reading-time';
+            day.textContent = `收录日期 ${dateStr}`;
+            meta.appendChild(day);
+
+            item.appendChild(title);
+            item.appendChild(summary);
+            item.appendChild(meta);
+            return item;
+        }
+
+        async function loadWeeklyPicks() {
+            const weekly = document.getElementById('weeklyPicks');
+            const count = document.getElementById('weeklyCount');
+            weekly.querySelector('.loading')?.remove();
+
+            const papers = [];
+            for (let i = 0; i < 7; i++) {
+                const dateStr = safeDateString(dateOffset(-i));
+                const dayData = await tryLoadDay(dateStr);
+                if (!dayData || !dayData.categories || !Array.isArray(dayData.categories.papers)) {
+                    continue;
+                }
+                dayData.categories.papers.forEach(p => {
+                    papers.push({ ...p, _date: dateStr });
+                });
+            }
+
+            const dedup = new Map();
+            papers.forEach(p => {
+                const key = (p.title || '').trim().toLowerCase();
+                if (!key) return;
+                if (!dedup.has(key) || paperHotScore(p) > paperHotScore(dedup.get(key))) {
+                    dedup.set(key, p);
+                }
+            });
+
+            const weeklyTop = Array.from(dedup.values())
+                .sort((a, b) => paperHotScore(b) - paperHotScore(a))
+                .slice(0, 6);
+
+            count.textContent = `共 ${weeklyTop.length} 篇`;
+
+            if (weeklyTop.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-message';
+                empty.textContent = '最近 7 天暂无可展示的高匹配论文';
+                weekly.appendChild(empty);
+                return;
+            }
+
+            weeklyTop.forEach(p => {
+                weekly.appendChild(createWeeklyCard(p, p._date));
+            });
+        }
         
         function renderContent(data) {
             currentData = data;
@@ -571,6 +722,7 @@
         });
         
         loadData(currentDate);
+        loadWeeklyPicks();
     </script>
 </body>
 </html>
