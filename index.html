@@ -109,10 +109,6 @@
             border-top: 4px solid #16a34a;
         }
 
-        .innovation-section {
-            border-top: 4px solid #ea580c;
-        }
-
         .weekly-note {
             font-size: 12px;
             color: #6b7280;
@@ -327,12 +323,6 @@
             <div class="loading">加载中...</div>
         </section>
 
-        <section class="category-section innovation-section" id="weeklyInnovation">
-            <h2 class="category-title">本周创新论文 <span class="paper-count" id="innovationCount">加载中...</span></h2>
-            <div class="weekly-note">基于创新评分与相关性综合排序，突出可用于内核网络优化创新的论文。</div>
-            <div class="loading">加载中...</div>
-        </section>
-        
         <div class="layout">
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-section">
@@ -371,6 +361,21 @@
             const month = date.getMonth() + 1;
             const day = date.getDate();
             return `${year}年${month}月${day}日`;
+        }
+
+        function hasChineseText(text) {
+            return typeof text === 'string' && /[\u4e00-\u9fff]/.test(text);
+        }
+
+        function ensureChineseSummary(item) {
+            const summary = (item && item.summary) ? String(item.summary).trim() : '';
+            if (summary && hasChineseText(summary)) {
+                return summary;
+            }
+            const title = (item && item.title) ? item.title : '该论文';
+            const tags = Array.isArray(item?.tags) ? item.tags.slice(0, 3) : [];
+            const tagText = tags.length ? tags.join('、') : 'Linux内核网络';
+            return `《${title}》与${tagText}相关。建议重点关注其内核路径、优化方法与性能评估结果。`;
         }
         
         function renderTagStats(tagStats) {
@@ -453,7 +458,7 @@
 
                 const summaryDiv = document.createElement('div');
                 summaryDiv.className = 'paper-summary';
-                summaryDiv.textContent = item.summary || '';
+                summaryDiv.textContent = ensureChineseSummary(item);
 
                 const metaDiv = document.createElement('div');
                 metaDiv.className = 'paper-meta';
@@ -609,7 +614,7 @@
 
             const summary = document.createElement('div');
             summary.className = 'paper-summary';
-            summary.textContent = paper.summary || '';
+            summary.textContent = ensureChineseSummary(paper);
 
             const meta = document.createElement('div');
             meta.className = 'paper-meta';
@@ -621,8 +626,7 @@
 
             const day = document.createElement('span');
             day.className = 'reading-time';
-            const innovation = Number.isFinite(Number(paper.innovationScore)) ? Number(paper.innovationScore) : 0;
-            day.textContent = `收录日期 ${dateStr} | 创新分 ${innovation}`;
+            day.textContent = `收录日期 ${dateStr}`;
             meta.appendChild(day);
 
             item.appendChild(title);
@@ -676,50 +680,15 @@
             });
         }
 
-        async function loadWeeklyInnovation() {
-            const panel = document.getElementById('weeklyInnovation');
-            const count = document.getElementById('innovationCount');
-            panel.querySelector('.loading')?.remove();
-
-            const papers = [];
-            for (let i = 0; i < 7; i++) {
+        async function findLatestAvailableDate(maxLookbackDays = 30) {
+            for (let i = 0; i <= maxLookbackDays; i++) {
                 const dateStr = safeDateString(dateOffset(-i));
                 const dayData = await tryLoadDay(dateStr);
-                if (!dayData || !dayData.categories || !Array.isArray(dayData.categories.papers)) {
-                    continue;
+                if (dayData && dayData.categories) {
+                    return new Date(dateStr + 'T00:00:00');
                 }
-                dayData.categories.papers.forEach(p => {
-                    papers.push({ ...p, _date: dateStr });
-                });
             }
-
-            const dedup = new Map();
-            papers.forEach(p => {
-                const key = (p.title || '').trim().toLowerCase();
-                if (!key) return;
-                const old = dedup.get(key);
-                const curScore = Number(p.innovationScore || 0) + paperHotScore(p);
-                const oldScore = old ? Number(old.innovationScore || 0) + paperHotScore(old) : -1;
-                if (!old || curScore > oldScore) {
-                    dedup.set(key, p);
-                }
-            });
-
-            const top = Array.from(dedup.values())
-                .sort((a, b) => (Number(b.innovationScore || 0) + paperHotScore(b)) - (Number(a.innovationScore || 0) + paperHotScore(a)))
-                .slice(0, 6);
-
-            count.textContent = `共 ${top.length} 篇`;
-
-            if (top.length === 0) {
-                const empty = document.createElement('div');
-                empty.className = 'empty-message';
-                empty.textContent = '最近 7 天暂无可展示的创新论文';
-                panel.appendChild(empty);
-                return;
-            }
-
-            top.forEach(p => panel.appendChild(createWeeklyCard(p, p._date)));
+            return new Date();
         }
         
         function renderContent(data) {
@@ -778,9 +747,13 @@
             loadData(currentDate);
         });
         
-        loadData(currentDate);
-        loadWeeklyPicks();
-        loadWeeklyInnovation();
+        async function initPage() {
+            currentDate = await findLatestAvailableDate(30);
+            await loadData(currentDate);
+            await loadWeeklyPicks();
+        }
+
+        initPage();
     </script>
 </body>
 </html>
