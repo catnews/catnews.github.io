@@ -1,0 +1,65 @@
+{
+  "date": "2026-05-20",
+  "categories": {
+    "papers": [
+      {
+        "title": "Joint Congestion Control Evaluation for MPTCP and MPQUIC over Multi-Link Backhauls with eMBB and mMTC-like Traffic",
+        "url": "https://doi.org/10.3390/electronics15091797",
+        "summary": "这篇研究工作《Joint Congestion Control Evaluation for MPTCP and MPQUIC over Multi-Link Backhauls with eMBB and mMTC-like Traffic》与TCP/IP、路由、包处理相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Joint Congestion Control Evaluation for MPTCP and MPQUIC over Multi-Link Backhau...",
+        "summary_en": "Multi-link terrestrial backhauls create a shared transport environment in which heterogeneous multipath protocols compete for the same forwarding reso...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "路由",
+          "包处理",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "Methodology and Architecture for Benchmarking End-to-End PQC Protocol Resilience in an IoT Context",
+        "url": "https://doi.org/10.3390/iot7010017",
+        "summary": "这篇研究工作《Methodology and Architecture for Benchmarking End-to-End PQC Protocol Resilience in an IoT Context》与TCP/IP、包处理、网络优化相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Methodology and Architecture for Benchmarking End-to-End PQC Protocol Resilience...",
+        "summary_en": "Migrating to Post-Quantum Cryptography (PQC) is critical for securing resource-constrained Internet of Things (IoT) devices against the “harvest-now, ...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "包处理",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 5
+      },
+      {
+        "title": "Protocols, Reactive Architectures, and Computing Platforms for Low-Latency, High-Concurrency Web Applications: A Systematic Literature Review",
+        "url": "https://doi.org/10.3390/fi18050254",
+        "summary": "这篇研究工作《Protocols, Reactive Architectures, and Computing Platforms for Low-Latency, High-Concurrency Web Applications: A Systematic Literature Review》与TCP/IP、Socket、驱动相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Protocols, Reactive Architectures, and Computing Platforms for Low-Latency, High...",
+        "summary_en": "This review examines the technologies shaping real-time web application development, with particular attention to bidirectional communication protocol...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "Socket",
+          "驱动",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 7
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 3,
+    "路由": 1,
+    "包处理": 2,
+    "网络优化": 2,
+    "性能": 2,
+    "Socket": 1,
+    "驱动": 1
+  }
+}
