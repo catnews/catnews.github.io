@@ -1,0 +1,28 @@
+{
+  "date": "2026-05-21",
+  "categories": {
+    "papers": [
+      {
+        "title": "Emulating large LEO satellite networks with eBPF",
+        "url": "https://doi.org/10.1016/j.comnet.2026.112383",
+        "summary": "本文提出使用eBPF技术构建大规模LEO卫星网络仿真工具。研究动机源于LEO卫星网络的高度动态特性（快速切换、拓扑变化、延迟波动）对网络协议测试带来挑战，现有仿真工具难以高效扩展到大型星座规模。论文利用eBPF在内核空间高效处理数据包的能力，实现可扩展的卫星网络仿真。虽然eBPF是Linux内核网络的重要技术，但本文重点是仿真/模拟工具开发，而非Linux内核网络子系统的实际实现或性能优化。论文对eBPF应用场景有一定参考价值，但与内核网络协议栈、容器网络或网络性能优化等热点话题关联度有限。",
+        "summary_en": "The rapid expansion of Low-Earth-Orbit (LEO) satellite networks is critical for the advancement of beyond-6G (B6G) and IoT systems. However, the highl...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "卫星网络仿真",
+          "网络模拟工具"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "卫星网络仿真": 1,
+    "网络模拟工具": 1
+  }
+}
