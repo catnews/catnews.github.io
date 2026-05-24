@@ -1,0 +1,29 @@
+{
+  "date": "2026-05-24",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for May 14, 2026",
+        "url": "https://lwn.net/Articles/1071535/",
+        "abstract": " LWN.net Weekly Edition for May 14, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pas",
+        "summary": "本期LWN.net周刊聚焦Linux内核多个关键领域。内存管理方面，长期维护者Andrew Morton宣布准备退休，标志着一个时代的结束；同时DAMON子系统持续演进，透明大页支持扩展至1GB粒度，页表共享(mshare)方案再次被讨论。I/O性能优化方面，基于io_uring的新dma-buf读写API旨在提升效率。安全领域，移除内核直接映射虽可增强安全性但损伤性能，Brendan Jackman提出API方案解决此矛盾。架构优化方面，两种64KB基础页配合4KB内核的方案被探索。Fedora项目关于AI开发者桌面的争议以及Forgejo的安全披露实践也值得关注。",
+        "source": "LWN.net",
+        "tags": [
+          "内存管理",
+          "Linux内核网络",
+          "透明大页",
+          "dma-buf"
+        ],
+        "readingTime": 5,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "内存管理": 1,
+    "Linux内核网络": 1,
+    "透明大页": 1,
+    "dma-buf": 1
+  }
+}
