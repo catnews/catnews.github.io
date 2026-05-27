@@ -1,0 +1,49 @@
+{
+  "date": "2026-05-27",
+  "categories": {
+    "papers": [
+      {
+        "title": "Heimdall: Formally Verified Automated Migration of Legacy eBPF Programs to Rust",
+        "url": "http://arxiv.org/abs/2605.25411v1",
+        "summary": "本文介绍了Heimdall，一个用于将传统eBPF程序自动迁移到Rust的经过形式化验证的工具。eBPF是Linux内核网络子系统的重要扩展技术，广泛应用于网络包处理（XDP）、流量监控和安全策略执行。该研究针对eBPF verifier只能检查底层内存安全和终止性，无法保证高级源码属性的问题，通过Rust语言迁移来增强eBPF程序的安全性、初始化规范和错误处理。Heimdall采用Coq进行形式化验证，确保迁移过程的正确性。这项工作对于提升Linux内核网络基础设施的安全性和可靠性具有重要意义。",
+        "summary_en": "Extended Berkeley Packet Filter (eBPF) programs are kernel extensions used for networking, observability, and security enforcement in the Linux kernel...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "形式化验证",
+          "Rust",
+          "Linux内核安全"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "LearnedCache: An eBPF-Integrated Perceptron-Based Eviction Policy for the Linux Page Cache",
+        "url": "http://arxiv.org/abs/2605.26168v1",
+        "summary": "这篇研究工作《LearnedCache: An eBPF-Integrated Perceptron-Based Eviction Policy for the Linux Page Cache》与eBPF、TCP/IP、Linux内核网络相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：LearnedCache: An eBPF-Integrated Perceptron-Based Eviction Policy for the Linux ...",
+        "summary_en": "Linux is the foundation of the digital age, accounting for the majority of the cloud and mobile OS markets. Any device that runs Linux uses the Linux ...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "Linux内核网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 7
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 2,
+    "形式化验证": 1,
+    "Rust": 1,
+    "Linux内核安全": 1,
+    "TCP/IP": 1,
+    "Linux内核网络": 1,
+    "性能": 1
+  }
+}
