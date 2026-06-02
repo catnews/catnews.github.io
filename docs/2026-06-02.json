@@ -1,0 +1,28 @@
+{
+  "date": "2026-06-02",
+  "categories": {
+    "papers": [
+      {
+        "title": "Waiting at the front door: Continuous monitoring of latency in the host network stack",
+        "url": "http://arxiv.org/abs/2606.02057v1",
+        "summary": "论文聚焦于亚毫秒级网络时代下，主机侧延迟成为制约应用端到端延迟的关键瓶颈。研究指出网卡到CPU的物理互联、内核网络栈处理、以及应用调度三者都可能引入显著延迟。作者提出对主机网络栈延迟进行持续监控的方法，以识别和量化这些延迟来源。该研究对于理解Linux内核网络子系统的性能特征具有重要价值，涉及到数据包在网卡、中断处理、内核协议栈处理、上下文切换等环节的延迟测量与分析。",
+        "summary_en": "With networking moving into the sub-millisecond latency domain, latency in the end host itself can become a significant barrier to achieving consisten...",
+        "source": "arXiv",
+        "tags": [
+          "Network latency monitoring",
+          "Linux kernel networking",
+          "Host performance optimization"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "Network latency monitoring": 1,
+    "Linux kernel networking": 1,
+    "Host performance optimization": 1
+  }
+}
