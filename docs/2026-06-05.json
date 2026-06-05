@@ -1,0 +1,70 @@
+{
+  "date": "2026-06-05",
+  "categories": {
+    "papers": [
+      {
+        "title": "SAC-BBR: A Semantic-Aware and Cross-Layer Collaborative Congestion Control Mechanism for Heterogeneous Campus Networks",
+        "url": "https://doi.org/10.3390/app16115587",
+        "summary": "论文提出SAC-BBR，一种语义感知和跨层协作的拥塞控制机制，针对Wi-Fi 7校园网络中的高密度接入和大规模数据传输场景。论文指出传统TCP BBR算法缺乏深层链路感知和服务语义理解，在复杂无线环境下会误判非拥塞丢包导致性能下降。研究通过跨层协同和语义感知来改进BBR，提升在高密度异构校园网络中的传输性能和公平性。该工作属于TCP/IP协议栈拥塞控制算法优化范畴，与Linux网络性能密切相关但属于学术算法研究层面。",
+        "summary_en": "With the widespread adoption of Wi-Fi 7 in campus networks, high-density access and large-scale research data transmission challenge traditional conge...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP拥塞控制",
+          "BBR算法改进",
+          "无线网络/Wi-Fi",
+          "校园网络"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 10
+      },
+      {
+        "title": "An Empirical Study of Vertical Handover Behavior on Android During Mobility and a Kernel-Aware Proactive Connectivity Manager",
+        "url": "https://hdl.handle.net/10919/143213",
+        "summary": "这篇研究工作《An Empirical Study of Vertical Handover Behavior on Android During Mobility and a Kernel-Aware Proactive Connectivity Manager》与TCP/IP、包处理、网络优化相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：An Empirical Study of Vertical Handover Behavior on Android During Mobility and ...",
+        "summary_en": "Mobile users spend much of their time in environments where Wi-Fi and cellular networks coexist, such as campuses and homes, and they frequently move ...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "包处理",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 3
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for May 28, 2026",
+        "url": "https://lwn.net/Articles/1073782/",
+        "abstract": " LWN.net Weekly Edition for May 28, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Pas",
+        "summary": "LWN.net 2026年5月28日周报主要内容包括：BPF支持已进入GCC 16，内核开发者持续推进BPF在后端编译器的支持；在内存管理方面，提出私有内存节点支持以管理设备提供的专用内存，以及利用BPF实现自定义页面缓存策略；大页故障处理仍是性能优化重点，存在锁竞争问题待解决；透明大页的自动管理机制持续改进；页面映射计数简化工作取得新进展；分层内存系统的内存控制器限制支持正在开发中。AI相关话题方面，Linu Torvalds与Dirk讨论了AI与内核开发的关系，另有MOT工具用于对抗AI领域的\"开放清洗\"问题，以及探索使用LLM进行内核补丁审查的方法。总体来看，本期内容侧重内存管理、文件系统和BPF生态系统的演进。",
+        "source": "LWN.net",
+        "tags": [
+          "eBPF",
+          "内存管理",
+          "文件系统",
+          "透明大页"
+        ],
+        "readingTime": 3,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "TCP拥塞控制": 1,
+    "BBR算法改进": 1,
+    "无线网络/Wi-Fi": 1,
+    "校园网络": 1,
+    "TCP/IP": 1,
+    "包处理": 1,
+    "网络优化": 1,
+    "性能": 1,
+    "eBPF": 1,
+    "内存管理": 1,
+    "文件系统": 1,
+    "透明大页": 1
+  }
+}
