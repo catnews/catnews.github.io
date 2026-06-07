@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-07",
+  "categories": {
+    "papers": [
+      {
+        "title": "EVALUASI TINGKAT KEAMANAN SERVER LINUX UBUNTU MELALUI PENERAPAN CIS BENCHMARKS, OPENVAS, DAN LYNIS SEBAGAI UPAYA MITIGASI VEKTOR SERANGAN",
+        "url": "https://doi.org/10.31539/ht1ydz84",
+        "summary": "这篇研究工作《EVALUASI TINGKAT KEAMANAN SERVER LINUX UBUNTU MELALUI PENERAPAN CIS BENCHMARKS, OPENVAS, DAN LYNIS SEBAGAI UPAYA MITIGASI VEKTOR SERANGAN》与TCP/IP、性能相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：EVALUASI TINGKAT KEAMANAN SERVER LINUX UBUNTU MELALUI PENERAPAN CIS BENCHMARKS, ...",
+        "summary_en": " Server berbasis Linux Ubuntu rentan terhadap berbagai vektor serangan siber akibat konfigurasi bawaan yang berorientasi pada fungsionalitas daripada ...",
+        "source": "Crossref",
+        "tags": [
+          "TCP/IP",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 3
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "性能": 1
+  }
+}
