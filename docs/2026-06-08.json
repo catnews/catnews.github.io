@@ -1,0 +1,44 @@
+{
+  "date": "2026-06-08",
+  "categories": {
+    "papers": [
+      {
+        "title": "Edge-Cloud-Assisted Real-Time Cyber-Physical Systems",
+        "url": "https://research.tue.nl/en/publications/f03226fa-940d-4809-9a5e-126bc9d9f39f",
+        "summary": "本文讨论边缘云辅助的信息物理系统(CPS)，重点关注汽车、航空航天、医疗和工业自动化等领域的实时性和可靠性需求。文章主要涉及CPS系统架构设计、边缘计算与云端协作概念，未涉及Linux内核网络子系统的具体技术（如TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter等）。虽然CPS系统可能需要网络通信，但本文摘要未涉及内核网络层面的技术细节，与Linux内核网络性能优化无直接关联。",
+        "summary_en": "Cyber-Physical Systems (CPS) represent a type of interconnected systems where computational and physical processes are deeply integrated. These system...",
+        "source": "OpenAlex",
+        "tags": [
+          "信息物理系统",
+          "边缘计算",
+          "实时系统"
+        ],
+        "readingTime": 3,
+        "relevance": "low",
+        "innovationScore": 7
+      },
+      {
+        "title": "Addressing Negative Commons Governance with Positive Commons Principles",
+        "url": "http://arxiv.org/abs/2606.04563v1",
+        "summary": "这篇研究工作《Addressing Negative Commons Governance with Positive Commons Principles》与TCP/IP、Linux内核网络相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Addressing Negative Commons Governance with Positive Commons Principles Computin...",
+        "summary_en": "Computing is accompanied by both positive and negative commons throughout its lifecycle of creation, execution, and disposal. We examine two governanc...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "Linux内核网络"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "信息物理系统": 1,
+    "边缘计算": 1,
+    "实时系统": 1,
+    "TCP/IP": 1,
+    "Linux内核网络": 1
+  }
+}

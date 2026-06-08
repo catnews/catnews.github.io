@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-08",
+  "papers": {
+    "raw": 224,
+    "dedup": 104,
+    "quick_high_medium": 0,
+    "fill_medium_high": 4,
+    "fill_low": 0,
+    "hotspot_final": 1,
+    "final": 2,
+    "dedup_rate": "46.4%",
+    "final_rate": "1.9%"
+  },
+  "news": {
+    "raw": 6,
+    "dedup": 4,
+    "preprocessed": 0,
+    "quick_high_medium": 0,
+    "fill_medium_high": 0,
+    "fill_low": 0,
+    "hotspot_final": 0,
+    "final": 0,
+    "dedup_rate": "66.7%",
+    "final_rate": "0.0%"
+  }
+}
