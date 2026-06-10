@@ -1,0 +1,28 @@
+{
+  "date": "2026-06-10",
+  "categories": {
+    "papers": [
+      {
+        "title": "A Deployment-Oriented Framework for Explainable AI-Assisted eBPF/XDP Mitigation at the IoT Edge",
+        "url": "http://arxiv.org/abs/2606.10508v1",
+        "summary": "本文提出一个面向部署的可解释AI辅助eBPF/XDP框架，用于IoT边缘安全防护。研究针对IoT设备异构性、资源受限、安全配置薄弱等问题，利用eBPF/XDP在内核层面实现高性能网络包处理和安全检测。框架结合可解释AI技术，提升安全决策的透明度。该方案充分发挥eBPF/XDP在Linux内核网络栈中的高速包处理能力，实现近实时的威胁缓解，适用于动态IoT网络环境。相比传统的签名和阈值检测方法，该框架能更好地应对复杂多变的攻击场景。",
+        "summary_en": "Internet of Things (IoT) deployments combine heterogeneous, resource-constrained devices with weak security configurations, exposed services, limited ...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF/XDP",
+          "IoT安全",
+          "AI安全防护"
+        ],
+        "readingTime": 12,
+        "relevance": "high",
+        "innovationScore": 8
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF/XDP": 1,
+    "IoT安全": 1,
+    "AI安全防护": 1
+  }
+}
