@@ -828,17 +828,19 @@
             wrapper.className = 'highlight-item';
 
             const summaryPoints = buildLwnSummaryPoints(item);
-            const summary = document.createElement(summaryPoints.length > 0 ? 'ul' : 'div');
-            summary.className = summaryPoints.length > 0 ? 'lwn-points' : 'lwn-brief';
+            const summary = document.createElement('div');
+            summary.className = 'lwn-brief';
+            summary.textContent = ensureChineseSummary(item);
+
+            const points = document.createElement('ul');
+            points.className = 'lwn-points';
 
             if (summaryPoints.length > 0) {
                 summaryPoints.forEach(point => {
                     const li = document.createElement('li');
                     li.textContent = point;
-                    summary.appendChild(li);
+                    points.appendChild(li);
                 });
-            } else {
-                summary.textContent = ensureChineseSummary(item);
             }
 
             const origin = document.createElement('div');
@@ -881,12 +883,21 @@
             });
 
             wrapper.appendChild(summary);
+            if (summaryPoints.length > 0) {
+                wrapper.appendChild(points);
+            }
             wrapper.appendChild(origin);
             wrapper.appendChild(meta);
             return wrapper;
         }
 
         function buildLwnSummaryPoints(item) {
+            if (Array.isArray(item.keyPoints) && item.keyPoints.length > 0) {
+                return item.keyPoints
+                    .map(point => (point || '').trim())
+                    .filter(point => point && point.length >= 16);
+            }
+
             const summary = ensureChineseSummary(item)
                 .replace(/[；;]+/g, '。')
                 .replace(/\s+/g, ' ')
@@ -901,8 +912,7 @@
                 .map(part => part.trim())
                 .filter(Boolean)
                 .map(part => part.replace(/^[-•\d\s]+/, '').trim())
-                .filter(part => part.length >= 8)
-                .slice(0, 3);
+                .filter(part => part.length >= 16);
 
             if (points.length >= 2) {
                 return points;

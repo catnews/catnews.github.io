@@ -297,9 +297,14 @@ NEWS_PROMPT = """你是一个技术资讯筛选助手。分析文章是否与 Li
 LWN_SUMMARY_PROMPT = """你是一个技术文章总结助手。请阅读LWN.net的文章内容，提取与Linux内核网络相关的重要信息。
 
 返回JSON格式：
-{"summary": "中文总结150-250字，突出关键技术和影响", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
+{"summary": "中文总结280-600字，覆盖背景、核心变化、实现机制、影响，不要过度压缩", "keyPoints": ["按原文重要信息输出完整条目列表，数量不要人为限制，尽可能覆盖完整内容"], "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
 
-注意：tags数组最多包含3-4个最重要的标签。"""
+注意：
+1. 不要只写结论，必须保留文章里的关键技术细节。
+2. keyPoints 必须返回完整条目；每条都要能单独阅读，禁止只写名词短语、禁止过短。
+3. keyPoints 的数量不要人为限制；如果原文有 8 条、10 条重要信息，就返回 8 条、10 条，不要压缩丢内容。
+4. 每条 keyPoints 优先描述一个独立信息点，例如问题背景、补丁行为、实现机制、性能影响、争议点或后续计划。
+5. tags数组最多包含3-4个最重要的标签。"""
 
 def random_delay(min_sec, max_sec):
     delay = random.uniform(min_sec, max_sec)
@@ -827,7 +832,7 @@ def fetch_lwn_article_content(url):
         text_content = re.sub(r'\s+', ' ', text_content)
         
         return {
-            "content": text_content[:2000],
+            "content": text_content[:6000],
             "is_free": is_free,
         }
     except Exception as e:
@@ -849,6 +854,11 @@ def summarize_lwn_article(title, content):
         if json_match:
             result = json.loads(json_match.group())
             result["relevance"] = "high"
+            key_points = result.get("keyPoints", [])
+            if isinstance(key_points, list):
+                result["keyPoints"] = [str(point).strip() for point in key_points if str(point).strip()]
+            else:
+                result["keyPoints"] = []
             return result
     except:
         pass
@@ -904,8 +914,9 @@ def fetch_lwn_news():
                 news.append({
                     "title": article['title'],
                     "url": article['url'],
-                    "abstract": content[:300],
+                    "abstract": content[:500],
                     "summary": summary_data.get('summary', ''),
+                    "keyPoints": summary_data.get('keyPoints', []),
                     "source": "LWN.net",
                     "tags": summary_data.get('tags', [])[:4],
                     "readingTime": summary_data.get('readingTime', 8),
@@ -1096,6 +1107,14 @@ def validate_output_item(item, category):
 
     if "readingTime" in item and not isinstance(item.get("readingTime"), int):
         return False, f"{category}: readingTime must be int"
+
+    if "keyPoints" in item:
+        key_points = item.get("keyPoints")
+        if not isinstance(key_points, list):
+            return False, f"{category}: keyPoints must be list"
+        for point in key_points:
+            if not isinstance(point, str):
+                return False, f"{category}: keyPoints entries must be string"
 
     if "relevance" in item and item.get("relevance") not in ["high", "medium", "low", "none"]:
         return False, f"{category}: invalid relevance"
