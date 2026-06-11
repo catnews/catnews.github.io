@@ -18,6 +18,7 @@ CROSSREF_API = "https://api.crossref.org/works"
 DBLP_API = "https://dblp.org/search/publ/api"
 OPENREVIEW_API = "https://api2.openreview.net/notes"
 MINIMAX_API = "https://api.minimaxi.com/v1/chat/completions"
+MINIMAX_MODEL = "MiniMax-M3"
 
 REQUEST_DELAY_MIN = 3
 REQUEST_DELAY_MAX = 5
@@ -208,6 +209,16 @@ HARD_EXCLUDE_KEYWORDS = [
     "image classification",
 ]
 
+LWN_PAYWALL_KEYWORDS = [
+    "subscriber-only",
+    "subscribers only",
+    "available to subscribers only",
+    "this article is available to subscribers only",
+    "purchase a subscription",
+    "log in to read",
+    "subscribe to lwn",
+]
+
 KERNEL_ANCHOR_KEYWORDS = [
     "linux kernel",
     "kernel",
@@ -304,7 +315,7 @@ def call_minimax(prompt, system_prompt, max_retries=3):
     for attempt in range(max_retries):
         try:
             payload = {
-                "model": "MiniMax-M2.7",
+                "model": MINIMAX_MODEL,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt}
@@ -797,18 +808,28 @@ def innovation_score(title, abstract, tags):
 
     return min(score, 10)
 
+def is_lwn_free_article(html):
+    page = (html or "").lower()
+    return not any(keyword in page for keyword in LWN_PAYWALL_KEYWORDS)
+
+
 def fetch_lwn_article_content(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
         with urllib.request.urlopen(req, timeout=30) as response:
             html = response.read().decode("utf-8")
+
+        is_free = is_lwn_free_article(html)
         
         text_content = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL)
         text_content = re.sub(r'<style[^>]*>.*?</style>', '', text_content, flags=re.DOTALL)
         text_content = re.sub(r'<[^>]+>', ' ', text_content)
         text_content = re.sub(r'\s+', ' ', text_content)
         
-        return text_content[:2000]
+        return {
+            "content": text_content[:2000],
+            "is_free": is_free,
+        }
     except Exception as e:
         print(f"    Error fetching article content: {e}")
         return None
@@ -860,27 +881,38 @@ def fetch_lwn_news():
                     "source": "LWN.net"
                 })
         
-        print(f"    Found {len(candidates)} candidates, processing top 5...")
+        print(f"    Found {len(candidates)} candidates, scanning all free articles in current archive...")
         
-        for i, article in enumerate(candidates[:5]):
+        for i, article in enumerate(candidates[:20]):
             print(f"    [{i+1}] {article['title'][:40]}...")
             time.sleep(2)
             
-            content = fetch_lwn_article_content(article['url'])
-            if content:
-                summary_data = summarize_lwn_article(article['title'], content)
-                if summary_data:
-                    news.append({
-                        "title": article['title'],
-                        "url": article['url'],
-                        "abstract": content[:300],
-                        "summary": summary_data.get('summary', ''),
-                        "source": "LWN.net",
-                        "tags": summary_data.get('tags', [])[:4],
-                        "readingTime": summary_data.get('readingTime', 8),
-                        "relevance": "high"
-                    })
-                    print(f"      ✓ Summarized")
+            article_data = fetch_lwn_article_content(article['url'])
+            if not article_data:
+                continue
+
+            if not article_data.get("is_free"):
+                print("      -> subscriber-only, skipped")
+                continue
+
+            content = article_data.get("content", "")
+            summary_data = summarize_lwn_article(article['title'], content)
+            if not summary_data:
+                summary_data = analyze_item_with_llm(article['title'], content, is_news=True)
+
+            if summary_data:
+                news.append({
+                    "title": article['title'],
+                    "url": article['url'],
+                    "abstract": content[:300],
+                    "summary": summary_data.get('summary', ''),
+                    "source": "LWN.net",
+                    "tags": summary_data.get('tags', [])[:4],
+                    "readingTime": summary_data.get('readingTime', 8),
+                    "relevance": "high",
+                    "access": "free",
+                })
+                print(f"      ✓ Summarized")
         
         print(f"    Final: {len(news)} LWN articles")
     except Exception as e:

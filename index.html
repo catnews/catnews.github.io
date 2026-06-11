@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CatNews - 每日Linux内核网络内容精选</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,10 +16,14 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(33, 150, 243, 0.16), transparent 28%),
+                radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 30%),
+                linear-gradient(180deg, #f4f9ff 0%, #f7f6f2 100%);
+            color: #243447;
             line-height: 1.6;
+            min-height: 100vh;
         }
         
         .page-wrapper {
@@ -47,20 +55,61 @@
                 width: 100%;
                 order: -1;
             }
+            .highlights-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         header {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(18, 87, 158, 0.95), rgba(16, 122, 94, 0.92));
+            padding: 24px;
+            border-radius: 18px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 18px 40px rgba(31, 78, 121, 0.18);
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.22), transparent 22%),
+                radial-gradient(circle at 82% 18%, rgba(255,255,255,0.16), transparent 18%);
+            pointer-events: none;
         }
         
         h1 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #2c3e50;
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 18px;
+            color: rgba(255,255,255,0.84);
+            font-size: 14px;
+        }
+
+        .hero-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.14);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
         }
         
         .date-nav {
@@ -68,51 +117,100 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
+            position: relative;
+            z-index: 1;
         }
         
         .date-nav button {
-            background-color: #3498db;
+            background: rgba(255,255,255,0.16);
             color: #fff;
             border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 8px 14px;
+            border-radius: 999px;
             cursor: pointer;
             font-size: 13px;
-            transition: background-color 0.2s;
+            transition: transform 0.2s, background-color 0.2s;
+            backdrop-filter: blur(4px);
         }
         
         .date-nav button:hover {
-            background-color: #2980b9;
+            background: rgba(255,255,255,0.24);
+            transform: translateY(-1px);
         }
         
         .date-nav button:disabled {
-            background-color: #bdc3c7;
+            background: rgba(255,255,255,0.08);
             cursor: not-allowed;
         }
         
         .current-date {
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 700;
             min-width: 140px;
             text-align: center;
+            color: #fff;
         }
         
         .category-section {
-            background-color: #fff;
+            background-color: rgba(255,255,255,0.92);
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 18px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 30px rgba(36, 52, 71, 0.08);
+            border: 1px solid rgba(255,255,255,0.8);
         }
 
-        .weekly-section {
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .highlight-panel {
+            min-height: 220px;
+            margin-bottom: 0;
+        }
+
+        .highlight-panel.lwn-panel {
+            border-top: 4px solid #d97706;
+            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 100%);
+        }
+
+        .highlight-panel.papers-panel {
             border-top: 4px solid #16a34a;
+            background: linear-gradient(180deg, #f4fbf7 0%, #ffffff 100%);
         }
 
         .weekly-note {
             font-size: 12px;
             color: #6b7280;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .highlight-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .highlight-item {
+            padding-bottom: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .highlight-item:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .highlight-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            font-size: 11px;
         }
         
         .category-title {
@@ -120,10 +218,26 @@
             color: #2c3e50;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.28);
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .title-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            letter-spacing: 0.02em;
+        }
+
+        .title-main i {
+            color: #0f766e;
+        }
+
+        .lwn-panel .title-main i {
+            color: #d97706;
         }
         
         .paper-count {
@@ -135,6 +249,12 @@
         .paper-item {
             padding: 12px 0;
             border-bottom: 1px solid #eee;
+            transition: transform 0.18s ease;
+        }
+
+        .paper-item:hover,
+        .highlight-item:hover {
+            transform: translateX(3px);
         }
         
         .paper-item:last-child {
@@ -149,11 +269,12 @@
         }
         
         .paper-title a {
-            color: #3498db;
+            color: #1d4f91;
             text-decoration: none;
         }
         
         .paper-title a:hover {
+            color: #0f766e;
             text-decoration: underline;
         }
         
@@ -226,11 +347,12 @@
         }
         
         .sidebar-section {
-            background-color: #fff;
+            background-color: rgba(255,255,255,0.92);
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 18px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 30px rgba(36, 52, 71, 0.08);
+            border: 1px solid rgba(255,255,255,0.8);
         }
         
         .sidebar-title {
@@ -240,6 +362,9 @@
             margin-bottom: 12px;
             padding-bottom: 8px;
             border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .tag-stat-item {
@@ -301,32 +426,45 @@
         footer {
             text-align: center;
             padding: 15px;
-            color: #999;
+            color: #6b7280;
             font-size: 12px;
+        }
+
+        .meta-pill-icon {
+            opacity: 0.75;
         }
     </style>
 </head>
 <body>
     <div class="page-wrapper">
         <header>
-            <h1>CatNews - 每日Linux内核网络内容精选</h1>
+            <h1><span class="hero-icon"><i class="fa-solid fa-cat"></i></span>CatNews</h1>
+            <div class="hero-subtitle">追踪 Linux 内核网络论文、LWN 资讯与热点技术脉络</div>
             <div class="date-nav">
-                <button id="prevDay">&larr; 前一天</button>
+                <button id="prevDay"><i class="fa-solid fa-chevron-left"></i> 前一天</button>
                 <span class="current-date" id="currentDate">-</span>
-                <button id="nextDay">后一天 &rarr;</button>
+                <button id="nextDay">后一天 <i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </header>
 
-        <section class="category-section weekly-section" id="weeklyPicks">
-            <h2 class="category-title">本周精选论文 <span class="paper-count" id="weeklyCount">加载中...</span></h2>
-            <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
-            <div class="loading">加载中...</div>
+        <section class="highlights-grid" id="topHighlights">
+            <section class="category-section highlight-panel lwn-panel" id="lwnHighlights">
+                <h2 class="category-title"><span class="title-main"><i class="fa-regular fa-newspaper"></i>LWN 最新免费资讯</span><span class="paper-count" id="lwnCount">加载中...</span></h2>
+                <div class="weekly-note">聚合最近 7 天已抓取的 LWN 免费文章，展示当期全部可读内容与 AI 中文总结。</div>
+                <div class="loading">加载中...</div>
+            </section>
+
+            <section class="category-section highlight-panel papers-panel" id="weeklyPicks">
+                <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-flask"></i>本周精选论文</span><span class="paper-count" id="weeklyCount">加载中...</span></h2>
+                <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
+                <div class="loading">加载中...</div>
+            </section>
         </section>
 
         <div class="layout">
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-section">
-                    <h3 class="sidebar-title">特性统计</h3>
+                    <h3 class="sidebar-title"><i class="fa-solid fa-chart-column"></i>特性统计</h3>
                     <div class="tag-stats" id="tagStats">
                         <div class="loading">加载中...</div>
                     </div>
@@ -339,7 +477,7 @@
         </div>
         
         <footer>
-            Powered by CatNews | GitHub Pages
+            <i class="fa-solid fa-satellite-dish meta-pill-icon"></i> Powered by CatNews | GitHub Pages
         </footer>
     </div>
     
@@ -580,6 +718,17 @@
             return formatDate(dateObj);
         }
 
+        function isFreeLwnItem(item) {
+            if (!item || item.source !== 'LWN.net') {
+                return false;
+            }
+            if (item.access === 'paid') {
+                return false;
+            }
+            const text = `${item.title || ''} ${item.summary || ''} ${item.summary_en || ''}`.toLowerCase();
+            return !(/subscriber|subscription|paid|仅订阅|付费/.test(text));
+        }
+
         async function tryLoadDay(dateStr) {
             if (weeklyCache.has(dateStr)) {
                 return weeklyCache.get(dateStr);
@@ -635,37 +784,131 @@
             return item;
         }
 
-        async function loadWeeklyPicks() {
+        function createHighlightCard(item, dateStr) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'highlight-item';
+
+            const title = document.createElement('div');
+            title.className = 'paper-title';
+            const link = document.createElement('a');
+            link.href = item.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = item.title;
+            title.appendChild(link);
+
+            const summary = document.createElement('div');
+            summary.className = 'paper-summary';
+            summary.textContent = ensureChineseSummary(item);
+
+            const meta = document.createElement('div');
+            meta.className = 'highlight-meta';
+
+            const src = document.createElement('span');
+            src.className = `source-tag ${(item.source || '').toLowerCase().replace(/[^a-z]/g, '')}`;
+            src.textContent = item.source || '';
+            meta.appendChild(src);
+
+            if (dateStr) {
+                const day = document.createElement('span');
+                day.className = 'reading-time';
+                day.textContent = `收录日期 ${dateStr}`;
+                meta.appendChild(day);
+            }
+
+            if (item.source === 'LWN.net') {
+                const freeTag = document.createElement('span');
+                freeTag.className = 'feature-tag';
+                freeTag.textContent = '免费';
+                meta.appendChild(freeTag);
+            }
+
+            const tags = Array.isArray(item.tags) ? item.tags.slice(0, 3) : [];
+            tags.forEach(tag => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'feature-tag';
+                tagEl.textContent = tag;
+                meta.appendChild(tagEl);
+            });
+
+            wrapper.appendChild(title);
+            wrapper.appendChild(summary);
+            wrapper.appendChild(meta);
+            return wrapper;
+        }
+
+        async function loadTopHighlights() {
+            const lwnSection = document.getElementById('lwnHighlights');
+            const lwnCount = document.getElementById('lwnCount');
             const weekly = document.getElementById('weeklyPicks');
-            const count = document.getElementById('weeklyCount');
+            const weeklyCount = document.getElementById('weeklyCount');
+            lwnSection.querySelector('.loading')?.remove();
             weekly.querySelector('.loading')?.remove();
 
             const papers = [];
+            const lwnNews = [];
             for (let i = 0; i < 7; i++) {
                 const dateStr = safeDateString(dateOffset(-i));
                 const dayData = await tryLoadDay(dateStr);
-                if (!dayData || !dayData.categories || !Array.isArray(dayData.categories.papers)) {
+                if (!dayData || !dayData.categories) {
                     continue;
                 }
-                dayData.categories.papers.forEach(p => {
+
+                const dayPapers = Array.isArray(dayData.categories.papers) ? dayData.categories.papers : [];
+                const dayNews = Array.isArray(dayData.categories.news) ? dayData.categories.news : [];
+
+                dayPapers.forEach(p => {
                     papers.push({ ...p, _date: dateStr });
                 });
+
+                dayNews
+                    .filter(item => isFreeLwnItem(item))
+                    .forEach(item => {
+                        lwnNews.push({ ...item, _date: dateStr });
+                    });
             }
 
-            const dedup = new Map();
+            const paperDedup = new Map();
             papers.forEach(p => {
                 const key = (p.title || '').trim().toLowerCase();
                 if (!key) return;
-                if (!dedup.has(key) || paperHotScore(p) > paperHotScore(dedup.get(key))) {
-                    dedup.set(key, p);
+                if (!paperDedup.has(key) || paperHotScore(p) > paperHotScore(paperDedup.get(key))) {
+                    paperDedup.set(key, p);
                 }
             });
 
-            const weeklyTop = Array.from(dedup.values())
+            const weeklyTop = Array.from(paperDedup.values())
                 .sort((a, b) => paperHotScore(b) - paperHotScore(a))
                 .slice(0, 6);
 
-            count.textContent = `共 ${weeklyTop.length} 篇`;
+            const lwnDedup = new Map();
+            lwnNews.forEach(item => {
+                const key = (item.title || '').trim().toLowerCase();
+                if (!key || lwnDedup.has(key)) {
+                    return;
+                }
+                lwnDedup.set(key, item);
+            });
+
+            const latestLwn = Array.from(lwnDedup.values())
+                .sort((a, b) => (b._date || '').localeCompare(a._date || ''));
+
+            lwnCount.textContent = `共 ${latestLwn.length} 条`;
+            weeklyCount.textContent = `共 ${weeklyTop.length} 篇`;
+
+            if (latestLwn.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-message';
+                empty.textContent = '最近 7 天暂无可展示的 LWN 免费资讯';
+                lwnSection.appendChild(empty);
+            } else {
+                const lwnList = document.createElement('div');
+                lwnList.className = 'highlight-list';
+                latestLwn.forEach(item => {
+                    lwnList.appendChild(createHighlightCard(item, item._date));
+                });
+                lwnSection.appendChild(lwnList);
+            }
 
             if (weeklyTop.length === 0) {
                 const empty = document.createElement('div');
@@ -750,7 +993,7 @@
         async function initPage() {
             currentDate = await findLatestAvailableDate(30);
             await loadData(currentDate);
-            await loadWeeklyPicks();
+            await loadTopHighlights();
         }
 
         initPage();
