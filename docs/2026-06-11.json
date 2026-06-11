@@ -1,0 +1,29 @@
+{
+  "date": "2026-06-11",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for June 4, 2026",
+        "url": "https://lwn.net/Articles/1074950/",
+        "abstract": " LWN.net Weekly Edition for June 4, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Password: | | Log in / Subscribe / Register LWN.net Weekly Edition for June 4, 2026 Welcome to the LWN.net Weekly Edition for June 4, 2026 This edition contains the following feature content: A trademark",
+        "summary": "这是LWN.net 2026年6月4日的每周摘要页面，但提供的内容仅为页面导航标题，未包含任何具体文章正文。LWN.net作为Linux内核领域的主要资讯来源，其每周摘要通常涵盖内核各个子系统的更新动态，可能包含网络相关内容，但由于本次摘要内容不完整，无法确认是否有针对Linux内核网络子系统的具体报道或讨论。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "LWN.net",
+          "Linux内核网络",
+          "每周摘要"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "LWN.net": 1,
+    "Linux内核网络": 1,
+    "每周摘要": 1
+  }
+}
