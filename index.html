@@ -1166,6 +1166,162 @@
         body.detail-mode .kpi-value { font-size: 22px; }
         body.detail-mode .content-grid { grid-template-columns: 1fr; }
 
+        /* ============== Tag cloud section ============== */
+        .tag-cloud-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tag-cloud-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .tag-cloud-header .category-title { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+        .tag-cloud-note {
+            font-size: 12px;
+            color: var(--color-text-3);
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+
+        .tag-cloud-section .top-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag-cloud-section .top-tag-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            border: 1px solid var(--color-border);
+            font-size: 12.5px;
+            cursor: pointer;
+            font-family: inherit;
+            color: var(--color-text-2);
+            grid-template-columns: none;
+            width: auto;
+            text-align: left;
+        }
+
+        .tag-cloud-section .top-tag-row:hover {
+            background: var(--color-accent-soft);
+            border-color: #bae6fd;
+        }
+
+        .tag-cloud-section .top-tag-row.active {
+            background: var(--color-accent);
+            color: #fff;
+            border-color: var(--color-accent);
+        }
+
+        .tag-cloud-section .top-tag-row .top-tag-name {
+            color: inherit;
+            white-space: nowrap;
+        }
+
+        .tag-cloud-section .top-tag-row .top-tag-count {
+            text-align: right;
+            color: var(--color-text-3);
+            font-variant-numeric: tabular-nums;
+            font-weight: 500;
+        }
+
+        .tag-cloud-section .top-tag-row.active .top-tag-count {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .tag-cloud-section .tag-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag-cloud-section .tag-stats:empty { display: none; }
+
+        .tag-cloud-section .tag-stats .tag-stat-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f8fafc;
+            border: 1px solid var(--color-border-3);
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            color: var(--color-text-2);
+            grid-template-columns: none;
+            width: auto;
+        }
+
+        .tag-cloud-section .tag-stats .tag-stat-item:hover {
+            background: var(--color-accent-soft);
+            border-color: #bae6fd;
+        }
+
+        .tag-cloud-section .tag-stats .tag-stat-item.active {
+            background: var(--color-accent);
+            color: #fff;
+            border-color: var(--color-accent);
+        }
+
+        .tag-cloud-section .tag-stats .tag-stat-name { color: inherit; }
+
+        .tag-cloud-section .tag-stats .tag-stat-count {
+            color: var(--color-text-3);
+            font-size: 11px;
+        }
+
+        .tag-cloud-section .tag-stats .tag-stat-item.active .tag-stat-count { color: rgba(255, 255, 255, 0.85); }
+
+        .tag-cloud-section .clear-filter {
+            width: auto;
+            padding: 4px 10px;
+            font-size: 12px;
+            display: inline-block;
+            background: #f1f5f9;
+        }
+
+        /* ============== Data status bar ============== */
+        .data-status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--color-text-3);
+            padding: 12px 16px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-status-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .data-status-item i {
+            color: var(--color-text-4);
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -1212,33 +1368,33 @@
             </div>
         </section>
 
-        <div class="kpi-strip" id="kpiStrip" aria-label="最新内容概览">
+        <div class="kpi-strip" id="kpiStrip" aria-label="近 7 天内容概览">
             <div class="kpi">
                 <span class="kpi-icon"><i class="fa-solid fa-flask" aria-hidden="true"></i></span>
                 <div class="kpi-body">
                     <span class="kpi-value" id="kpiPapers">-</span>
-                    <span class="kpi-label" id="kpiPapersLabel">最新论文</span>
+                    <span class="kpi-label">7 天精选论文</span>
                 </div>
             </div>
             <div class="kpi">
                 <span class="kpi-icon warning"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
                 <div class="kpi-body">
                     <span class="kpi-value" id="kpiNews">-</span>
-                    <span class="kpi-label" id="kpiNewsLabel">最新资讯</span>
+                    <span class="kpi-label">7 天 LWN 资讯</span>
                 </div>
             </div>
             <div class="kpi">
                 <span class="kpi-icon success"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>
                 <div class="kpi-body">
                     <span class="kpi-value" id="kpiHighMatch">-</span>
-                    <span class="kpi-label">高匹配项</span>
+                    <span class="kpi-label">标签出现次数</span>
                 </div>
             </div>
             <div class="kpi">
                 <span class="kpi-icon info"><i class="fa-solid fa-tags" aria-hidden="true"></i></span>
                 <div class="kpi-body">
                     <span class="kpi-value" id="kpiTags">-</span>
-                    <span class="kpi-label">活跃标签</span>
+                    <span class="kpi-label">活跃标签数</span>
                 </div>
             </div>
         </div>
@@ -1270,33 +1426,30 @@
             </section>
         </section>
 
-        <div class="layout">
-            <aside class="sidebar" id="sidebar" aria-label="侧栏">
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title"><i class="fa-solid fa-fire" aria-hidden="true"></i>最新热词 Top 10</h3>
-                    <div class="top-tags" id="topTags">
-                        <div class="loading" style="padding:12px 0;">加载中...</div>
-                    </div>
-                </div>
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>全量标签</h3>
-                    <div class="tag-stats" id="tagStats">
-                        <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
-                    </div>
-                </div>
-                <div class="sidebar-section" id="dataStatus" aria-live="polite">
-                    <h3 class="sidebar-title"><i class="fa-regular fa-circle-check" aria-hidden="true"></i>数据状态</h3>
-                    <div id="dataStatusBody" style="font-size:12.5px;color:var(--color-text-3);line-height:1.7;">
-                        <div>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN / patchwork (netdevbpf)</div>
-                        <div id="dataStatusRange" style="margin-top:6px;">-</div>
-                    </div>
-                </div>
-            </aside>
-
-            <main class="main-content" id="content">
+        <section class="tag-cloud-section" aria-label="全量标签">
+            <div class="tag-cloud-header">
+                <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-tags" aria-hidden="true"></i>全量标签</span><span class="item-count" id="topTagsCount">-</span></h2>
+                <button id="clearFilterBtn" class="clear-filter" type="button" style="display:none;"><i class="fa-solid fa-xmark" aria-hidden="true"></i> 清除筛选</button>
+            </div>
+            <div class="tag-cloud-note">点击任意标签可在上方精选区筛选。Top 10 优先展示。</div>
+            <div class="top-tags" id="topTags" style="margin-bottom:10px;">
+                <div class="loading" style="padding:12px 0;">加载中...</div>
+            </div>
+            <div class="tag-stats" id="tagStats">
                 <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
-            </main>
-        </div>
+            </div>
+        </section>
+
+        <section class="data-status-bar" id="dataStatus" aria-live="polite">
+            <div class="data-status-item">
+                <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+                <span>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN / patchwork (netdevbpf)</span>
+            </div>
+            <div class="data-status-item">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                <span id="dataStatusRange">-</span>
+            </div>
+        </section>
 
         <footer>
             <div><i class="fa-solid fa-satellite-dish meta-pill-icon" aria-hidden="true"></i> Powered by CatNews | GitHub Pages</div>
@@ -1313,10 +1466,7 @@
 
         // ---------------- State ----------------
         const state = {
-            currentDate: null,
             selectedFilter: null,
-            currentData: null,
-            latestAvailableDate: null,
             viewMode: 'compact',
         };
 
@@ -1437,20 +1587,6 @@
             return Promise.all(dateStrs.map(d => tryLoadDay(d)));
         }
 
-        async function findLatestAvailableDate(maxLookbackDays = 60) {
-            const strs = [];
-            for (let i = 0; i <= maxLookbackDays; i++) {
-                strs.push(formatDate(dateOffset(-i)));
-            }
-            const results = await loadDaysParallel(strs);
-            for (let i = 0; i < results.length; i++) {
-                if (results[i] && results[i].categories) {
-                    return new Date(strs[i] + 'T00:00:00');
-                }
-            }
-            return new Date();
-        }
-
         // ---------------- Hot score / filters ----------------
         function normalizeRelevanceScore(relevance) {
             if (relevance === 'high') return 3;
@@ -1516,19 +1652,24 @@
             return fallback;
         }
 
-        // ---------------- Render: tag stats ----------------
-        function renderTagStats(tagStats) {
+        // ---------------- Render: tag stats (Top 10 之外的剩余标签) ----------------
+        function renderTagStats(remainingEntries) {
             const container = document.getElementById('tagStats');
+            const clearBtn = document.getElementById('clearFilterBtn');
 
-            if (!tagStats || Object.keys(tagStats).length === 0) {
-                container.innerHTML = '<div class="empty-message">暂无统计</div>';
+            if (clearBtn) clearBtn.style.display = state.selectedFilter ? 'inline-block' : 'none';
+
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!remainingEntries || remainingEntries.length === 0) {
+                if (Object.keys(aggregateWeekFromCache().tagTotals).length === 0) {
+                    container.innerHTML = '<div class="empty-message" style="padding:8px 0;">暂无统计</div>';
+                }
                 return;
             }
 
-            const sorted = Object.entries(tagStats).sort((a, b) => b[1] - a[1]);
-            container.innerHTML = '';
-
-            sorted.forEach(([tag, count]) => {
+            remainingEntries.forEach(([tag, count]) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = `tag-stat-item ${state.selectedFilter === tag ? 'active' : ''}`;
@@ -1549,25 +1690,14 @@
 
                 btn.addEventListener('click', () => toggleFilter(tag));
             });
-
-            if (state.selectedFilter) {
-                const clearBtn = document.createElement('button');
-                clearBtn.type = 'button';
-                clearBtn.className = 'clear-filter';
-                clearBtn.id = 'clearFilter';
-                clearBtn.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i> 清除筛选';
-                container.appendChild(clearBtn);
-                clearBtn.addEventListener('click', () => toggleFilter(null));
-            }
         }
 
         // ---------------- Render: card factory ----------------
         function toggleFilter(tag) {
             state.selectedFilter = state.selectedFilter === tag ? null : tag;
             writeTagToUrl(state.selectedFilter);
-            renderTagStats(state.currentData?.tagStats || {});
-            renderTopTags(state.currentData || {});
-            renderItems(state.currentData);
+            renderTopHighlights();
+            renderTopTags();
         }
 
         function buildTagElements(tags, onClick) {
@@ -1709,78 +1839,15 @@
         }
 
         // ---------------- Render: sections ----------------
-        function renderItems(data) {
-            const content = document.getElementById('content');
+        // main-content (按日 papers/news 列表) 已被移除：稀疏数据 + 上方 topHighlights
+        // 已经聚合 7 天内容，覆盖用户 95% 的浏览场景。如需深度探索，使用顶部
+        // "全量标签"区按 tag 筛选。
 
-            if (!data || !data.categories) {
-                content.innerHTML = '<div class="empty-message">暂无数据</div>';
-                return;
-            }
-
-            content.innerHTML = '';
-
-            const papers = data.categories.papers || [];
-            const news = data.categories.news || [];
-            let hasContent = false;
-
-            const filteredPapers = applyFilter(papers);
-            if (filteredPapers.length > 0) {
-                content.appendChild(createSection('论文', filteredPapers, 5, '', 'paper'));
-                hasContent = true;
-            }
-
-            const filteredNews = applyFilter(news);
-            if (filteredNews.length > 0) {
-                content.appendChild(createSection('资讯', filteredNews, 3, 'news-section', 'lwn'));
-                hasContent = true;
-            }
-
-            if (!hasContent) {
-                const empty = document.createElement('div');
-                empty.className = 'empty-message';
-                empty.textContent = state.selectedFilter ? '当前筛选无匹配内容' : '暂无数据';
-                content.appendChild(empty);
-            }
-        }
-
-        function createSection(titleText, list, defaultReadingTime, extraClass, variant) {
-            const section = document.createElement('section');
-            section.className = extraClass ? `category-section ${extraClass}` : 'category-section';
-
-            const heading = document.createElement('h2');
-            heading.className = 'category-title';
-            const main = document.createElement('span');
-            main.className = 'title-main';
-            const icon = document.createElement('i');
-            icon.className = variant === 'lwn' ? 'fa-regular fa-newspaper' : 'fa-solid fa-flask';
-            icon.setAttribute('aria-hidden', 'true');
-            main.appendChild(icon);
-            main.appendChild(document.createTextNode(titleText));
-            heading.appendChild(main);
-
-            const count = document.createElement('span');
-            count.className = 'item-count';
-            count.textContent = `共 ${list.length} ${titleText === '资讯' ? '条' : '篇'}`;
-            heading.appendChild(count);
-
-            section.appendChild(heading);
-
-            const listEl = document.createElement('div');
-            listEl.className = 'list';
-            list.forEach(item => {
-                listEl.appendChild(renderCard(item, { variant, defaultReadingTime }));
-            });
-            section.appendChild(listEl);
-            return section;
-        }
+        // Module-scope cache for top highlights (rebuilt by loadTopHighlights, re-rendered on filter).
+        const topHighlights = { lwn: [], papers: [] };
 
         // ---------------- Render: top highlights ----------------
         async function loadTopHighlights() {
-            const lwnSection = document.getElementById('lwnHighlights');
-            const weekly = document.getElementById('weeklyPicks');
-            lwnSection.querySelector('.loading')?.remove();
-            weekly.querySelector('.loading')?.remove();
-
             const dateStrs = [];
             for (let i = 0; i < 7; i++) dateStrs.push(formatDate(dateOffset(-i)));
             const dayDatas = await loadDaysParallel(dateStrs);
@@ -1808,7 +1875,7 @@
             }
             const weeklyTop = Array.from(paperDedup.values())
                 .sort((a, b) => paperHotScore(b) - paperHotScore(a))
-                .slice(0, 6);
+                .slice(0, 8);
 
             const lwnDedup = new Map();
             for (const item of lwnNews) {
@@ -1817,16 +1884,37 @@
                 lwnDedup.set(key, item);
             }
             const latestLwn = Array.from(lwnDedup.values())
-                .sort((a, b) => (b._date || '').localeCompare(a._date || ''));
+                .sort((a, b) => (b._date || '').localeCompare(a._date || ''))
+                .slice(0, 10);
 
-            document.getElementById('lwnCount').textContent = `共 ${latestLwn.length} 条`;
-            document.getElementById('weeklyCount').textContent = `共 ${weeklyTop.length} 篇`;
+            topHighlights.papers = weeklyTop;
+            topHighlights.lwn = latestLwn;
+
+            renderTopHighlights();
+            renderTrend();
+            renderSourceBars();
+        }
+
+        function renderTopHighlights() {
+            const lwnSection = document.getElementById('lwnHighlights');
+            const weekly = document.getElementById('weeklyPicks');
+            // Clear the panel except its <h2> heading
+            lwnSection.querySelectorAll('.list, .empty-message, .loading, .weekly-note').forEach(n => n.remove());
+            weekly.querySelectorAll('.list, .empty-message, .loading, .weekly-note').forEach(n => n.remove());
+
+            const papers = applyFilter(topHighlights.papers);
+            const lwn = applyFilter(topHighlights.lwn);
+
+            document.getElementById('lwnCount').textContent = `共 ${lwn.length} 条`;
+            document.getElementById('weeklyCount').textContent = `共 ${papers.length} 篇`;
 
             const fillPanel = (panel, items, variant, opts) => {
                 if (items.length === 0) {
                     const empty = document.createElement('div');
                     empty.className = 'empty-message';
-                    empty.textContent = `最近 7 天暂无${opts.emptyLabel}`;
+                    empty.textContent = state.selectedFilter
+                        ? `标签「${state.selectedFilter}」下无${opts.emptyLabel}`
+                        : `最近 7 天暂无${opts.emptyLabel}`;
                     panel.appendChild(empty);
                     return;
                 }
@@ -1838,11 +1926,8 @@
                 panel.appendChild(list);
             };
 
-            fillPanel(lwnSection, latestLwn, 'lwn', { showFreeTag: true, emptyLabel: '可展示的 LWN 免费资讯' });
-            fillPanel(weekly, weeklyTop, 'paper', { emptyLabel: '可展示的高匹配论文' });
-
-            renderTrend();
-            renderSourceBars();
+            fillPanel(lwnSection, lwn, 'lwn', { showFreeTag: true, emptyLabel: 'LWN 免费资讯' });
+            fillPanel(weekly, papers, 'paper', { emptyLabel: '高匹配论文' });
         }
 
         // ---------------- Render: data status ----------------
@@ -1902,16 +1987,20 @@
             return { byDate, sourceTotals, tagTotals };
         }
 
-        // ---------------- Render: KPI strip ----------------
-        function renderKpi(data) {
-            const papers = (data && data.categories && data.categories.papers) || [];
-            const news = (data && data.categories && data.categories.news) || [];
-            const tagStats = (data && data.tagStats) || {};
-            const highMatch = papers.filter(p => p.relevance === 'high').length;
-            document.getElementById('kpiPapers').textContent = String(papers.length);
-            document.getElementById('kpiNews').textContent = String(news.length);
-            document.getElementById('kpiHighMatch').textContent = String(highMatch);
-            document.getElementById('kpiTags').textContent = String(Object.keys(tagStats).length);
+        // ---------------- Render: KPI strip (last 7 days aggregate) ----------------
+        function renderKpi() {
+            const { tagTotals } = aggregateWeekFromCache();
+            const papers = topHighlights.papers;
+            const lwn = topHighlights.lwn;
+            // Total unique count over 7 days (we don't dedupe here, but it's an estimate)
+            const totalPapers7d = papers.length; // weeklyTop already deduped across 7 days
+            const totalLwn7d = lwn.length;
+            const tagEntries = Object.entries(tagTotals);
+            const totalTagOccurrences = tagEntries.reduce((s, [, n]) => s + n, 0);
+            document.getElementById('kpiPapers').textContent = String(totalPapers7d);
+            document.getElementById('kpiNews').textContent = String(totalLwn7d);
+            document.getElementById('kpiHighMatch').textContent = String(totalTagOccurrences);
+            document.getElementById('kpiTags').textContent = String(tagEntries.length);
         }
 
         // ---------------- Render: trend bars ----------------
@@ -1982,21 +2071,25 @@
         }
 
         // ---------------- Render: top tags (sidebar) ----------------
-        function renderTopTags(data) {
+        function renderTopTags() {
             const container = document.getElementById('topTags');
+            const countEl = document.getElementById('topTagsCount');
             if (!container) return;
-            const tagStats = (data && data.tagStats) || {};
-            const sorted = Object.entries(tagStats).sort((a, b) => b[1] - a[1]).slice(0, 10);
+            const { tagTotals } = aggregateWeekFromCache();
+            const sorted = Object.entries(tagTotals).sort((a, b) => b[1] - a[1]);
+            if (countEl) countEl.textContent = `共 ${sorted.length} 个标签`;
             if (sorted.length === 0) {
                 container.innerHTML = '<div class="empty-message" style="padding:12px 0;">暂无标签</div>';
                 return;
             }
             container.innerHTML = '';
-            sorted.forEach(([tag, count]) => {
+            const top = sorted.slice(0, 10);
+            top.forEach(([tag, count]) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = `top-tag-row ${state.selectedFilter === tag ? 'active' : ''}`;
                 btn.dataset.tag = tag;
+                btn.setAttribute('aria-pressed', state.selectedFilter === tag ? 'true' : 'false');
                 const name = document.createElement('span');
                 name.className = 'top-tag-name';
                 name.textContent = tag;
@@ -2008,17 +2101,20 @@
                 btn.addEventListener('click', () => toggleFilter(tag));
                 container.appendChild(btn);
             });
+            renderTagStats(sorted.slice(10));
         }
 
         // ---------------- Render: footer last updated ----------------
         function renderLastUpdated() {
             const el = document.getElementById('lastUpdated');
             if (!el) return;
-            if (!state.latestAvailableDate) {
+            const dates = Array.from(parsedAvailableDates).sort();
+            if (dates.length === 0) {
                 el.textContent = '';
                 return;
             }
-            el.textContent = `数据更新至 ${formatDisplayDate(state.latestAvailableDate)}`;
+            const [y, m, d] = dates[dates.length - 1].split('-').map(Number);
+            el.textContent = `数据更新至 ${y}年${m}月${d}日`;
         }
 
         // ---------------- Render: patches (yesterday netdev) ----------------
@@ -2036,6 +2132,7 @@
             document.getElementById('patchesDate').textContent = `(${yDateStr})`;
 
             let payload = null;
+            let foundDate = yDateStr;
             try {
                 const res = await fetch(`docs/${yDateStr}.patches.json`, { cache: 'force-cache' });
                 if (res.ok) payload = await res.json();
@@ -2049,13 +2146,30 @@
                     const ds = formatDate(d);
                     try {
                         const r = await fetch(`docs/${ds}.patches.json`, { cache: 'force-cache' });
-                        if (r.ok) { payload = await r.json(); break; }
+                        if (r.ok) { payload = await r.json(); foundDate = ds; break; }
                     } catch (e) { /* ignore */ }
                 }
             }
 
-            const ir = (payload && Array.isArray(payload.inReview)) ? payload.inReview : [];
-            const mg = (payload && Array.isArray(payload.merged)) ? payload.merged : [];
+            const section = document.getElementById('patchesSection');
+            if (!payload) {
+                // No data ever - show a single friendly placeholder instead of an empty 2-col grid
+                section.innerHTML = `
+                    <div class="patches-header">
+                        <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>昨日 netdev 补丁 <span class="meta-pill" style="font-weight:500;font-size:12px;">(${yDateStr})</span></h2>
+                    </div>
+                    <div class="empty-message" style="padding:18px 4px;">
+                        <i class="fa-regular fa-hourglass-half" aria-hidden="true"></i>
+                        暂无可展示的补丁数据。Action 将在北京时间每日 10:00 抓取昨日 netdev 补丁，
+                        <a href="https://github.com/catnews/catnews.github.io/actions" target="_blank" rel="noopener noreferrer">手动触发</a>可立即获取。
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('patchesDate').textContent = `(${foundDate})`;
+            const ir = Array.isArray(payload.inReview) ? payload.inReview : [];
+            const mg = Array.isArray(payload.merged) ? payload.merged : [];
             const rfc = ir.filter(p => p.isRfc).length;
             document.getElementById('patchesInReview').textContent = String(ir.length);
             document.getElementById('patchesRfc').textContent = String(rfc);
@@ -2159,57 +2273,28 @@
                 .replace(/'/g, '&#39;');
         }
 
-        // ---------------- Main load ----------------
-        function renderContent(data) {
-            state.currentData = data;
-            if (!data || !data.categories || Object.keys(data.categories).length === 0) {
-                document.getElementById('content').innerHTML = '<div class="empty-message">最新一天暂无内容</div>';
-                renderTagStats({});
-                renderKpi({});
-                renderTopTags({});
-                return;
-            }
-            renderKpi(data);
-            renderTopTags(data);
-            renderTagStats(data.tagStats || {});
-            renderItems(data);
-        }
-
-        async function loadData(date) {
-            const content = document.getElementById('content');
-            content.innerHTML = '<div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>';
-            document.getElementById('tagStats').innerHTML = '<div class="loading">加载中...</div>';
-
-            const dateStr = formatDate(date);
-            const data = await tryLoadDay(dateStr);
-            if (data && data.categories) {
-                renderContent(data);
-            } else {
-                content.innerHTML = '<div class="empty-message">最新一天暂无内容</div>';
-                renderTagStats({});
-                renderKpi({});
-                renderTopTags({});
-            }
-        }
+        // ---------------- Main load (no per-day detail page) ----------------
+        // Strategy: 一次性预热 7 天缓存，渲染 topHighlights / patches / KPI / 标签云。
+        // 没有按日 main content：稀疏数据 + 顶部 7 天聚合已经覆盖所有场景。
 
         // ---------------- Event bindings ----------------
         document.getElementById('viewCompact').addEventListener('click', () => applyViewMode('compact'));
         document.getElementById('viewDetail').addEventListener('click', () => applyViewMode('detail'));
+        document.getElementById('clearFilterBtn').addEventListener('click', () => toggleFilter(null));
 
         // ---------------- Init ----------------
         async function initPage() {
             initViewMode();
+            state.selectedFilter = readTagFromUrl();
 
-            state.latestAvailableDate = await findLatestAvailableDate(60);
-            state.currentDate = state.latestAvailableDate;
-            state.selectedFilter = null;
-
-            // 预热 7 天缓存 + 并行拉高亮区
+            // 预热 7 天缓存，并行拉高亮区 + 昨日补丁
             const dateStrs = [];
             for (let i = 0; i < 7; i++) dateStrs.push(formatDate(dateOffset(-i)));
             await loadDaysParallel(dateStrs);
 
-            await Promise.all([loadData(state.currentDate), loadTopHighlights(), loadPatches()]);
+            await Promise.all([loadTopHighlights(), loadPatches()]);
+            renderKpi();
+            renderTopTags();
             renderDataStatus();
             renderLastUpdated();
         }
