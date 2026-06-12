@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CatNews - 每日Linux内核网络内容精选</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%90%B1%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -18,11 +19,13 @@
         body {
             font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
             background:
-                radial-gradient(circle at top left, rgba(33, 150, 243, 0.12), transparent 28%),
-                radial-gradient(circle at top right, rgba(16, 185, 129, 0.10), transparent 30%),
-                linear-gradient(180deg, #f4f9ff 0%, #f7f6f2 100%);
-            color: #1f2a3a;
-            line-height: 1.7;
+                radial-gradient(circle at top left, rgba(33, 150, 243, 0.10), transparent 30%),
+                radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 32%),
+                linear-gradient(180deg, #f6f9fd 0%, #f8f7f3 100%);
+            color: #1c2533;
+            line-height: 1.85;
+            letter-spacing: 0.01em;
+            font-size: 15px;
             min-height: 100vh;
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
@@ -46,7 +49,7 @@
         }
         
         .sidebar {
-            width: 220px;
+            width: 260px;
             flex-shrink: 0;
         }
         
@@ -121,49 +124,72 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 8px;
             position: relative;
             z-index: 1;
         }
-        
+
         .date-nav button {
             background: #ffffff;
             color: #334155;
             border: none;
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 999px;
             cursor: pointer;
             font-size: 13px;
             transition: transform 0.2s, background-color 0.2s;
             box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
-        
+
         .date-nav button:hover {
             background: #f8fafc;
             transform: translateY(-1px);
         }
-        
+
         .date-nav button:disabled {
             background: #f1f5f9;
             color: #94a3b8;
             cursor: not-allowed;
         }
-        
+
+        .date-nav button.icon-only {
+            padding: 6px 10px;
+        }
+
+        .date-nav .today-btn {
+            background: #0f766e;
+            color: #ffffff;
+            box-shadow: none;
+        }
+
+        .date-nav .today-btn:hover {
+            background: #115e59;
+        }
+
+        .date-nav .today-btn:disabled {
+            background: #cbd5e1;
+            color: #ffffff;
+        }
+
         .current-date {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 600;
             min-width: 140px;
             text-align: center;
             color: #334155;
+            font-variant-numeric: tabular-nums;
         }
         
         .category-section {
-            background-color: rgba(255,255,255,0.92);
-            padding: 20px;
-            border-radius: 18px;
+            background-color: #ffffff;
+            padding: 22px;
+            border-radius: 14px;
             margin-bottom: 20px;
-            box-shadow: 0 12px 30px rgba(36, 52, 71, 0.08);
-            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
+            border: 1px solid #e6ebf2;
         }
 
         .highlights-grid {
@@ -179,19 +205,18 @@
         }
 
         .highlight-panel.lwn-panel {
-            border-top: 4px solid #d97706;
-            background: linear-gradient(180deg, #fff8ef 0%, #ffffff 100%);
+            border-left: 3px solid #d97706;
         }
 
         .highlight-panel.papers-panel {
-            border-top: 4px solid #16a34a;
-            background: linear-gradient(180deg, #f4fbf7 0%, #ffffff 100%);
+            border-left: 3px solid #16a34a;
         }
 
         .weekly-note {
-            font-size: 12px;
+            font-size: 12.5px;
             color: #6b7280;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            line-height: 1.7;
         }
 
         .highlight-list {
@@ -201,13 +226,41 @@
         }
 
         .highlight-item {
-            padding: 14px 0;
-            border-bottom: 1px solid #eceff3;
+            position: relative;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            background: #ffffff;
+            border: 1px solid #e6ebf2;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
 
-        .highlight-item:last-child {
-            padding-bottom: 0;
-            border-bottom: none;
+        .highlight-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            bottom: 14px;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: transparent;
+            transition: background 0.18s ease;
+        }
+
+        .highlight-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(28, 37, 51, 0.08);
+            border-color: #d6dde6;
+        }
+
+        .highlight-item:hover::before {
+            background: #d97706;
+        }
+
+        .highlight-list .highlight-item:last-child,
+        .paper-list .paper-item:last-child {
+            margin-bottom: 0;
         }
 
         .highlight-meta {
@@ -215,72 +268,109 @@
             gap: 8px;
             align-items: center;
             flex-wrap: wrap;
-            margin-top: 10px;
-            font-size: 12px;
+            margin-top: 12px;
+            font-size: 12.5px;
             color: #64748b;
         }
         
         .category-title {
-            font-size: 16px;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(52, 152, 219, 0.28);
+            font-size: 18px;
+            color: #1c2533;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e6ebf2;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.01em;
         }
 
         .title-main {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
-            letter-spacing: 0.02em;
         }
 
         .title-main i {
             color: #0f766e;
+            font-size: 18px;
         }
 
         .lwn-panel .title-main i {
             color: #d97706;
         }
-        
+
         .paper-count {
             font-size: 13px;
-            font-weight: normal;
-            color: #7f8c8d;
+            font-weight: 500;
+            color: #64748b;
+            font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
+            letter-spacing: 0;
+        }
+
+        .paper-count::before {
+            content: '｜ ';
+            color: #cbd5e1;
         }
         
         .paper-item {
-            padding: 16px 0;
-            border-bottom: 1px solid #eceff3;
-            transition: transform 0.18s ease;
+            position: relative;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            background: #ffffff;
+            border: 1px solid #e6ebf2;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+
+        .paper-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            bottom: 14px;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: transparent;
+            transition: background 0.18s ease;
         }
 
         .paper-item:hover,
         .highlight-item:hover {
-            transform: translateX(3px);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(28, 37, 51, 0.08);
+            border-color: #d6dde6;
+        }
+
+        .paper-item:hover::before,
+        .highlight-item:hover::before {
+            background: #0f766e;
         }
 
         .lwn-brief {
-            font-size: 14.5px;
+            font-size: 15px;
             color: #3b4a5c;
-            line-height: 1.8;
+            line-height: 1.85;
             margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .lwn-points {
-            margin: 0 0 12px 0;
-            padding-left: 20px;
+            margin: 0 0 14px 0;
+            padding-left: 22px;
             color: #2c3a4d;
         }
 
         .lwn-points li {
-            margin-bottom: 6px;
-            line-height: 1.75;
-            font-size: 14.5px;
+            margin-bottom: 8px;
+            line-height: 1.85;
+            font-size: 15px;
         }
 
         .lwn-points li:last-child {
@@ -307,11 +397,11 @@
         }
         
         .paper-title {
-            font-size: 15.5px;
+            font-size: 16.5px;
             font-weight: 600;
-            color: #1d2b3a;
-            margin-bottom: 8px;
-            line-height: 1.45;
+            color: #1c2533;
+            margin-bottom: 10px;
+            line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -329,53 +419,63 @@
         }
 
         .paper-summary {
-            font-size: 14.5px;
-            color: #475569;
-            margin-bottom: 10px;
-            line-height: 1.75;
+            font-size: 15px;
+            color: #3f4b5d;
+            margin-bottom: 12px;
+            line-height: 1.85;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .paper-meta {
             display: flex;
             gap: 8px;
-            font-size: 12px;
+            font-size: 12.5px;
             align-items: center;
             flex-wrap: wrap;
             color: #64748b;
         }
 
         .source-tag {
-            background-color: #e8f4fc;
-            color: #3498db;
-            padding: 2px 8px;
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 2px 10px;
             border-radius: 999px;
             font-size: 12px;
             font-weight: 500;
+            border: 1px solid #e2e8f0;
         }
 
         .source-tag.arxiv {
-            background-color: #fee2e2;
-            color: #dc2626;
+            background-color: #f1f5f9;
+            color: #b91c1c;
+            border-color: #e2e8f0;
         }
 
         .source-tag.semanticscholar {
-            background-color: #dbeafe;
-            color: #2563eb;
+            background-color: #f1f5f9;
+            color: #1d4ed8;
+            border-color: #e2e8f0;
         }
 
         .source-tag.lwnnet {
-            background-color: #fef3c7;
+            background-color: #fff7ed;
             color: #b45309;
+            border-color: #fed7aa;
         }
 
         .source-tag.phoronix {
-            background-color: #e0e7ff;
-            color: #4f46e5;
+            background-color: #f1f5f9;
+            color: #4338ca;
+            border-color: #e2e8f0;
         }
 
         .source-tag.kernelnewbies {
-            background-color: #fce7f3;
-            color: #db2777;
+            background-color: #fdf2f8;
+            color: #be185d;
+            border-color: #fbcfe8;
         }
         
         .news-section {
@@ -385,13 +485,34 @@
         .feature-tag {
             background-color: #eef2f7;
             color: #475569;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 999px;
             font-size: 12px;
             border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+        }
+
+        .feature-tag:hover {
+            background-color: #e0f2fe;
+            border-color: #bae6fd;
+            color: #0369a1;
+        }
+
+        .feature-tag.active {
+            background-color: #0f766e;
+            color: #ffffff;
+            border-color: #0f766e;
         }
 
         .feature-tag.lwn-free {
+            background-color: #ecfdf5;
+            color: #047857;
+            border-color: #a7f3d0;
+            cursor: default;
+        }
+
+        .feature-tag.lwn-free:hover {
             background-color: #ecfdf5;
             color: #047857;
             border-color: #a7f3d0;
@@ -405,28 +526,29 @@
 
         .reading-time {
             color: #94a3b8;
-            font-size: 12px;
+            font-size: 12.5px;
         }
         
         .sidebar-section {
-            background-color: rgba(255,255,255,0.92);
-            padding: 15px;
-            border-radius: 18px;
-            margin-bottom: 20px;
-            box-shadow: 0 12px 30px rgba(36, 52, 71, 0.08);
-            border: 1px solid rgba(255,255,255,0.8);
+            background-color: #ffffff;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
+            border: 1px solid #e6ebf2;
         }
-        
+
         .sidebar-title {
             font-size: 14px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #1c2533;
             margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eef2f7;
             display: flex;
             align-items: center;
             gap: 8px;
+            letter-spacing: 0.02em;
         }
         
         .tag-stat-item {
@@ -508,9 +630,10 @@
             <h1><span class="hero-icon"><i class="fa-solid fa-cat"></i></span>CatNews</h1>
             <div class="hero-subtitle">追踪 Linux 内核网络论文、LWN 资讯与热点技术脉络</div>
             <div class="date-nav">
-                <button id="prevDay"><i class="fa-solid fa-chevron-left"></i> 前一天</button>
+                <button id="prevDay" class="icon-only" title="前一天"><i class="fa-solid fa-chevron-left"></i></button>
                 <span class="current-date" id="currentDate">-</span>
-                <button id="nextDay">后一天 <i class="fa-solid fa-chevron-right"></i></button>
+                <button id="nextDay" class="icon-only" title="后一天"><i class="fa-solid fa-chevron-right"></i></button>
+                <button id="todayBtn" class="today-btn" title="跳到最新有数据的日期"><i class="fa-solid fa-calendar-day"></i> 跳到今天</button>
             </div>
         </header>
 
@@ -585,12 +708,12 @@
         
         function renderTagStats(tagStats) {
             const container = document.getElementById('tagStats');
-            
+
             if (!tagStats || Object.keys(tagStats).length === 0) {
                 container.innerHTML = '<div class="empty-message">暂无统计</div>';
                 return;
             }
-            
+
             const sortedTags = Object.entries(tagStats).sort((a, b) => b[1] - a[1]);
             container.innerHTML = '';
 
@@ -615,9 +738,12 @@
                     selectedFilter = selectedFilter === tag ? null : tag;
                     renderTagStats(currentData?.tagStats || {});
                     renderItems(currentData);
+                    if (selectedFilter) {
+                        document.getElementById('content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 });
             });
-            
+
             if (selectedFilter) {
                 const clearBtn = document.createElement('div');
                 clearBtn.className = 'clear-filter';
@@ -682,9 +808,15 @@
                         const tagEl = document.createElement('span');
                         tagEl.className = 'feature-tag';
                         if (tag === selectedFilter) {
-                            tagEl.style.fontWeight = 'bold';
+                            tagEl.classList.add('active');
                         }
                         tagEl.textContent = tag;
+                        tagEl.addEventListener('click', (ev) => {
+                            ev.stopPropagation();
+                            selectedFilter = selectedFilter === tag ? null : tag;
+                            renderTagStats(currentData?.tagStats || {});
+                            renderItems(currentData);
+                        });
                         tagsContainer.appendChild(tagEl);
                     });
                     metaDiv.appendChild(tagsContainer);
@@ -845,6 +977,28 @@
             day.textContent = `收录日期 ${dateStr}`;
             meta.appendChild(day);
 
+            const tags = Array.isArray(paper.tags) ? paper.tags.slice(0, 3) : [];
+            if (tags.length > 0) {
+                const tagsContainer = document.createElement('div');
+                tagsContainer.className = 'tags-container';
+                tags.forEach(tag => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'feature-tag';
+                    if (tag === selectedFilter) {
+                        tagEl.classList.add('active');
+                    }
+                    tagEl.textContent = tag;
+                    tagEl.addEventListener('click', (ev) => {
+                        ev.stopPropagation();
+                        selectedFilter = selectedFilter === tag ? null : tag;
+                        renderTagStats(currentData?.tagStats || {});
+                        renderItems(currentData);
+                    });
+                    tagsContainer.appendChild(tagEl);
+                });
+                meta.appendChild(tagsContainer);
+            }
+
             item.appendChild(title);
             item.appendChild(summary);
             item.appendChild(meta);
@@ -877,10 +1031,13 @@
                 wrapper.appendChild(points);
             }
 
-            const summary = document.createElement('div');
-            summary.className = 'lwn-brief';
-            summary.textContent = ensureChineseSummary(item);
-            wrapper.appendChild(summary);
+            const hasKeyPoints = Array.isArray(item.keyPoints) && item.keyPoints.length > 0;
+            if (!hasKeyPoints) {
+                const summary = document.createElement('div');
+                summary.className = 'lwn-brief';
+                summary.textContent = ensureChineseSummary(item);
+                wrapper.appendChild(summary);
+            }
 
             const meta = document.createElement('div');
             meta.className = 'highlight-meta';
@@ -915,7 +1072,16 @@
             tags.forEach(tag => {
                 const tagEl = document.createElement('span');
                 tagEl.className = 'feature-tag';
+                if (tag === selectedFilter) {
+                    tagEl.classList.add('active');
+                }
                 tagEl.textContent = tag;
+                tagEl.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    selectedFilter = selectedFilter === tag ? null : tag;
+                    renderTagStats(currentData?.tagStats || {});
+                    renderItems(currentData);
+                });
                 meta.appendChild(tagEl);
             });
 
@@ -1079,10 +1245,10 @@
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading">加载中...</div>';
             document.getElementById('tagStats').innerHTML = '<div class="loading">加载中...</div>';
-            
+
             const dateStr = formatDate(date);
             const url = `docs/${dateStr}.json`;
-            
+
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
@@ -1094,9 +1260,20 @@
                 content.innerHTML = '<div class="empty-message">该日期暂无数据</div>';
                 renderTagStats({});
             }
-            
+
             document.getElementById('currentDate').textContent = formatDisplayDate(date);
             updateNavButtons();
+            updateTodayButton();
+        }
+
+        function updateTodayButton() {
+            const btn = document.getElementById('todayBtn');
+            if (!btn) return;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const checkDate = new Date(currentDate);
+            checkDate.setHours(0, 0, 0, 0);
+            btn.disabled = checkDate.getTime() === today.getTime();
         }
         
         function updateNavButtons() {
@@ -1104,20 +1281,35 @@
             today.setHours(0, 0, 0, 0);
             const checkDate = new Date(currentDate);
             checkDate.setHours(0, 0, 0, 0);
-            
+
             document.getElementById('nextDay').disabled = checkDate >= today;
         }
-        
+
         document.getElementById('prevDay').addEventListener('click', () => {
             currentDate.setDate(currentDate.getDate() - 1);
             loadData(currentDate);
         });
-        
+
         document.getElementById('nextDay').addEventListener('click', () => {
             currentDate.setDate(currentDate.getDate() + 1);
             loadData(currentDate);
         });
-        
+
+        document.getElementById('todayBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('todayBtn');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 正在定位…';
+            try {
+                currentDate = await findLatestAvailableDate(30);
+                await loadData(currentDate);
+            } finally {
+                btn.innerHTML = original;
+                btn.disabled = false;
+                updateNavButtons();
+            }
+        });
+
         async function initPage() {
             currentDate = await findLatestAvailableDate(30);
             await loadData(currentDate);
