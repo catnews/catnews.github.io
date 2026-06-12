@@ -1,0 +1,28 @@
+{
+  "date": "2026-06-12",
+  "categories": {
+    "papers": [
+      {
+        "title": "Fundamental Limits of Hypergraph Edge Partitioning under Independent Edge Sampling",
+        "url": "http://arxiv.org/abs/2606.13491v1",
+        "summary": "这篇研究工作《Fundamental Limits of Hypergraph Edge Partitioning under Independent Edge Sampling》与TCP/IP、驱动、性能相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Fundamental Limits of Hypergraph Edge Partitioning under Independent Edge Sampli...",
+        "summary_en": "Hypergraph edge partitioning is a central problem in theoretical and applied computer science, with broad impact on distributed computation, communica...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "驱动": 1,
+    "性能": 1
+  }
+}
