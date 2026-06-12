@@ -18,12 +18,15 @@
         body {
             font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
             background:
-                radial-gradient(circle at top left, rgba(33, 150, 243, 0.16), transparent 28%),
-                radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 30%),
+                radial-gradient(circle at top left, rgba(33, 150, 243, 0.12), transparent 28%),
+                radial-gradient(circle at top right, rgba(16, 185, 129, 0.10), transparent 30%),
                 linear-gradient(180deg, #f4f9ff 0%, #f7f6f2 100%);
-            color: #243447;
-            line-height: 1.6;
+            color: #1f2a3a;
+            line-height: 1.7;
             min-height: 100vh;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .page-wrapper {
@@ -198,8 +201,8 @@
         }
 
         .highlight-item {
-            padding-bottom: 14px;
-            border-bottom: 1px solid #eee;
+            padding: 14px 0;
+            border-bottom: 1px solid #eceff3;
         }
 
         .highlight-item:last-child {
@@ -212,8 +215,9 @@
             gap: 8px;
             align-items: center;
             flex-wrap: wrap;
-            margin-top: 8px;
-            font-size: 11px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #64748b;
         }
         
         .category-title {
@@ -250,8 +254,8 @@
         }
         
         .paper-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
+            padding: 16px 0;
+            border-bottom: 1px solid #eceff3;
             transition: transform 0.18s ease;
         }
 
@@ -261,21 +265,22 @@
         }
 
         .lwn-brief {
-            font-size: 14px;
-            color: #334155;
-            line-height: 1.75;
-            margin-bottom: 10px;
+            font-size: 14.5px;
+            color: #3b4a5c;
+            line-height: 1.8;
+            margin-bottom: 12px;
         }
 
         .lwn-points {
-            margin: 0 0 10px 0;
-            padding-left: 18px;
-            color: #334155;
+            margin: 0 0 12px 0;
+            padding-left: 20px;
+            color: #2c3a4d;
         }
 
         .lwn-points li {
             margin-bottom: 6px;
-            line-height: 1.7;
+            line-height: 1.75;
+            font-size: 14.5px;
         }
 
         .lwn-points li:last-child {
@@ -283,8 +288,9 @@
         }
 
         .lwn-origin {
-            font-size: 12px;
-            color: #64748b;
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 6px;
         }
 
         .lwn-origin a {
@@ -301,63 +307,72 @@
         }
         
         .paper-title {
-            font-size: 14px;
+            font-size: 15.5px;
             font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 6px;
+            color: #1d2b3a;
+            margin-bottom: 8px;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        
+
         .paper-title a {
             color: #1d4f91;
             text-decoration: none;
         }
-        
+
         .paper-title a:hover {
             color: #0f766e;
             text-decoration: underline;
         }
-        
+
         .paper-summary {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 6px;
-            line-height: 1.5;
+            font-size: 14.5px;
+            color: #475569;
+            margin-bottom: 10px;
+            line-height: 1.75;
         }
-        
+
         .paper-meta {
             display: flex;
             gap: 8px;
-            font-size: 11px;
+            font-size: 12px;
             align-items: center;
+            flex-wrap: wrap;
+            color: #64748b;
         }
-        
+
         .source-tag {
             background-color: #e8f4fc;
             color: #3498db;
-            padding: 2px 6px;
-            border-radius: 3px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 500;
         }
-        
+
         .source-tag.arxiv {
             background-color: #fee2e2;
             color: #dc2626;
         }
-        
+
         .source-tag.semanticscholar {
             background-color: #dbeafe;
             color: #2563eb;
         }
-        
+
         .source-tag.lwnnet {
             background-color: #fef3c7;
-            color: #d97706;
+            color: #b45309;
         }
-        
+
         .source-tag.phoronix {
             background-color: #e0e7ff;
             color: #4f46e5;
         }
-        
+
         .source-tag.kernelnewbies {
             background-color: #fce7f3;
             color: #db2777;
@@ -368,21 +383,29 @@
         }
         
         .feature-tag {
-            background-color: #d1fae5;
-            color: #059669;
-            padding: 2px 6px;
-            border-radius: 3px;
+            background-color: #eef2f7;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            border: 1px solid #e2e8f0;
         }
-        
+
+        .feature-tag.lwn-free {
+            background-color: #ecfdf5;
+            color: #047857;
+            border-color: #a7f3d0;
+        }
+
         .tags-container {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             flex-wrap: wrap;
         }
-        
+
         .reading-time {
-            color: #95a5a6;
-            font-size: 11px;
+            color: #94a3b8;
+            font-size: 12px;
         }
         
         .sidebar-section {
@@ -410,32 +433,37 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 0;
+            padding: 8px 10px;
             font-size: 13px;
             cursor: pointer;
             transition: background-color 0.2s;
-            border-radius: 4px;
+            border-radius: 8px;
         }
-        
+
         .tag-stat-item:hover {
-            background-color: #f8f9fa;
+            background-color: #f1f5f9;
         }
-        
+
         .tag-stat-item.active {
-            background-color: #e8f4fc;
+            background-color: #e0f2fe;
         }
-        
+
         .tag-stat-name {
-            color: #333;
+            color: #334155;
         }
-        
+
         .tag-stat-count {
-            background-color: #3498db;
-            color: #fff;
+            background-color: #e2e8f0;
+            color: #475569;
             padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
+            border-radius: 999px;
+            font-size: 11px;
             font-weight: 500;
+        }
+
+        .tag-stat-item.active .tag-stat-count {
+            background-color: #0ea5e9;
+            color: #fff;
         }
         
         .clear-filter {
@@ -827,30 +855,32 @@
             const wrapper = document.createElement('div');
             wrapper.className = 'highlight-item';
 
-            const summaryPoints = buildLwnSummaryPoints(item);
-            const summary = document.createElement('div');
-            summary.className = 'lwn-brief';
-            summary.textContent = ensureChineseSummary(item);
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'paper-title';
+            const titleLink = document.createElement('a');
+            titleLink.href = item.url;
+            titleLink.target = '_blank';
+            titleLink.rel = 'noopener noreferrer';
+            titleLink.textContent = item.title;
+            titleDiv.appendChild(titleLink);
+            wrapper.appendChild(titleDiv);
 
+            const summaryPoints = buildLwnSummaryPoints(item);
             const points = document.createElement('ul');
             points.className = 'lwn-points';
-
             if (summaryPoints.length > 0) {
                 summaryPoints.forEach(point => {
                     const li = document.createElement('li');
                     li.textContent = point;
                     points.appendChild(li);
                 });
+                wrapper.appendChild(points);
             }
 
-            const origin = document.createElement('div');
-            origin.className = 'lwn-origin';
-            const originLink = document.createElement('a');
-            originLink.href = item.url;
-            originLink.target = '_blank';
-            originLink.rel = 'noopener noreferrer';
-            originLink.textContent = item.title;
-            origin.append('原文：', originLink);
+            const summary = document.createElement('div');
+            summary.className = 'lwn-brief';
+            summary.textContent = ensureChineseSummary(item);
+            wrapper.appendChild(summary);
 
             const meta = document.createElement('div');
             meta.className = 'highlight-meta';
@@ -867,9 +897,16 @@
                 meta.appendChild(day);
             }
 
+            if (item.readingTime) {
+                const rt = document.createElement('span');
+                rt.className = 'reading-time';
+                rt.textContent = `约 ${item.readingTime} 分钟`;
+                meta.appendChild(rt);
+            }
+
             if (item.source === 'LWN.net') {
                 const freeTag = document.createElement('span');
-                freeTag.className = 'feature-tag';
+                freeTag.className = 'feature-tag lwn-free';
                 freeTag.textContent = '免费';
                 meta.appendChild(freeTag);
             }
@@ -882,11 +919,6 @@
                 meta.appendChild(tagEl);
             });
 
-            wrapper.appendChild(summary);
-            if (summaryPoints.length > 0) {
-                wrapper.appendChild(points);
-            }
-            wrapper.appendChild(origin);
             wrapper.appendChild(meta);
             return wrapper;
         }
