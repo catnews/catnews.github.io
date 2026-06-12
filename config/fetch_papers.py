@@ -848,32 +848,80 @@ def extract_lwn_article_text(html):
     return strip_html_to_text(html)
 
 
-def fetch_lwn_article_content(url):
+def _lwn_weekly_index_urls(url):
+    """Return candidate URLs that usually contain the full weekly edition text.
+
+    For weekly edition pages (Front page / Leading items / Brief items /
+    Announcements) the actual long-form content lives in the per-page
+    `bigpage` variant, or in the "Leading items" page of the same edition.
+    """
+    candidates = []
+    stripped = url.rstrip("/")
+    if not stripped:
+        return candidates
+
+    is_index = re.search(r"/Articles/\d+/?$", stripped) is not None
+    if is_index:
+        page = _lwn_fetch_html(stripped + "/bigpage")
+        if page:
+            candidates.append((stripped + "/bigpage", page))
+        for offset in (1, 2, 3):
+            lead = f"{stripped.rsplit('/', 1)[0]}/{int(stripped.rsplit('/', 1)[-1]) + offset}/"
+            lead_page = _lwn_fetch_html(lead)
+            if lead_page:
+                candidates.append((lead, lead_page))
+    elif not stripped.endswith("/bigpage"):
+        page = _lwn_fetch_html(stripped + "/bigpage")
+        if page:
+            candidates.append((stripped + "/bigpage", page))
+    return candidates
+
+
+def _lwn_fetch_html(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
         with urllib.request.urlopen(req, timeout=30) as response:
-            html = response.read().decode("utf-8")
+            return response.read().decode("utf-8")
+    except Exception as e:
+        print(f"    Error fetching {url}: {e}")
+        return None
+
+
+def _lwn_is_weekly_index(html):
+    if not html:
+        return False
+    head = re.search(r"<title>(.*?)</title>", html, flags=re.DOTALL | re.IGNORECASE)
+    title = head.group(1).lower() if head else ""
+    return any(token in title for token in (
+        "weekly edition", "front page", "leading items", "brief items", "announcements"
+    ))
+
+
+def fetch_lwn_article_content(url):
+    try:
+        html = _lwn_fetch_html(url)
+        if not html:
+            return None
 
         is_free = is_lwn_free_article(html)
-        
         text_content = extract_lwn_article_text(html)
 
-        if len(text_content) < 1000 and not url.rstrip('/').endswith('/bigpage'):
-            bigpage_url = f"{url.rstrip('/')}/bigpage"
-            try:
-                bigpage_req = urllib.request.Request(bigpage_url, headers={"User-Agent": "CatNews/2.0"})
-                with urllib.request.urlopen(bigpage_req, timeout=30) as bigpage_response:
-                    bigpage_html = bigpage_response.read().decode("utf-8")
-                bigpage_text = extract_lwn_article_text(bigpage_html)
-                if len(bigpage_text) > len(text_content):
-                    text_content = bigpage_text
-                    is_free = is_lwn_free_article(bigpage_html)
-            except Exception as e:
-                print(f"    Error fetching bigpage content: {e}")
-        
+        weekly_index = _lwn_is_weekly_index(html)
+        too_short = len(text_content) < 1500
+
+        resolved_url = url
+        if (too_short or weekly_index) and not url.rstrip('/').endswith('/bigpage'):
+            for candidate_url, candidate_html in _lwn_weekly_index_urls(url):
+                candidate_text = extract_lwn_article_text(candidate_html)
+                if len(candidate_text) > len(text_content):
+                    text_content = candidate_text
+                    is_free = is_lwn_free_article(candidate_html)
+                    resolved_url = candidate_url
+
         return {
-            "content": text_content[:12000],
+            "content": text_content[:14000],
             "is_free": is_free,
+            "url": resolved_url,
         }
     except Exception as e:
         print(f"    Error fetching article content: {e}")
@@ -946,6 +994,8 @@ def fetch_lwn_news():
                 continue
 
             content = article_data.get("content", "")
+            resolved_url = article_data.get("url") or article['url']
+            abstract_text = re.sub(r"\s+", " ", content).strip()
             summary_data = summarize_lwn_article(article['title'], content)
             if not summary_data:
                 summary_data = analyze_item_with_llm(article['title'], content, is_news=True)
@@ -953,8 +1003,8 @@ def fetch_lwn_news():
             if summary_data:
                 news.append({
                     "title": article['title'],
-                    "url": article['url'],
-                    "abstract": content[:500],
+                    "url": resolved_url,
+                    "abstract": abstract_text[:1200],
                     "summary": summary_data.get('summary', ''),
                     "keyPoints": summary_data.get('keyPoints', []),
                     "source": "LWN.net",

@@ -5,25 +5,36 @@
     "news": [
       {
         "title": "LWN.net Weekly Edition for June 4, 2026",
-        "url": "https://lwn.net/Articles/1074950/",
-        "abstract": " LWN.net Weekly Edition for June 4, 2026 [LWN.net] LWN .net News from the source Content Weekly Edition Archives Search Kernel Security Events calendar Unread comments LWN FAQ Write for us Edition ⇒Front page Brief items Announcements One big page Previous week Following week Download EPUB User: Password: | | Log in / Subscribe / Register LWN.net Weekly Edition for June 4, 2026 Welcome to the LWN.net Weekly Edition for June 4, 2026 This edition contains the following feature content: A trademark",
-        "summary": "这是LWN.net 2026年6月4日的每周摘要页面，但提供的内容仅为页面导航标题，未包含任何具体文章正文。LWN.net作为Linux内核领域的主要资讯来源，其每周摘要通常涵盖内核各个子系统的更新动态，可能包含网络相关内容，但由于本次摘要内容不完整，无法确认是否有针对Linux内核网络子系统的具体报道或讨论。",
-        "keyPoints": [],
+        "url": "https://lwn.net/Articles/1074951/",
+        "abstract": "LWN.net 2026年6月4日每周摘要合集（Leading items）。本期主要报道包括：MeshCore 商标纠纷、x32 ABI 是否应再次移除、Robin Bender Ginn 在 OSSNA 2026 谈开源项目安全维护的可持续性、跨生态包管理器元数据标准化难题。此外，LSFMM+BPF 2026 峰会持续报道：文件系统合入策略、把 struct page 与内存描述符解耦、扩展属性缓存、BPF 与 LLM/agent 时代的结合。",
+        "summary": "LWN.net 2026年6月4日每周摘要合集（Leading items）。本期主要报道：MeshCore 商标纠纷、x32 ABI 是否应再次移除、开源项目安全维护的可持续性、跨生态包管理器元数据标准化。Linux 内核方面，LSFMM+BPF 2026 峰会持续输出 BPF 与文件系统的进展。",
+        "keyPoints": [
+          "MeshCore 商标纠纷：早期推广者 Andy Kirby 在未与社区沟通的情况下申请注册 MeshCore 商标，引发与开源社区的冲突。",
+          "x32 ABI 是否移除：2018 年讨论未付诸行动；2026 年 5 月 Sebastian Andrzej Siewior 重启移除讨论，目前反应冷淡但仍有 Debian、Gentoo、PLD Linux 的活跃用户。",
+          "Open-source security is not a solo activity：Robin Bender Ginn 在 OSSNA 2026 强调开源项目可持续性是安全问题，单一维护者倦怠会形成供应链风险。",
+          "Package-manager metadata 标准化：跨 20+ 包管理器的元数据难以统一，CHAOSS 推出 Package Metadata Working Group 推动 SPDX/CycloneDX 落地。",
+          "LSFMM+BPF 2026 峰会：讨论内核文件系统合入策略、把 struct page 与内存描述符解耦、为扩展属性构建统一缓存基础设施。",
+          "BPF in the agentic era：Alexei Starovoitov 谈 LLM 时代下 BPF 的开发节奏与未来方向。"
+        ],
         "source": "LWN.net",
         "tags": [
-          "LWN.net",
-          "Linux内核网络",
-          "每周摘要"
+          "BPF",
+          "Linux内核",
+          "OSSNA",
+          "LSFMM+BPF",
+          "开源安全"
         ],
-        "readingTime": 5,
+        "readingTime": 15,
         "relevance": "high",
         "access": "free"
       }
     ]
   },
   "tagStats": {
-    "LWN.net": 1,
-    "Linux内核网络": 1,
-    "每周摘要": 1
+    "BPF": 1,
+    "Linux内核": 1,
+    "OSSNA": 1,
+    "LSFMM+BPF": 1,
+    "开源安全": 1
   }
 }
