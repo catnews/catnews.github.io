@@ -4,25 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CatNews - 每日Linux内核网络内容精选</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f172a'/%3E%3Crect x='6' y='10' width='52' height='38' rx='4' fill='none' stroke='%23334155' stroke-width='2'/%3E%3Ccircle cx='13' cy='17' r='1.5' fill='%23f87171'/%3E%3Ccircle cx='18' cy='17' r='1.5' fill='%23fbbf24'/%3E%3Ccircle cx='23' cy='17' r='1.5' fill='%2334d399'/%3E%3Ctext x='32' y='38' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='%2334d399'%3E%26gt;_%3C/text%3E%3Ctext x='50' y='58' font-family='Arial,sans-serif' font-size='10' font-weight='700' text-anchor='end' fill='%23f97316'%3EcN%3C/text%3E%3C/svg%3E">
+    <meta name="description" content="CatNews 自动聚合 Linux 内核网络方向的论文、期刊与 LWN 免费资讯，每日精选与中文摘要。">
+    <meta name="keywords" content="Linux, 内核, 网络, eBPF, XDP, TCP, 论文, LWN, 内核网络">
+    <meta name="author" content="CatNews">
+    <meta name="theme-color" content="#0f766e">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CatNews - 每日Linux内核网络内容精选">
+    <meta property="og:description" content="每日精选 Linux 内核网络方向的论文、期刊与 LWN 免费资讯。">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:site_name" content="CatNews">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="CatNews - 每日Linux内核网络内容精选">
+    <meta name="twitter:description" content="每日精选 Linux 内核网络方向的论文、期刊与 LWN 免费资讯。">
+    <link rel="canonical" href="./">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f766e'/%3E%3Crect x='6' y='10' width='52' height='38' rx='4' fill='none' stroke='%23a7f3d0' stroke-width='2'/%3E%3Ccircle cx='13' cy='17' r='1.5' fill='%23fca5a5'/%3E%3Ccircle cx='18' cy='17' r='1.5' fill='%23fde68a'/%3E%3Ccircle cx='23' cy='17' r='1.5' fill='%236ee7b7'/%3E%3Ctext x='32' y='38' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='%236ee7b7'%3E%26gt;_%3C/text%3E%3Ctext x='50' y='58' font-family='Arial,sans-serif' font-size='10' font-weight='700' text-anchor='end' fill='%23fbbf24'%3EcN%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"></noscript>
     <style>
+        :root {
+            --color-bg: #f6f9fd;
+            --color-bg-2: #f8f7f3;
+            --color-surface: #ffffff;
+            --color-text: #1c2533;
+            --color-text-2: #3f4b5d;
+            --color-text-3: #64748b;
+            --color-text-4: #94a3b8;
+            --color-border: #e6ebf2;
+            --color-border-2: #d6dde6;
+            --color-border-3: #eef2f7;
+            --color-accent: #0f766e;
+            --color-accent-2: #115e59;
+            --color-accent-soft: #e0f2fe;
+            --color-accent-text: #0369a1;
+            --color-link: #1d4f91;
+            --color-warning: #d97706;
+            --color-warning-2: #b45309;
+            --color-warning-soft: #fff7ed;
+            --color-danger: #dc2626;
+            --color-danger-soft: #fee2e2;
+            --color-success: #16a34a;
+            --color-success-soft: #ecfdf5;
+            --shadow-sm: 0 1px 2px rgba(28, 37, 51, 0.04);
+            --shadow-md: 0 6px 18px rgba(28, 37, 51, 0.08);
+            --shadow-header: 0 8px 22px rgba(36, 52, 71, 0.08);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --transition: 0.18s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
             background:
                 radial-gradient(circle at top left, rgba(33, 150, 243, 0.10), transparent 30%),
                 radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 32%),
-                linear-gradient(180deg, #f6f9fd 0%, #f8f7f3 100%);
-            color: #1c2533;
+                linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-2) 100%);
+            color: var(--color-text);
             line-height: 1.85;
             letter-spacing: 0.01em;
             font-size: 15px;
@@ -31,47 +83,68 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--color-accent);
+            color: #fff;
+            padding: 8px 16px;
+            z-index: 1000;
+            text-decoration: none;
+            border-radius: 0 0 var(--radius-sm) 0;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
         .page-wrapper {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+
         .layout {
             display: flex;
             gap: 20px;
         }
-        
+
         .main-content {
             flex: 1;
             min-width: 0;
         }
-        
+
         .sidebar {
             width: 260px;
             flex-shrink: 0;
         }
-        
-        @media (max-width: 768px) {
+
+        @media (max-width: 900px) {
             .layout {
                 flex-direction: column;
             }
             .sidebar {
                 width: 100%;
-                order: -1;
-            }
-            .highlights-grid {
-                grid-template-columns: 1fr;
             }
         }
-        
+
+        @media (max-width: 768px) {
+            .highlights-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .date-nav {
+                flex-wrap: wrap;
+            }
+        }
+
         header {
             background: linear-gradient(180deg, #f7f8fa 0%, #eef2f5 100%);
             padding: 24px;
-            border-radius: 18px;
+            border-radius: var(--radius-xl);
             margin-bottom: 20px;
-            box-shadow: 0 8px 22px rgba(36, 52, 71, 0.08);
+            box-shadow: var(--shadow-header);
             color: #243447;
             position: relative;
             overflow: hidden;
@@ -87,7 +160,7 @@
                 radial-gradient(circle at 84% 20%, rgba(148, 163, 184, 0.08), transparent 16%);
             pointer-events: none;
         }
-        
+
         h1 {
             font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
             font-size: 28px;
@@ -104,7 +177,7 @@
             position: relative;
             z-index: 1;
             margin-bottom: 18px;
-            color: #64748b;
+            color: var(--color-text-3);
             font-size: 14px;
         }
 
@@ -119,7 +192,7 @@
             background: rgba(255,255,255,0.72);
             box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
         }
-        
+
         .date-nav {
             display: flex;
             align-items: center;
@@ -137,21 +210,27 @@
             border-radius: 999px;
             cursor: pointer;
             font-size: 13px;
-            transition: transform 0.2s, background-color 0.2s;
+            font-family: inherit;
+            transition: transform var(--transition), background-color var(--transition), box-shadow var(--transition);
             box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
 
-        .date-nav button:hover {
+        .date-nav button:hover:not(:disabled) {
             background: #f8fafc;
             transform: translateY(-1px);
         }
 
+        .date-nav button:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
         .date-nav button:disabled {
             background: #f1f5f9;
-            color: #94a3b8;
+            color: var(--color-text-4);
             cursor: not-allowed;
         }
 
@@ -160,18 +239,17 @@
         }
 
         .date-nav .today-btn {
-            background: #0f766e;
+            background: var(--color-accent);
             color: #ffffff;
             box-shadow: none;
         }
 
-        .date-nav .today-btn:hover {
-            background: #115e59;
+        .date-nav .today-btn:hover:not(:disabled) {
+            background: var(--color-accent-2);
         }
 
         .date-nav .today-btn:disabled {
             background: #cbd5e1;
-            color: #ffffff;
         }
 
         .current-date {
@@ -182,14 +260,14 @@
             color: #334155;
             font-variant-numeric: tabular-nums;
         }
-        
+
         .category-section {
-            background-color: #ffffff;
+            background-color: var(--color-surface);
             padding: 22px;
-            border-radius: 14px;
+            border-radius: var(--radius-lg);
             margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
-            border: 1px solid #e6ebf2;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border);
         }
 
         .highlights-grid {
@@ -197,24 +275,24 @@
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 20px;
             margin-bottom: 20px;
+            align-items: start;
         }
 
         .highlight-panel {
-            min-height: 220px;
             margin-bottom: 0;
         }
 
         .highlight-panel.lwn-panel {
-            border-left: 3px solid #d97706;
+            border-left: 3px solid var(--color-warning);
         }
 
         .highlight-panel.papers-panel {
-            border-left: 3px solid #16a34a;
+            border-left: 3px solid var(--color-success);
         }
 
         .weekly-note {
             font-size: 12.5px;
-            color: #6b7280;
+            color: var(--color-text-3);
             margin-bottom: 14px;
             line-height: 1.7;
         }
@@ -225,18 +303,19 @@
             gap: 14px;
         }
 
-        .highlight-item {
+        /* Unified card styles (paper + highlight share base) */
+        .card {
             position: relative;
             padding: 16px 18px;
             margin-bottom: 14px;
-            background: #ffffff;
-            border: 1px solid #e6ebf2;
-            border-radius: 12px;
-            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
-            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
         }
 
-        .highlight-item::before {
+        .card::before {
             content: '';
             position: absolute;
             left: 0;
@@ -245,40 +324,47 @@
             width: 3px;
             border-radius: 0 3px 3px 0;
             background: transparent;
-            transition: background 0.18s ease;
+            transition: background var(--transition);
         }
 
-        .highlight-item:hover {
+        .card:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(28, 37, 51, 0.08);
-            border-color: #d6dde6;
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-border-2);
         }
 
-        .highlight-item:hover::before {
-            background: #d97706;
+        .card:hover::before {
+            background: var(--color-accent);
         }
 
-        .highlight-list .highlight-item:last-child,
-        .paper-list .paper-item:last-child {
+        .card.accent-warning:hover::before {
+            background: var(--color-warning);
+        }
+
+        .list > .card:last-child {
             margin-bottom: 0;
         }
 
-        .highlight-meta {
+        .card-meta {
             display: flex;
             gap: 8px;
             align-items: center;
             flex-wrap: wrap;
             margin-top: 12px;
             font-size: 12.5px;
-            color: #64748b;
+            color: var(--color-text-3);
         }
-        
+
+        .card-meta--inline {
+            margin-top: 0;
+        }
+
         .category-title {
             font-size: 18px;
-            color: #1c2533;
+            color: var(--color-text);
             margin-bottom: 16px;
             padding-bottom: 12px;
-            border-bottom: 1px solid #e6ebf2;
+            border-bottom: 1px solid var(--color-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -294,71 +380,76 @@
         }
 
         .title-main i {
-            color: #0f766e;
+            color: var(--color-accent);
             font-size: 18px;
         }
 
         .lwn-panel .title-main i {
-            color: #d97706;
+            color: var(--color-warning);
         }
 
-        .paper-count {
+        .item-count {
             font-size: 13px;
             font-weight: 500;
-            color: #64748b;
+            color: var(--color-text-3);
             font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
             letter-spacing: 0;
         }
 
-        .paper-count::before {
+        .item-count::before {
             content: '｜ ';
             color: #cbd5e1;
         }
-        
-        .paper-item {
-            position: relative;
-            padding: 16px 18px;
-            margin-bottom: 14px;
-            background: #ffffff;
-            border: 1px solid #e6ebf2;
-            border-radius: 12px;
-            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
-            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-        }
 
-        .paper-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 14px;
-            bottom: 14px;
-            width: 3px;
-            border-radius: 0 3px 3px 0;
-            background: transparent;
-            transition: background 0.18s ease;
-        }
-
-        .paper-item:hover,
-        .highlight-item:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(28, 37, 51, 0.08);
-            border-color: #d6dde6;
-        }
-
-        .paper-item:hover::before,
-        .highlight-item:hover::before {
-            background: #0f766e;
-        }
-
-        .lwn-brief {
-            font-size: 15px;
-            color: #3b4a5c;
-            line-height: 1.85;
-            margin-bottom: 12px;
+        .card-title {
+            font-size: 16.5px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 10px;
+            line-height: 1.5;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        .card-title.expanded {
+            -webkit-line-clamp: unset;
+            display: block;
+            overflow: visible;
+        }
+
+        .card-title a {
+            color: var(--color-link);
+            text-decoration: none;
+        }
+
+        .card-title a:hover {
+            color: var(--color-accent);
+            text-decoration: underline;
+        }
+
+        .card-title a:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        .card-summary {
+            font-size: 15px;
+            color: var(--color-text-2);
+            margin-bottom: 12px;
+            line-height: 1.85;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-summary.expanded {
+            -webkit-line-clamp: unset;
+            display: block;
+            overflow: visible;
         }
 
         .lwn-points {
@@ -377,65 +468,27 @@
             margin-bottom: 0;
         }
 
-        .lwn-origin {
-            font-size: 13px;
-            color: #475569;
-            margin-bottom: 6px;
-        }
-
-        .lwn-origin a {
-            color: #1d4f91;
-            text-decoration: none;
-        }
-
-        .lwn-origin a:hover {
-            text-decoration: underline;
-        }
-        
-        .paper-item:last-child {
-            border-bottom: none;
-        }
-        
-        .paper-title {
-            font-size: 16.5px;
-            font-weight: 600;
-            color: #1c2533;
-            margin-bottom: 10px;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .paper-title a {
-            color: #1d4f91;
-            text-decoration: none;
-        }
-
-        .paper-title a:hover {
-            color: #0f766e;
-            text-decoration: underline;
-        }
-
-        .paper-summary {
-            font-size: 15px;
-            color: #3f4b5d;
-            margin-bottom: 12px;
-            line-height: 1.85;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .paper-meta {
-            display: flex;
-            gap: 8px;
+        .expand-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-accent);
             font-size: 12.5px;
+            cursor: pointer;
+            padding: 4px 0;
+            font-family: inherit;
+            display: inline-flex;
             align-items: center;
-            flex-wrap: wrap;
-            color: #64748b;
+            gap: 4px;
+        }
+
+        .expand-btn:hover {
+            text-decoration: underline;
+        }
+
+        .expand-btn:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+            border-radius: 2px;
         }
 
         .source-tag {
@@ -446,42 +499,23 @@
             font-size: 12px;
             font-weight: 500;
             border: 1px solid #e2e8f0;
+            white-space: nowrap;
         }
 
-        .source-tag.arxiv {
-            background-color: #f1f5f9;
-            color: #b91c1c;
-            border-color: #e2e8f0;
-        }
+        .source-tag.arxiv { color: #b91c1c; }
+        .source-tag.semanticscholar { color: #1d4ed8; }
+        .source-tag.lwnnet { background-color: var(--color-warning-soft); color: var(--color-warning-2); border-color: #fed7aa; }
+        .source-tag.phoronix { color: #4338ca; }
+        .source-tag.kernelnewbies { background-color: #fdf2f8; color: #be185d; border-color: #fbcfe8; }
+        .source-tag.openalex { color: #0e7490; border-color: #cffafe; background-color: #ecfeff; }
+        .source-tag.crossref { color: #6d28d9; border-color: #ddd6fe; background-color: #f5f3ff; }
+        .source-tag.dblp { color: #b45309; border-color: #fde68a; background-color: #fffbeb; }
+        .source-tag.openreview { color: #047857; border-color: #a7f3d0; background-color: #ecfdf5; }
 
-        .source-tag.semanticscholar {
-            background-color: #f1f5f9;
-            color: #1d4ed8;
-            border-color: #e2e8f0;
-        }
-
-        .source-tag.lwnnet {
-            background-color: #fff7ed;
-            color: #b45309;
-            border-color: #fed7aa;
-        }
-
-        .source-tag.phoronix {
-            background-color: #f1f5f9;
-            color: #4338ca;
-            border-color: #e2e8f0;
-        }
-
-        .source-tag.kernelnewbies {
-            background-color: #fdf2f8;
-            color: #be185d;
-            border-color: #fbcfe8;
-        }
-        
         .news-section {
             border-bottom-color: #f59e0b;
         }
-        
+
         .feature-tag {
             background-color: #eef2f7;
             color: #475569;
@@ -490,30 +524,36 @@
             font-size: 12px;
             border: 1px solid #e2e8f0;
             cursor: pointer;
-            transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+            transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+            font-family: inherit;
         }
 
         .feature-tag:hover {
-            background-color: #e0f2fe;
+            background-color: var(--color-accent-soft);
             border-color: #bae6fd;
-            color: #0369a1;
+            color: var(--color-accent-text);
         }
 
         .feature-tag.active {
-            background-color: #0f766e;
+            background-color: var(--color-accent);
             color: #ffffff;
-            border-color: #0f766e;
+            border-color: var(--color-accent);
+        }
+
+        .feature-tag:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
         }
 
         .feature-tag.lwn-free {
-            background-color: #ecfdf5;
+            background-color: var(--color-success-soft);
             color: #047857;
             border-color: #a7f3d0;
             cursor: default;
         }
 
         .feature-tag.lwn-free:hover {
-            background-color: #ecfdf5;
+            background-color: var(--color-success-soft);
             color: #047857;
             border-color: #a7f3d0;
         }
@@ -524,33 +564,36 @@
             flex-wrap: wrap;
         }
 
-        .reading-time {
-            color: #94a3b8;
+        .meta-pill {
+            color: var(--color-text-4);
             font-size: 12.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        
+
         .sidebar-section {
-            background-color: #ffffff;
+            background-color: var(--color-surface);
             padding: 18px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             margin-bottom: 18px;
-            box-shadow: 0 1px 2px rgba(28, 37, 51, 0.04);
-            border: 1px solid #e6ebf2;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border);
         }
 
         .sidebar-title {
             font-size: 14px;
             font-weight: 600;
-            color: #1c2533;
+            color: var(--color-text);
             margin-bottom: 12px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #eef2f7;
+            border-bottom: 1px solid var(--color-border-3);
             display: flex;
             align-items: center;
             gap: 8px;
             letter-spacing: 0.02em;
         }
-        
+
         .tag-stat-item {
             display: flex;
             justify-content: space-between;
@@ -559,7 +602,13 @@
             font-size: 13px;
             cursor: pointer;
             transition: background-color 0.2s;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            color: inherit;
         }
 
         .tag-stat-item:hover {
@@ -567,7 +616,12 @@
         }
 
         .tag-stat-item.active {
-            background-color: #e0f2fe;
+            background-color: var(--color-accent-soft);
+        }
+
+        .tag-stat-item:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: -2px;
         }
 
         .tag-stat-name {
@@ -587,108 +641,175 @@
             background-color: #0ea5e9;
             color: #fff;
         }
-        
+
         .clear-filter {
             margin-top: 10px;
             padding: 8px;
-            background-color: #fee2e2;
-            color: #dc2626;
-            border-radius: 4px;
+            background-color: #f1f5f9;
+            color: var(--color-text-3);
+            border-radius: var(--radius-sm);
             text-align: center;
             cursor: pointer;
             font-size: 12px;
+            border: 1px solid var(--color-border);
+            font-family: inherit;
+            width: 100%;
         }
-        
-        .empty-message {
-            text-align: center;
-            color: #999;
-            padding: 40px;
-            font-size: 14px;
+
+        .clear-filter:hover {
+            background-color: var(--color-border-3);
         }
-        
+
+        .clear-filter:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        .empty-message,
         .loading {
             text-align: center;
-            color: #999;
-            padding: 40px;
+            color: var(--color-text-3);
+            padding: 40px 20px;
+            font-size: 14px;
         }
-        
+
+        .loading i {
+            margin-right: 6px;
+        }
+
         footer {
             text-align: center;
-            padding: 15px;
-            color: #6b7280;
+            padding: 20px 15px;
+            color: var(--color-text-3);
             font-size: 12px;
+            border-top: 1px solid var(--color-border-3);
+            margin-top: 20px;
+        }
+
+        footer .footer-links {
+            margin-top: 6px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        footer a {
+            color: var(--color-text-3);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--color-accent);
+            text-decoration: underline;
         }
 
         .meta-pill-icon {
             opacity: 0.75;
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#content">跳到主要内容</a>
     <div class="page-wrapper">
         <header>
-            <h1><span class="hero-icon"><i class="fa-solid fa-terminal"></i></span>CatNews</h1>
+            <h1><span class="hero-icon" aria-hidden="true"><i class="fa-solid fa-terminal"></i></span>CatNews</h1>
             <div class="hero-subtitle">追踪 Linux 内核网络论文、LWN 资讯与热点技术脉络</div>
-            <div class="date-nav">
-                <button id="prevDay" class="icon-only" title="前一天"><i class="fa-solid fa-chevron-left"></i></button>
-                <span class="current-date" id="currentDate">-</span>
-                <button id="nextDay" class="icon-only" title="后一天"><i class="fa-solid fa-chevron-right"></i></button>
-                <button id="todayBtn" class="today-btn" title="跳到最新有数据的日期"><i class="fa-solid fa-calendar-day"></i> 跳到今天</button>
+            <div class="date-nav" role="navigation" aria-label="日期导航">
+                <button id="prevDay" class="icon-only" title="前一天" aria-label="前一天"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                <span class="current-date" id="currentDate" aria-live="polite">-</span>
+                <button id="nextDay" class="icon-only" title="后一天" aria-label="后一天"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+                <button id="todayBtn" class="today-btn" title="跳到最新有数据的日期" aria-label="跳到最新有数据的日期"><i class="fa-solid fa-calendar-day" aria-hidden="true"></i> 跳到今天</button>
             </div>
         </header>
 
-        <section class="highlights-grid" id="topHighlights">
+        <section class="highlights-grid" id="topHighlights" aria-label="精选高亮区">
             <section class="category-section highlight-panel lwn-panel" id="lwnHighlights">
-                <h2 class="category-title"><span class="title-main"><i class="fa-regular fa-newspaper"></i>LWN 最新免费资讯</span><span class="paper-count" id="lwnCount">加载中...</span></h2>
+                <h2 class="category-title"><span class="title-main"><i class="fa-regular fa-newspaper" aria-hidden="true"></i>LWN 最新免费资讯</span><span class="item-count" id="lwnCount">加载中...</span></h2>
                 <div class="weekly-note">聚合最近 7 天已抓取的 LWN 免费文章，展示当期全部可读内容与 AI 中文总结。</div>
-                <div class="loading">加载中...</div>
+                <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
             </section>
 
             <section class="category-section highlight-panel papers-panel" id="weeklyPicks">
-                <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-flask"></i>本周精选论文</span><span class="paper-count" id="weeklyCount">加载中...</span></h2>
+                <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-flask" aria-hidden="true"></i>本周精选论文</span><span class="item-count" id="weeklyCount">加载中...</span></h2>
                 <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
-                <div class="loading">加载中...</div>
+                <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
             </section>
         </section>
 
         <div class="layout">
-            <aside class="sidebar" id="sidebar">
+            <aside class="sidebar" id="sidebar" aria-label="侧栏">
                 <div class="sidebar-section">
-                    <h3 class="sidebar-title"><i class="fa-solid fa-chart-column"></i>特性统计</h3>
+                    <h3 class="sidebar-title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>特性统计</h3>
                     <div class="tag-stats" id="tagStats">
-                        <div class="loading">加载中...</div>
+                        <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+                    </div>
+                </div>
+                <div class="sidebar-section" id="dataStatus" aria-live="polite">
+                    <h3 class="sidebar-title"><i class="fa-regular fa-circle-check" aria-hidden="true"></i>数据状态</h3>
+                    <div id="dataStatusBody" style="font-size:12.5px;color:var(--color-text-3);line-height:1.7;">
+                        <div>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN</div>
+                        <div id="dataStatusRange" style="margin-top:6px;">-</div>
                     </div>
                 </div>
             </aside>
-            
+
             <main class="main-content" id="content">
-                <div class="loading">加载中...</div>
+                <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
             </main>
         </div>
-        
+
         <footer>
-            <i class="fa-solid fa-satellite-dish meta-pill-icon"></i> Powered by CatNews | GitHub Pages
+            <div><i class="fa-solid fa-satellite-dish meta-pill-icon" aria-hidden="true"></i> Powered by CatNews | GitHub Pages</div>
+            <div class="footer-links">
+                <a href="./" aria-label="首页">首页</a>
+                <a href="https://github.com/anomalyco/opencode" target="_blank" rel="noopener noreferrer">关于</a>
+                <span id="lastUpdated">-</span>
+            </div>
         </footer>
     </div>
-    
+
     <script>
-        let currentDate = new Date();
-        let selectedFilter = null;
-        let currentData = null;
-        const weeklyCache = new Map();
-        
+        'use strict';
+
+        // ---------------- State ----------------
+        const state = {
+            currentDate: new Date(),
+            selectedFilter: null,
+            currentData: null,
+            latestAvailableDate: null,
+        };
+
+        const dayCache = new Map();
+        const inflight = new Map();
+        const parsedAvailableDates = new Set();
+
+        // ---------------- Utilities ----------------
         function formatDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
         }
-        
+
         function formatDisplayDate(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
-            return `${year}年${month}月${day}日`;
+            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+
+        function dateOffset(days) {
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + days);
+            return d;
         }
 
         function hasChineseText(text) {
@@ -696,16 +817,162 @@
         }
 
         function ensureChineseSummary(item) {
-            const summary = (item && item.summary) ? String(item.summary).trim() : '';
-            if (summary && hasChineseText(summary)) {
-                return summary;
-            }
+            const summary = item && item.summary ? String(item.summary).trim() : '';
+            if (summary && hasChineseText(summary)) return summary;
             const title = (item && item.title) ? item.title : '该论文';
             const tags = Array.isArray(item?.tags) ? item.tags.slice(0, 3) : [];
             const tagText = tags.length ? tags.join('、') : 'Linux内核网络';
             return `《${title}》与${tagText}相关。建议重点关注其内核路径、优化方法与性能评估结果。`;
         }
-        
+
+        function normalizeSourceClass(source) {
+            return String(source || '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        function debounce(fn, wait) {
+            let t;
+            return function (...args) {
+                clearTimeout(t);
+                t = setTimeout(() => fn.apply(this, args), wait);
+            };
+        }
+
+        // ---------------- URL routing ----------------
+        function readUrlState() {
+            const params = new URLSearchParams(window.location.search);
+            const dateParam = params.get('date');
+            const tagParam = params.get('tag');
+            let date = null;
+            if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+                const [y, m, d] = dateParam.split('-').map(Number);
+                const dt = new Date(y, m - 1, d);
+                if (!isNaN(dt.getTime())) date = dt;
+            }
+            return { date, tag: tagParam };
+        }
+
+        function writeUrlState(date, tag) {
+            const params = new URLSearchParams();
+            if (date) params.set('date', formatDate(date));
+            if (tag) params.set('tag', tag);
+            const qs = params.toString();
+            const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+            window.history.replaceState(null, '', newUrl);
+        }
+
+        // ---------------- Data loading ----------------
+        async function tryLoadDay(dateStr) {
+            if (dayCache.has(dateStr)) return dayCache.get(dateStr);
+            if (inflight.has(dateStr)) return inflight.get(dateStr);
+
+            const promise = (async () => {
+                try {
+                    const res = await fetch(`docs/${dateStr}.json`, { cache: 'force-cache' });
+                    if (!res.ok) {
+                        dayCache.set(dateStr, null);
+                        return null;
+                    }
+                    const data = await res.json();
+                    dayCache.set(dateStr, data);
+                    if (data && data.categories) parsedAvailableDates.add(dateStr);
+                    return data;
+                } catch (e) {
+                    dayCache.set(dateStr, null);
+                    return null;
+                } finally {
+                    inflight.delete(dateStr);
+                }
+            })();
+            inflight.set(dateStr, promise);
+            return promise;
+        }
+
+        async function loadDaysParallel(dateStrs) {
+            return Promise.all(dateStrs.map(d => tryLoadDay(d)));
+        }
+
+        async function findLatestAvailableDate(maxLookbackDays = 60) {
+            const strs = [];
+            for (let i = 0; i <= maxLookbackDays; i++) {
+                strs.push(formatDate(dateOffset(-i)));
+            }
+            const results = await loadDaysParallel(strs);
+            for (let i = 0; i < results.length; i++) {
+                if (results[i] && results[i].categories) {
+                    return new Date(strs[i] + 'T00:00:00');
+                }
+            }
+            return new Date();
+        }
+
+        // ---------------- Hot score / filters ----------------
+        function normalizeRelevanceScore(relevance) {
+            if (relevance === 'high') return 3;
+            if (relevance === 'medium') return 2;
+            if (relevance === 'low') return 1;
+            return 0;
+        }
+
+        const HOT_TAGS = new Set(['eBPF', 'XDP', 'TCP/IP', 'Netfilter', '容器网络', '性能', 'Linux内核网络']);
+
+        function paperHotScore(paper) {
+            const tags = Array.isArray(paper.tags) ? paper.tags : [];
+            let score = normalizeRelevanceScore(paper.relevance);
+            for (const tag of tags) {
+                if (HOT_TAGS.has(tag)) score += 1;
+            }
+            return score;
+        }
+
+        function isFreeLwnItem(item) {
+            if (!item || item.source !== 'LWN.net') return false;
+            if (item.access === 'paid') return false;
+            const text = `${item.title || ''} ${item.summary || ''} ${item.summary_en || ''}`.toLowerCase();
+            return !/(subscriber|subscription|paid|仅订阅|付费)/.test(text);
+        }
+
+        function applyFilter(list) {
+            if (!state.selectedFilter) return list;
+            return list.filter(item => Array.isArray(item.tags) && item.tags.includes(state.selectedFilter));
+        }
+
+        // ---------------- LWN summary points ----------------
+        function buildLwnSummaryPoints(item) {
+            if (Array.isArray(item.keyPoints) && item.keyPoints.length > 0) {
+                return item.keyPoints
+                    .map(p => (p || '').trim())
+                    .filter(p => p && p.length >= 16);
+            }
+
+            const summary = ensureChineseSummary(item)
+                .replace(/[；;]+/g, '。')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (!summary) return [];
+
+            let points = summary
+                .split(/。|\.|!|！|\?|？/)
+                .map(p => p.trim())
+                .filter(Boolean)
+                .map(p => p.replace(/^[-•\d\s]+/, '').trim())
+                .filter(p => p.length >= 16);
+
+            if (points.length >= 2) return points;
+
+            if (summary.length <= 36) return [summary];
+
+            const chunkSize = Math.ceil(summary.length / 3);
+            const fallback = [];
+            for (let i = 0; i < 3 && i * chunkSize < summary.length; i++) {
+                const part = summary.slice(i * chunkSize, (i + 1) * chunkSize).trim();
+                if (part) fallback.push(part);
+            }
+            return fallback;
+        }
+
+        // ---------------- Render: tag stats ----------------
         function renderTagStats(tagStats) {
             const container = document.getElementById('tagStats');
 
@@ -714,13 +981,15 @@
                 return;
             }
 
-            const sortedTags = Object.entries(tagStats).sort((a, b) => b[1] - a[1]);
+            const sorted = Object.entries(tagStats).sort((a, b) => b[1] - a[1]);
             container.innerHTML = '';
 
-            sortedTags.forEach(([tag, count]) => {
-                const item = document.createElement('div');
-                item.className = `tag-stat-item ${selectedFilter === tag ? 'active' : ''}`;
-                item.dataset.tag = tag;
+            sorted.forEach(([tag, count]) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `tag-stat-item ${state.selectedFilter === tag ? 'active' : ''}`;
+                btn.dataset.tag = tag;
+                btn.setAttribute('aria-pressed', state.selectedFilter === tag ? 'true' : 'false');
 
                 const name = document.createElement('span');
                 name.className = 'tag-stat-name';
@@ -730,534 +999,350 @@
                 countEl.className = 'tag-stat-count';
                 countEl.textContent = String(count);
 
-                item.appendChild(name);
-                item.appendChild(countEl);
-                container.appendChild(item);
+                btn.appendChild(name);
+                btn.appendChild(countEl);
+                container.appendChild(btn);
 
-                item.addEventListener('click', () => {
-                    selectedFilter = selectedFilter === tag ? null : tag;
-                    renderTagStats(currentData?.tagStats || {});
-                    renderItems(currentData);
-                    if (selectedFilter) {
-                        document.getElementById('content').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
+                btn.addEventListener('click', () => toggleFilter(tag));
             });
 
-            if (selectedFilter) {
-                const clearBtn = document.createElement('div');
+            if (state.selectedFilter) {
+                const clearBtn = document.createElement('button');
+                clearBtn.type = 'button';
                 clearBtn.className = 'clear-filter';
                 clearBtn.id = 'clearFilter';
-                clearBtn.textContent = '清除筛选';
+                clearBtn.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i> 清除筛选';
                 container.appendChild(clearBtn);
-
-                clearBtn.addEventListener('click', () => {
-                    selectedFilter = null;
-                    renderTagStats(currentData?.tagStats || {});
-                    renderItems(currentData);
-                });
+                clearBtn.addEventListener('click', () => toggleFilter(null));
             }
         }
-        
+
+        // ---------------- Render: card factory ----------------
+        function toggleFilter(tag) {
+            state.selectedFilter = state.selectedFilter === tag ? null : tag;
+            writeUrlState(state.currentDate, state.selectedFilter);
+            renderTagStats(state.currentData?.tagStats || {});
+            renderItems(state.currentData);
+        }
+
+        function buildTagElements(tags, onClick) {
+            if (!Array.isArray(tags) || tags.length === 0) return null;
+            const container = document.createElement('div');
+            container.className = 'tags-container';
+            tags.forEach(tag => {
+                const el = document.createElement('button');
+                el.type = 'button';
+                el.className = `feature-tag ${state.selectedFilter === tag ? 'active' : ''}`;
+                el.setAttribute('aria-pressed', state.selectedFilter === tag ? 'true' : 'false');
+                el.textContent = tag;
+                el.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    onClick(tag);
+                });
+                container.appendChild(el);
+            });
+            return container;
+        }
+
+        function buildSourceTag(source) {
+            const el = document.createElement('span');
+            el.className = `source-tag ${normalizeSourceClass(source)}`;
+            el.textContent = source || '';
+            return el;
+        }
+
+        function buildExpandableText(text, opts = {}) {
+            const { lines = 4, className = 'card-summary' } = opts;
+            const wrapper = document.createElement('div');
+            const textEl = document.createElement('div');
+            textEl.className = className;
+            textEl.textContent = text;
+            wrapper.appendChild(textEl);
+
+            requestAnimationFrame(() => {
+                if (textEl.scrollHeight > textEl.clientHeight + 1) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'expand-btn';
+                    btn.innerHTML = '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开';
+                    let expanded = false;
+                    btn.addEventListener('click', () => {
+                        expanded = !expanded;
+                        textEl.classList.toggle('expanded', expanded);
+                        btn.innerHTML = expanded
+                            ? '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i> 收起'
+                            : '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开';
+                    });
+                    wrapper.appendChild(btn);
+                }
+            });
+            return wrapper;
+        }
+
+        function buildTitleElement(title, url) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'card-title';
+            const a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = title;
+            wrapper.appendChild(a);
+            return wrapper;
+        }
+
+        function buildCardMetaRow(parts) {
+            const meta = document.createElement('div');
+            meta.className = 'card-meta';
+            parts.forEach(p => {
+                if (p) meta.appendChild(p);
+            });
+            return meta;
+        }
+
+        function renderCard(item, opts = {}) {
+            const {
+                variant = 'paper',
+                defaultReadingTime = 5,
+                showDate = false,
+                dateStr = '',
+                showFreeTag = false,
+            } = opts;
+
+            const wrapper = document.createElement('article');
+            wrapper.className = `card ${variant === 'lwn' ? 'accent-warning' : ''}`;
+
+            wrapper.appendChild(buildTitleElement(item.title, item.url));
+
+            if (variant === 'lwn') {
+                const points = buildLwnSummaryPoints(item);
+                if (points.length > 0) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'lwn-points';
+                    points.forEach(p => {
+                        const li = document.createElement('li');
+                        li.textContent = p;
+                        ul.appendChild(li);
+                    });
+                    wrapper.appendChild(ul);
+                } else {
+                    wrapper.appendChild(buildExpandableText(ensureChineseSummary(item), { lines: 3 }));
+                }
+            } else {
+                wrapper.appendChild(buildExpandableText(ensureChineseSummary(item), { lines: 4 }));
+            }
+
+            const metaParts = [buildSourceTag(item.source)];
+
+            if (showDate && dateStr) {
+                const day = document.createElement('span');
+                day.className = 'meta-pill';
+                day.innerHTML = `<i class="fa-regular fa-calendar" aria-hidden="true"></i> ${dateStr}`;
+                metaParts.push(day);
+            }
+
+            if (showFreeTag) {
+                const freeTag = document.createElement('span');
+                freeTag.className = 'feature-tag lwn-free';
+                freeTag.textContent = '免费';
+                metaParts.push(freeTag);
+            }
+
+            if (item.readingTime || defaultReadingTime) {
+                const rt = document.createElement('span');
+                rt.className = 'meta-pill';
+                rt.innerHTML = `<i class="fa-regular fa-clock" aria-hidden="true"></i> 约 ${item.readingTime || defaultReadingTime} 分钟`;
+                metaParts.push(rt);
+            }
+
+            const tags = Array.isArray(item.tags) ? item.tags.slice(0, 3) : [];
+            const tagsEl = buildTagElements(tags, toggleFilter);
+            if (tagsEl) metaParts.push(tagsEl);
+
+            wrapper.appendChild(buildCardMetaRow(metaParts));
+            return wrapper;
+        }
+
+        // ---------------- Render: sections ----------------
         function renderItems(data) {
             const content = document.getElementById('content');
-            
+
             if (!data || !data.categories) {
                 content.innerHTML = '<div class="empty-message">暂无数据</div>';
                 return;
             }
-            
+
             content.innerHTML = '';
-            
+
             const papers = data.categories.papers || [];
             const news = data.categories.news || [];
             let hasContent = false;
 
-            function createItemNode(item, defaultReadingTime) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'paper-item';
-
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'paper-title';
-
-                const link = document.createElement('a');
-                link.href = item.url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                link.textContent = item.title;
-                titleDiv.appendChild(link);
-
-                const summaryDiv = document.createElement('div');
-                summaryDiv.className = 'paper-summary';
-                summaryDiv.textContent = ensureChineseSummary(item);
-
-                const metaDiv = document.createElement('div');
-                metaDiv.className = 'paper-meta';
-
-                const sourceTag = document.createElement('span');
-                const sourceClass = (item.source || '').toLowerCase().replace(/[^a-z]/g, '');
-                sourceTag.className = `source-tag ${sourceClass}`;
-                sourceTag.textContent = item.source || '';
-                metaDiv.appendChild(sourceTag);
-
-                const tags = Array.isArray(item.tags) ? item.tags : [];
-                if (tags.length > 0) {
-                    const tagsContainer = document.createElement('div');
-                    tagsContainer.className = 'tags-container';
-                    tags.forEach(tag => {
-                        const tagEl = document.createElement('span');
-                        tagEl.className = 'feature-tag';
-                        if (tag === selectedFilter) {
-                            tagEl.classList.add('active');
-                        }
-                        tagEl.textContent = tag;
-                        tagEl.addEventListener('click', (ev) => {
-                            ev.stopPropagation();
-                            selectedFilter = selectedFilter === tag ? null : tag;
-                            renderTagStats(currentData?.tagStats || {});
-                            renderItems(currentData);
-                        });
-                        tagsContainer.appendChild(tagEl);
-                    });
-                    metaDiv.appendChild(tagsContainer);
-                }
-
-                const readingTime = document.createElement('span');
-                readingTime.className = 'reading-time';
-                readingTime.textContent = `约 ${item.readingTime || defaultReadingTime} 分钟`;
-                metaDiv.appendChild(readingTime);
-
-                wrapper.appendChild(titleDiv);
-                wrapper.appendChild(summaryDiv);
-                wrapper.appendChild(metaDiv);
-                return wrapper;
+            const filteredPapers = applyFilter(papers);
+            if (filteredPapers.length > 0) {
+                content.appendChild(createSection('论文', filteredPapers, 5, '', 'paper'));
+                hasContent = true;
             }
 
-            function createSection(titleText, list, defaultReadingTime, extraClass) {
-                const section = document.createElement('section');
-                section.className = extraClass ? `category-section ${extraClass}` : 'category-section';
-
-                const heading = document.createElement('h2');
-                heading.className = 'category-title';
-                heading.appendChild(document.createTextNode(titleText));
-
-                const count = document.createElement('span');
-                count.className = 'paper-count';
-                count.textContent = `共 ${list.length} ${titleText === '资讯' ? '条' : '篇'}`;
-                heading.appendChild(count);
-
-                section.appendChild(heading);
-                list.forEach(item => {
-                    section.appendChild(createItemNode(item, defaultReadingTime));
-                });
-                return section;
+            const filteredNews = applyFilter(news);
+            if (filteredNews.length > 0) {
+                content.appendChild(createSection('资讯', filteredNews, 3, 'news-section', 'lwn'));
+                hasContent = true;
             }
-            
-            if (papers.length > 0) {
-                let filteredPapers = selectedFilter 
-                    ? papers.filter(p => p.tags && p.tags.includes(selectedFilter))
-                    : papers;
-                
-                if (filteredPapers.length > 0) {
-                    content.appendChild(createSection('论文', filteredPapers, 5, ''));
-                    hasContent = true;
-                }
-            }
-            
-            if (news.length > 0) {
-                let filteredNews = selectedFilter 
-                    ? news.filter(n => n.tags && n.tags.includes(selectedFilter))
-                    : news;
-                
-                if (filteredNews.length > 0) {
-                    content.appendChild(createSection('资讯', filteredNews, 3, 'news-section'));
-                    hasContent = true;
-                }
-            }
-            
+
             if (!hasContent) {
                 const empty = document.createElement('div');
                 empty.className = 'empty-message';
-                empty.textContent = selectedFilter ? '当前筛选无匹配内容' : '暂无数据';
+                empty.textContent = state.selectedFilter ? '当前筛选无匹配内容' : '暂无数据';
                 content.appendChild(empty);
             }
         }
 
-        function normalizeRelevanceScore(relevance) {
-            if (relevance === 'high') return 3;
-            if (relevance === 'medium') return 2;
-            if (relevance === 'low') return 1;
-            return 0;
-        }
+        function createSection(titleText, list, defaultReadingTime, extraClass, variant) {
+            const section = document.createElement('section');
+            section.className = extraClass ? `category-section ${extraClass}` : 'category-section';
 
-        function paperHotScore(paper) {
-            const tags = Array.isArray(paper.tags) ? paper.tags : [];
-            const hotTags = ['eBPF', 'XDP', 'TCP/IP', 'Netfilter', '容器网络', '性能', 'Linux内核网络'];
-            let score = normalizeRelevanceScore(paper.relevance);
-            tags.forEach(tag => {
-                if (hotTags.includes(tag)) {
-                    score += 1;
-                }
+            const heading = document.createElement('h2');
+            heading.className = 'category-title';
+            const main = document.createElement('span');
+            main.className = 'title-main';
+            const icon = document.createElement('i');
+            icon.className = variant === 'lwn' ? 'fa-regular fa-newspaper' : 'fa-solid fa-flask';
+            icon.setAttribute('aria-hidden', 'true');
+            main.appendChild(icon);
+            main.appendChild(document.createTextNode(titleText));
+            heading.appendChild(main);
+
+            const count = document.createElement('span');
+            count.className = 'item-count';
+            count.textContent = `共 ${list.length} ${titleText === '资讯' ? '条' : '篇'}`;
+            heading.appendChild(count);
+
+            section.appendChild(heading);
+
+            const listEl = document.createElement('div');
+            listEl.className = 'list';
+            list.forEach(item => {
+                listEl.appendChild(renderCard(item, { variant, defaultReadingTime }));
             });
-            return score;
+            section.appendChild(listEl);
+            return section;
         }
 
-        function parseDateFromFilename(path) {
-            const m = path.match(/(\d{4}-\d{2}-\d{2})\.json$/);
-            return m ? m[1] : null;
-        }
-
-        function dateOffset(days) {
-            const d = new Date();
-            d.setDate(d.getDate() + days);
-            return d;
-        }
-
-        function safeDateString(dateObj) {
-            return formatDate(dateObj);
-        }
-
-        function isFreeLwnItem(item) {
-            if (!item || item.source !== 'LWN.net') {
-                return false;
-            }
-            if (item.access === 'paid') {
-                return false;
-            }
-            const text = `${item.title || ''} ${item.summary || ''} ${item.summary_en || ''}`.toLowerCase();
-            return !(/subscriber|subscription|paid|仅订阅|付费/.test(text));
-        }
-
-        async function tryLoadDay(dateStr) {
-            if (weeklyCache.has(dateStr)) {
-                return weeklyCache.get(dateStr);
-            }
-            try {
-                const res = await fetch(`docs/${dateStr}.json`);
-                if (!res.ok) {
-                    weeklyCache.set(dateStr, null);
-                    return null;
-                }
-                const data = await res.json();
-                weeklyCache.set(dateStr, data);
-                return data;
-            } catch (e) {
-                weeklyCache.set(dateStr, null);
-                return null;
-            }
-        }
-
-        function createWeeklyCard(paper, dateStr) {
-            const item = document.createElement('div');
-            item.className = 'paper-item';
-
-            const title = document.createElement('div');
-            title.className = 'paper-title';
-            const a = document.createElement('a');
-            a.href = paper.url;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            a.textContent = paper.title;
-            title.appendChild(a);
-
-            const summary = document.createElement('div');
-            summary.className = 'paper-summary';
-            summary.textContent = ensureChineseSummary(paper);
-
-            const meta = document.createElement('div');
-            meta.className = 'paper-meta';
-
-            const src = document.createElement('span');
-            src.className = `source-tag ${(paper.source || '').toLowerCase().replace(/[^a-z]/g, '')}`;
-            src.textContent = paper.source || '';
-            meta.appendChild(src);
-
-            const day = document.createElement('span');
-            day.className = 'reading-time';
-            day.textContent = `收录日期 ${dateStr}`;
-            meta.appendChild(day);
-
-            const tags = Array.isArray(paper.tags) ? paper.tags.slice(0, 3) : [];
-            if (tags.length > 0) {
-                const tagsContainer = document.createElement('div');
-                tagsContainer.className = 'tags-container';
-                tags.forEach(tag => {
-                    const tagEl = document.createElement('span');
-                    tagEl.className = 'feature-tag';
-                    if (tag === selectedFilter) {
-                        tagEl.classList.add('active');
-                    }
-                    tagEl.textContent = tag;
-                    tagEl.addEventListener('click', (ev) => {
-                        ev.stopPropagation();
-                        selectedFilter = selectedFilter === tag ? null : tag;
-                        renderTagStats(currentData?.tagStats || {});
-                        renderItems(currentData);
-                    });
-                    tagsContainer.appendChild(tagEl);
-                });
-                meta.appendChild(tagsContainer);
-            }
-
-            item.appendChild(title);
-            item.appendChild(summary);
-            item.appendChild(meta);
-            return item;
-        }
-
-        function createHighlightCard(item, dateStr) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'highlight-item';
-
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'paper-title';
-            const titleLink = document.createElement('a');
-            titleLink.href = item.url;
-            titleLink.target = '_blank';
-            titleLink.rel = 'noopener noreferrer';
-            titleLink.textContent = item.title;
-            titleDiv.appendChild(titleLink);
-            wrapper.appendChild(titleDiv);
-
-            const summaryPoints = buildLwnSummaryPoints(item);
-            const points = document.createElement('ul');
-            points.className = 'lwn-points';
-            if (summaryPoints.length > 0) {
-                summaryPoints.forEach(point => {
-                    const li = document.createElement('li');
-                    li.textContent = point;
-                    points.appendChild(li);
-                });
-                wrapper.appendChild(points);
-            }
-
-            const hasKeyPoints = Array.isArray(item.keyPoints) && item.keyPoints.length > 0;
-            if (!hasKeyPoints) {
-                const summary = document.createElement('div');
-                summary.className = 'lwn-brief';
-                summary.textContent = ensureChineseSummary(item);
-                wrapper.appendChild(summary);
-            }
-
-            const meta = document.createElement('div');
-            meta.className = 'highlight-meta';
-
-            const src = document.createElement('span');
-            src.className = `source-tag ${(item.source || '').toLowerCase().replace(/[^a-z]/g, '')}`;
-            src.textContent = item.source || '';
-            meta.appendChild(src);
-
-            if (dateStr) {
-                const day = document.createElement('span');
-                day.className = 'reading-time';
-                day.textContent = `收录日期 ${dateStr}`;
-                meta.appendChild(day);
-            }
-
-            if (item.readingTime) {
-                const rt = document.createElement('span');
-                rt.className = 'reading-time';
-                rt.textContent = `约 ${item.readingTime} 分钟`;
-                meta.appendChild(rt);
-            }
-
-            if (item.source === 'LWN.net') {
-                const freeTag = document.createElement('span');
-                freeTag.className = 'feature-tag lwn-free';
-                freeTag.textContent = '免费';
-                meta.appendChild(freeTag);
-            }
-
-            const tags = Array.isArray(item.tags) ? item.tags.slice(0, 3) : [];
-            tags.forEach(tag => {
-                const tagEl = document.createElement('span');
-                tagEl.className = 'feature-tag';
-                if (tag === selectedFilter) {
-                    tagEl.classList.add('active');
-                }
-                tagEl.textContent = tag;
-                tagEl.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    selectedFilter = selectedFilter === tag ? null : tag;
-                    renderTagStats(currentData?.tagStats || {});
-                    renderItems(currentData);
-                });
-                meta.appendChild(tagEl);
-            });
-
-            wrapper.appendChild(meta);
-            return wrapper;
-        }
-
-        function buildLwnSummaryPoints(item) {
-            if (Array.isArray(item.keyPoints) && item.keyPoints.length > 0) {
-                return item.keyPoints
-                    .map(point => (point || '').trim())
-                    .filter(point => point && point.length >= 16);
-            }
-
-            const summary = ensureChineseSummary(item)
-                .replace(/[；;]+/g, '。')
-                .replace(/\s+/g, ' ')
-                .trim();
-
-            if (!summary) {
-                return [];
-            }
-
-            const points = summary
-                .split(/。|\.|!|！|\?|？/)
-                .map(part => part.trim())
-                .filter(Boolean)
-                .map(part => part.replace(/^[-•\d\s]+/, '').trim())
-                .filter(part => part.length >= 16);
-
-            if (points.length >= 2) {
-                return points;
-            }
-
-            if (summary.length <= 36) {
-                return [summary];
-            }
-
-            const fallback = [];
-            const chunkSize = Math.ceil(summary.length / 3);
-            for (let i = 0; i < 3 && i * chunkSize < summary.length; i++) {
-                const part = summary.slice(i * chunkSize, (i + 1) * chunkSize).trim();
-                if (part) {
-                    fallback.push(part);
-                }
-            }
-            return fallback;
-        }
-
+        // ---------------- Render: top highlights ----------------
         async function loadTopHighlights() {
             const lwnSection = document.getElementById('lwnHighlights');
-            const lwnCount = document.getElementById('lwnCount');
             const weekly = document.getElementById('weeklyPicks');
-            const weeklyCount = document.getElementById('weeklyCount');
             lwnSection.querySelector('.loading')?.remove();
             weekly.querySelector('.loading')?.remove();
 
+            const dateStrs = [];
+            for (let i = 0; i < 7; i++) dateStrs.push(formatDate(dateOffset(-i)));
+            const dayDatas = await loadDaysParallel(dateStrs);
+
             const papers = [];
             const lwnNews = [];
-            for (let i = 0; i < 7; i++) {
-                const dateStr = safeDateString(dateOffset(-i));
-                const dayData = await tryLoadDay(dateStr);
-                if (!dayData || !dayData.categories) {
-                    continue;
-                }
-
+            for (let i = 0; i < dayDatas.length; i++) {
+                const dayData = dayDatas[i];
+                const dateStr = dateStrs[i];
+                if (!dayData || !dayData.categories) continue;
                 const dayPapers = Array.isArray(dayData.categories.papers) ? dayData.categories.papers : [];
                 const dayNews = Array.isArray(dayData.categories.news) ? dayData.categories.news : [];
-
-                dayPapers.forEach(p => {
-                    papers.push({ ...p, _date: dateStr });
-                });
-
-                dayNews
-                    .filter(item => isFreeLwnItem(item))
-                    .forEach(item => {
-                        lwnNews.push({ ...item, _date: dateStr });
-                    });
+                dayPapers.forEach(p => papers.push({ ...p, _date: dateStr }));
+                dayNews.filter(isFreeLwnItem).forEach(item => lwnNews.push({ ...item, _date: dateStr }));
             }
 
             const paperDedup = new Map();
-            papers.forEach(p => {
+            for (const p of papers) {
                 const key = (p.title || '').trim().toLowerCase();
-                if (!key) return;
-                if (!paperDedup.has(key) || paperHotScore(p) > paperHotScore(paperDedup.get(key))) {
+                if (!key) continue;
+                const existing = paperDedup.get(key);
+                if (!existing || paperHotScore(p) > paperHotScore(existing)) {
                     paperDedup.set(key, p);
                 }
-            });
-
+            }
             const weeklyTop = Array.from(paperDedup.values())
                 .sort((a, b) => paperHotScore(b) - paperHotScore(a))
                 .slice(0, 6);
 
             const lwnDedup = new Map();
-            lwnNews.forEach(item => {
+            for (const item of lwnNews) {
                 const key = (item.title || '').trim().toLowerCase();
-                if (!key || lwnDedup.has(key)) {
-                    return;
-                }
+                if (!key || lwnDedup.has(key)) continue;
                 lwnDedup.set(key, item);
-            });
-
+            }
             const latestLwn = Array.from(lwnDedup.values())
                 .sort((a, b) => (b._date || '').localeCompare(a._date || ''));
 
-            lwnCount.textContent = `共 ${latestLwn.length} 条`;
-            weeklyCount.textContent = `共 ${weeklyTop.length} 篇`;
+            document.getElementById('lwnCount').textContent = `共 ${latestLwn.length} 条`;
+            document.getElementById('weeklyCount').textContent = `共 ${weeklyTop.length} 篇`;
 
-            if (latestLwn.length === 0) {
-                const empty = document.createElement('div');
-                empty.className = 'empty-message';
-                empty.textContent = '最近 7 天暂无可展示的 LWN 免费资讯';
-                lwnSection.appendChild(empty);
-            } else {
-                const lwnList = document.createElement('div');
-                lwnList.className = 'highlight-list';
-                latestLwn.forEach(item => {
-                    lwnList.appendChild(createHighlightCard(item, item._date));
+            const fillPanel = (panel, items, variant, opts) => {
+                if (items.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'empty-message';
+                    empty.textContent = `最近 7 天暂无${opts.emptyLabel}`;
+                    panel.appendChild(empty);
+                    return;
+                }
+                const list = document.createElement('div');
+                list.className = 'list';
+                items.forEach(item => {
+                    list.appendChild(renderCard(item, { variant, showDate: true, dateStr: item._date, ...opts }));
                 });
-                lwnSection.appendChild(lwnList);
-            }
+                panel.appendChild(list);
+            };
 
-            if (weeklyTop.length === 0) {
-                const empty = document.createElement('div');
-                empty.className = 'empty-message';
-                empty.textContent = '最近 7 天暂无可展示的高匹配论文';
-                weekly.appendChild(empty);
+            fillPanel(lwnSection, latestLwn, 'lwn', { showFreeTag: true, emptyLabel: '可展示的 LWN 免费资讯' });
+            fillPanel(weekly, weeklyTop, 'paper', { emptyLabel: '可展示的高匹配论文' });
+        }
+
+        // ---------------- Render: data status ----------------
+        function renderDataStatus() {
+            const el = document.getElementById('dataStatusRange');
+            if (!el) return;
+            const dates = Array.from(parsedAvailableDates).sort();
+            if (dates.length === 0) {
+                el.textContent = '尚未发现数据';
                 return;
             }
-
-            weeklyTop.forEach(p => {
-                weekly.appendChild(createWeeklyCard(p, p._date));
-            });
+            el.textContent = `已收录 ${dates.length} 天 · ${dates[0]} → ${dates[dates.length - 1]}`;
         }
 
-        async function findLatestAvailableDate(maxLookbackDays = 30) {
-            for (let i = 0; i <= maxLookbackDays; i++) {
-                const dateStr = safeDateString(dateOffset(-i));
-                const dayData = await tryLoadDay(dateStr);
-                if (dayData && dayData.categories) {
-                    return new Date(dateStr + 'T00:00:00');
-                }
+        // ---------------- Render: footer last updated ----------------
+        function renderLastUpdated() {
+            const el = document.getElementById('lastUpdated');
+            if (!el) return;
+            if (!state.latestAvailableDate) {
+                el.textContent = '';
+                return;
             }
-            return new Date();
+            el.textContent = `数据更新至 ${formatDisplayDate(state.latestAvailableDate)}`;
         }
-        
+
+        // ---------------- Main load ----------------
         function renderContent(data) {
-            currentData = data;
-            
+            state.currentData = data;
             if (!data || !data.categories || Object.keys(data.categories).length === 0) {
                 document.getElementById('content').innerHTML = '<div class="empty-message">暂无数据</div>';
                 renderTagStats({});
                 return;
             }
-            
             renderTagStats(data.tagStats || {});
             renderItems(data);
         }
-        
+
         async function loadData(date) {
             const content = document.getElementById('content');
-            content.innerHTML = '<div class="loading">加载中...</div>';
+            content.innerHTML = '<div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>';
             document.getElementById('tagStats').innerHTML = '<div class="loading">加载中...</div>';
 
             const dateStr = formatDate(date);
-            const url = `docs/${dateStr}.json`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('No data');
-                }
-                const data = await response.json();
+            const data = await tryLoadDay(dateStr);
+            if (data && data.categories) {
                 renderContent(data);
-            } catch (error) {
-                content.innerHTML = '<div class="empty-message">该日期暂无数据</div>';
+            } else {
+                content.innerHTML = '<div class="empty-message">该日期暂无数据，可尝试跳到今天</div>';
                 renderTagStats({});
             }
 
@@ -1271,49 +1356,82 @@
             if (!btn) return;
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const checkDate = new Date(currentDate);
+            const checkDate = new Date(state.currentDate);
             checkDate.setHours(0, 0, 0, 0);
             btn.disabled = checkDate.getTime() === today.getTime();
         }
-        
+
         function updateNavButtons() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const checkDate = new Date(currentDate);
+            const checkDate = new Date(state.currentDate);
             checkDate.setHours(0, 0, 0, 0);
-
             document.getElementById('nextDay').disabled = checkDate >= today;
         }
 
-        document.getElementById('prevDay').addEventListener('click', () => {
-            currentDate.setDate(currentDate.getDate() - 1);
-            loadData(currentDate);
-        });
+        function changeDate(deltaDays) {
+            const next = new Date(state.currentDate);
+            next.setDate(next.getDate() + deltaDays);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (deltaDays > 0 && next > today) return;
+            state.currentDate = next;
+            writeUrlState(state.currentDate, state.selectedFilter);
+            loadData(state.currentDate);
+        }
 
-        document.getElementById('nextDay').addEventListener('click', () => {
-            currentDate.setDate(currentDate.getDate() + 1);
-            loadData(currentDate);
-        });
-
-        document.getElementById('todayBtn').addEventListener('click', async () => {
+        async function jumpToLatest() {
             const btn = document.getElementById('todayBtn');
             const original = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 正在定位…';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> 正在定位…';
             try {
-                currentDate = await findLatestAvailableDate(30);
-                await loadData(currentDate);
+                const latest = await findLatestAvailableDate(60);
+                state.latestAvailableDate = latest;
+                state.currentDate = latest;
+                state.selectedFilter = null;
+                writeUrlState(state.currentDate, state.selectedFilter);
+                await Promise.all([loadData(state.currentDate), loadTopHighlights()]);
+                renderDataStatus();
+                renderLastUpdated();
             } finally {
                 btn.innerHTML = original;
                 btn.disabled = false;
                 updateNavButtons();
+                updateTodayButton();
+            }
+        }
+
+        // ---------------- Event bindings ----------------
+        document.getElementById('prevDay').addEventListener('click', () => changeDate(-1));
+        document.getElementById('nextDay').addEventListener('click', () => changeDate(1));
+        document.getElementById('todayBtn').addEventListener('click', jumpToLatest);
+
+        window.addEventListener('popstate', async () => {
+            const { date, tag } = readUrlState();
+            if (date) {
+                state.currentDate = date;
+                state.selectedFilter = tag;
+                await loadData(state.currentDate);
             }
         });
 
+        // ---------------- Init ----------------
         async function initPage() {
-            currentDate = await findLatestAvailableDate(30);
-            await loadData(currentDate);
-            await loadTopHighlights();
+            const { date: urlDate, tag: urlTag } = readUrlState();
+            state.latestAvailableDate = await findLatestAvailableDate(60);
+            state.currentDate = urlDate || state.latestAvailableDate;
+            state.selectedFilter = urlTag;
+
+            // 预热缓存 + 并行拉高亮区
+            const dateStrs = [];
+            for (let i = 0; i < 7; i++) dateStrs.push(formatDate(dateOffset(-i)));
+            await loadDaysParallel(dateStrs);
+
+            await Promise.all([loadData(state.currentDate), loadTopHighlights()]);
+            writeUrlState(state.currentDate, state.selectedFilter);
+            renderDataStatus();
+            renderLastUpdated();
         }
 
         initPage();
