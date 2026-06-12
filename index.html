@@ -139,6 +139,199 @@
             }
         }
 
+        /* ============== Patches section ============== */
+        .patches-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .patches-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .patches-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--color-text);
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .patches-header h2 i { color: var(--color-accent); font-size: 16px; }
+
+        .patches-summary {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--color-text-3);
+        }
+
+        .patches-summary .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: var(--color-text-2);
+            font-variant-numeric: tabular-nums;
+            font-weight: 500;
+        }
+
+        .patches-summary .pill.rfc {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .patches-summary .pill.merged {
+            background: var(--color-success-soft);
+            color: #047857;
+        }
+
+        .patches-note {
+            font-size: 12.5px;
+            color: var(--color-text-3);
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+
+        .patches-cols {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+            gap: 16px;
+        }
+
+        .patches-col-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-text-2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed var(--color-border);
+        }
+
+        .patches-col-title i { color: var(--color-warning-2); }
+        .patches-col.merged .patches-col-title i { color: #047857; }
+
+        .patches-col .list:empty + .empty-message,
+        .patches-col .empty-message {
+            display: block;
+        }
+
+        .patch-card {
+            position: relative;
+            padding: 10px 12px 10px 14px;
+            margin-bottom: 8px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+        }
+
+        .patch-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+            background: var(--color-warning);
+            transition: background var(--transition);
+        }
+
+        .patch-card.rfc {
+            background: linear-gradient(180deg, #fffbeb 0%, #ffffff 60%);
+            border-color: #fde68a;
+        }
+
+        .patch-card.merged::before { background: #047857; }
+
+        .patch-card:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-border-2);
+        }
+
+        .patch-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text);
+            line-height: 1.45;
+            margin-bottom: 4px;
+        }
+
+        .patch-title a {
+            color: var(--color-link);
+            text-decoration: none;
+        }
+
+        .patch-title a:hover { color: var(--color-accent); text-decoration: underline; }
+        .patch-title a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
+
+        .patch-summary {
+            font-size: 12.5px;
+            color: var(--color-text-2);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .patch-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            margin-top: 6px;
+            font-size: 11.5px;
+            color: var(--color-text-3);
+        }
+
+        .patch-tag {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: var(--color-text-2);
+            font-size: 11px;
+            border: 1px solid var(--color-border);
+        }
+
+        .patch-tag.rfc {
+            background: #fde68a;
+            color: #92400e;
+            border-color: #fcd34d;
+            font-weight: 600;
+        }
+
+        .patch-tag.merged {
+            background: var(--color-success-soft);
+            color: #047857;
+            border-color: #a7f3d0;
+        }
+
+        @media (max-width: 900px) {
+            .patches-cols { grid-template-columns: 1fr; }
+        }
+
         header {
             background: linear-gradient(180deg, #f7f8fa 0%, #eef2f5 100%);
             padding: 24px;
@@ -988,32 +1181,50 @@
     <div class="page-wrapper">
         <header>
             <h1><span class="hero-icon" aria-hidden="true"><i class="fa-solid fa-terminal"></i></span>CatNews</h1>
-            <div class="hero-subtitle">追踪 Linux 内核网络论文、LWN 资讯与热点技术脉络</div>
+            <div class="hero-subtitle">追踪 Linux 内核网络论文、LWN 资讯、netdev 补丁与热点技术脉络</div>
             <div class="view-toggle" role="tablist" aria-label="视图模式">
                 <button id="viewCompact" class="active" type="button" role="tab" aria-selected="true" title="紧凑视图"><i class="fa-solid fa-table-list" aria-hidden="true"></i> 紧凑</button>
                 <button id="viewDetail" type="button" role="tab" aria-selected="false" title="详细视图"><i class="fa-solid fa-bars" aria-hidden="true"></i> 详细</button>
             </div>
-            <div class="date-nav" role="navigation" aria-label="日期导航">
-                <button id="prevDay" class="icon-only" title="前一天" aria-label="前一天"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
-                <span class="current-date" id="currentDate" aria-live="polite">-</span>
-                <button id="nextDay" class="icon-only" title="后一天" aria-label="后一天"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
-                <button id="todayBtn" class="today-btn" title="跳到最新有数据的日期" aria-label="跳到最新有数据的日期"><i class="fa-solid fa-calendar-day" aria-hidden="true"></i> 跳到今天</button>
-            </div>
         </header>
 
-        <div class="kpi-strip" id="kpiStrip" aria-label="今日数据概览">
+        <section class="patches-section" id="patchesSection" aria-label="昨日 netdev 补丁">
+            <div class="patches-header">
+                <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>昨日 netdev 补丁 <span id="patchesDate" class="meta-pill" style="font-weight:500;font-size:12px;">-</span></h2>
+                <div class="patches-summary" id="patchesSummary" aria-live="polite">
+                    <span class="pill"><i class="fa-regular fa-eye" aria-hidden="true"></i> 审查中 <strong id="patchesInReview">-</strong></span>
+                    <span class="pill rfc"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i> RFC <strong id="patchesRfc">-</strong></span>
+                    <span class="pill merged"><i class="fa-solid fa-code-merge" aria-hidden="true"></i> 已合并 <strong id="patchesMerged">-</strong></span>
+                </div>
+            </div>
+            <div class="patches-note">来源：patchwork.kernel.org/project/netdevbpf/（Netdev + BPF 邮件列表）。审查中包含带 [RFC] 标签的设计提案；已合并为 maintainer 树接受的 commit。AI 总结每个 patch 的核心改动。</div>
+            <div class="patches-cols">
+                <div class="patches-col" id="patchesInReviewCol">
+                    <div class="patches-col-title"><i class="fa-regular fa-eye" aria-hidden="true"></i>审查中（含 RFC）</div>
+                    <div class="list" id="patchesInReviewList"></div>
+                    <div class="empty-message" id="patchesInReviewEmpty" style="display:none;">昨日无新增审查 patch</div>
+                </div>
+                <div class="patches-col merged" id="patchesMergedCol">
+                    <div class="patches-col-title"><i class="fa-solid fa-code-merge" aria-hidden="true"></i>已合并到 maintainer 树</div>
+                    <div class="list" id="patchesMergedList"></div>
+                    <div class="empty-message" id="patchesMergedEmpty" style="display:none;">昨日无 accepted 记录</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="kpi-strip" id="kpiStrip" aria-label="最新内容概览">
             <div class="kpi">
                 <span class="kpi-icon"><i class="fa-solid fa-flask" aria-hidden="true"></i></span>
                 <div class="kpi-body">
                     <span class="kpi-value" id="kpiPapers">-</span>
-                    <span class="kpi-label">今日论文</span>
+                    <span class="kpi-label" id="kpiPapersLabel">最新论文</span>
                 </div>
             </div>
             <div class="kpi">
                 <span class="kpi-icon warning"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
                 <div class="kpi-body">
                     <span class="kpi-value" id="kpiNews">-</span>
-                    <span class="kpi-label">今日资讯</span>
+                    <span class="kpi-label" id="kpiNewsLabel">最新资讯</span>
                 </div>
             </div>
             <div class="kpi">
@@ -1062,7 +1273,7 @@
         <div class="layout">
             <aside class="sidebar" id="sidebar" aria-label="侧栏">
                 <div class="sidebar-section">
-                    <h3 class="sidebar-title"><i class="fa-solid fa-fire" aria-hidden="true"></i>今日热词 Top 10</h3>
+                    <h3 class="sidebar-title"><i class="fa-solid fa-fire" aria-hidden="true"></i>最新热词 Top 10</h3>
                     <div class="top-tags" id="topTags">
                         <div class="loading" style="padding:12px 0;">加载中...</div>
                     </div>
@@ -1076,7 +1287,7 @@
                 <div class="sidebar-section" id="dataStatus" aria-live="polite">
                     <h3 class="sidebar-title"><i class="fa-regular fa-circle-check" aria-hidden="true"></i>数据状态</h3>
                     <div id="dataStatusBody" style="font-size:12.5px;color:var(--color-text-3);line-height:1.7;">
-                        <div>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN</div>
+                        <div>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN / patchwork (netdevbpf)</div>
                         <div id="dataStatusRange" style="margin-top:6px;">-</div>
                     </div>
                 </div>
@@ -1102,7 +1313,7 @@
 
         // ---------------- State ----------------
         const state = {
-            currentDate: new Date(),
+            currentDate: null,
             selectedFilter: null,
             currentData: null,
             latestAvailableDate: null,
@@ -1181,23 +1392,14 @@
             applyViewMode(mode);
         }
 
-        // ---------------- URL routing ----------------
-        function readUrlState() {
+        // ---------------- URL routing (tag only) ----------------
+        function readTagFromUrl() {
             const params = new URLSearchParams(window.location.search);
-            const dateParam = params.get('date');
-            const tagParam = params.get('tag');
-            let date = null;
-            if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
-                const [y, m, d] = dateParam.split('-').map(Number);
-                const dt = new Date(y, m - 1, d);
-                if (!isNaN(dt.getTime())) date = dt;
-            }
-            return { date, tag: tagParam };
+            return params.get('tag');
         }
 
-        function writeUrlState(date, tag) {
+        function writeTagToUrl(tag) {
             const params = new URLSearchParams();
-            if (date) params.set('date', formatDate(date));
             if (tag) params.set('tag', tag);
             const qs = params.toString();
             const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
@@ -1362,7 +1564,7 @@
         // ---------------- Render: card factory ----------------
         function toggleFilter(tag) {
             state.selectedFilter = state.selectedFilter === tag ? null : tag;
-            writeUrlState(state.currentDate, state.selectedFilter);
+            writeTagToUrl(state.selectedFilter);
             renderTagStats(state.currentData?.tagStats || {});
             renderTopTags(state.currentData || {});
             renderItems(state.currentData);
@@ -1819,11 +2021,149 @@
             el.textContent = `数据更新至 ${formatDisplayDate(state.latestAvailableDate)}`;
         }
 
+        // ---------------- Render: patches (yesterday netdev) ----------------
+        async function loadPatches() {
+            // "Yesterday" in Beijing time, since fetch_lore_patches runs on BJ-now-1.
+            // We compute via the user's local offset for the wall-clock date, then
+            // shift by 16h so the Beijing day is captured regardless of viewer TZ.
+            const nowMs = Date.now();
+            const bjNow = new Date(nowMs + 8 * 3600 * 1000);
+            const yesterday = new Date(bjNow);
+            yesterday.setUTCHours(0, 0, 0, 0);
+            yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+            const yDateStr = formatDate(yesterday);
+
+            document.getElementById('patchesDate').textContent = `(${yDateStr})`;
+
+            let payload = null;
+            try {
+                const res = await fetch(`docs/${yDateStr}.patches.json`, { cache: 'force-cache' });
+                if (res.ok) payload = await res.json();
+            } catch (e) { /* ignore */ }
+
+            // Fallback: try the day before that (e.g. workflow hadn't run yet today)
+            if (!payload) {
+                for (let i = 1; i <= 3; i++) {
+                    const d = new Date(yesterday);
+                    d.setUTCDate(d.getUTCDate() - i);
+                    const ds = formatDate(d);
+                    try {
+                        const r = await fetch(`docs/${ds}.patches.json`, { cache: 'force-cache' });
+                        if (r.ok) { payload = await r.json(); break; }
+                    } catch (e) { /* ignore */ }
+                }
+            }
+
+            const ir = (payload && Array.isArray(payload.inReview)) ? payload.inReview : [];
+            const mg = (payload && Array.isArray(payload.merged)) ? payload.merged : [];
+            const rfc = ir.filter(p => p.isRfc).length;
+            document.getElementById('patchesInReview').textContent = String(ir.length);
+            document.getElementById('patchesRfc').textContent = String(rfc);
+            document.getElementById('patchesMerged').textContent = String(mg.length);
+
+            renderPatchList(document.getElementById('patchesInReviewList'),
+                            document.getElementById('patchesInReviewEmpty'), ir);
+            renderPatchList(document.getElementById('patchesMergedList'),
+                            document.getElementById('patchesMergedEmpty'), mg);
+        }
+
+        function renderPatchList(listEl, emptyEl, items) {
+            listEl.innerHTML = '';
+            if (!items || items.length === 0) {
+                emptyEl.style.display = 'block';
+                return;
+            }
+            emptyEl.style.display = 'none';
+            for (const p of items) {
+                const card = document.createElement('article');
+                card.className = `patch-card ${p.isRfc ? 'rfc' : ''} ${p.state === 'accepted' ? 'merged' : ''}`;
+
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'patch-title';
+                const a = document.createElement('a');
+                a.href = p.url || p.patchworkUrl || '#';
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = p.title || '(无标题)';
+                titleDiv.appendChild(a);
+                card.appendChild(titleDiv);
+
+                if (p.summary) {
+                    const sum = document.createElement('div');
+                    sum.className = 'patch-summary';
+                    sum.textContent = p.summary;
+                    card.appendChild(sum);
+                }
+
+                const meta = document.createElement('div');
+                meta.className = 'patch-meta';
+
+                if (p.isRfc) {
+                    const t = document.createElement('span');
+                    t.className = 'patch-tag rfc';
+                    t.textContent = 'RFC';
+                    meta.appendChild(t);
+                }
+                if (p.state === 'accepted') {
+                    const t = document.createElement('span');
+                    t.className = 'patch-tag merged';
+                    t.textContent = '已合并';
+                    meta.appendChild(t);
+                }
+                if (p.version) {
+                    const t = document.createElement('span');
+                    t.className = 'patch-tag';
+                    t.textContent = p.version;
+                    meta.appendChild(t);
+                }
+                if (Array.isArray(p.tags)) {
+                    for (const tag of p.tags.slice(0, 3)) {
+                        const t = document.createElement('span');
+                        t.className = 'patch-tag';
+                        t.textContent = tag;
+                        meta.appendChild(t);
+                    }
+                }
+                if (p.submitter) {
+                    const sub = document.createElement('span');
+                    sub.className = 'meta-pill';
+                    sub.innerHTML = `<i class="fa-regular fa-user" aria-hidden="true"></i> ${escapeHtml(p.submitter)}`;
+                    meta.appendChild(sub);
+                }
+                if (p.date) {
+                    const dt = document.createElement('span');
+                    dt.className = 'meta-pill';
+                    const dd = String(p.date).slice(5, 16).replace('T', ' ');
+                    dt.innerHTML = `<i class="fa-regular fa-clock" aria-hidden="true"></i> ${dd}`;
+                    meta.appendChild(dt);
+                }
+                if (p.commitRef) {
+                    const cm = document.createElement('span');
+                    cm.className = 'meta-pill';
+                    cm.title = p.commitRef;
+                    cm.innerHTML = `<i class="fa-solid fa-hashtag" aria-hidden="true"></i> ${escapeHtml(String(p.commitRef).slice(0, 8))}`;
+                    meta.appendChild(cm);
+                }
+
+                card.appendChild(meta);
+                listEl.appendChild(card);
+            }
+        }
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // ---------------- Main load ----------------
         function renderContent(data) {
             state.currentData = data;
             if (!data || !data.categories || Object.keys(data.categories).length === 0) {
-                document.getElementById('content').innerHTML = '<div class="empty-message">暂无数据</div>';
+                document.getElementById('content').innerHTML = '<div class="empty-message">最新一天暂无内容</div>';
                 renderTagStats({});
                 renderKpi({});
                 renderTopTags({});
@@ -1845,99 +2185,31 @@
             if (data && data.categories) {
                 renderContent(data);
             } else {
-                content.innerHTML = '<div class="empty-message">该日期暂无数据，可尝试跳到今天</div>';
+                content.innerHTML = '<div class="empty-message">最新一天暂无内容</div>';
                 renderTagStats({});
                 renderKpi({});
                 renderTopTags({});
             }
-
-            document.getElementById('currentDate').textContent = formatDisplayDate(date);
-            updateNavButtons();
-            updateTodayButton();
-        }
-
-        function updateTodayButton() {
-            const btn = document.getElementById('todayBtn');
-            if (!btn) return;
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const checkDate = new Date(state.currentDate);
-            checkDate.setHours(0, 0, 0, 0);
-            btn.disabled = checkDate.getTime() === today.getTime();
-        }
-
-        function updateNavButtons() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const checkDate = new Date(state.currentDate);
-            checkDate.setHours(0, 0, 0, 0);
-            document.getElementById('nextDay').disabled = checkDate >= today;
-        }
-
-        function changeDate(deltaDays) {
-            const next = new Date(state.currentDate);
-            next.setDate(next.getDate() + deltaDays);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (deltaDays > 0 && next > today) return;
-            state.currentDate = next;
-            writeUrlState(state.currentDate, state.selectedFilter);
-            loadData(state.currentDate);
-        }
-
-        async function jumpToLatest() {
-            const btn = document.getElementById('todayBtn');
-            const original = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> 正在定位…';
-            try {
-                const latest = await findLatestAvailableDate(60);
-                state.latestAvailableDate = latest;
-                state.currentDate = latest;
-                state.selectedFilter = null;
-                writeUrlState(state.currentDate, state.selectedFilter);
-                await Promise.all([loadData(state.currentDate), loadTopHighlights()]);
-                renderDataStatus();
-                renderLastUpdated();
-            } finally {
-                btn.innerHTML = original;
-                btn.disabled = false;
-                updateNavButtons();
-                updateTodayButton();
-            }
         }
 
         // ---------------- Event bindings ----------------
-        document.getElementById('prevDay').addEventListener('click', () => changeDate(-1));
-        document.getElementById('nextDay').addEventListener('click', () => changeDate(1));
-        document.getElementById('todayBtn').addEventListener('click', jumpToLatest);
         document.getElementById('viewCompact').addEventListener('click', () => applyViewMode('compact'));
         document.getElementById('viewDetail').addEventListener('click', () => applyViewMode('detail'));
-
-        window.addEventListener('popstate', async () => {
-            const { date, tag } = readUrlState();
-            if (date) {
-                state.currentDate = date;
-                state.selectedFilter = tag;
-                await loadData(state.currentDate);
-            }
-        });
 
         // ---------------- Init ----------------
         async function initPage() {
             initViewMode();
-            const { date: urlDate, tag: urlTag } = readUrlState();
-            state.latestAvailableDate = await findLatestAvailableDate(60);
-            state.currentDate = urlDate || state.latestAvailableDate;
-            state.selectedFilter = urlTag;
 
-            // 预热缓存 + 并行拉高亮区
+            state.latestAvailableDate = await findLatestAvailableDate(60);
+            state.currentDate = state.latestAvailableDate;
+            state.selectedFilter = null;
+
+            // 预热 7 天缓存 + 并行拉高亮区
             const dateStrs = [];
             for (let i = 0; i < 7; i++) dateStrs.push(formatDate(dateOffset(-i)));
             await loadDaysParallel(dateStrs);
 
-            await Promise.all([loadData(state.currentDate), loadTopHighlights()]);
-            writeUrlState(state.currentDate, state.selectedFilter);
+            await Promise.all([loadData(state.currentDate), loadTopHighlights(), loadPatches()]);
             renderDataStatus();
             renderLastUpdated();
         }

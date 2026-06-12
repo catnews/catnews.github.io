@@ -6,6 +6,7 @@ import urllib.error
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 import os
+import sys
 import hashlib
 import re
 import time
@@ -1589,6 +1590,25 @@ def main():
     
     beijing_now = datetime.now(timezone.utc) + timedelta(hours=8)
     today = beijing_now.strftime("%Y-%m-%d")
+
+    # ---------- Lore kernel patches (yesterday) ----------
+    try:
+        script_dir_lore = os.path.dirname(os.path.abspath(__file__))
+        if script_dir_lore not in sys.path:
+            sys.path.insert(0, script_dir_lore)
+        import fetch_lore_patches  # type: ignore
+        yesterday_str = (beijing_now - timedelta(days=1)).strftime("%Y-%m-%d")
+        fetch_lore_patches.run(
+            docs_dir,
+            yesterday_str,
+            call_minimax_fn=call_minimax,
+            gate_fn=passes_domain_gate,
+            excluded_fn=is_hard_excluded,
+            delay_min=LLM_DELAY_MIN,
+            delay_max=LLM_DELAY_MAX,
+        )
+    except Exception as e:
+        print(f"[lore] skipped: {e}", flush=True)
     
     output = {
         "date": today,
