@@ -10,6 +10,7 @@ import hashlib
 import re
 import time
 import random
+import html as html_lib
 
 ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
@@ -311,7 +312,7 @@ def random_delay(min_sec, max_sec):
     print(f"  Waiting {delay:.1f}s...")
     time.sleep(delay)
 
-def call_minimax(prompt, system_prompt, max_retries=3):
+def call_minimax(prompt, system_prompt, max_retries=3, max_tokens=500):
     api_key = os.environ.get("MINIMAX_API_KEY", "")
     if not api_key:
         print("Warning: MINIMAX_API_KEY not set")
@@ -326,7 +327,7 @@ def call_minimax(prompt, system_prompt, max_retries=3):
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.7,
-                "max_tokens": 500
+                "max_tokens": max_tokens
             }
             
             data = json.dumps(payload).encode("utf-8")
@@ -818,6 +819,35 @@ def is_lwn_free_article(html):
     return not any(keyword in page for keyword in LWN_PAYWALL_KEYWORDS)
 
 
+def strip_html_to_text(html):
+    text = re.sub(r'<script[^>]*>.*?</script>', ' ', html or '', flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<style[^>]*>.*?</style>', ' ', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<!--.*?-->', ' ', text, flags=re.DOTALL)
+    text = re.sub(r'<(p|br|li|h[1-6]|blockquote|div|tr|ul|ol)[^>]*>', ' ', text, flags=re.IGNORECASE)
+    text = re.sub(r'<[^>]+>', ' ', text)
+    text = html_lib.unescape(text)
+    return re.sub(r'\s+', ' ', text).strip()
+
+
+def extract_lwn_article_text(html):
+    if not html:
+        return ""
+
+    match = re.search(
+        r'<div\s+class="ArticleText"[^>]*>(.*?)(?:<div\s+class="CommentBox"|<div\s+class="bottomnav"|</body>)',
+        html,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+    if match:
+        return strip_html_to_text(match.group(1))
+
+    main_match = re.search(r'<main[^>]*>(.*?)</main>', html, flags=re.DOTALL | re.IGNORECASE)
+    if main_match:
+        return strip_html_to_text(main_match.group(1))
+
+    return strip_html_to_text(html)
+
+
 def fetch_lwn_article_content(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
@@ -826,13 +856,23 @@ def fetch_lwn_article_content(url):
 
         is_free = is_lwn_free_article(html)
         
-        text_content = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL)
-        text_content = re.sub(r'<style[^>]*>.*?</style>', '', text_content, flags=re.DOTALL)
-        text_content = re.sub(r'<[^>]+>', ' ', text_content)
-        text_content = re.sub(r'\s+', ' ', text_content)
+        text_content = extract_lwn_article_text(html)
+
+        if len(text_content) < 1000 and not url.rstrip('/').endswith('/bigpage'):
+            bigpage_url = f"{url.rstrip('/')}/bigpage"
+            try:
+                bigpage_req = urllib.request.Request(bigpage_url, headers={"User-Agent": "CatNews/2.0"})
+                with urllib.request.urlopen(bigpage_req, timeout=30) as bigpage_response:
+                    bigpage_html = bigpage_response.read().decode("utf-8")
+                bigpage_text = extract_lwn_article_text(bigpage_html)
+                if len(bigpage_text) > len(text_content):
+                    text_content = bigpage_text
+                    is_free = is_lwn_free_article(bigpage_html)
+            except Exception as e:
+                print(f"    Error fetching bigpage content: {e}")
         
         return {
-            "content": text_content[:6000],
+            "content": text_content[:12000],
             "is_free": is_free,
         }
     except Exception as e:
@@ -841,11 +881,11 @@ def fetch_lwn_article_content(url):
 
 def summarize_lwn_article(title, content):
     prompt = f"""标题：{title}
-内容：{content}
+内容：{content[:10000]}
 
 请提取重要信息并返回JSON。"""
     
-    response = call_minimax(prompt, LWN_SUMMARY_PROMPT)
+    response = call_minimax(prompt, LWN_SUMMARY_PROMPT, max_tokens=1800)
     if not response:
         return None
     
