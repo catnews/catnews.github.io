@@ -332,6 +332,29 @@
             .patches-cols { grid-template-columns: 1fr; }
         }
 
+        .patches-more-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .patches-more-row .clear-filter {
+            background: var(--color-bg-2);
+            border: 1px dashed var(--color-border-2);
+            color: var(--color-text-3);
+            padding: 6px 14px;
+            font-size: 12.5px;
+        }
+
+        .patches-more-row .clear-filter:hover {
+            background: #fff;
+            color: var(--color-text-2);
+        }
+
+        .patch-card.collapsed {
+            display: none;
+        }
+
         header {
             background: linear-gradient(180deg, #f7f8fa 0%, #eef2f5 100%);
             padding: 24px;
@@ -1366,6 +1389,11 @@
                     <div class="empty-message" id="patchesMergedEmpty" style="display:none;">昨日无 accepted 记录</div>
                 </div>
             </div>
+            <div class="patches-more-row" id="patchesMoreRow" style="display:none;">
+                <button id="patchesMoreBtn" class="clear-filter" type="button">
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表
+                </button>
+            </div>
         </section>
 
         <div class="kpi-strip" id="kpiStrip" aria-label="近 7 天内容概览">
@@ -2174,12 +2202,31 @@
             document.getElementById('patchesInReview').textContent = String(ir.length);
             document.getElementById('patchesRfc').textContent = String(rfc);
             document.getElementById('patchesMerged').textContent = String(mg.length);
+            patchCounts.inReview = ir.length;
+            patchCounts.merged = mg.length;
 
             renderPatchList(document.getElementById('patchesInReviewList'),
                             document.getElementById('patchesInReviewEmpty'), ir);
             renderPatchList(document.getElementById('patchesMergedList'),
                             document.getElementById('patchesMergedEmpty'), mg);
+
+            // "Show all" button: visible only if either column overflows.
+            const moreBtn = document.getElementById('patchesMoreBtn');
+            const moreRow = document.getElementById('patchesMoreRow');
+            const overflow = (ir.length > PATCH_INITIAL_VISIBLE) || (mg.length > PATCH_INITIAL_VISIBLE);
+            moreRow.style.display = overflow ? 'flex' : 'none';
+            if (overflow) {
+                const hidden = Math.max(0, ir.length - PATCH_INITIAL_VISIBLE) + Math.max(0, mg.length - PATCH_INITIAL_VISIBLE);
+                moreBtn.innerHTML = `<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表（还有 ${hidden} 条）`;
+                moreBtn.dataset.expanded = 'false';
+            }
         }
+
+        // Default number of patches shown expanded in each column; rest are
+        // collapsed behind a "show all" button to keep the page scannable.
+        const PATCH_INITIAL_VISIBLE = 8;
+        // Cached totals so the "expand" toggle can re-collapse by index.
+        const patchCounts = { inReview: 0, merged: 0 };
 
         function renderPatchList(listEl, emptyEl, items) {
             listEl.innerHTML = '';
@@ -2188,9 +2235,10 @@
                 return;
             }
             emptyEl.style.display = 'none';
-            for (const p of items) {
+            items.forEach((p, idx) => {
                 const card = document.createElement('article');
                 card.className = `patch-card ${p.isRfc ? 'rfc' : ''} ${p.state === 'accepted' ? 'merged' : ''}`;
+                if (idx >= PATCH_INITIAL_VISIBLE) card.classList.add('collapsed');
 
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'patch-title';
@@ -2261,7 +2309,7 @@
 
                 card.appendChild(meta);
                 listEl.appendChild(card);
-            }
+            });
         }
 
         function escapeHtml(s) {
@@ -2280,6 +2328,23 @@
         // ---------------- Event bindings ----------------
         document.getElementById('viewCompact').addEventListener('click', () => applyViewMode('compact'));
         document.getElementById('viewDetail').addEventListener('click', () => applyViewMode('detail'));
+        document.getElementById('patchesMoreBtn').addEventListener('click', () => {
+            const btn = document.getElementById('patchesMoreBtn');
+            const expanded = btn.dataset.expanded === 'true';
+            const next = !expanded;
+            btn.dataset.expanded = String(next);
+            ['#patchesInReviewList', '#patchesMergedList'].forEach(sel => {
+                const cards = document.querySelectorAll(`${sel} .patch-card`);
+                cards.forEach((el, idx) => {
+                    if (idx >= PATCH_INITIAL_VISIBLE) {
+                        el.classList.toggle('collapsed', !next);
+                    }
+                });
+            });
+            btn.innerHTML = next
+                ? '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i> 收起'
+                : '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表';
+        });
         document.getElementById('clearFilterBtn').addEventListener('click', () => toggleFilter(null));
 
         // ---------------- Init ----------------

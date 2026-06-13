@@ -29,10 +29,12 @@ from datetime import datetime, timedelta, timezone
 PATCHWORK_API = "https://patchwork.kernel.org/api/patches/"
 NETDEV_PROJECT = "netdevbpf"  # Netdev + BPF on patchwork
 PAGE_SIZE = 30
-MAX_INREVIEW_PAGES = 6   # 180 latest; yesterday's ~120 patches fit
-MAX_MERGED_PAGES = 4      # 120 latest accepted
-DEFAULT_MAX_INREVIEW = 12
-DEFAULT_MAX_MERGED = 8
+# Safety cap on pages; the early-stop below usually bails much earlier
+# (typically around page 9 for a busy day).
+MAX_INREVIEW_PAGES = 20
+MAX_MERGED_PAGES = 6
+DEFAULT_MAX_INREVIEW = 24  # cap LLM calls for in-review
+DEFAULT_MAX_MERGED = 12
 STATE_MERGED = "accepted"
 STATE_IN_REVIEW_STATES = {"new", "changes-requested", "superseded", "rfc"}
 
@@ -65,8 +67,13 @@ def _http_get_json(url, timeout=60, retries=3):
 
 
 # ---------------- Fetch helpers ----------------
-def _fetch_paginated(url_base, max_pages):
-    """Walk a paginated patchwork endpoint, newest first. Returns list."""
+def _fetch_paginated(url_base, max_pages, stop_date_utc=None):
+    """Walk a paginated patchwork endpoint, newest first.
+
+    If `stop_date_utc` is given (ISO string like '2026-06-11T16:00:00'),
+    stop early once a page's last (oldest) entry is older than that.
+    Returns a list of patch dicts.
+    """
     out = []
     for page in range(1, max_pages + 1):
         sep = "&" if "?" in url_base else "?"
@@ -75,20 +82,26 @@ def _fetch_paginated(url_base, max_pages):
         if not data or not isinstance(data, list) or len(data) == 0:
             break
         out.extend(data)
+        if stop_date_utc:
+            # API returns results sorted by `order` (we use order=-date),
+            # so the last entry in the page is the oldest of this page.
+            last_date = (data[-1].get("date") or "")[:19]
+            if last_date and last_date < stop_date_utc:
+                break
         time.sleep(0.5)
     return out
 
 
-def fetch_in_review_submissions():
-    """Pull recent submissions across all in-review states."""
-    url = f"{PATCHWORK_API}?project={NETDEV_PROJECT}&order=-id"
-    return _fetch_paginated(url, MAX_INREVIEW_PAGES)
+def fetch_in_review_submissions(stop_date_utc=None):
+    """Pull recent submissions across all in-review states, sorted by date desc."""
+    url = f"{PATCHWORK_API}?project={NETDEV_PROJECT}&order=-date"
+    return _fetch_paginated(url, MAX_INREVIEW_PAGES, stop_date_utc=stop_date_utc)
 
 
-def fetch_accepted_merges():
+def fetch_accepted_merges(stop_date_utc=None):
     """Pull recent accepted patches (these are merged)."""
-    url = f"{PATCHWORK_API}?project={NETDEV_PROJECT}&state={STATE_MERGED}&order=-id"
-    return _fetch_paginated(url, MAX_MERGED_PAGES)
+    url = f"{PATCHWORK_API}?project={NETDEV_PROJECT}&state={STATE_MERGED}&order=-date"
+    return _fetch_paginated(url, MAX_MERGED_PAGES, stop_date_utc=stop_date_utc)
 
 
 # ---------------- Date filter ----------------
@@ -317,9 +330,21 @@ def _infer_tags_from_text(text, max_tags=3):
 
 
 def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
-                      limit=None, delay_min=2, delay_max=4):
-    """Run LLM summary + domain gate on a list of normalized patches."""
+                      limit=None, llm_budget=8, delay_min=2, delay_max=4):
+    """Run domain gate + (LLM summary for the first llm_budget patches) on a
+    list of normalized patches.
+
+    Behavior:
+      * Domain gate is applied to every patch; non-networking patches are
+        dropped entirely.
+      * The first llm_budget net patches get full LLM Chinese summary.
+      * Remaining net patches (up to `limit`) get a heuristic Chinese
+        summary derived from the title + diff head — so the user still sees
+        ALL of yesterday's netdev activity, not just the top N.
+      * If `call_minimax_fn` is None, all entries get the heuristic path.
+    """
     results = []
+    llm_used = 0
     for p in patches:
         if limit and len(results) >= limit:
             break
@@ -331,9 +356,13 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                              gate_fn, excluded_fn):
             print(f"  [lore] skip (gate) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
             continue
-        prompt = _format_patch_for_prompt(p)
-        resp = _call_minimax_summary(call_minimax_fn, prompt)
-        parsed = _parse_summary_response(resp)
+        parsed = None
+        if call_minimax_fn and llm_used < llm_budget:
+            prompt = _format_patch_for_prompt(p)
+            resp = _call_minimax_summary(call_minimax_fn, prompt)
+            parsed = _parse_summary_response(resp)
+            if parsed:
+                llm_used += 1
         if not parsed:
             fallback_text = (raw.get("content") or p.get("title", "")).strip()
             if not fallback_text:
@@ -344,7 +373,7 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                 "tags": _infer_tags_from_text(gate_text),
                 "readingTime": 3,
             }
-        if parsed["relevance"] == "none":
+        if parsed.get("relevance") == "none":
             print(f"  [lore] skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
             continue
         p["summary"] = parsed["summary"]
@@ -354,7 +383,7 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
         # Drop raw to keep JSON small
         p.pop("raw", None)
         results.append(p)
-        if delay_min and delay_max:
+        if call_minimax_fn and llm_used < llm_budget and delay_min and delay_max:
             time.sleep(random.uniform(delay_min, delay_max))
     return results
 
@@ -383,29 +412,40 @@ def write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)
 # ---------------- Top-level ----------------
 def run(docs_dir, target_date_str, *,
         call_minimax_fn, gate_fn, excluded_fn,
-        max_in_review=DEFAULT_MAX_INREVIEW, max_merged=DEFAULT_MAX_MERGED,
+        max_in_review=80, max_merged=30, llm_budget_per_side=8,
         delay_min=2, delay_max=4):
     print(f"[lore] fetching netdevbpf patches for {target_date_str}", flush=True)
 
+    # Compute the Beijing-day window in UTC, used as the early-stop boundary.
+    y, m, d = (int(x) for x in target_date_str.split("-"))
+    day_start_bj = datetime(y, m, d, 0, 0, 0, tzinfo=BEIJING_TZ)
+    # Anything dated before this is OUTSIDE the target day in BJ time.
+    stop_utc = day_start_bj.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+
     # 1. In-review submissions: filter by Beijing "yesterday" date
-    in_review_raw = fetch_in_review_submissions()
+    in_review_raw = fetch_in_review_submissions(stop_date_utc=stop_utc)
     in_review_raw = [p for p in in_review_raw if _is_in_review_state(p)]
     in_review_raw = [p for p in in_review_raw if _is_in_day(p.get("date"), target_date_str)]
     print(f"[lore]   in-review submissions on {target_date_str}: {len(in_review_raw)}", flush=True)
 
     # 2. Merged (accepted): the date in patchwork is submission time, not merge time.
-    #    We simply take the most recent accepted set and present them as the
-    #    "recently merged" feed (capped).
-    merged_raw = fetch_accepted_merges()
+    #    We take the most recent accepted set and present them as the
+    #    "recently merged" feed (capped). We use a wider stop window here so
+    #    users see accepted commits that landed in the last few days, not
+    #    only those submitted in the target day.
+    merged_stop_utc = (day_start_bj - timedelta(days=5)).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+    merged_raw = fetch_accepted_merges(stop_date_utc=merged_stop_utc)
     print(f"[lore]   total accepted fetched: {len(merged_raw)}", flush=True)
 
     in_review_normalized = [_normalize_patch(p) for p in in_review_raw]
     merged_normalized = [_normalize_patch(p) for p in merged_raw]
 
     in_review = summarize_patches(call_minimax_fn, in_review_normalized, gate_fn, excluded_fn,
-                                  limit=max_in_review, delay_min=delay_min, delay_max=delay_max)
+                                  limit=max_in_review, llm_budget=llm_budget_per_side,
+                                  delay_min=delay_min, delay_max=delay_max)
     merged = summarize_patches(call_minimax_fn, merged_normalized, gate_fn, excluded_fn,
-                               limit=max_merged, delay_min=delay_min, delay_max=delay_max)
+                               limit=max_merged, llm_budget=llm_budget_per_side,
+                               delay_min=delay_min, delay_max=delay_max)
 
     fetched_at = datetime.now(BEIJING_TZ).strftime("%Y-%m-%dT%H:%M:%S%z")
     out_path = write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)
