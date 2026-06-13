@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
-"""Pull yesterday's netdev patches from patchwork.kernel.org and summarize via LLM.
+"""Fetch yesterday's netdev + bpf patch activity from patchwork.kernel.org
+and summarize via LLM.
 
 This is a standalone module imported by fetch_papers.py.
-- Source: patchwork.kernel.org Netdev + BPF project (project_id=399)
-- For each patch on the previous Beijing-time day, classify:
-    * inReview  (state == 'new')   - including RFC tags
-    * merged    (state == 'accepted')
-- Run domain gate (Linux kernel + network) using the same keywords as the
-  papers pipeline; summarize accepted/new patches via MiniMax LLM.
+- Source: patchwork.kernel.org Netdev + BPF (project link_name = "netdevbpf")
+- Strategy:
+    inReview  = state in (new, changes-requested, superseded, rfc)
+                 whose submission date falls on "yesterday" (Beijing)
+    merged    = state == accepted
+                 (the date of a merged patch in patchwork reflects submission
+                  time, not merge time; we just show the most recent accepted
+                  set, capped at MAX_MERGED)
+- The patchwork API has a quirk: ?project_id=<int> silently falls back to
+  "Linux Input" for unknown ids. The reliable query is ?project=<link_name>.
+- Apply domain gate (Linux kernel + network) and run MiniMax LLM for
+  Chinese summary + tags + readingTime.
 - Write docs/<YYYY-MM-DD>.patches.json
 """
 import json
@@ -16,48 +23,40 @@ import random
 import re
 import time
 import urllib.error
-import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
 PATCHWORK_API = "https://patchwork.kernel.org/api/patches/"
-NETDEV_PROJECT_ID = 399  # "Netdev + BPF" project on patchwork.kernel.org
-PATCHWORK_MAX_PAGES = 4  # 120 patches latest, plenty for a single day
+NETDEV_PROJECT = "netdevbpf"  # Netdev + BPF on patchwork
+PAGE_SIZE = 30
+MAX_INREVIEW_PAGES = 6   # 180 latest; yesterday's ~120 patches fit
+MAX_MERGED_PAGES = 4      # 120 latest accepted
 DEFAULT_MAX_INREVIEW = 12
 DEFAULT_MAX_MERGED = 8
+STATE_MERGED = "accepted"
+STATE_IN_REVIEW_STATES = {"new", "changes-requested", "superseded", "rfc"}
 
-# State values from patchwork
-STATE_IN_REVIEW = "new"          # posted, awaiting review
-STATE_MERGED = "accepted"        # accepted into maintainer tree
-# We also treat 'handled-elsewhere' as effectively merged info; skip for now.
-
-# Beijing timezone for "yesterday" calculation (matches the main script)
+# Beijing timezone
 BEIJING_TZ = timezone(timedelta(hours=8))
 
 
+# ---------------- HTTP ----------------
 def _http_get_json(url, timeout=60, retries=3):
-    """GET a JSON URL with retry/backoff. Returns parsed JSON or None."""
     last_err = None
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(
-                url,
-                headers={
-                    "User-Agent": "CatNews-Fetcher/1.0",
-                    "Accept": "application/json",
-                },
-            )
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "CatNews-Fetcher/1.0",
+                "Accept": "application/json",
+            })
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return json.loads(resp.read().decode("utf-8", errors="replace"))
         except urllib.error.HTTPError as e:
             last_err = f"HTTP {e.code} {e.reason}"
             if e.code == 429:
-                wait = 15 + attempt * 10
-                print(f"  [lore] rate-limited, waiting {wait}s", flush=True)
-                time.sleep(wait)
+                time.sleep(15 + attempt * 10)
             else:
-                # 5xx transient
-                time.sleep(5 + attempt * 5)
+                time.sleep(3 + attempt * 3)
         except Exception as e:
             last_err = f"{type(e).__name__}: {e}"
             time.sleep(3 + attempt * 3)
@@ -65,108 +64,89 @@ def _http_get_json(url, timeout=60, retries=3):
     return None
 
 
+# ---------------- Fetch helpers ----------------
+def _fetch_paginated(url_base, max_pages):
+    """Walk a paginated patchwork endpoint, newest first. Returns list."""
+    out = []
+    for page in range(1, max_pages + 1):
+        sep = "&" if "?" in url_base else "?"
+        url = f"{url_base}{sep}page={page}"
+        data = _http_get_json(url)
+        if not data or not isinstance(data, list) or len(data) == 0:
+            break
+        out.extend(data)
+        time.sleep(0.5)
+    return out
+
+
+def fetch_in_review_submissions():
+    """Pull recent submissions across all in-review states."""
+    url = f"{PATCHWORK_API}?project={NETDEV_PROJECT}&order=-id"
+    return _fetch_paginated(url, MAX_INREVIEW_PAGES)
+
+
+def fetch_accepted_merges():
+    """Pull recent accepted patches (these are merged)."""
+    url = f"{PATCHWORK_API}?project={NETDEV_PROJECT}&state={STATE_MERGED}&order=-id"
+    return _fetch_paginated(url, MAX_MERGED_PAGES)
+
+
+# ---------------- Date filter ----------------
 def _safe_parse_date(date_str):
-    """Parse patchwork 'date' (ISO 8601, may be in the future due to bad header)."""
     if not date_str or not isinstance(date_str, str):
         return None
     try:
-        # Patchwork dates end without tz; assume UTC.
         return datetime.strptime(date_str[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
     except Exception:
         return None
 
 
-def _is_recent_enough(date_obj, day_start_utc, day_end_utc, now_utc):
-    """Filter: keep patches whose date falls within [day_start_utc, day_end_utc].
+def _is_in_day(date_str, target_date_str):
+    """Check whether date_str (patchwork 'date') is on target_date_str.
 
-    Also handles the patchwork oddity where some legacy patches have
-    far-future Date headers (e.g. 2085). For those, if they appear near
-    the end of the page list we still want them - so we treat a future
-    date as "very old / unknown" and drop it.
+    Patchwork's 'date' field has uncertain timezone semantics (some
+    records have future dates due to bad mail headers; some look like UTC).
+    To stay correct we treat the date as wall-clock and apply a +8h Beijing
+    shift, then take the calendar day. With ±2h fuzz this gives a 24h
+    window for a single Beijing day, with up to 2h of overlap into
+    neighbors which we accept.
     """
-    if date_obj is None:
+    if not date_str or not target_date_str:
         return False
-    if date_obj > now_utc + timedelta(days=1):
-        # Far-future (patchwork anomaly) - drop.
+    dt = _safe_parse_date(date_str)
+    if dt is None:
         return False
-    return day_start_utc <= date_obj <= day_end_utc
+    bj = dt.astimezone(BEIJING_TZ)
+    return bj.strftime("%Y-%m-%d") == target_date_str
 
 
-def _is_rfc(name, prefixes):
-    name_l = (name or "").lower()
-    if "[rfc]" in name_l:
+# ---------------- Patch classification ----------------
+def _is_rfc(p):
+    """RFC tag in patchwork 'tags' dict or [RFC] in name prefix."""
+    tags = p.get("tags") or {}
+    if isinstance(tags, dict) and any("rfc" in str(k).lower() for k in tags.keys()):
         return True
-    for p in prefixes or []:
-        if "rfc" in p.lower():
+    name = p.get("name") or ""
+    if re.match(r"^\s*\[RFC\b", name, re.IGNORECASE):
+        return True
+    prefixes = p.get("prefixes") or []
+    return any("rfc" in str(p_).lower() for p_ in prefixes)
+
+
+def _has_series_marker(p):
+    prefixes = p.get("prefixes") or []
+    for pfx in prefixes:
+        if re.match(r"^\d+/\d+$", str(pfx).strip()):
             return True
     return False
 
 
-def _has_series_marker(prefixes):
-    """A patch that's part of a series typically has '1/N', 'v2', 'PATCH net-next'."""
-    for p in prefixes or []:
-        if re.match(r"^\d+/\d+$", p.strip()):
-            return True
-        if re.match(r"^v\d+$", p.strip(), re.IGNORECASE):
-            return True
-    return False
+def _is_in_review_state(p):
+    state = p.get("state") or ""
+    return state in STATE_IN_REVIEW_STATES
 
 
-def fetch_recent_patches(project_id=NETDEV_PROJECT_ID, max_pages=PATCHWORK_MAX_PAGES):
-    """Walk patchwork by id descending, return raw patch list (newest first)."""
-    out = []
-    for page in range(1, max_pages + 1):
-        url = f"{PATCHWORK_API}?project_id={project_id}&order=-id&page={page}"
-        data = _http_get_json(url)
-        if not data:
-            break
-        if not isinstance(data, list) or len(data) == 0:
-            break
-        out.extend(data)
-        # Heuristic stop: if the oldest in this page is already well before "yesterday", bail.
-        oldest_id = data[-1].get("id", 0)
-        # Patches have monotonically increasing id; for netdev we get ~200-400 patches/day,
-        # so 4 pages (120 patches) is more than enough for a 24h window.
-        if page >= 3:
-            break
-        time.sleep(1.0)
-    return out
-
-
-def filter_by_date(patches, target_date_str):
-    """Return (in_review, merged) for patches whose date is target_date_str (Beijing).
-
-    target_date_str: 'YYYY-MM-DD' in Beijing time.
-    """
-    if not target_date_str:
-        return [], []
-    y, m, d = (int(x) for x in target_date_str.split("-"))
-    day_start_local = datetime(y, m, d, 0, 0, 0, tzinfo=BEIJING_TZ)
-    day_end_local = day_start_local + timedelta(days=1) - timedelta(seconds=1)
-    day_start_utc = day_start_local.astimezone(timezone.utc)
-    day_end_utc = day_end_local.astimezone(timezone.utc)
-    now_utc = datetime.now(timezone.utc)
-
-    in_review = []
-    merged = []
-    for p in patches:
-        state = p.get("state")
-        if state not in (STATE_IN_REVIEW, STATE_MERGED):
-            continue
-        dt = _safe_parse_date(p.get("date"))
-        if not _is_recent_enough(dt, day_start_utc, day_end_utc, now_utc):
-            # Once we exit the window, stop scanning (list is sorted -id).
-            # Only stop if we passed the window from the bottom side; we cannot
-            # easily detect that here, so do a soft pass.
-            continue
-        item = _normalize_patch(p)
-        if state == STATE_IN_REVIEW:
-            in_review.append(item)
-        else:
-            merged.append(item)
-    return in_review, merged
-
-
+# ---------------- Normalize ----------------
 def _normalize_patch(p):
     """Turn a patchwork patch dict into a flat dict for downstream processing."""
     prefixes = p.get("prefixes") or []
@@ -182,8 +162,8 @@ def _normalize_patch(p):
         "commitRef": p.get("commit_ref"),
         "version": ",".join(prefixes),
         "prefixes": prefixes,
-        "isRfc": _is_rfc(name, prefixes),
-        "isSeries": _has_series_marker(prefixes),
+        "isRfc": _is_rfc(p),
+        "isSeries": _has_series_marker(p),
         "state": p.get("state"),
         "submitter": submitter,
         "date": p.get("date"),
@@ -191,12 +171,23 @@ def _normalize_patch(p):
     }
 
 
-# -------------------- Domain gate (reuse from main module) --------------------
-# We expect passes_domain_gate / is_hard_excluded to be passed in by the caller
-# so we don't duplicate keyword lists. See fetch_papers.main().
+def _load_patch_detail(patch):
+    """Fetch full detail to get content/diff (if not already in list response)."""
+    raw = patch.get("raw") or {}
+    if raw.get("content") or raw.get("diff"):
+        return raw
+    pid = patch.get("id")
+    if not pid:
+        return raw
+    detail = _http_get_json(f"{PATCHWORK_API}{pid}/")
+    if detail:
+        patch["raw"] = detail
+        return detail
+    return raw
 
+
+# ---------------- Domain gate ----------------
 def passes_domain(patch, gate_fn, excluded_fn):
-    """Apply the same Linux kernel + network gate used for papers."""
     text = f"{patch.get('title', '')} {patch.get('summary', '')}".strip()
     if not text:
         return False
@@ -205,7 +196,7 @@ def passes_domain(patch, gate_fn, excluded_fn):
     return bool(gate_fn(patch.get("title", ""), text, source="lore.kernel.org"))
 
 
-# -------------------- LLM summarization --------------------
+# ---------------- LLM summarization ----------------
 PATCH_SUMMARY_PROMPT = """你是 Linux 内核网络补丁分析助手。阅读给定的 patch 标题与正文片段，
 判断它是否属于 Linux 内核网络子系统（TCP/IP 协议栈 / eBPF / XDP / Netfilter /
 网络驱动 / 路由网桥 / virtio-net / 网络性能优化等）。
@@ -223,27 +214,26 @@ PATCH_SUMMARY_PROMPT = """你是 Linux 内核网络补丁分析助手。阅读�
 
 
 def _format_patch_for_prompt(p):
-    """Concatenate available text fields to feed the LLM."""
     raw = p.get("raw") or {}
     title = p.get("title", "")
     parts = [f"标题：{title}"]
     prefix = p.get("version") or ""
     if prefix:
         parts.append(f"前缀：[{prefix}]")
-    # content may be huge; truncate
     content = (raw.get("content") or "").strip()
     if content:
-        parts.append(f"补丁内容（截取前 1500 字）：\n{content[:1500]}")
+        parts.append(f"补丁内容（前 1500 字）：\n{content[:1500]}")
     diff = (raw.get("diff") or "").strip()
     if diff:
-        parts.append(f"diff（截取前 1200 字）：\n{diff[:1200]}")
+        parts.append(f"diff（前 1200 字）：\n{diff[:1200]}")
     parts.append(f"提交者：{p.get('submitter', '')}")
     parts.append(f"链接：{p.get('url', '')}")
+    if p.get("commitRef"):
+        parts.append(f"合并 commit：{p['commitRef']}")
     return "\n\n".join(parts)
 
 
 def _call_minimax_summary(call_minimax_fn, prompt):
-    """Call the host's call_minimax; tolerate failures."""
     try:
         return call_minimax_fn(prompt, PATCH_SUMMARY_PROMPT, max_tokens=600)
     except Exception as e:
@@ -286,64 +276,7 @@ def _parse_summary_response(resp):
     }
 
 
-def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
-                      limit=None, delay_min=2, delay_max=4):
-    """Run LLM summary + domain gate on a list of normalized patches.
-
-    Returns a filtered list with `summary`, `tags`, `relevance`, `readingTime` filled in.
-    """
-    results = []
-    for p in patches:
-        if limit and len(results) >= limit:
-            break
-        # Fetch full content if not already loaded
-        raw = p.get("raw") or {}
-        if not raw.get("content") and p.get("id"):
-            detail = _http_get_json(f"{PATCHWORK_API}{p['id']}/")
-            if detail:
-                p["raw"] = detail
-        prompt = _format_patch_for_prompt(p)
-        if not prompt.strip():
-            continue
-        # Domain gate first (cheap)
-        # Build a quick text corpus for the gate
-        raw_now = p.get("raw") or {}
-        gate_text = f"{p.get('title', '')}\n{(raw_now.get('content') or '')[:600]}"
-        if not passes_domain({"title": p.get("title", ""), "summary": gate_text},
-                             gate_fn, excluded_fn):
-            print(f"  [lore] skip (gate) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
-            continue
-        resp = _call_minimax_summary(call_minimax_fn, prompt)
-        parsed = _parse_summary_response(resp)
-        if not parsed:
-            # Fallback: heuristic summary from the title + raw content head
-            raw_now = p.get("raw") or {}
-            fallback_text = (raw_now.get("content") or p.get("title", "")).strip()
-            if not fallback_text:
-                continue
-            parsed = {
-                "relevance": "low",
-                "summary": _chinese_fallback(p.get("title", ""), fallback_text),
-                "tags": _infer_tags_from_text(gate_text),
-                "readingTime": 3,
-            }
-        if parsed["relevance"] == "none":
-            print(f"  [lore] skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
-            continue
-        p["summary"] = parsed["summary"]
-        p["tags"] = parsed["tags"]
-        p["relevance"] = parsed["relevance"]
-        p["readingTime"] = parsed["readingTime"]
-        # Drop raw to keep JSON small
-        p.pop("raw", None)
-        results.append(p)
-        if delay_min and delay_max:
-            time.sleep(random.uniform(delay_min, delay_max))
-    return results
-
-
 def _chinese_fallback(title, content):
-    """Build a minimal Chinese summary when LLM is unavailable."""
     text = re.sub(r"\s+", " ", content or "").strip()
     if not text:
         return f"《{title}》与 Linux 内核网络相关，请参考原文获取完整信息。"
@@ -353,7 +286,6 @@ def _chinese_fallback(title, content):
     return f"《{title}》涉及 Linux 内核网络相关改动。摘要：{clipped}"
 
 
-# Tag inference fallback (subset; the main script has a richer table).
 _LORE_TAG_HINTS = {
     "ebpf": "eBPF", "bpf": "eBPF",
     "xdp": "XDP", "af_xdp": "XDP",
@@ -384,9 +316,51 @@ def _infer_tags_from_text(text, max_tags=3):
     return out
 
 
-# -------------------- Writer --------------------
+def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
+                      limit=None, delay_min=2, delay_max=4):
+    """Run LLM summary + domain gate on a list of normalized patches."""
+    results = []
+    for p in patches:
+        if limit and len(results) >= limit:
+            break
+        # Fetch full content if not already loaded
+        _load_patch_detail(p)
+        raw = p.get("raw") or {}
+        gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
+        if not passes_domain({"title": p.get("title", ""), "summary": gate_text},
+                             gate_fn, excluded_fn):
+            print(f"  [lore] skip (gate) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
+            continue
+        prompt = _format_patch_for_prompt(p)
+        resp = _call_minimax_summary(call_minimax_fn, prompt)
+        parsed = _parse_summary_response(resp)
+        if not parsed:
+            fallback_text = (raw.get("content") or p.get("title", "")).strip()
+            if not fallback_text:
+                continue
+            parsed = {
+                "relevance": "low",
+                "summary": _chinese_fallback(p.get("title", ""), fallback_text),
+                "tags": _infer_tags_from_text(gate_text),
+                "readingTime": 3,
+            }
+        if parsed["relevance"] == "none":
+            print(f"  [lore] skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
+            continue
+        p["summary"] = parsed["summary"]
+        p["tags"] = parsed["tags"]
+        p["relevance"] = parsed["relevance"]
+        p["readingTime"] = parsed["readingTime"]
+        # Drop raw to keep JSON small
+        p.pop("raw", None)
+        results.append(p)
+        if delay_min and delay_max:
+            time.sleep(random.uniform(delay_min, delay_max))
+    return results
+
+
+# ---------------- Writer ----------------
 def write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at):
-    """Write docs/<date>.patches.json; returns the path."""
     os.makedirs(docs_dir, exist_ok=True)
     rfc_count = sum(1 for p in in_review if p.get("isRfc"))
     payload = {
@@ -406,20 +380,31 @@ def write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)
     return out_path
 
 
+# ---------------- Top-level ----------------
 def run(docs_dir, target_date_str, *,
         call_minimax_fn, gate_fn, excluded_fn,
         max_in_review=DEFAULT_MAX_INREVIEW, max_merged=DEFAULT_MAX_MERGED,
         delay_min=2, delay_max=4):
-    """Top-level entry point used by fetch_papers.main()."""
-    print(f"[lore] fetching netdev patches for {target_date_str}", flush=True)
-    raw = fetch_recent_patches()
-    print(f"[lore]   raw pages fetched: {len(raw)} patches", flush=True)
-    in_review, merged = filter_by_date(raw, target_date_str)
-    print(f"[lore]   in day window: inReview={len(in_review)} merged={len(merged)}", flush=True)
+    print(f"[lore] fetching netdevbpf patches for {target_date_str}", flush=True)
 
-    in_review = summarize_patches(call_minimax_fn, in_review, gate_fn, excluded_fn,
+    # 1. In-review submissions: filter by Beijing "yesterday" date
+    in_review_raw = fetch_in_review_submissions()
+    in_review_raw = [p for p in in_review_raw if _is_in_review_state(p)]
+    in_review_raw = [p for p in in_review_raw if _is_in_day(p.get("date"), target_date_str)]
+    print(f"[lore]   in-review submissions on {target_date_str}: {len(in_review_raw)}", flush=True)
+
+    # 2. Merged (accepted): the date in patchwork is submission time, not merge time.
+    #    We simply take the most recent accepted set and present them as the
+    #    "recently merged" feed (capped).
+    merged_raw = fetch_accepted_merges()
+    print(f"[lore]   total accepted fetched: {len(merged_raw)}", flush=True)
+
+    in_review_normalized = [_normalize_patch(p) for p in in_review_raw]
+    merged_normalized = [_normalize_patch(p) for p in merged_raw]
+
+    in_review = summarize_patches(call_minimax_fn, in_review_normalized, gate_fn, excluded_fn,
                                   limit=max_in_review, delay_min=delay_min, delay_max=delay_max)
-    merged = summarize_patches(call_minimax_fn, merged, gate_fn, excluded_fn,
+    merged = summarize_patches(call_minimax_fn, merged_normalized, gate_fn, excluded_fn,
                                limit=max_merged, delay_min=delay_min, delay_max=delay_max)
 
     fetched_at = datetime.now(BEIJING_TZ).strftime("%Y-%m-%dT%H:%M:%S%z")
