@@ -170,6 +170,12 @@
             box-shadow: var(--shadow-sm);
         }
 
+        .content-shell {
+            width: 100%;
+            max-width: 1160px;
+            margin: 0 auto;
+        }
+
         .content-hero h2 {
             font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
             font-size: 18px;
@@ -1543,6 +1549,7 @@
         </div>
 
         <section id="contentView" class="page-view" hidden>
+            <div class="content-shell">
             <section class="content-hero" aria-label="论文与 LWN 概览">
                 <h2><i class="fa-solid fa-layer-group" aria-hidden="true"></i>论文 + LWN</h2>
                 <p>聚合最近 7 天的精选论文与 LWN 免费资讯，按相关性与标签快速扫读。</p>
@@ -1630,6 +1637,7 @@
                     <span id="dataStatusRange">-</span>
                 </div>
             </section>
+            </div>
         </section>
 
         <footer>
