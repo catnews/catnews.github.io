@@ -286,13 +286,32 @@
         .patch-title a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
 
         .patch-summary {
-            font-size: 12.5px;
+            font-size: 13px;
             color: var(--color-text-2);
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        .patch-summary-shell {
+            margin-top: 8px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #dbe7f1;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+        }
+
+        .patch-summary-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 6px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0f766e;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
         }
 
         .patch-meta {
@@ -1760,6 +1779,10 @@
             const textEl = document.createElement('div');
             textEl.className = className;
             textEl.textContent = text;
+            textEl.style.display = '-webkit-box';
+            textEl.style.webkitBoxOrient = 'vertical';
+            textEl.style.webkitLineClamp = String(lines);
+            textEl.style.overflow = 'hidden';
             wrapper.appendChild(textEl);
 
             requestAnimationFrame(() => {
@@ -1772,6 +1795,16 @@
                     btn.addEventListener('click', () => {
                         expanded = !expanded;
                         textEl.classList.toggle('expanded', expanded);
+                        if (expanded) {
+                            textEl.style.display = 'block';
+                            textEl.style.webkitLineClamp = 'unset';
+                            textEl.style.overflow = 'visible';
+                        } else {
+                            textEl.style.display = '-webkit-box';
+                            textEl.style.webkitBoxOrient = 'vertical';
+                            textEl.style.webkitLineClamp = String(lines);
+                            textEl.style.overflow = 'hidden';
+                        }
                         btn.innerHTML = expanded
                             ? '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i> 收起'
                             : '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开';
@@ -2251,10 +2284,13 @@
                 card.appendChild(titleDiv);
 
                 if (p.summary) {
-                    const sum = document.createElement('div');
-                    sum.className = 'patch-summary';
-                    sum.textContent = p.summary;
-                    card.appendChild(sum);
+                    const sumWrap = buildExpandableText(p.summary, { lines: 4, className: 'patch-summary' });
+                    sumWrap.className = 'patch-summary-shell';
+                    const label = document.createElement('div');
+                    label.className = 'patch-summary-label';
+                    label.innerHTML = '<i class="fa-solid fa-bolt" aria-hidden="true"></i> 重点摘要';
+                    sumWrap.prepend(label);
+                    card.appendChild(sumWrap);
                 }
 
                 const meta = document.createElement('div');
