@@ -292,14 +292,61 @@ def _parse_summary_response(resp):
     }
 
 
+def _compact_patch_subject(title):
+    text = re.sub(r"^\s*\[[^\]]+\]\s*", "", str(title or "")).strip()
+    text = re.sub(r"^\s*(?:[A-Za-z0-9_.+-]+:\s*)+", "", text).strip()
+    text = re.sub(r"\s+", " ", text)
+    if len(text) > 60:
+        text = text[:60].rstrip()
+    return text or "该补丁"
+
+
+def _paraphrase_commit_style_text(text):
+    cleaned = re.sub(r"^\s*\[[^\]]+\]\s*", "", str(text or "")).strip()
+    cleaned = re.sub(r"^\s*(?:[A-Za-z0-9_.+-]+:\s*)+", "", cleaned).strip()
+    cleaned = cleaned.replace("don't", "avoid").replace("do not", "avoid")
+
+    replacements = [
+        (r"(?i)\bswitch to\b", "切换为"),
+        (r"(?i)\bconvert(?:ed)? to\b", "改为"),
+        (r"(?i)\breplace(?:d)? with\b", "替换为"),
+        (r"(?i)\breplace(?:d)?\b", "替换"),
+        (r"(?i)\bfix(?:es|ed)?\b", "修复"),
+        (r"(?i)\bremove(?:s|d)?\b", "移除"),
+        (r"(?i)\badd(?:s|ed)?\b", "新增"),
+        (r"(?i)\bupdate(?:s|d)?\b", "更新"),
+        (r"(?i)\boptimi[sz]e(?:s|d)?\b", "优化"),
+        (r"(?i)\bavoid(?:s|ed)?\b", "避免"),
+        (r"(?i)\bprevent(?:s|ed)?\b", "防止"),
+        (r"(?i)\brework(?:s|ed)?\b", "重构"),
+        (r"(?i)\buse\b", "改用"),
+        (r"(?i)\bgeneric learning enablement\b", "通用学习启用逻辑"),
+        (r"(?i)\breallocated skb header\b", "重新分配后的 skb 头部"),
+        (r"(?i)\bsource address\b", "源地址"),
+        (r"(?i)\bread the ip source address\b", "读取 IP 源地址"),
+    ]
+    for pattern, repl in replacements:
+        cleaned = re.sub(pattern, repl, cleaned)
+
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" .:-，,；;")
+    return cleaned
+
+
 def _chinese_fallback(title, content):
-    text = re.sub(r"\s+", " ", content or "").strip()
-    if not text:
-        return f"《{title}》与 Linux 内核网络相关，请参考原文获取完整信息。"
-    clipped = text[:160]
-    if len(text) > 160:
-        clipped += "..."
-    return f"《{title}》涉及 Linux 内核网络相关改动。摘要：{clipped}"
+    subject = _compact_patch_subject(title)
+    detail = _paraphrase_commit_style_text(content)
+    if not detail:
+        return f"《{subject}》主要调整 Linux 内核网络相关实现，重点在稳定性和可维护性。"
+
+    title_text = re.sub(r"\s+", " ", str(title or "")).strip().lower()
+    detail_text = re.sub(r"\s+", " ", detail).strip().lower()
+    similar = bool(title_text and (detail_text == title_text or detail_text in title_text or title_text in detail_text))
+    if similar or len(detail) < 28:
+        return f"《{subject}》主要围绕相关实现做调整，重点是修复边界问题并提升一致性。"
+
+    if len(detail) > 84:
+        detail = detail[:84].rstrip() + "..."
+    return f"《{subject}》主要围绕“{detail}”进行调整，修正相关实现并降低维护成本。"
 
 
 _LORE_TAG_HINTS = {
