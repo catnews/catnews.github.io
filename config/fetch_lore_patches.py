@@ -32,9 +32,9 @@ PAGE_SIZE = 30
 # Safety cap on pages; the early-stop below usually bails much earlier
 # (typically around page 9 for a busy day).
 MAX_INREVIEW_PAGES = 20
-MAX_MERGED_PAGES = 6
+MAX_MERGED_PAGES = 10
 DEFAULT_MAX_INREVIEW = 24  # cap LLM calls for in-review
-DEFAULT_MAX_MERGED = 12
+DEFAULT_MAX_MERGED = None  # Keep merged feed complete; page fetch already bounds scope.
 STATE_MERGED = "accepted"
 STATE_IN_REVIEW_STATES = {"new", "changes-requested", "superseded", "rfc"}
 
@@ -75,6 +75,7 @@ def _fetch_paginated(url_base, max_pages, stop_date_utc=None):
     Returns a list of patch dicts.
     """
     out = []
+    hit_page_cap = False
     for page in range(1, max_pages + 1):
         sep = "&" if "?" in url_base else "?"
         url = f"{url_base}{sep}page={page}"
@@ -88,8 +89,10 @@ def _fetch_paginated(url_base, max_pages, stop_date_utc=None):
             last_date = (data[-1].get("date") or "")[:19]
             if last_date and last_date < stop_date_utc:
                 break
+        if page == max_pages:
+            hit_page_cap = True
         time.sleep(0.5)
-    return out
+    return out, hit_page_cap
 
 
 def fetch_in_review_submissions(stop_date_utc=None):
@@ -412,7 +415,7 @@ def write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)
 # ---------------- Top-level ----------------
 def run(docs_dir, target_date_str, *,
         call_minimax_fn, gate_fn, excluded_fn,
-        max_in_review=80, max_merged=30, llm_budget_per_side=8,
+        max_in_review=80, max_merged=DEFAULT_MAX_MERGED, llm_budget_per_side=8,
         delay_min=2, delay_max=4):
     print(f"[lore] fetching netdevbpf patches for {target_date_str}", flush=True)
 
@@ -423,7 +426,7 @@ def run(docs_dir, target_date_str, *,
     stop_utc = day_start_bj.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
     # 1. In-review submissions: filter by Beijing "yesterday" date
-    in_review_raw = fetch_in_review_submissions(stop_date_utc=stop_utc)
+    in_review_raw, in_review_hit_cap = fetch_in_review_submissions(stop_date_utc=stop_utc)
     in_review_raw = [p for p in in_review_raw if _is_in_review_state(p)]
     in_review_raw = [p for p in in_review_raw if _is_in_day(p.get("date"), target_date_str)]
     print(f"[lore]   in-review submissions on {target_date_str}: {len(in_review_raw)}", flush=True)
@@ -434,8 +437,12 @@ def run(docs_dir, target_date_str, *,
     #    users see accepted commits that landed in the last few days, not
     #    only those submitted in the target day.
     merged_stop_utc = (day_start_bj - timedelta(days=5)).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
-    merged_raw = fetch_accepted_merges(stop_date_utc=merged_stop_utc)
+    merged_raw, merged_hit_cap = fetch_accepted_merges(stop_date_utc=merged_stop_utc)
     print(f"[lore]   total accepted fetched: {len(merged_raw)}", flush=True)
+    if in_review_hit_cap:
+        print(f"[lore]   warning: in-review fetch hit page cap ({MAX_INREVIEW_PAGES} pages)", flush=True)
+    if merged_hit_cap:
+        print(f"[lore]   warning: merged fetch hit page cap ({MAX_MERGED_PAGES} pages)", flush=True)
 
     in_review_normalized = [_normalize_patch(p) for p in in_review_raw]
     merged_normalized = [_normalize_patch(p) for p in merged_raw]
