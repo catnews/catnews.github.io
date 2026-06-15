@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-15",
+  "categories": {
+    "papers": [
+      {
+        "title": "Functional Networking for Millions of Docker Desktops (Experience Report)",
+        "url": "https://www.semanticscholar.org/paper/4a56411471d7b791f74ed366758ba6086e56d2d2",
+        "summary": "该论文是Docker Desktop的经验报告，介绍其十年间如何在Mac和Windows非Linux主机上通过虚拟化结合OCaml unikernel实现Linux容器的无缝运行体验。重点涉及Docker Desktop在非Linux平台上的网络功能实现，包括虚拟机与宿主机之间的网络桥接、容器网络配置等。论文从实践角度回顾了大规模分发中遇到的网络挑战和解决方案，但内容主要聚焦于用户态OCaml网络栈与虚拟化层面的工程实践，而非Linux内核网络子系统的内部机制（如eBPF、Netfilter、Veth等）。对关注容器网络的用户有参考价值，但与Linux内核网络开发的直接关联有限。",
+        "summary_en": "Docker is a developer tool used by millions of developers to build, share and run software stacks. The Docker Desktop clients for Mac and Windows have...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "容器网络",
+          "Docker",
+          "虚拟化",
+          "用户体验"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 1
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "容器网络": 1,
+    "Docker": 1,
+    "虚拟化": 1,
+    "用户体验": 1
+  }
+}
