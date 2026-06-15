@@ -90,6 +90,99 @@
             padding: 20px;
         }
 
+        .main-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 0 0 14px;
+            padding: 6px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 12px;
+            z-index: 20;
+        }
+
+        .main-tab {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font: inherit;
+            font-weight: 700;
+            color: var(--color-text-2);
+            background: transparent;
+            cursor: pointer;
+            transition: background-color var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .main-tab:hover {
+            background: rgba(15, 118, 110, 0.07);
+            color: var(--color-accent-2);
+        }
+
+        .main-tab.active {
+            background: linear-gradient(180deg, #0f766e 0%, #115e59 100%);
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+        }
+
+        .main-tab:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
+        .main-tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 7px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .main-tab:not(.active) .main-tab-count {
+            background: rgba(148, 163, 184, 0.16);
+            color: var(--color-text-3);
+        }
+
+        .page-view[hidden] {
+            display: none !important;
+        }
+
+        .content-hero {
+            margin: 0 0 14px;
+            padding: 16px 18px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(248,250,252,0.96));
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-hero h2 {
+            font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+            font-size: 18px;
+            margin-bottom: 4px;
+            color: var(--color-text);
+        }
+
+        .content-hero p {
+            color: var(--color-text-3);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
         .layout {
             display: flex;
             gap: 20px;
@@ -1409,116 +1502,134 @@
             </div>
         </header>
 
-        <section class="patches-section" id="patchesSection" aria-label="昨日 netdev 补丁">
-            <div class="patches-header">
-                <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>昨日 netdev 补丁 <span id="patchesDate" class="meta-pill" style="font-weight:500;font-size:12px;">-</span></h2>
-                <div class="patches-summary" id="patchesSummary" aria-live="polite">
-                    <span class="pill"><i class="fa-regular fa-eye" aria-hidden="true"></i> 审查中 <strong id="patchesInReview">-</strong></span>
-                    <span class="pill rfc"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i> RFC <strong id="patchesRfc">-</strong></span>
-                    <span class="pill merged"><i class="fa-solid fa-code-merge" aria-hidden="true"></i> 已合并 <strong id="patchesMerged">-</strong></span>
-                </div>
-            </div>
-            <div class="patches-note">来源：patchwork.kernel.org/project/netdevbpf/（Netdev + BPF 邮件列表）。审查中包含带 [RFC] 标签的设计提案；已合并为 maintainer 树接受的 commit。AI 总结每个 patch 的核心改动。</div>
-            <div class="patches-cols">
-                <div class="patches-col" id="patchesInReviewCol">
-                    <div class="patches-col-title"><i class="fa-regular fa-eye" aria-hidden="true"></i>审查中（含 RFC）</div>
-                    <div class="list" id="patchesInReviewList"></div>
-                    <div class="empty-message" id="patchesInReviewEmpty" style="display:none;">昨日无新增审查 patch</div>
-                </div>
-                <div class="patches-col merged" id="patchesMergedCol">
-                    <div class="patches-col-title"><i class="fa-solid fa-code-merge" aria-hidden="true"></i>已合并到 maintainer 树</div>
-                    <div class="list" id="patchesMergedList"></div>
-                    <div class="empty-message" id="patchesMergedEmpty" style="display:none;">昨日无 accepted 记录</div>
-                </div>
-            </div>
-            <div class="patches-more-row" id="patchesMoreRow" style="display:none;">
-                <button id="patchesMoreBtn" class="clear-filter" type="button">
-                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表
-                </button>
-            </div>
-        </section>
-
-        <div class="kpi-strip" id="kpiStrip" aria-label="近 7 天内容概览">
-            <div class="kpi">
-                <span class="kpi-icon"><i class="fa-solid fa-flask" aria-hidden="true"></i></span>
-                <div class="kpi-body">
-                    <span class="kpi-value" id="kpiPapers">-</span>
-                    <span class="kpi-label">7 天精选论文</span>
-                </div>
-            </div>
-            <div class="kpi">
-                <span class="kpi-icon warning"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
-                <div class="kpi-body">
-                    <span class="kpi-value" id="kpiNews">-</span>
-                    <span class="kpi-label">7 天 LWN 资讯</span>
-                </div>
-            </div>
-            <div class="kpi">
-                <span class="kpi-icon success"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>
-                <div class="kpi-body">
-                    <span class="kpi-value" id="kpiHighMatch">-</span>
-                    <span class="kpi-label">标签出现次数</span>
-                </div>
-            </div>
-            <div class="kpi">
-                <span class="kpi-icon info"><i class="fa-solid fa-tags" aria-hidden="true"></i></span>
-                <div class="kpi-body">
-                    <span class="kpi-value" id="kpiTags">-</span>
-                    <span class="kpi-label">活跃标签数</span>
-                </div>
-            </div>
+        <div class="main-tabs" role="tablist" aria-label="主内容切换">
+            <button id="mainTabPatches" class="main-tab active" type="button" role="tab" aria-selected="true" aria-controls="patchView">
+                <span>昨日 netdev 补丁</span><span id="mainTabPatchesCount" class="main-tab-count">-</span>
+            </button>
+            <button id="mainTabContent" class="main-tab" type="button" role="tab" aria-selected="false" aria-controls="contentView">
+                <span>论文 + LWN</span><span id="mainTabContentCount" class="main-tab-count">-</span>
+            </button>
         </div>
 
-        <div class="insights-row" id="insightsRow" aria-label="趋势与来源">
-            <div class="insight-panel">
-                <div class="insight-title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>最近 7 天收录趋势</div>
-                <div class="trend-bars" id="trendBars" aria-hidden="true"></div>
-            </div>
-            <div class="insight-panel">
-                <div class="insight-title"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>来源分布（7 天）</div>
-                <div class="source-bars" id="sourceBars">
-                    <div class="loading" style="padding: 12px 0;">加载中…</div>
+        <section id="patchView" class="page-view">
+            <section class="patches-section" id="patchesSection" aria-label="昨日 netdev 补丁">
+                <div class="patches-header">
+                    <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>昨日 netdev 补丁 <span id="patchesDate" class="meta-pill" style="font-weight:500;font-size:12px;">-</span></h2>
+                    <div class="patches-summary" id="patchesSummary" aria-live="polite">
+                        <span class="pill"><i class="fa-regular fa-eye" aria-hidden="true"></i> 审查中 <strong id="patchesInReview">-</strong></span>
+                        <span class="pill rfc"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i> RFC <strong id="patchesRfc">-</strong></span>
+                        <span class="pill merged"><i class="fa-solid fa-code-merge" aria-hidden="true"></i> 已合并 <strong id="patchesMerged">-</strong></span>
+                    </div>
                 </div>
-            </div>
+                <div class="patches-note">来源：patchwork.kernel.org/project/netdevbpf/（Netdev + BPF 邮件列表）。审查中包含带 [RFC] 标签的设计提案；已合并为 maintainer 树接受的 commit。AI 总结每个 patch 的核心改动。</div>
+                <div class="patches-cols">
+                    <div class="patches-col" id="patchesInReviewCol">
+                        <div class="patches-col-title"><i class="fa-regular fa-eye" aria-hidden="true"></i>审查中（含 RFC）</div>
+                        <div class="list" id="patchesInReviewList"></div>
+                        <div class="empty-message" id="patchesInReviewEmpty" style="display:none;">昨日无新增审查 patch</div>
+                    </div>
+                    <div class="patches-col merged" id="patchesMergedCol">
+                        <div class="patches-col-title"><i class="fa-solid fa-code-merge" aria-hidden="true"></i>已合并到 maintainer 树</div>
+                        <div class="list" id="patchesMergedList"></div>
+                        <div class="empty-message" id="patchesMergedEmpty" style="display:none;">昨日无 accepted 记录</div>
+                    </div>
+                </div>
+                <div class="patches-more-row" id="patchesMoreRow" style="display:none;">
+                    <button id="patchesMoreBtn" class="clear-filter" type="button">
+                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表
+                    </button>
+                </div>
+            </section>
         </div>
 
-        <section class="highlights-grid" id="topHighlights" aria-label="精选高亮区">
-            <section class="category-section highlight-panel lwn-panel" id="lwnHighlights">
-                <h2 class="category-title"><span class="title-main"><i class="fa-regular fa-newspaper" aria-hidden="true"></i>LWN 最新免费资讯</span><span class="item-count" id="lwnCount">加载中...</span></h2>
-                <div class="weekly-note">聚合最近 7 天已抓取的 LWN 免费文章，展示当期全部可读内容与 AI 中文总结。</div>
-                <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+        <section id="contentView" class="page-view" hidden>
+            <section class="content-hero" aria-label="论文与 LWN 概览">
+                <h2><i class="fa-solid fa-layer-group" aria-hidden="true"></i>论文 + LWN</h2>
+                <p>聚合最近 7 天的精选论文与 LWN 免费资讯，按相关性与标签快速扫读。</p>
             </section>
 
-            <section class="category-section highlight-panel papers-panel" id="weeklyPicks">
-                <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-flask" aria-hidden="true"></i>本周精选论文</span><span class="item-count" id="weeklyCount">加载中...</span></h2>
-                <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
-                <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+            <div class="kpi-strip" id="kpiStrip" aria-label="近 7 天内容概览">
+                <div class="kpi">
+                    <span class="kpi-icon"><i class="fa-solid fa-flask" aria-hidden="true"></i></span>
+                    <div class="kpi-body">
+                        <span class="kpi-value" id="kpiPapers">-</span>
+                        <span class="kpi-label">7 天精选论文</span>
+                    </div>
+                </div>
+                <div class="kpi">
+                    <span class="kpi-icon warning"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
+                    <div class="kpi-body">
+                        <span class="kpi-value" id="kpiNews">-</span>
+                        <span class="kpi-label">7 天 LWN 资讯</span>
+                    </div>
+                </div>
+                <div class="kpi">
+                    <span class="kpi-icon success"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>
+                    <div class="kpi-body">
+                        <span class="kpi-value" id="kpiHighMatch">-</span>
+                        <span class="kpi-label">标签出现次数</span>
+                    </div>
+                </div>
+                <div class="kpi">
+                    <span class="kpi-icon info"><i class="fa-solid fa-tags" aria-hidden="true"></i></span>
+                    <div class="kpi-body">
+                        <span class="kpi-value" id="kpiTags">-</span>
+                        <span class="kpi-label">活跃标签数</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insights-row" id="insightsRow" aria-label="趋势与来源">
+                <div class="insight-panel">
+                    <div class="insight-title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>最近 7 天收录趋势</div>
+                    <div class="trend-bars" id="trendBars" aria-hidden="true"></div>
+                </div>
+                <div class="insight-panel">
+                    <div class="insight-title"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>来源分布（7 天）</div>
+                    <div class="source-bars" id="sourceBars">
+                        <div class="loading" style="padding: 12px 0;">加载中…</div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="highlights-grid" id="topHighlights" aria-label="精选高亮区">
+                <section class="category-section highlight-panel lwn-panel" id="lwnHighlights">
+                    <h2 class="category-title"><span class="title-main"><i class="fa-regular fa-newspaper" aria-hidden="true"></i>LWN 最新免费资讯</span><span class="item-count" id="lwnCount">加载中...</span></h2>
+                    <div class="weekly-note">聚合最近 7 天已抓取的 LWN 免费文章，展示当期全部可读内容与 AI 中文总结。</div>
+                    <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+                </section>
+
+                <section class="category-section highlight-panel papers-panel" id="weeklyPicks">
+                    <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-flask" aria-hidden="true"></i>本周精选论文</span><span class="item-count" id="weeklyCount">加载中...</span></h2>
+                    <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
+                    <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+                </section>
             </section>
-        </section>
 
-        <section class="tag-cloud-section" aria-label="全量标签">
-            <div class="tag-cloud-header">
-                <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-tags" aria-hidden="true"></i>全量标签</span><span class="item-count" id="topTagsCount">-</span></h2>
-                <button id="clearFilterBtn" class="clear-filter" type="button" style="display:none;"><i class="fa-solid fa-xmark" aria-hidden="true"></i> 清除筛选</button>
-            </div>
-            <div class="tag-cloud-note">点击任意标签可在上方精选区筛选。Top 10 优先展示。</div>
-            <div class="top-tags" id="topTags" style="margin-bottom:10px;">
-                <div class="loading" style="padding:12px 0;">加载中...</div>
-            </div>
-            <div class="tag-stats" id="tagStats">
-                <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
-            </div>
-        </section>
+            <section class="tag-cloud-section" aria-label="全量标签">
+                <div class="tag-cloud-header">
+                    <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-tags" aria-hidden="true"></i>全量标签</span><span class="item-count" id="topTagsCount">-</span></h2>
+                    <button id="clearFilterBtn" class="clear-filter" type="button" style="display:none;"><i class="fa-solid fa-xmark" aria-hidden="true"></i> 清除筛选</button>
+                </div>
+                <div class="tag-cloud-note">点击任意标签可在上方精选区筛选。Top 10 优先展示。</div>
+                <div class="top-tags" id="topTags" style="margin-bottom:10px;">
+                    <div class="loading" style="padding:12px 0;">加载中...</div>
+                </div>
+                <div class="tag-stats" id="tagStats">
+                    <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+                </div>
+            </section>
 
-        <section class="data-status-bar" id="dataStatus" aria-live="polite">
-            <div class="data-status-item">
-                <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
-                <span>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN / patchwork (netdevbpf)</span>
-            </div>
-            <div class="data-status-item">
-                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                <span id="dataStatusRange">-</span>
-            </div>
+            <section class="data-status-bar" id="dataStatus" aria-live="polite">
+                <div class="data-status-item">
+                    <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+                    <span>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN / patchwork (netdevbpf)</span>
+                </div>
+                <div class="data-status-item">
+                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                    <span id="dataStatusRange">-</span>
+                </div>
+            </section>
         </section>
 
         <footer>
@@ -1538,6 +1649,7 @@
         const state = {
             selectedFilter: null,
             viewMode: 'compact',
+            mainView: 'patches',
         };
 
         const dayCache = new Map();
@@ -1610,6 +1722,30 @@
                 if (saved === 'compact' || saved === 'detail') mode = saved;
             } catch (e) { /* ignore */ }
             applyViewMode(mode);
+        }
+
+        // ---------------- Main view (patches / content) ----------------
+        const MAIN_VIEW_KEY = 'catnews.mainView';
+
+        function applyMainView(view) {
+            state.mainView = view === 'content' ? 'content' : 'patches';
+            const isPatches = state.mainView === 'patches';
+            document.getElementById('patchView').hidden = !isPatches;
+            document.getElementById('contentView').hidden = isPatches;
+            document.getElementById('mainTabPatches').classList.toggle('active', isPatches);
+            document.getElementById('mainTabContent').classList.toggle('active', !isPatches);
+            document.getElementById('mainTabPatches').setAttribute('aria-selected', isPatches ? 'true' : 'false');
+            document.getElementById('mainTabContent').setAttribute('aria-selected', isPatches ? 'false' : 'true');
+            try { localStorage.setItem(MAIN_VIEW_KEY, state.mainView); } catch (e) { /* ignore */ }
+        }
+
+        function initMainView() {
+            let view = 'patches';
+            try {
+                const saved = localStorage.getItem(MAIN_VIEW_KEY);
+                if (saved === 'patches' || saved === 'content') view = saved;
+            } catch (e) { /* ignore */ }
+            applyMainView(view);
         }
 
         // ---------------- URL routing (tag only) ----------------
@@ -2085,6 +2221,16 @@
             document.getElementById('kpiNews').textContent = String(totalLwn7d);
             document.getElementById('kpiHighMatch').textContent = String(totalTagOccurrences);
             document.getElementById('kpiTags').textContent = String(tagEntries.length);
+
+            const patchesPayload = window.__patchesPayload || null;
+            const patchTotal = patchesPayload
+                ? ((Array.isArray(patchesPayload.inReview) ? patchesPayload.inReview.length : 0)
+                    + (Array.isArray(patchesPayload.merged) ? patchesPayload.merged.length : 0))
+                : 0;
+            const patchCountEl = document.getElementById('mainTabPatchesCount');
+            const contentCountEl = document.getElementById('mainTabContentCount');
+            if (patchCountEl) patchCountEl.textContent = patchTotal ? String(patchTotal) : '-';
+            if (contentCountEl) contentCountEl.textContent = String(totalPapers7d + totalLwn7d);
         }
 
         // ---------------- Render: trend bars ----------------
@@ -2255,6 +2401,7 @@
             const ir = Array.isArray(payload.inReview) ? payload.inReview : [];
             const mg = Array.isArray(payload.merged) ? payload.merged : [];
             const rfc = ir.filter(p => p.isRfc).length;
+            window.__patchesPayload = payload;
             document.getElementById('patchesInReview').textContent = String(ir.length);
             document.getElementById('patchesRfc').textContent = String(rfc);
             document.getElementById('patchesMerged').textContent = String(mg.length);
@@ -2387,6 +2534,8 @@
         // ---------------- Event bindings ----------------
         document.getElementById('viewCompact').addEventListener('click', () => applyViewMode('compact'));
         document.getElementById('viewDetail').addEventListener('click', () => applyViewMode('detail'));
+        document.getElementById('mainTabPatches').addEventListener('click', () => applyMainView('patches'));
+        document.getElementById('mainTabContent').addEventListener('click', () => applyMainView('content'));
         document.getElementById('patchesMoreBtn').addEventListener('click', () => {
             const btn = document.getElementById('patchesMoreBtn');
             const expanded = btn.dataset.expanded === 'true';
@@ -2409,6 +2558,7 @@
         // ---------------- Init ----------------
         async function initPage() {
             initViewMode();
+            initMainView();
             state.selectedFilter = readTagFromUrl();
 
             // 预热 7 天缓存，并行拉高亮区 + 昨日补丁
