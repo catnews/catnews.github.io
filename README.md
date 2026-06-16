@@ -93,7 +93,7 @@ catnews.github.io/
 
 GitHub Actions 文件：`.github/workflows/fetch-papers.yml`
 
-- 每天 UTC `02:00`（北京时间 `10:00`）自动运行
+- 每天 UTC `21:00`（北京时间 `05:00`）自动运行
 - 支持手动触发 `workflow_dispatch`
 - 若 `docs` 目录有更新则自动提交
 
