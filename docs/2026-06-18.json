@@ -1,0 +1,43 @@
+{
+  "date": "2026-06-18",
+  "categories": {
+    "papers": [
+      {
+        "title": "Using P4 to build a DDoS stresser platform",
+        "url": "https://doi.org/10.1007/s00502-026-01431-8",
+        "summary": "这篇研究工作《Using P4 to build a DDoS stresser platform》与TCP/IP、网络优化、性能相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Using P4 to build a DDoS stresser platform Abstract This paper presents a high-p...",
+        "summary_en": "Abstract This paper presents a high-performance framework for flexible network load and DDoS attack pattern generation utilizing a P4-programmable Int...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 2
+      },
+      {
+        "title": "Anchors that Don't Lift: Understanding Supply Chain Driven Kernel Lock-In and Governance-Mediated Mitigation Strategies in SOHO Devices",
+        "url": "http://arxiv.org/abs/2606.11175v1",
+        "summary": "这篇研究工作《Anchors that Don't Lift: Understanding Supply Chain Driven Kernel Lock-In and Governance-Mediated Mitigation Strategies in SOHO Devices》与TCP/IP、Linux内核网络相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Anchors that Don't Lift: Understanding Supply Chain Driven Kernel Lock-In and Go...",
+        "summary_en": "Small Office/Home Office (SOHO) devices are widely popular, yet often attacked due to security vulnerabilities in their firmware, affecting thousands ...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "Linux内核网络"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 6
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 2,
+    "网络优化": 1,
+    "性能": 1,
+    "Linux内核网络": 1
+  }
+}
