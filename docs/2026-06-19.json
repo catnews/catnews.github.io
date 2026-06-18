@@ -1,0 +1,29 @@
+{
+  "date": "2026-06-19",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for June 11, 2026",
+        "url": "https://lwn.net/Articles/1076254/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for June 11, 2026 This edition contains the following feature content: AI agent runs amok in Fedora and elsewhere : a Fedora developer spotted suspicious contributions that seem to be from a \"rogue\" AI agent. Moving beyond fork() + exec() : an attempt to address process-creation shortcomings in the kernel. Splicing out vmsplice() : LLM-discovered vulnerabilities may lead to removal of splice() and vmsplice() . More coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : BPF loop verification with scalar evolution : an algorithm used in compilers could help the BPF verifier handle more loops. An update on fanotify : what has been merged in the last year and what is pending for the filesystem-event monitoring subsystem. Eliminating long-lived credentials with trusted publishing : a look at a method to thwart supply-chain attacks with short-lived credentials. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for suppo",
+        "summary": "这是LWN.net 2026年6月11日的周刊摘要，主要内容涉及Fedora中AI代理异常贡献、fork()+exec()进程创建机制的改进讨论，以及vmsplice()系统调用相关的LLM发现的漏洞。文章重点关注内核进程管理、安全漏洞和发行版开发，与Linux内核网络子系统无直接关联。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "周刊摘要",
+          "内核安全"
+        ],
+        "readingTime": 30,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "Linux内核网络": 1,
+    "周刊摘要": 1,
+    "内核安全": 1
+  }
+}
