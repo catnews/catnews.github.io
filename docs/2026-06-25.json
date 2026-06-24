@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-25",
+  "categories": {
+    "papers": [
+      {
+        "title": "Building a Low-cost Network Digital Twin for the IoT-Edge-Cloud Continuum Using Open-Source Tooling",
+        "url": "http://arxiv.org/abs/2606.24853v1",
+        "summary": "本文提出了一种面向IoT-边缘-云连续体的低成本网络数字孪生（NDT）框架，基于Containerlab、Open vSwitch（OVS）、ONOS控制器和Prometheus+Grafana可观测性栈等全开源工具构建。该框架允许在不影响生产环境的前提下验证网络配置和测试故障场景，涉及容器化网络仿真、SDN控制、虚拟交换等Linux网络技术。虽然核心贡献在于系统集成与运维框架设计，而非直接修改Linux内核网络栈，但OVS作为Linux内核用户态/内核态虚拟交换机是该方案的关键组件，与容器网络、SDN网络仿真场景紧密相关，对理解Linux网络生态在边缘云场景中的实际应用有一定参考价值。",
+        "summary_en": "Validating network configurations and testing failure scenarios in IoT-edge-cloud environments without disrupting live infrastructure remains an open ...",
+        "source": "arXiv",
+        "tags": [
+          "Open vSwitch",
+          "容器网络",
+          "SDN/ONOS",
+          "网络数字孪生"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 3
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "Open vSwitch": 1,
+    "容器网络": 1,
+    "SDN/ONOS": 1,
+    "网络数字孪生": 1
+  }
+}
