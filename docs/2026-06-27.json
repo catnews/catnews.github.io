@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-27",
+  "categories": {
+    "papers": [
+      {
+        "title": "Performance Evaluation of the Next-Generation Internet Protocol QUIC Against TCP: A Latency- and Throughput-Oriented Analysis",
+        "url": "https://doi.org/10.55205/joctensa.5120261897001",
+        "summary": "本文实验性地比较了QUIC协议与TCP协议在低延迟、高吞吐和网络适应性方面的性能差异。研究在受控测试环境中进行，测量不同网络条件下两种协议的表现。QUIC作为新一代传输层协议，基于UDP实现，已在Linux内核中获得原生支持（如内核中的QUIC实现提案），与内核网络栈性能优化密切相关。TCP/IP协议栈是Linux内核网络子系统的核心组成部分，该研究虽然侧重于协议层面的性能评估，但其结论对Linux内核网络协议栈的设计与优化（特别是低延迟传输、吞吐调优）具有参考价值。不过论文本身并未深入涉及Linux内核网络子系统内部机制（如Socket实现、TCP拥塞控制算法内核实现、eBPF加速等），更多是端到端的协议性能基准测试。",
+        "summary_en": "This study experimentаlly сompаres the performаnсe of the Quiсk UDP Internet Сonneсtions protoсol аnd the Trаnsmission Сontrol Protoсol in line with t...",
+        "source": "OpenAlex",
+        "tags": [
+          "QUIC",
+          "TCP性能",
+          "网络协议基准测试",
+          "传输层协议"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 6
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "QUIC": 1,
+    "TCP性能": 1,
+    "网络协议基准测试": 1,
+    "传输层协议": 1
+  }
+}
