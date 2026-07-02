@@ -1,0 +1,55 @@
+{
+  "date": "2026-07-03",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for June 25, 2026",
+        "url": "https://lwn.net/Articles/1078380/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for June 25, 2026 This edition contains the following feature content: Free-threaded Python: past, present, and future : a look at the efforts to remove Python's global interpreter lock (GIL) and what's coming next. AURpocalypse now: a look at the recent AUR attacks : Arch faces its worst onslaught of AUR package compromises yet. Fedora: 2FA, or not 2FA, that is the question : an attempt to improve Fedora's security. The first half of the 7.2 merge window : important changes coming to the next kernel release. More coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : A helper library for BPF arenas : a look at the libarena library and where it's going. Suspending and resuming BPF programs : a plan to introduce coroutines into BPF. KASAN for JIT-compiled BPF code : the kernel address sanitizer learns how to detect bugs in BPF's JIT compiler. Single-hop block replication with RMR and BRMR : a method for cloud providers to expose durable block devices with as little overhead as possible. Reports from OSPM 2026, day one : sessions from day one of the Power Management and Scheduling in the Linux Kernel (OSPM) Summit. ",
+        "summary": "本文为LWN.net 2026年6月25日周报，汇总了多篇深度报道。核心内容包括Python自由线程化（移除GIL）的演进历程：CPython核心开发者Thomas Wouters在PyCon US 2026上介绍了GIL的动机、多次移除尝试及现状。GIL保护Python对象及其引用计数以及CPython内部，但牺牲了多线程并行能力。历史上Greg Stein（1996年Python 1.4补丁）、Trent Nelson的PyParallel（2013年）、Larry Hastings的Gilectomy（2015年）等尝试均因单线程性能损耗或通用性不足而失败。最终Meta的Sam Gross在CPython 3.9的No-GIL分支上取得突破，并提出PEP 703，引入对象拥有者线程（owner thread）机制，允许其他线程以较慢路径访问对象。动机层面，线程主要解决CPU等待内存的性能问题，但共享可变数据极其复杂，而Python一切皆对象、引用计数遍布每个对象，使线程安全极具挑战。备选方案如子解释器、asyncio各有局限。周报还预告了Linux 7.2合并窗口前半段的重要变更、BPF arenas辅助库libarena、BPF协程挂起恢复、JIT编译BPF代码的KASAN检测、基于RMR/BRMR的单跳块复制、OSPM 2026峰会两日报道、Arch仓库AUR攻击事件及Fedora双因素认证讨论。",
+        "keyPoints": [
+          "LWN.net 2026年6月25日周报包含10篇主要专题报道，涵盖Python、Linux内核7.2合并窗口、BPF子系统、存储与电源管理等领域",
+          "Python自由线程化是近五年最大变革，Meta核心开发者Thomas Wouters在PyCon US 2026详解其过去、现在与未来",
+          "GIL保护Python对象引用计数及CPython内部，但不保护用户Python代码与大部分C/C++扩展，且并非最高效的多线程支持方式",
+          "线程存在的核心原因是内存访问延迟，线程可在等待内存时让CPU执行其他任务，多进程方案因开销大且地址空间不共享而逊色",
+          "GIL最初添加时多CPU系统罕见，现今手机已具备八核，GIL已严重制约多核性能利用",
+          "Greg Stein 1996年为Python 1.4提供的GIL移除补丁采用细粒度锁替代引用计数，但因单线程性能损耗过大而未成功",
+          "2013年Trent Nelson启动的PyParallel采用非OS线程模型，将引用计数与垃圾回收延迟到线程完成时执行，但无法兼容已有OS线程的代码",
+          "2015年Larry Hastings启动Gilectomy项目，探索引用计数处理新方案，几年后基本放弃但留下后续探索方向",
+          "Meta的Sam Gross在CPython 3.9的No-GIL分支上成功解决大部分GIL移除难题，并撰写PEP 703《使全局解释器锁在CPython中可选》",
+          "PEP 703引入对象拥有者线程（owner thread）机制，拥有者线程可快速访问对象及引用计数，其他线程需走较慢路径",
+          "共享可变数据在线程间极难处理，CPU缓存、预取与内存重排序使线程间可见性与顺序问题异常复杂，需要内存屏障与原子操作",
+          "Python一切皆对象且引用计数存在于每个对象中，使线程安全挑战被放大，全局加锁替代引用计数会导致50%以上的解释器性能损耗",
+          "PyDict_GetItem()返回借用引用依赖GIL保证对象在增加引用计数期间不变，无GIL时此类C API依赖将产生正确性风险",
+          "子解释器方案允许单进程内多个带独立GIL的解释器在线程中运行，但与第三方库交互尚不成熟且子解释器间缺乏高效数据复制方式",
+          "asyncio等价于绿色线程，是网络I/O场景的最佳实践，但无法满足所有性能需求，无GIL多线程方案可提供更高吞吐、更低内存与更低延迟",
+          "Linux 7.2合并窗口前半段包含重要内核变更（具体细节文章未给出）",
+          "BPF arenas引入libarena辅助库，旨在改进BPF程序内存管理机制",
+          "BPF子系统计划引入协程机制以支持BPF程序的挂起与恢复执行",
+          "KASAN（内核地址消毒器）扩展支持检测JIT编译BPF代码中的内存错误",
+          "RMR与BRMR提供面向云提供商的单跳块复制方案，以最小开销暴露持久化块设备",
+          "OSPM 2026峰会两天报道涵盖Linux内核电源管理与调度相关议题",
+          "Arch Linux AUR（Arch用户仓库）遭遇史上最严重的一波软件包供应链攻击事件",
+          "Fedora社区正在讨论是否引入双因素认证（2FA）以提升账户安全性"
+        ],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "Python",
+          "eBPF",
+          "电源管理"
+        ],
+        "readingTime": 45,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "Linux内核网络": 1,
+    "Python": 1,
+    "eBPF": 1,
+    "电源管理": 1
+  }
+}
