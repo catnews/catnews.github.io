@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-04",
+  "categories": {
+    "papers": [
+      {
+        "title": "Designing Transport-Level Encryption for Datacenter Networks",
+        "url": "https://doi.org/10.1109/sp63933.2026.00080",
+        "summary": "这篇论文提出了一种名为SMT的协议设计，用于在新兴的数据中心传输协议（如NDP和Homa）中集成传输层数据加密。SMT将基于TLS的加密机制与基于消息的传输协议相结合，在保证数据安全隔离的同时维持传输效率。该工作针对云环境下的多租户场景，解决租户间数据加密和防止网络基础设施中潜在窃听者的问题。论文涉及传输协议设计、数据中心网络优化和加密集成等方向，与底层传输协议栈设计相关，但并不直接讨论Linux内核实现或代码层面的修改，更多是从协议架构层面进行设计探索。",
+        "summary_en": "Cloud applications need network data encryption to isolate from other tenants and protect their data from potential eavesdroppers in the network infra...",
+        "source": "OpenAlex",
+        "tags": [
+          "传输协议",
+          "数据中心网络",
+          "加密协议",
+          "NDP/Homa"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 7
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "传输协议": 1,
+    "数据中心网络": 1,
+    "加密协议": 1,
+    "NDP/Homa": 1
+  }
+}
