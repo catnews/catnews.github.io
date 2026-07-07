@@ -1,0 +1,64 @@
+{
+  "date": "2026-07-08",
+  "categories": {
+    "papers": [
+      {
+        "title": "A Systematic Evaluation of MPSoC-enabled Real-Time Containers for Space Environment Applications",
+        "url": "https://openalex.org/W7167444586",
+        "summary": "本文探讨在太空/卫星环境下使用MPSoC（多处理器片上系统）实现实时容器化部署，以简化航天器软件开发和实验部署。虽然涉及容器技术，但研究重点在于太空嵌入式场景下的容器运行时隔离与实时性保障，与Linux内核网络子系统（TCP/IP协议栈、eBPF/XDP、Netfilter、容器网络CNI/netns/veth等）无直接关联。论文不涉及网络协议栈优化、容器网络通信或内核网络性能分析，属于嵌入式实时系统与容器虚拟化领域的研究。",
+        "summary_en": "In recent years, the growing number of satellites has motivated space agencies to open spacecraft software development to third parties, highlighting ...",
+        "source": "OpenAlex",
+        "tags": [
+          "容器技术",
+          "嵌入式系统",
+          "太空计算",
+          "实时系统"
+        ],
+        "readingTime": 8,
+        "relevance": "low",
+        "innovationScore": 4
+      },
+      {
+        "title": "МОДЕЛЮВАННЯ ТА ОЦІНКА ВПЛИВУ СИСТЕМ ВИЯВЛЕННЯ ВТОРГНЕНЬ НА ПРОДУКТИВНІСТЬ ІЗОЛЬОВАНИХ ІНФОРМАЦІЙНО-КОМУНІКАЦІЙНИХ СИСТЕМ",
+        "url": "https://ts.khpi.edu.ua/article/view/365913",
+        "summary": "这篇研究工作《МОДЕЛЮВАННЯ ТА ОЦІНКА ВПЛИВУ СИСТЕМ ВИЯВЛЕННЯ ВТОРГНЕНЬ НА ПРОДУКТИВНІСТЬ ІЗОЛЬОВАНИХ ІНФОРМАЦІЙНО-КОМУНІКАЦІЙНИХ СИСТЕМ》与TCP/IP、路由、驱动相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：МОДЕЛЮВАННЯ ТА ОЦІНКА ВПЛИВУ СИСТЕМ ВИЯВЛЕННЯ ВТОРГНЕНЬ НА ПРОДУКТИВНІСТЬ ІЗОЛЬО...",
+        "summary_en": "Topicality. Today’s information and communication systems (ICS) face a growing number of complex cyber threats, making active defense mechanisms absol...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "路由",
+          "驱动",
+          "包处理"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 3
+      },
+      {
+        "title": "Platonic Projection Structures: Operator-Induced Observability in Representation Learning",
+        "url": "http://arxiv.org/abs/2607.05175v1",
+        "summary": "这篇研究工作《Platonic Projection Structures: Operator-Induced Observability in Representation Learning》与TCP/IP、驱动相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Platonic Projection Structures: Operator-Induced Observability in Representation...",
+        "summary_en": "We characterize observability in representation learning through Platonic Projection Structures (PPS), an operator-theoretic framework for analyzing r...",
+        "source": "arXiv",
+        "tags": [
+          "TCP/IP",
+          "驱动"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 2
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "容器技术": 1,
+    "嵌入式系统": 1,
+    "太空计算": 1,
+    "实时系统": 1,
+    "TCP/IP": 2,
+    "路由": 1,
+    "驱动": 2,
+    "包处理": 1
+  }
+}
