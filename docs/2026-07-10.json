@@ -1,0 +1,29 @@
+{
+  "date": "2026-07-10",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for July 2, 2026",
+        "url": "https://lwn.net/Articles/1079457/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for July 2, 2026 This edition contains the following feature content: Xsnow \"protestware\" in Debian : should distributions allow software with unexpected behavior triggered by a user's locale settings? What's coming in Git 2.55 : a look at some of the interesting features in the latest Git release. Flexible metaprogramming with Rhombus : a new programming language that marries metaprogramming capabilities with a Python-like syntax. Hardening the kernel with allocation tokens and bootpatch-SLR : more efforts to make kernel bugs harder to exploit. Continued coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : Initiating writeback earlier : a discussion on whether to change when writeback is initiated and how that might be done. Efficient access to local storage for BPF programs : two approaches to improving performance for BPF programs. The rest of the 7.2 merge window : more interesting changes coming to the next kernel release. Secure Boot certificate expiration is here : what to know now that the first batch of Secure Boot certificates have expired. A look at MinIO alternatives: Ceph and Garage : two S3-compati",
+        "summary": "LWN.net每周摘要，涵盖Debian中的抗议软件讨论、Git 2.55新特性介绍以及Rhombus元编程语言等相关内容，未涉及Linux内核网络相关主题。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "LWN",
+          "Debian",
+          "Git"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "LWN": 1,
+    "Debian": 1,
+    "Git": 1
+  }
+}
