@@ -1,0 +1,30 @@
+{
+  "date": "2026-07-12",
+  "categories": {
+    "papers": [
+      {
+        "title": "Performance evaluation of TCP congestion control variants across application workloads in cloud based networks",
+        "url": "https://doi.org/10.1038/s41598-026-61100-w",
+        "summary": "本文针对云环境下TCP拥塞控制算法的性能评估问题，系统比较了CUBIC、Reno和BBR三种主流TCP变体在四种不同应用负载下的表现。这些拥塞控制算法均实现在Linux内核TCP/IP协议栈中，研究关注的延迟、吞吐量及公平性指标直接关系到Linux内核网络性能优化。通过在共享云环境中测试不同工作负载的并发运行情况，揭示了不同算法在混部场景下的优劣，为云数据中心和容器网络环境下的TCP参数调优及内核协议栈选型提供了实验依据。研究内容与Linux内核网络子系统的TCP性能调优高度相关。",
+        "summary_en": "Choosing the right Transmission Control Protocol (TCP) congestion control algorithm matters more in shared cloud environments than is often appreciate...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP拥塞控制",
+          "网络性能优化",
+          "BBR/CUBIC/Reno",
+          "云计算"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 6
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP拥塞控制": 1,
+    "网络性能优化": 1,
+    "BBR/CUBIC/Reno": 1,
+    "云计算": 1
+  }
+}
