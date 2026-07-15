@@ -1934,7 +1934,7 @@
         const state = {
             selectedFilter: null,
             viewMode: 'compact',
-            mainView: 'patches',
+            mainView: 'content',
         };
 
         const dayCache = new Map();
@@ -2019,7 +2019,7 @@
         }
 
         // ---------------- Main view (patches / content) ----------------
-        const MAIN_VIEW_KEY = 'catnews.mainView';
+        const MAIN_VIEW_KEY = 'catnews.mainView.v2';
 
         function applyMainView(view) {
             state.mainView = view === 'content' ? 'content' : 'patches';
@@ -2034,7 +2034,7 @@
         }
 
         function initMainView() {
-            let view = 'patches';
+            let view = 'content';
             try {
                 const saved = localStorage.getItem(MAIN_VIEW_KEY);
                 if (saved === 'patches' || saved === 'content') view = saved;
@@ -2364,6 +2364,7 @@
         // Module-scope cache for historical highlights (papers older than the current week).
         const HISTORY_WINDOW_DAYS = 60; // 向前回溯的天数（不含本周）
         const HISTORY_TOP_N = 20;       // 历史精选展示数量
+        const WEEKLY_TOP_N = 16;        // 本周精选展示数量，覆盖单日抓取上限
         const historicalHighlights = { papers: [] };
 
         // ---------------- Render: top highlights ----------------
@@ -2395,7 +2396,7 @@
             }
             const weeklyTop = Array.from(paperDedup.values())
                 .sort((a, b) => paperHotScore(b) - paperHotScore(a))
-                .slice(0, 8);
+                .slice(0, WEEKLY_TOP_N);
 
             const lwnDedup = new Map();
             for (const item of lwnNews) {
