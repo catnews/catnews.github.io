@@ -1,0 +1,69 @@
+{
+  "date": "2026-07-16",
+  "categories": {
+    "papers": [
+      {
+        "title": "Plug &amp; Offload: Transparently Offloading TCP Stack onto Off-path SmartNIC with PnO-TCP.",
+        "url": "https://doi.org/10.48550/arXiv.2503.22930",
+        "summary": "该工作提出PnO-TCP（Plug & Offload TCP），目标是透明地将主机侧的TCP连接处理卸载到一颗off-path SmartNIC上运行。论文背景在于传统on-path SmartNIC需要直接转发数据包，部署复杂且侵入数据面，而off-path架构将SmartNIC作为TCP状态的协处理器/卸载器，主机仍负责实际收发，但TCP连接状态机、拥塞控制、重传等热路径逻辑被搬到SmartNIC固件/软件中执行，以释放主机CPU、提升性能可预测性。核心方法强调Plug & Offload式的透明部署：不修改应用程序socket接口，不重写内核TCP，而是通过SmartNIC侧运行的TCP卸载引擎接管连接，对主机暴露与内核TCP等价的行为，从而降低落地门槛。系统设计层面需要解决主机与SmartNIC之间的连接状态同步、事件分发（收发完成通知、ACK/重传触发）以及与现有socket语义兼容等问题。读者应关注其与Linux内核TCP的兼容边界：哪些TCP语义被卸载，哪些仍由主机协议栈处理；off-path模型相对on-path DPDK/SmartNIC方案在吞吐、尾延迟和CPU占用上的权衡；以及在普通网卡环境下的可移植性和对RDMA/RoCE等并行高速路径的关系。",
+        "summary_en": "Venue: CoRR",
+        "source": "DBLP",
+        "tags": [
+          "TCP offload",
+          "SmartNIC",
+          "off-path offload",
+          "旁路"
+        ],
+        "readingTime": 12,
+        "relevance": "medium",
+        "innovationScore": 2
+      },
+      {
+        "title": "Testing the OpenvSwitch module of the Linux kernel network subsystem",
+        "url": "https://www.semanticscholar.org/paper/21167c1a29208f6a6020ccabc23c5bf8e741e12f",
+        "summary": "论文聚焦Linux内核网络子系统中OpenvSwitch（OVS）模块的安全性测试，属于ISP RAS Linux验证中心项目的一部分。背景指出Linux作为全球主流操作系统，其内核代码质量直接影响上层产品的可靠性与安全性，而当前每年新发现错误数量与未修复旧错误的累积表明现有测试手段仍不足。研究方法结合架构分析与模糊测试（fuzzing）两类手段：前者通过梳理OVS模块的内部结构、关键数据流（如datapath、flow table处理、netlink接口交互）来识别潜在攻击面与危险代码路径；后者选用业界广泛使用的syzkaller作为模糊测试工具，针对OVS内核模块的入口（特别是netlink配置面与datapath fast path）构造输入并尝试触发崩溃、内存错误等异常。评估结果显示，研究在OVS模块中发现了一个真实缺陷，该缺陷已被接受合入Linux内核主分支（mainline），证明该测试方案对内核网络子系统代码具备实际漏洞发现能力。读者应关注的是：论文侧重测试方法与流程经验而非OVS内部协议细节；所发现的单个bug虽验证了方法有效性，但OVS作为复杂的数据通路模块，仍有大量未覆盖路径（如特定action组合、tunnel处理、conntrack交互）值得后续持续模糊测试；其方法可推广至netfilter、tc等其他内核网络子系统的安全性评估。",
+        "summary_en": "This paper presents the experience of researching the security of the OpenvSwitch module of the Linux kernel network subsystem. Today Linux is one of the most popular operating systems in the world. The quality of the code of this OS (and in particular its kernel) directly affects the reliability and security of the entire range of products based on it. The international community of Linux developers is making great efforts to improve its reliability, using all kinds of testing methods and error detections. However, the number of new errors detected annually and the number of old errors that h...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "OpenvSwitch",
+          "fuzzing",
+          "syzkaller",
+          "kernel-security"
+        ],
+        "readingTime": 4,
+        "relevance": "high",
+        "innovationScore": 4
+      }
+    ],
+    "news": [
+      {
+        "title": "Cilium 1.19, Network Policy enhancements, Multi Pool IPAM goes stable, IPv6 progress, and more!",
+        "url": "https://isovalent.com/blog/post/cilium-119-ztunnel-transparent-encryption-multi-pool-ipam-goes-stable-ipv6-progress-and-more?&utm_medium=referral&utm_campaign=cilium-blog",
+        "summary": "Cilium 1.19 发布，重点改进包括：Network Policy 增强（更细粒度的 L7 策略控制、策略审计与可观测性）；Multi Pool IPAM 正式 GA，支持多 IP 池隔离 Pod IP 分配，适配 IPv4/IPv6 双栈及多租户场景；IPv6 在数据面与控制面的成熟度提升，涵盖 IPv6 策略路由、SRv6 实验性支持。该版本深度依赖 Linux 内核 eBPF/XDP/TC hook 实现数据面加速与策略执行，网络栈相关性强。多池 IPAM 对集群规模扩展、地址规划及与内核网络子系统交互有直接影响，Network Policy 增强涉及 eBPF map 状态机更新。关注点：1.19 在 eBPF 内核兼容范围（内核版本要求）、XDP 卸载到 SmartNIC 的支持变化、IPv6 策略在 Cilium eBPF datapath 下的端到端验证结果。",
+        "source": "Cilium Blog",
+        "tags": [
+          "容器网络",
+          "eBPF",
+          "Kubernetes网络",
+          "IPv6"
+        ],
+        "readingTime": 6,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "TCP offload": 1,
+    "SmartNIC": 1,
+    "off-path offload": 1,
+    "旁路": 1,
+    "OpenvSwitch": 1,
+    "fuzzing": 1,
+    "syzkaller": 1,
+    "kernel-security": 1,
+    "容器网络": 1,
+    "eBPF": 1,
+    "Kubernetes网络": 1,
+    "IPv6": 1
+  }
+}
