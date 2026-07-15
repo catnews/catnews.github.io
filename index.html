@@ -694,7 +694,7 @@
 
         .highlights-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 1fr);
             gap: 18px;
             margin-bottom: 18px;
             align-items: start;
@@ -715,7 +715,20 @@
         .highlight-panel.historical-panel {
             border-left: 2px solid var(--color-accent);
             margin-top: 0;
-            grid-column: 1 / -1;
+        }
+
+        .highlight-panel .list {
+            display: grid;
+            gap: 12px 16px;
+        }
+
+        .highlight-panel.papers-panel .list,
+        .highlight-panel.historical-panel .list {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .highlight-panel.lwn-panel .list {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         }
 
         .highlight-panel.historical-panel .title-main i {
@@ -770,6 +783,10 @@
         }
 
         .list > .card:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight-panel .list > .card {
             margin-bottom: 0;
         }
 
@@ -1521,6 +1538,14 @@
             .content-grid { grid-template-columns: 1fr; }
         }
 
+        @media (max-width: 900px) {
+            .highlight-panel.papers-panel .list,
+            .highlight-panel.historical-panel .list,
+            .highlight-panel.lwn-panel .list {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 700px) {
             .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .insights-row { grid-template-columns: 1fr; }
@@ -1879,13 +1904,13 @@
 
                 <section class="category-section highlight-panel papers-panel" id="weeklyPicks">
                     <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-flask" aria-hidden="true"></i>本周精选论文</span><span class="item-count" id="weeklyCount">加载中...</span></h2>
-                    <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
+                    <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文；桌面端采用双列卡片，减少长短栏失衡。</div>
                     <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
                 </section>
 
                 <section class="category-section highlight-panel historical-panel" id="historicalPicks" aria-label="历史精选论文">
                     <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>历史精选论文</span><span class="item-count" id="historicalCount">加载中...</span></h2>
-                    <div class="weekly-note">从更长时间窗口（≥7 天前）的论文中按相关度与热门标签评分去重，展示 Top 20，避免与本周精选重复。</div>
+                    <div class="weekly-note">从更长时间窗口（≥7 天前）的论文中按相关度与热门标签评分去重，展示 Top 20，并采用双列排列避免长列表挤压页面。</div>
                     <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
                 </section>
             </section>
