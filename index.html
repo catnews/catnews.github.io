@@ -647,6 +647,16 @@
             border-left: 3px solid var(--color-success);
         }
 
+        .highlight-panel.historical-panel {
+            border-left: 3px solid #6366f1;
+            margin-top: 16px;
+            grid-column: 1 / -1;
+        }
+
+        .highlight-panel.historical-panel .title-main i {
+            color: #6366f1;
+        }
+
         .weekly-note {
             font-size: 12.5px;
             color: var(--color-text-3);
@@ -1611,6 +1621,12 @@
                     <div class="weekly-note">基于最近 7 天内容自动聚合，优先展示匹配度高的论文。</div>
                     <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
                 </section>
+
+                <section class="category-section highlight-panel historical-panel" id="historicalPicks" aria-label="历史精选论文">
+                    <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>历史精选论文</span><span class="item-count" id="historicalCount">加载中...</span></h2>
+                    <div class="weekly-note">从更长时间窗口（≥7 天前）的论文中按相关度与热门标签评分去重，展示 Top 20，避免与本周精选重复。</div>
+                    <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+                </section>
             </section>
 
             <section class="tag-cloud-section" aria-label="全量标签">
@@ -1911,6 +1927,7 @@
             state.selectedFilter = state.selectedFilter === tag ? null : tag;
             writeTagToUrl(state.selectedFilter);
             renderTopHighlights();
+            renderHistoricalHighlights();
             renderTopTags();
         }
 
@@ -2074,6 +2091,11 @@
         // Module-scope cache for top highlights (rebuilt by loadTopHighlights, re-rendered on filter).
         const topHighlights = { lwn: [], papers: [] };
 
+        // Module-scope cache for historical highlights (papers older than the current week).
+        const HISTORY_WINDOW_DAYS = 60; // 向前回溯的天数（不含本周）
+        const HISTORY_TOP_N = 20;       // 历史精选展示数量
+        const historicalHighlights = { papers: [] };
+
         // ---------------- Render: top highlights ----------------
         async function loadTopHighlights() {
             const dateStrs = [];
@@ -2156,6 +2178,79 @@
 
             fillPanel(lwnSection, lwn, 'lwn', { showFreeTag: true, emptyLabel: 'LWN 免费资讯' });
             fillPanel(weekly, papers, 'paper', { emptyLabel: '高匹配论文' });
+        }
+
+        // ---------------- Render: historical highlights (papers older than 7 days) ----------------
+        async function loadHistoricalHighlights() {
+            // 从 day -7 起向前回溯 HISTORY_WINDOW_DAYS 天，避免与本周精选重叠。
+            const dateStrs = [];
+            for (let i = 7; i < 7 + HISTORY_WINDOW_DAYS; i++) {
+                dateStrs.push(formatDate(dateOffset(-i)));
+            }
+            const dayDatas = await loadDaysParallel(dateStrs);
+
+            const papers = [];
+            for (let i = 0; i < dayDatas.length; i++) {
+                const dayData = dayDatas[i];
+                const dateStr = dateStrs[i];
+                if (!dayData || !dayData.categories) continue;
+                const dayPapers = Array.isArray(dayData.categories.papers) ? dayData.categories.papers : [];
+                dayPapers.forEach(p => papers.push({ ...p, _date: dateStr }));
+            }
+
+            // 去重：相同标题只保留评分最高的版本
+            const dedup = new Map();
+            for (const p of papers) {
+                const key = (p.title || '').trim().toLowerCase();
+                if (!key) continue;
+                const existing = dedup.get(key);
+                if (!existing || paperHotScore(p) > paperHotScore(existing)) {
+                    dedup.set(key, p);
+                }
+            }
+
+            // 排除已在"本周精选"中的论文
+            const weeklyTitles = new Set(
+                (topHighlights.papers || [])
+                    .map(p => (p.title || '').trim().toLowerCase())
+            );
+            const historical = Array.from(dedup.values())
+                .filter(p => !weeklyTitles.has((p.title || '').trim().toLowerCase()))
+                .sort((a, b) => paperHotScore(b) - paperHotScore(a))
+                .slice(0, HISTORY_TOP_N);
+
+            historicalHighlights.papers = historical;
+            renderHistoricalHighlights();
+        }
+
+        function renderHistoricalHighlights() {
+            const panel = document.getElementById('historicalPicks');
+            if (!panel) return;
+            panel.querySelectorAll('.list, .empty-message, .loading, .weekly-note').forEach(n => n.remove());
+
+            const papers = applyFilter(historicalHighlights.papers);
+            document.getElementById('historicalCount').textContent = `共 ${papers.length} 篇`;
+
+            if (papers.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-message';
+                empty.textContent = state.selectedFilter
+                    ? `标签「${state.selectedFilter}」下无历史精选`
+                    : '历史数据暂无精选论文';
+                panel.appendChild(empty);
+                return;
+            }
+
+            const list = document.createElement('div');
+            list.className = 'list';
+            papers.forEach(item => {
+                list.appendChild(renderCard(item, {
+                    variant: 'paper',
+                    showDate: true,
+                    dateStr: item._date,
+                }));
+            });
+            panel.appendChild(list);
         }
 
         // ---------------- Render: data status ----------------
@@ -2579,6 +2674,13 @@
             renderTopTags();
             renderDataStatus();
             renderLastUpdated();
+
+            // 历史精选不阻塞首屏：异步回溯更早数据后渲染。
+            // 依赖 topHighlights.papers 已就绪以便去重排除。
+            loadHistoricalHighlights().catch((e) => {
+                console.warn('historical highlights load failed', e);
+                renderHistoricalHighlights();
+            });
         }
 
         initPage();
