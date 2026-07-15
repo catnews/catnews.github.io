@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CatNews - 每日Linux内核网络内容精选</title>
-    <meta name="description" content="CatNews 自动聚合 Linux 内核网络方向的论文、期刊与 LWN 免费资讯，每日精选与中文摘要。">
-    <meta name="keywords" content="Linux, 内核, 网络, eBPF, XDP, TCP, 论文, LWN, 内核网络">
+    <meta name="description" content="CatNews 自动聚合 Linux 内核网络方向的论文、技术动态与 netdev 补丁，每日精选与中文摘要。">
+    <meta name="keywords" content="Linux, 内核, 网络, eBPF, XDP, TCP, 论文, 技术动态, 内核网络">
     <meta name="author" content="CatNews">
     <meta name="theme-color" content="#1e3a8a">
     <meta property="og:type" content="website">
     <meta property="og:title" content="CatNews - 每日Linux内核网络内容精选">
-    <meta property="og:description" content="每日精选 Linux 内核网络方向的论文、期刊与 LWN 免费资讯。">
+    <meta property="og:description" content="每日精选 Linux 内核网络方向的论文、期刊与技术动态。">
     <meta property="og:locale" content="zh_CN">
     <meta property="og:site_name" content="CatNews">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="CatNews - 每日Linux内核网络内容精选">
-    <meta name="twitter:description" content="每日精选 Linux 内核网络方向的论文、期刊与 LWN 免费资讯。">
+    <meta name="twitter:description" content="每日精选 Linux 内核网络方向的论文、期刊与技术动态。">
     <link rel="canonical" href="./">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23131a24'/%3E%3Crect x='1' y='1' width='62' height='62' fill='none' stroke='%231e3a8a' stroke-width='1.5'/%3E%3Ctext x='32' y='30' font-family='Georgia,serif' font-size='22' font-weight='700' text-anchor='middle' fill='%23f5f5f4'%3EC%3C/text%3E%3Ctext x='32' y='50' font-family='monospace' font-size='11' text-anchor='middle' fill='%2394a3b8'%3EN%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1797,7 +1797,7 @@
     <div class="page-wrapper">
         <header>
             <h1>CatNews<span class="masthead-meta">/ Linux Kernel Networking Daily</span></h1>
-            <div class="hero-subtitle">追踪 Linux 内核网络论文、LWN 资讯、netdev 补丁与热点技术脉络</div>
+            <div class="hero-subtitle">追踪 Linux 内核网络论文、技术动态、netdev 补丁与热点技术脉络</div>
             <div class="view-toggle" role="tablist" aria-label="视图模式">
                 <button id="viewCompact" class="active" type="button" role="tab" aria-selected="true" title="紧凑视图"><i class="fa-solid fa-table-list" aria-hidden="true"></i> Compact</button>
                 <button id="viewDetail" type="button" role="tab" aria-selected="false" title="详细视图"><i class="fa-solid fa-bars" aria-hidden="true"></i> Detail</button>
@@ -1809,7 +1809,7 @@
                 <span>昨日 netdev 补丁</span><span id="mainTabPatchesCount" class="main-tab-count">-</span>
             </button>
             <button id="mainTabContent" class="main-tab" type="button" role="tab" aria-selected="false" aria-controls="contentView">
-                <span>论文 + LWN</span><span id="mainTabContentCount" class="main-tab-count">-</span>
+                <span>论文 + 动态</span><span id="mainTabContentCount" class="main-tab-count">-</span>
             </button>
         </div>
 
@@ -1846,9 +1846,9 @@
 
         <section id="contentView" class="page-view" hidden>
             <div class="content-shell">
-            <section class="content-hero" aria-label="论文与 LWN 概览">
-                <h2><i class="fa-solid fa-layer-group" aria-hidden="true"></i>论文 + LWN</h2>
-                <p>聚合最近 7 天的精选论文与 LWN 免费资讯，按相关性与标签快速扫读。</p>
+            <section class="content-hero" aria-label="论文与技术动态概览">
+                <h2><i class="fa-solid fa-layer-group" aria-hidden="true"></i>论文 + 技术动态</h2>
+                <p>聚合最近 7 天的精选论文与 Linux 网络技术动态，按相关性与标签快速扫读。</p>
             </section>
 
             <div class="kpi-strip" id="kpiStrip" aria-label="近 7 天内容概览">
@@ -1863,7 +1863,7 @@
                     <span class="kpi-icon warning"><i class="fa-regular fa-newspaper" aria-hidden="true"></i></span>
                     <div class="kpi-body">
                         <span class="kpi-value" id="kpiNews">-</span>
-                        <span class="kpi-label">7 天 LWN 资讯</span>
+                        <span class="kpi-label">7 天技术动态</span>
                     </div>
                 </div>
                 <div class="kpi">
@@ -1897,8 +1897,8 @@
 
             <section class="highlights-grid" id="topHighlights" aria-label="精选高亮区">
                 <section class="category-section highlight-panel lwn-panel" id="lwnHighlights">
-                    <h2 class="category-title"><span class="title-main"><i class="fa-regular fa-newspaper" aria-hidden="true"></i>LWN 最新免费资讯</span><span class="item-count" id="lwnCount">加载中...</span></h2>
-                    <div class="weekly-note">聚合最近 7 天已抓取的 LWN 免费文章，展示当期全部可读内容与 AI 中文总结。</div>
+                    <h2 class="category-title"><span class="title-main"><i class="fa-regular fa-newspaper" aria-hidden="true"></i>Linux 网络技术动态</span><span class="item-count" id="lwnCount">加载中...</span></h2>
+                    <div class="weekly-note">聚合少量高质量来源的 Linux 网络、eBPF/XDP、SmartNIC 与内核数据面动态，过滤泛资讯噪声。</div>
                     <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
                 </section>
 
@@ -1932,7 +1932,7 @@
             <section class="data-status-bar" id="dataStatus" aria-live="polite">
                 <div class="data-status-item">
                     <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
-                    <span>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN / patchwork (netdevbpf)</span>
+                    <span>数据源：arXiv / Semantic Scholar / OpenAlex / Crossref / DBLP / OpenReview / LWN / Cloudflare / Cilium / patchwork (netdevbpf)</span>
                 </div>
                 <div class="data-status-item">
                     <i class="fa-regular fa-calendar" aria-hidden="true"></i>
@@ -2131,9 +2131,11 @@
             return score;
         }
 
-        function isFreeLwnItem(item) {
-            if (!item || item.source !== 'LWN.net') return false;
-            if (item.access === 'paid') return false;
+        const TECH_NEWS_SOURCES = new Set(['LWN.net', 'Phoronix', 'Kernel Newbies', 'Cloudflare Blog', 'Cilium Blog']);
+
+        function isTechNewsItem(item) {
+            if (!item || !TECH_NEWS_SOURCES.has(item.source)) return false;
+            if (item.source === 'LWN.net' && item.access === 'paid') return false;
             const text = `${item.title || ''} ${item.summary || ''} ${item.summary_en || ''}`.toLowerCase();
             return !/(subscriber|subscription|paid|仅订阅|付费)/.test(text);
         }
@@ -2399,7 +2401,7 @@
             const dayDatas = await loadDaysParallel(dateStrs);
 
             const papers = [];
-            const lwnNews = [];
+            const techNews = [];
             for (let i = 0; i < dayDatas.length; i++) {
                 const dayData = dayDatas[i];
                 const dateStr = dateStrs[i];
@@ -2407,7 +2409,7 @@
                 const dayPapers = Array.isArray(dayData.categories.papers) ? dayData.categories.papers : [];
                 const dayNews = Array.isArray(dayData.categories.news) ? dayData.categories.news : [];
                 dayPapers.forEach(p => papers.push({ ...p, _date: dateStr }));
-                dayNews.filter(isFreeLwnItem).forEach(item => lwnNews.push({ ...item, _date: dateStr }));
+                dayNews.filter(isTechNewsItem).forEach(item => techNews.push({ ...item, _date: dateStr }));
             }
 
             const paperDedup = new Map();
@@ -2423,18 +2425,18 @@
                 .sort((a, b) => paperHotScore(b) - paperHotScore(a))
                 .slice(0, WEEKLY_TOP_N);
 
-            const lwnDedup = new Map();
-            for (const item of lwnNews) {
+            const newsDedup = new Map();
+            for (const item of techNews) {
                 const key = (item.title || '').trim().toLowerCase();
-                if (!key || lwnDedup.has(key)) continue;
-                lwnDedup.set(key, item);
+                if (!key || newsDedup.has(key)) continue;
+                newsDedup.set(key, item);
             }
-            const latestLwn = Array.from(lwnDedup.values())
+            const latestTechNews = Array.from(newsDedup.values())
                 .sort((a, b) => (b._date || '').localeCompare(a._date || ''))
                 .slice(0, 10);
 
             topHighlights.papers = weeklyTop;
-            topHighlights.lwn = latestLwn;
+            topHighlights.lwn = latestTechNews;
 
             renderTopHighlights();
             renderTrend();
@@ -2449,9 +2451,9 @@
             weekly.querySelectorAll('.list, .empty-message, .loading, .weekly-note').forEach(n => n.remove());
 
             const papers = applyFilter(topHighlights.papers);
-            const lwn = applyFilter(topHighlights.lwn);
+            const techNews = applyFilter(topHighlights.lwn);
 
-            document.getElementById('lwnCount').textContent = `共 ${lwn.length} 条`;
+            document.getElementById('lwnCount').textContent = `共 ${techNews.length} 条`;
             document.getElementById('weeklyCount').textContent = `共 ${papers.length} 篇`;
 
             const fillPanel = (panel, items, variant, opts) => {
@@ -2472,7 +2474,7 @@
                 panel.appendChild(list);
             };
 
-            fillPanel(lwnSection, lwn, 'lwn', { showFreeTag: true, emptyLabel: 'LWN 免费资讯' });
+            fillPanel(lwnSection, techNews, 'lwn', { showFreeTag: false, emptyLabel: '技术动态' });
             fillPanel(weekly, papers, 'paper', { emptyLabel: '高匹配论文' });
         }
 
@@ -2610,14 +2612,14 @@
         function renderKpi() {
             const { tagTotals } = aggregateWeekFromCache();
             const papers = topHighlights.papers;
-            const lwn = topHighlights.lwn;
+            const techNews = topHighlights.lwn;
             // Total unique count over 7 days (we don't dedupe here, but it's an estimate)
             const totalPapers7d = papers.length; // weeklyTop already deduped across 7 days
-            const totalLwn7d = lwn.length;
+            const totalTechNews7d = techNews.length;
             const tagEntries = Object.entries(tagTotals);
             const totalTagOccurrences = tagEntries.reduce((s, [, n]) => s + n, 0);
             document.getElementById('kpiPapers').textContent = String(totalPapers7d);
-            document.getElementById('kpiNews').textContent = String(totalLwn7d);
+            document.getElementById('kpiNews').textContent = String(totalTechNews7d);
             document.getElementById('kpiHighMatch').textContent = String(totalTagOccurrences);
             document.getElementById('kpiTags').textContent = String(tagEntries.length);
 
@@ -2629,7 +2631,7 @@
             const patchCountEl = document.getElementById('mainTabPatchesCount');
             const contentCountEl = document.getElementById('mainTabContentCount');
             if (patchCountEl) patchCountEl.textContent = patchTotal ? String(patchTotal) : '-';
-            if (contentCountEl) contentCountEl.textContent = String(totalPapers7d + totalLwn7d);
+            if (contentCountEl) contentCountEl.textContent = String(totalPapers7d + totalTechNews7d);
         }
 
         // ---------------- Render: trend bars ----------------

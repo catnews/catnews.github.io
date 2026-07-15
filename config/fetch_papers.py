@@ -340,11 +340,35 @@ NON_KERNEL_CONTEXT_KEYWORDS = [
 
 MIN_YEAR = 2020
 MAX_PAPERS = 16
-MAX_NEWS = 12
+MAX_NEWS = 10
 MAX_CANDIDATES = 80
 MIN_PAPERS_TARGET = 12
-MIN_NEWS_TARGET = 8
+MIN_NEWS_TARGET = 4
 ENABLE_NEWS = True
+
+TECH_NEWS_RSS_FEEDS = [
+    {
+        "source": "Cloudflare Blog",
+        "url": "https://blog.cloudflare.com/tag/networking/rss/",
+        "limit": 4,
+    },
+    {
+        "source": "Cilium Blog",
+        "url": "https://cilium.io/blog/rss.xml",
+        "limit": 4,
+    },
+]
+
+TECH_NEWS_STRONG_TERMS = [
+    "linux kernel", "linux network", "kernel network", "netdev", "ebpf", "bpf", "xdp",
+    "cilium", "datapath", "cubic", "bbr", "congestion control", "tcp", "quic",
+    "smartnic", "dpu", "dpdk", "rdma", "af_xdp", "napi", "qdisc", "netfilter",
+]
+
+TECH_NEWS_REQUIRED_CONTEXT = [
+    "network", "networking", "packet", "datapath", "tcp", "quic", "socket", "latency",
+    "throughput", "performance", "kernel", "linux", "ebpf", "xdp", "cilium",
+]
 
 PAPER_PROMPT = """你是 Linux 内核网络论文筛选专家。严格判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
 
@@ -365,15 +389,15 @@ PAPER_PROMPT = """你是 Linux 内核网络论文筛选专家。严格判断论�
 4. summary 必须说明论文的主要内容和关注点，按自然段覆盖：研究问题/背景、核心方法或系统设计、实验评估或结论、与 Linux 内核网络/旁路高速网络的关系、读者应关注的限制或落地点。
 5. summary 禁止使用“主要围绕某某进行调整”“实现与优化”“建议重点关注”等空泛模板；不能只翻译标题，必须从摘要中提取具体对象、机制、指标或场景。"""
 
-NEWS_PROMPT = """你是一个技术资讯筛选助手。分析文章是否与 Linux 内核网络相关。
+NEWS_PROMPT = """你是一个技术资讯筛选助手。严格分析文章是否与 Linux 内核网络、eBPF/XDP、内核网络性能、容器网络数据面、SmartNIC/DPU/DPDK/RDMA 等高速网络路径相关。
 
-相关主题：网络性能测试、内核网络更新、驱动发布、网络子系统讨论等。
-重点关注热点：容器网络（Kubernetes/CNI）和 Linux 网络性能提升。
+相关主题：Linux 网络子系统更新、网络性能优化、eBPF/XDP/Cilium 数据面、驱动/NIC/SmartNIC、内核旁路、netdev 讨论、容器网络中明确依赖内核网络能力的技术变化。
+排除：泛云产品发布、纯安全营销、通用 Kubernetes 运维、HTTP/应用层服务、与 Linux 网络栈无直接关系的公司新闻。
 
 返回JSON格式：
-{"relevance": "high/medium/low/none", "summary": "中文总结100-200字", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
+{"relevance": "high/medium/low/none", "summary": "中文总结120-240字，说明具体技术点和为什么值得关注", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
 
-注意：tags数组最多包含3-4个最重要的标签，不要过多。"""
+注意：只有明确命中 Linux 网络/eBPF/XDP/SmartNIC/DPDK/RDMA/Cilium 数据面等技术点时才给 high/medium；tags数组最多包含3-4个最重要的标签，不要过多。"""
 
 LWN_SUMMARY_PROMPT = """你是一个技术文章总结助手。请阅读LWN.net的文章内容，提取与Linux内核网络相关的重要信息。
 
@@ -572,6 +596,22 @@ def passes_domain_gate(title, abstract, source=""):
 
     # 论文类：无内核专属词一律挡下，由 LLM 再筛
     return False
+
+def passes_tech_news_gate(title, abstract, source=""):
+    merged = f"{title} {abstract}".lower()
+    if is_hard_excluded(merged):
+        return False
+    if any(keyword in merged for keyword in NON_KERNEL_CONTEXT_KEYWORDS):
+        if not any(term in merged for term in ("linux", "kernel", "ebpf", "xdp", "cilium")):
+            return False
+
+    strong_hits = sum(1 for term in TECH_NEWS_STRONG_TERMS if term in merged)
+    context_hits = sum(1 for term in TECH_NEWS_REQUIRED_CONTEXT if term in merged)
+    source_bonus = 1 if source in ("LWN.net", "Cloudflare Blog", "Cilium Blog") else 0
+    return strong_hits + source_bonus >= 2 and context_hits >= 2
+
+def passes_news_domain_gate(title, abstract, source=""):
+    return passes_domain_gate(title, abstract, source) or passes_tech_news_gate(title, abstract, source)
 
 def prioritize_items(items, content_field="abstract"):
     def score(item):
@@ -1014,6 +1054,80 @@ def strip_html_to_text(html):
     text = re.sub(r'<[^>]+>', ' ', text)
     text = html_lib.unescape(text)
     return re.sub(r'\s+', ' ', text).strip()
+
+def text_from_xml_node(node):
+    if node is None or node.text is None:
+        return ""
+    return strip_html_to_text(node.text)
+
+def find_xml_text(node, names):
+    for name in names:
+        found = node.find(name)
+        text = text_from_xml_node(found)
+        if text:
+            return text
+    for child in list(node):
+        tag = child.tag.split('}', 1)[-1].lower()
+        if tag in names:
+            text = text_from_xml_node(child)
+            if text:
+                return text
+    return ""
+
+def find_xml_link(node):
+    link = find_xml_text(node, ["link"])
+    if link:
+        return link
+    for child in list(node):
+        tag = child.tag.split('}', 1)[-1].lower()
+        if tag == "link":
+            href = child.attrib.get("href", "")
+            if href:
+                return href
+    return ""
+
+def fetch_tech_rss_news():
+    news = []
+    for feed in TECH_NEWS_RSS_FEEDS:
+        source = feed["source"]
+        try:
+            print(f"  Fetching {source}...")
+            random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+            req = urllib.request.Request(feed["url"], headers={"User-Agent": "CatNews/2.0"})
+            with urllib.request.urlopen(req, timeout=30) as response:
+                xml_text = response.read().decode("utf-8")
+
+            root = ET.fromstring(xml_text)
+            items = []
+            for node in root.iter():
+                tag = node.tag.split('}', 1)[-1].lower()
+                if tag in ("item", "entry"):
+                    items.append(node)
+
+            source_items = []
+            for item in items[: feed.get("limit", 4) * 3]:
+                title = find_xml_text(item, ["title"])
+                url = find_xml_link(item)
+                abstract = find_xml_text(item, ["description", "summary", "content", "encoded"])
+                if not abstract:
+                    abstract = title
+                if not title or not url:
+                    continue
+                if not passes_news_domain_gate(title, abstract, source):
+                    continue
+                source_items.append({
+                    "title": title,
+                    "url": url,
+                    "abstract": abstract[:1200],
+                    "source": source,
+                })
+                if len(source_items) >= feed.get("limit", 4):
+                    break
+            news.extend(source_items)
+            print(f"    Found {len(source_items)} {source} items")
+        except Exception as e:
+            print(f"{source} fetch error: {e}")
+    return news
 
 
 def extract_lwn_article_text(html):
@@ -1564,8 +1678,9 @@ def main():
     
     news_candidates = []
     if ENABLE_NEWS:
-        print("\n[Phase 4] Fetching news from LWN/Phoronix...")
+        print("\n[Phase 4] Fetching curated Linux networking tech updates...")
         news_candidates.extend(fetch_lwn_news())
+        news_candidates.extend(fetch_tech_rss_news())
         news_candidates.extend(fetch_phoronix_news())
         news_candidates.extend(fetch_kernel_newbies())
 
@@ -1590,11 +1705,13 @@ def main():
                 print("    -> excluded by hard rules")
                 continue
 
-            if not passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', '')):
+            if not passes_news_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', '')):
                 print("    -> excluded by domain gate")
                 continue
             
-            relevance = quick_filter_relevance(item['title'], item.get('abstract', item['title']))
+            relevance = heuristic_relevance(item['title'], item.get('abstract', item['title']))
+            if relevance == 'none' and passes_tech_news_gate(item['title'], item.get('abstract', item['title']), item.get('source', '')):
+                relevance = 'medium'
             print(f"    -> {relevance}")
             
             if relevance in ['high', 'medium']:
@@ -1610,7 +1727,7 @@ def main():
         for item in news_candidates[:20]:
             if item in filtered_news:
                 continue
-            if not passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', '')):
+            if not passes_news_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', '')):
                 continue
             fallback_relevance = heuristic_relevance(item['title'], item.get('abstract', item['title']))
             if fallback_relevance in ['medium', 'high']:
@@ -1708,7 +1825,7 @@ def main():
                 analysis
                 and analysis.get('relevance') in ['high', 'medium']
                 and not is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}")
-                and passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', ''))
+                and passes_news_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', ''))
             ):
                 if news_hot_score > 0:
                     stats["news_hotspot_in_final"] += 1
@@ -1728,7 +1845,7 @@ def main():
                 and analysis.get('relevance') == 'low'
                 and news_hot_score >= 2
                 and not is_hard_excluded(f"{item['title']} {item.get('abstract', item['title'])}")
-                and passes_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', ''))
+                and passes_news_domain_gate(item['title'], item.get('abstract', item['title']), item.get('source', ''))
             ):
                 stats["news_hotspot_in_final"] += 1
                 selected_news.append({
