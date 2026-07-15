@@ -3,219 +3,204 @@
   "categories": {
     "papers": [
       {
-        "title": "LogNIC: A High-Level Performance Model for SmartNICs",
-        "url": "https://www.semanticscholar.org/paper/5af33a09cd39080597ef8fe2e599901a7c90d5ab",
-        "summary": "LogNIC提出了一种针对SmartNIC的高层次性能建模框架，旨在简化SmartNIC辅助方案的开发。当前在数据中心和企业集群中，SmartNIC已成为不可或缺的高性能通信基础设施，提供in-network computing能力。然而，为SmartNIC编写高效程序仍然复杂且繁琐，需要程序员深入理解SmartNIC底层硬件架构。LogNIC通过提供抽象的性能模型，使开发者能够在高层快速评估和优化SmartNIC加速方案，降低了SmartNIC编程门槛。该工作对采用BlueField等DPU/SmartNIC进行硬件卸载高速网络的研究具有重要参考价值，为kernel-bypass与硬件卸载方案的性能预测提供了方法论支持。",
-        "summary_en": "SmartNICs have become an indispensable communication fabric and computing substrate in today’s data centers and enterprise clusters, providing in-netw...",
+        "title": "KBP: Kernel Enhancements for Low-Latency Networking without Application Customization in Virtual Server",
+        "url": "https://www.semanticscholar.org/paper/2fd96bd5e732753e472e01acf8af3d477c2d0a87",
+        "summary": "论文研究将专用网络硬件（如 FPGA SmartNIC）虚拟化为虚拟机后在通用服务器上运行时产生的毫秒级网络延迟问题。通过一系列实验，作者定位了虚拟化环境下数据包从硬件到 guest 应用之间多阶段排队与中断路径导致的延迟瓶颈。为此提出 KBP（Kernel Busy Poll）：在内核中运行一个专用内核线程，以忙轮询方式持续检测 NIC 到来数据包并立即转入内核网络协议栈处理，无需硬件中断触发。KBP 设计满足三个目标——达到微秒级尾延迟且吞吐量超过 NAPI 与 OvS-DPDK、保持 POSIX socket 接口无需修改应用程序、以及独立于具体 Linux 内核安全更新版本。评估在虚拟服务器环境下对比传统 NAPI 与 OvS-DPDK 方案，结果显示 KBP 将最大往返延迟降低超过 98%，吞吐量提升至约 3 倍。论文与 Linux 内核网络关系紧密：KBP 直接落在内核网络收发路径上，绕开传统中断/软中断开销，与 busy_poll 机制思路一致但以独立线程形式实现，NAPI 既是基线也是被优化对象。读者应关注其对单租户/低核数虚拟化场景的适用边界、对 CPU 占用率的代价，以及与现有 busy_poll socket 选项的差异和兼容性。",
+        "summary_en": "Packet processing on commodity hardware is a cost-efficient and flexible alternative to specialized networking hardware. However, virtualizing dedicated networking hardware as a virtual machine on a commodity server results in performance problems, such as longer latency and lower throughput. This paper focuses on obtaining a low-latency networking system in a virtual server. We reveal mechanisms that cause millisecond-scale networking delays in a virtual server through a series of experiments. To eliminate such delays, we designed and implemented the kernel busy poll (KBP), which achieves thr...",
         "source": "Semantic Scholar",
         "tags": [
-          "SmartNIC",
-          "性能建模",
-          "硬件卸载",
-          "高速网络"
+          "kernel busy poll",
+          "NAPI",
+          "virtual networking",
+          "low-latency"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 8
+      },
+      {
+        "title": "NIDP: Low-Latency Networking without Application Customization in Virtual Machine",
+        "url": "https://www.semanticscholar.org/paper/3fc627b1e8c6cb05f2c32df4c8b9cdeb81096db0",
+        "summary": "这篇研究工作《NIDP: Low-Latency Networking without Application Customization in Virtual Machine》被归入路由、包处理、旁路方向。摘要显示，其核心内容是：More and more applications require high real-time performance, such as online games and autonomous vehicles, so low-latency networks are needed. However, forwarding packets to/from an application in a server increases latency because of the virtualization overhead. To remove the causes of packet-forwarding delays in a virtual machine (VM), we design and impl... 阅读时应重点核对三点：它是否直接触达 Linux 内核网络路径或旁路数据面，方法相比现有协议栈/用户态方案解决了什么瓶颈，以及实验是否给出吞吐、时延、CPU 开销或可部署性证据。",
+        "summary_en": "More and more applications require high real-time performance, such as online games and autonomous vehicles, so low-latency networks are needed. However, forwarding packets to/from an application in a server increases latency because of the virtualization overhead. To remove the causes of packet-forwarding delays in a virtual machine (VM), we design and implement a non-interruptive data path (NIDP), which meets three requirements: (A) low latency in the order of microseconds and high throughput are achieved in a VM, (B) application customization is unnecessary, and (C) Linux kernel modificatio...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "路由",
+          "包处理",
+          "旁路",
+          "Linux内核网络"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 5
+      },
+      {
+        "title": "Energy-Efficient KBP: Kernel Enhancements for Low-Latency and Energy-Efficient Networking",
+        "url": "https://www.semanticscholar.org/paper/4d9eff4b7dd01129573bc3d4deed03ce282f3f48",
+        "summary": "针对实时应用向边缘服务器卸载以及虚拟化环境对微秒级低延迟网络的需求，论文指出通过性能调优和busy polling实现低延迟会显著增加服务器功耗。为解决延迟与能耗的矛盾，作者设计并实现了能量高效内核忙轮询系统EE-KBP（Energy-Efficient Kernel Busy Poll），其核心是在Linux内核中设置专门的轮询线程，在有包到达时以轮询模式高速接收数据包，无包到达时进入睡眠并降低CPU运行频率。该系统在四个维度进行设计：虚拟服务器中微秒级包转发延迟、低于现有方案的功耗、无需修改应用代码、无需随内核安全更新重新开发。实验评估表明，EE-KBP在多数流量条件下实现微秒级低延迟网络，相比Linux内核默认的NAPI机制获得1.4×到3.1×的吞吐提升，同时降低功耗。该工作直接修改Linux内核NAPI/忙轮询相关代码路径，对内核网络数据面（NAPI轮询、CPU频率调控、虚拟化场景下的包处理）有明确贡献，读者应关注其轮询线程与NAPI交互、对多核/CPU亲和性的影响，以及在真实NFV负载而非仅微基准测试下的通用性。",
+        "summary_en": "SUMMARY Real-time applications are becoming more and more popular, and due to the demand for more compact and portable user devices, oﬄoadingterminalprocessestoedgeserversisbeingconsidered. Moreover, it is necessary to process packets with low latency on edge servers, which are often virtualized for operability. When trying to achieve low-latency networking, the increase in server power consumption due to performance tuning and busy polling for fast packet receiving becomes a problem. Thus, we design and implement a low-latency and energy-eﬃcient networking system, energy-eﬃcient kernel busy p...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "kernel-busy-polling",
+          "NAPI",
+          "low-latency-networking",
+          "energy-efficiency"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 5
+      },
+      {
+        "title": "Performance Characteristics and Guidelines of Offloading Middleboxes Onto BlueField-2 DPU",
+        "url": "https://www.semanticscholar.org/paper/6dae6ddfb7dcf991fb7e6af81be550ac354a1805",
+        "summary": "随着数据中心网络带宽增速远超CPU性能，传统软件middlebox效率下降，业界寄望于DPU将网络功能从CPU卸载。本文以NVIDIA BlueField-2 DPU为对象，系统评测了三种DPU能力的性能边界：流表硬件卸载（用于无状态防火墙）、ARM子系统上的数据包处理（用于包调度）、以及连接跟踪硬件卸载（用于负载均衡）。在流表卸载方面，论文实现了基于TC flower/eSwitch offload的防火墙并测量吞吐随流水线条目数和pipeline深度的变化，发现浅pipeline下吞吐高但随深度增加出现明显回退；在ARM调度方面，将简单FIFO/公平队列调度器跑在BlueField-2的ARM核上，与x86主机侧方案对比，结果显示在当前驱动与内存子系统条件下ARM方案并未带来性能增益，甚至略低于CPU方案；在连接跟踪卸载方面，将netfilter连接跟踪offload用于L4负载均衡实现，提升了稳态转发带宽，但增加了每连接创建开销，使高并发短连接场景吞吐下降。论文最终归纳出针对DPU middlebox卸载的若干设计建议：优先用硬件流表处理无状态匹配、谨慎把有状态连接跟踪全部offload、避免在ARM上跑非必要的复杂调度逻辑。读者应关注其具体瓶颈指标（流水线深度、连接建立速率）以及与Linux内核TC/conntrack offload接口的对应关系，作为在生产环境部署BlueField方案时的参考。",
+        "summary_en": "With the rapid growth in data center network bandwidth far outpacing improvements in CPU performance, traditional software middleboxes running on servers have become inefficient. The emerging data processing units aim to address this by offloading network functions from the CPU. However, as DPUs are still a new technology, there lacks comprehensive evaluation of their capabilities for accelerating middleboxes. This paper benchmarks and analyzes the performance of offloading middleboxes onto the NVIDIA BlueField-2 DPU. Three key DPU capabilities are explored: flow tables offloading, ARM subsyst...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "DPU",
+          "BlueField-2",
+          "middlebox offload",
+          "connection tracking"
         ],
         "readingTime": 8,
         "relevance": "medium",
         "innovationScore": 6
       },
       {
-        "title": "Closed-Loop CPU-Aware Traffic Control for SDN-Enabled 5G/6G Networks in Open vSwitch Dataplanes",
-        "url": "https://doi.org/10.3390/smartcities9060091",
-        "summary": "这篇研究工作《Closed-Loop CPU-Aware Traffic Control for SDN-Enabled 5G/6G Networks in Open vSwitch Dataplanes》与eBPF、XDP、路由相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Closed-Loop CPU-Aware Traffic Control for SDN-Enabled 5G/6G Networks in Open vSw...",
-        "summary_en": "This paper presents a closed-loop, CPU-aware traffic-control framework for SDN in 5G/6G multi-tenant edge environments based on commodity KVM/OVS infr...",
-        "source": "OpenAlex",
+        "title": "Battle of the BlueFields: An In-Depth Comparison of the BlueField-2 and BlueField-3 SmartNICs",
+        "url": "https://www.semanticscholar.org/paper/a783f2a2bf813724bf51ee1888dad3fff7ed14a7",
+        "summary": "本文针对NVIDIA BlueField系列SmartNIC/DPU进行代际性能对比，重点衡量BlueField-3相对BlueField-2在片上能力与通信卸载能力上的提升。研究分两部分展开：(1) 单DPU本征能力测试，通过memcpy延迟与STREAM带宽基准，量化片上存储子系统与计算子系统的代际差异；(2) 在HPC场景下结合DPU感知的MPI库（含staging-based设计与GVMI-based设计），评估两类卸载通信模式在微基准与应用层面的表现。实验结果显示，BlueField-3在memcpy延迟上最高提升约61%，STREAM带宽提升最高达82%；在使用DPU感知MPI库时，staging-based设计在微基准级别获得超过30%改进，在应用级别接近翻倍；然而GVMI-based设计受架构不敏感性影响，基准层面改进不超过10%，应用层面收益低于2%。与Linux内核网络的关系方面，BlueField DPU通常运行定制Linux发行版并与宿主Linux通过特定接口（如virtio-net、RDMA verbs、eSwitch/ASAP²等）协作，但本文未深入分析内核网络栈代码路径，而侧重DPU侧的片上硬件能力与MPI卸载效率。读者应关注的限制包括：评估对象局限于NVIDIA自家DPU生态，缺少与纯软件DPDK或内核XDP方案对比，且未涉及多租户虚拟化、容器网络或安全隔离等数据中心更广泛关注场景。",
+        "summary_en": "Over the past several years, Smart Network Interface Cards (NIC/SmartNICs) have rapidly evolved in popularity. In particular, NVIDIA’s BlueField line of SmartNICs has been effective in a wide variety of uses: Offloading communication in High-Performance Computing applications (HPC), various stages of the Deep Learning (DL) pipeline, and is designed especially for Datacenter/virtualization uses. The BlueField-3 DPU was released at the end of 2022 as a follow-up to its widely accepted BlueField-2 predecessor, and this work will serve as an in-depth performance evaluation between the two to show ...",
+        "source": "Semantic Scholar",
         "tags": [
-          "eBPF",
-          "XDP",
-          "路由",
-          "驱动"
-        ],
-        "readingTime": 5,
-        "relevance": "high",
-        "innovationScore": 10
-      },
-      {
-        "title": "FlexTOE: Flexible TCP Offload with Fine-Grained Parallelism",
-        "url": "http://arxiv.org/abs/2110.10919v2",
-        "summary": "FlexTOE提出了一种灵活且高性能的TCP卸载引擎（TOE），将TCP数据面处理几乎全部从主机CPU卸载到SmartNIC上执行。其设计目标是消除主机侧的TCP数据路径开销，同时保持高度可定制性，可与其他TCP协议栈（如Linux内核TCP）互通。FlexTOE聚焦于已建立连接的数据面卸载，避免复杂的控制逻辑处理，简化了硬件实现复杂度。它兼容POSIX socket接口，在恶劣网络条件下表现出良好鲁棒性。该工作属于典型的kernel bypass/offload路线，通过SmartNIC提供与Linux内核网络栈并行的高速数据面，适用于数据中心高吞吐低延迟场景，是研究主机侧网络栈卸载与RDMA/SmartNIC数据面设计的重要参考。",
-        "summary_en": "FlexTOE is a flexible, yet high-performance TCP offload engine (TOE) to SmartNICs. FlexTOE eliminates almost all host data-path TCP processing and is ...",
-        "source": "arXiv",
-        "tags": [
-          "TCP offload",
           "SmartNIC",
-          "旁路",
-          "data-path acceleration"
+          "BlueField-DPU",
+          "MPI-offload",
+          "HPC"
         ],
         "readingTime": 8,
         "relevance": "medium",
-        "innovationScore": 10
+        "innovationScore": 4
       },
       {
-        "title": "Joyride: Rethinking Linux's network stack design for better performance, security, and reliability",
-        "url": "http://arxiv.org/abs/2509.25015v1",
-        "summary": "Joyride 论文针对现代分布式计算（科学计算、数据挖掘、机器学习等）对低延迟、高吞吐、高安全与高可靠性的需求，指出传统 Linux TCP/IP 协议栈在面对 100Gbps 及以上高速网卡时存在的诸多问题。这些问题主要源于 Linux 网络栈的传统设计假设（如 sk_buff 分配拷贝开销、socket 层抽象、协议处理路径过长等）。Joyride 提出对 Linux 网络栈架构进行根本性重新设计，以同时改善性能、安全性和可靠性。该工作直接修改 Linux 内核网络子系统代码路径，是典型的内核网络栈内部研究，对未来高速网络环境下的操作系统网络设计具有重要参考价值。",
-        "summary_en": "Contemporary distributed computing workloads, including scientific computation, data mining, and machine learning, increasingly demand OS networking w...",
-        "source": "arXiv",
+        "title": "Understanding the Idiosyncrasies of Emerging BlueField DPUs",
+        "url": "https://www.semanticscholar.org/paper/9b555aababbeeaeeee62549a37bd1fccf1127f81",
+        "summary": "本文对 NVIDIA BlueField 系列 DPU（BF-1/2/3）进行系统级表征分析，旨在帮助数据中心用户理解如何在不同代际 DPU 配置下有效卸载与加速网络、DMA 与内存相关负载。研究团队执行了 15 项基准测试，覆盖三个核心维度：网络（穷尽测试 on-path 模式 5 个子模式与 off-path 模式）、DMA 引擎（自研 DPUDMABench 微基准套件分析多种数据交换原语）以及内存子系统。在应用层面，通过 TCP/IP 与 RDMA 两种典型场景评估 DPU 模式对 MICA、HERD 等键值存储的性能影响。基于三代硬件对比，作者总结出 14 项关键 idiosyncrasies，涵盖 ARM 核调度、PCIe 带宽、DMA 描述符限制、on-path 跳数、off-path 内核旁路时机等，并对系统集成与未来 DPU 硬件设计给出指导建议。读者应关注：(1) on-path 与 off-path 在延迟/吞吐上的具体差异及适用负载；(2) DPU ARM 核性能 vs 主机 CPU 的卸载代价模型；(3) RDMA/TCP 卸载在 BlueField 演进中的代际进步与瓶颈。该工作虽不直接修改 Linux 内核网络源码，但所揭示的 DPU 旁路行为对 Linux 内核生态中 virtio-net、RDMA 子系统、SRIOV 等高速网络栈设计与部署决策有重要参考价值。",
+        "summary_en": "Data Processing Units (DPUs) are becoming available in datacenter environments to offload/accelerate workloads from the host. However, a comprehensive analysis is required to help users determine how to effectively utilize DPUs for their workloads, considering the various configurations and generations available. To fill in this gap, we conduct a fair and rigorous characterization by performing 15 benchmarking tests to demonstrate the evolution of representative SoC-based DPUs, specifically NVIDIA’s BlueField-1, BlueField-2, and BlueField-3. Our work surfaces several idiosyncrasies across thre...",
+        "source": "Semantic Scholar",
         "tags": [
-          "Linux内核网络栈",
-          "TCP/IP",
-          "高性能网络",
-          "内核重构"
+          "DPU表征",
+          "BlueField",
+          "RDMA卸载",
+          "TCP/IP网络旁路"
         ],
-        "readingTime": 15,
+        "readingTime": 25,
+        "relevance": "medium",
+        "innovationScore": 4
+      },
+      {
+        "title": "PAMO: Pattern Matching Offload for Intrusion Detection Systems",
+        "url": "https://www.semanticscholar.org/paper/94e52fac5cf3f9477e4814e5e8450f275fdccb96",
+        "summary": "论文针对入侵检测系统（IDS）在高速网络中计算开销过大的问题，提出了PAMO（Pattern Matching Offload），将Suricata中最耗CPU的模式匹配（规则评估占CPU超过60%）任务卸载到商品化SmartNIC的硬件加速引擎上。具体地，论文使用NVIDIA BlueField-2上的RXP（Regular eXpression Processor）加速器作为卸载目标，先对RXP引擎的吞吐、匹配延迟、规则规模、误报率等特性进行了系统化评估，随后将其集成进Suricata的预处理（prefiltering）阶段，使得不匹配的数据包可被快速丢弃，匹配命中的数据包再交回CPU做深入检测。实验基于约3万用户校园网的真实回放流量，评估显示PAMO可实现80 Gbps以上的吞吐，相对纯软件Suricata性能提升40%，每Gbps总拥有成本降低28%；在SmartNIC-only部署模式下（仅使用BlueField-2上8个ARM核配合RXP），吞吐达到6.8 Gbps，相对纯软件方案提升70%，能效提升44%。该工作展示了将关键网络安安全任务完全下沉到SmartNIC数据面运行的可行性。读者应关注：RXP引擎支持的规则语法子集限制、与Suricata版本演进和规则集规模的兼容性，以及在非BlueField-2 SmartNIC上的可移植性。对Linux内核网络栈而言，PAMO本身是旁路卸载路径，但ARM核上仍可能运行定制DPDK或用户态协议栈与内核网络栈形成数据面分流，是内核旁路高速网络研究的相关方向。",
+        "summary_en": "Intrusion Detection Systems (IDS) play a crucial role in network security. An IDS recognizes malicious activity in network traffic by matching it against patterns defined in a set of rules. The complexity and size of rule sets lead to substantial computational load. In a state-of-the-art IDS, such as Suricata, a single CPU core processes a few hundred MB to a few GB of network traffic per second, and rule evaluation accounts for over 60% of CPU consumption. Scaling IDS to today's high-speed networks is, therefore, a significant challenge. We present PAMO, a PAttern Matching Offload for Intrusi...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "IDS",
+          "硬件卸载",
+          "Suricata"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 4
+      },
+      {
+        "title": "DPU-Bench: A Micro-Benchmark Suite to Measure Offload Efficiency Of SmartNICs",
+        "url": "https://www.semanticscholar.org/paper/8ae76ae628c0da2b7fa2dea1518ce1ff9b7bcbb5",
+        "summary": "这篇研究工作《DPU-Bench: A Micro-Benchmark Suite to Measure Offload Efficiency Of SmartNICs》被归入TCP/IP、驱动、网络优化方向。摘要显示，其核心内容是：Smart Network Interface Cards (SmartNIC) have experienced massive growth in popularity over the last few years such as the NVIDIA BlueField-2 Data Processing Unit (DPU). Being equipped with their own set of cores and memory allows them to perform actions beyond a regular NIC, and HPC researchers are designing new ways to use them. For example, offloading com... 阅读时应重点核对三点：它是否直接触达 Linux 内核网络路径或旁路数据面，方法相比现有协议栈/用户态方案解决了什么瓶颈，以及实验是否给出吞吐、时延、CPU 开销或可部署性证据。",
+        "summary_en": "Smart Network Interface Cards (SmartNIC) have experienced massive growth in popularity over the last few years such as the NVIDIA BlueField-2 Data Processing Unit (DPU). Being equipped with their own set of cores and memory allows them to perform actions beyond a regular NIC, and HPC researchers are designing new ways to use them. For example, offloading communication to one enables the CPU \"host\" to perform more computationally heavy tasks. However, one question remains: How much of that work can be distributed among processes placed on the SmartNIC before facing performance degradation? We p...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
         "relevance": "high",
         "innovationScore": 4
       },
       {
-        "title": "Adaptive SmartNIC Offloading for Unleashing the Performance of Protocol-Oblivious Forwarding",
-        "url": "https://www.semanticscholar.org/paper/93e7d40f4359a707e0034dcd8547b736a0b5466f",
-        "summary": "本文研究面向物联网（IoT）场景下协议无关转发（Protocol-Oblivious Forwarding, POF）的SmartNIC自适应卸载方案。针对PDP（可编程数据面）中软件实现的POF性能瓶颈问题，论文提出将流表等关键数据结构卸载到SmartNIC硬件上，通过硬件加速提升数据包处理的吞吐和时延。论文设计了自适应卸载机制，根据流表规模、流量特征等动态决定哪些表项应驻留在SmartNIC的板载内存中，从而在硬件资源受限的情况下最大化卸载收益。该方案在保留软件可编程性的同时利用SmartNIC的并行处理能力，为异构IoT网络中的高速包处理提供了可行的软硬协同路径。",
-        "summary_en": "The growth of Internet of Things (IoT) has led to the convergence of heterogeneous networking systems powered by various protocols, and consequently t...",
+        "title": "A Novel Framework for Efficient Offloading of Communication Operations to Bluefield SmartNICs",
+        "url": "https://www.semanticscholar.org/paper/7a8932bac2697fd913debf89eca17fd9ea955c7f",
+        "summary": "针对NVIDIA BlueField DPU卸载MPI通信操作的问题，现有方案仅支持固定算法/通信模式，且因DPU与host之间数据staging导致延迟劣化。论文提出一个通用且低延迟的卸载框架：先分析MPI等高层编程模型在表达复杂通信模式卸载时的不足，并设计一套新的API以支持任意通信模式；进一步剖析DPU卸载通信操作的关键瓶颈（如host↔DPU数据搬运、消息匹配、协议处理），并针对若干典型通信模式给出高效设计。框架的目标是实现任意通信模式都能在DPU上以低延迟并与host计算完美重叠（perfect overlap）的方式执行。实验方面，在Alltoall微基准测试上相比最先进的staging式卸载方案提升47%；在应用层面，在512进程规模下P3DFFT加速最高60%，HPL提升15%。该工作与Linux内核网络的关系在于：BlueField DPU本身运行独立软件栈（ARM核+DPDK/内核网络栈），是典型的硬件卸载旁路数据面，与传统内核网络栈并行存在；论文未直接改动Linux内核网络源码路径，但提出的host-DPU协同机制、零拷贝消息匹配与overlap策略，对内核网络/旁路高速网络研究者理解SmartNIC编程模型与数据传输优化具有参考价值。读者应关注：方案针对HPC MPI场景而非通用TCP/IP socket或XDP/eBPF数据面，且依赖特定BlueField硬件能力，移植到通用DPDK或virtio-net卸载路径时需重新评估API与性能瓶颈。",
+        "summary_en": "Smart Network Interface Cards (SmartNICs) such as NVIDIA’s BlueField Data Processing Units (DPUs) provide advanced networking capabilities and processor cores, enabling the offload of complex operations away from the host. In the context of MPI, prior work has explored the use of DPUs to offload non-blocking collective operations. The limitations of current state-of-the-art approaches are twofold: They only work for a pre-defined set of algorithms/communication patterns and have degraded communication latency due to staging data between the DPU and the host. In this paper, we propose a framewo...",
         "source": "Semantic Scholar",
         "tags": [
-          "SmartNIC卸载",
-          "可编程数据面",
-          "协议无关转发",
-          "IoT加速"
-        ],
-        "readingTime": 12,
-        "relevance": "medium",
-        "innovationScore": 6
-      },
-      {
-        "title": "Understanding the Micro-Behaviors of Hardware Offloaded Network Stacks with Lumina",
-        "url": "https://www.semanticscholar.org/paper/9212c5f733c396a2c1ef57e0ecc290addf6b2273",
-        "summary": "随着数据中心对高吞吐、超低时延和低CPU开销的需求增长，硬件卸载网络栈（如基于SmartNIC/DPU的offloaded stack）被广泛部署。然而，这类硬件栈对测试工具提出了独特挑战：传统面向软件网络栈的测试方法难以捕捉其内部微行为。Lumina提出了一套针对硬件卸载网络栈的观测与测试框架，能够深入剖析硬件数据路径中的包处理、调度、资源管理等微行为，帮助用户理解并充分利用硬件卸载栈的极致性能。该工作与Linux内核网络子系统高度互补，因内核TCP/IP栈正面临被旁路/卸载的架构演进趋势，但Lumina本身聚焦于硬件卸载侧而非内核源码修改。",
-        "summary_en": "Hardware offloaded network stacks are widely adopted in modern datacenters to meet the demand for high throughput, ultra-low latency and low CPU overh...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "hardware-offloaded-stack",
-          "SmartNIC",
-          "network-observability",
-          "kernel-bypass"
-        ],
-        "readingTime": 8,
-        "relevance": "medium",
-        "innovationScore": 2
-      },
-      {
-        "title": "Age-Based CoDel and His Friends. Improving the Linux Scheduler with 2-Level AQM Disciplines",
-        "url": "https://www.semanticscholar.org/paper/f7b497740d994d2767896c6f831baf01071ead1d",
-        "summary": "该论文研究将主动队列管理（AQM）算法（如CoDel、FQ-CoDel、PIE）与基于年龄的调度策略（如Least Attained Service、Two-Level Processor Sharing）相结合，以改进Linux内核数据包调度器的网络性能。AQM算法管理队列长度并保证公平带宽分配，而age-based调度通过优先处理新流来降低流完成时间（FCT）。论文在Linux qdisc框架内实现2级AQM调度策略，针对kernel内部的排队规则（qdisc）代码路径进行修改与评估，旨在降低平均流完成时间并提升网络吞吐。属于Linux内核网络子系统调度层面的直接研究。",
-        "summary_en": "We study the combination of Active Queue Management (AQM) techniques and age-based scheduling disciplines to improve network performance in the Linux ...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "qdisc",
-          "AQM",
-          "CoDel",
-          "flow-completion-time"
-        ],
-        "readingTime": 8,
-        "relevance": "high",
-        "innovationScore": 6
-      },
-      {
-        "title": "FlexiNS: A SmartNIC-Centric, Line-Rate and Flexible Network Stack",
-        "url": "https://www.semanticscholar.org/paper/75aa494ad2347d647af68243601ec82101cebd10",
-        "summary": "FlexiNS针对现有CPU-centric网络栈在高速网络下开销过大、纯硬件卸载方案灵活性不足的问题，提出将网络栈卸载到off-path SmartNIC的方案。论文在SmartNIC上同时实现控制面灵活性和数据面线速转发能力，在控制面保留软件可编程性，在数据面通过硬件加速保证线速吞吐。该工作属于DPU/SmartNIC卸载方向，为数据中心提供兼顾灵活性与高性能的网络栈替代方案，与Linux内核网络栈形成并行的高速数据面路径。",
-        "summary_en": "As the gap between network and CPU speeds rapidly increases, the CPU-centric network stack proves inadequate due to excessive CPU and memory overhead....",
-        "source": "Semantic Scholar",
-        "tags": [
-          "SmartNIC",
-          "网络栈卸载",
-          "硬件卸载",
-          "数据中心网络"
-        ],
-        "readingTime": 8,
-        "relevance": "medium",
-        "innovationScore": 1
-      },
-      {
-        "title": "Enabling Time-Aware Priority Traffic Management over Distributed FPGA Nodes",
-        "url": "http://arxiv.org/abs/2509.26043v1",
-        "summary": "本文探讨网络接口卡（NIC）从简单数据收发设备演进为复杂异构系统的过程，重点研究基于FPGA的分布式网络节点上的时间感知优先级流量管理。随着NIC不断卸载主机CPU的包处理任务（如压缩/解压、校验和计算等），FPGA等可编程硬件成为实现灵活数据面卸载的关键平台。论文提出在分布式FPGA节点上实现时间感知的流量调度机制，以保障关键流量的低延迟传输。该工作属于SmartNIC/FPGA硬件卸载方向，与Linux内核旁路高速网络栈研究密切相关，但并未直接修改内核网络代码路径，而是通过硬件卸载方式提供并行的高速数据面能力。",
-        "summary_en": "Network Interface Cards (NICs) greatly evolved from simple basic devices moving traffic in and out of the network to complex heterogeneous systems off...",
-        "source": "arXiv",
-        "tags": [
-          "SmartNIC",
-          "FPGA-Offload",
-          "Priority-Traffic-Management",
-          "Hardware-Acceleration"
-        ],
-        "readingTime": 6,
-        "relevance": "medium",
-        "innovationScore": 7
-      },
-      {
-        "title": "Towards Timing Isolation for Mixed-Criticality Communication in Software-Defined Vehicles",
-        "url": "http://arxiv.org/abs/2508.13652v2",
-        "summary": "随着汽车行业向基于Linux的集中式架构转型，确保混合关键性应用的可预测执行变得至关重要。然而，Linux网络栈的并发使用会带来干扰，导致延迟和抖动不可预测。本文提出一种分层软件架构，对汽车以太网通信实施时间隔离机制。该架构旨在解决Linux内核网络栈中多租户/多关键性应用共享网络资源时产生的干扰问题，通过在内核网络调度层面引入隔离保证，实现混合关键性通信的确定性时延。论文结合汽车功能安全（ISO 26262）和实时系统需求，探索了Linux网络栈在车载中央计算平台中的实时性增强方案。",
-        "summary_en": "As the automotive industry transitions toward centralized Linux-based architectures, ensuring the predictable execution of mixed-criticality applicati...",
-        "source": "arXiv",
-        "tags": [
-          "Linux网络栈",
-          "时间隔离",
-          "混合关键性",
-          "汽车以太网"
+          "SmartNIC offload",
+          "MPI通信卸载",
+          "BlueField DPU",
+          "HPC高速网络"
         ],
         "readingTime": 8,
         "relevance": "medium",
         "innovationScore": 6
-      },
-      {
-        "title": "SmartNS: Enabling Line-rate and Flexible Network Stack with SmartNIC",
-        "url": "https://www.semanticscholar.org/paper/51bd7dc90f7c006900d7f69dc5e2ccbfe2e1e804",
-        "summary": "SmartNS针对CPU-centric网络栈在高带宽场景下CPU和内存开销过大的问题，提出将网络栈灵活卸载到SmartNIC的方案。现有硬件卸载方案灵活性不足，而朴素卸载方案也存在效率问题。SmartNS旨在结合SmartNIC的可编程性和硬件卸载的高性能优势，提供线速且灵活的网络栈处理能力，绕过传统内核网络数据面实现高性能数据通路。",
-        "summary_en": "As the gap between network and CPU speeds rapidly increases, the CPU-centric network stack proves inadequate due to excessive CPU and memory overheads...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "SmartNIC",
-          "网络栈卸载",
-          "高速网络",
-          "硬件卸载"
-        ],
-        "readingTime": 6,
-        "relevance": "medium",
-        "innovationScore": 1
       }
     ],
-    "news": []
+    "news": [
+      {
+        "title": "When \"idle\" isn't idle: how a Linux kernel optimization became a QUIC bug",
+        "url": "https://blog.cloudflare.com/quic-death-spiral-fix/",
+        "summary": "文章剖析了一个 Linux 内核 CUBIC 拥塞控制算法的 bug：内核在检测到连接空闲后会重置拥塞窗口（cwnd），但将 RTT 估算等待时间错误地计为应用层空闲时间（idle period），导致 CUBIC 的拥塞窗口被持续钉死在最小值（cwnd floor），吞吐量急剧下降。研究方法包括对比空闲前后窗口状态、追踪内核对 `tcp_cwnd_reduction` 与 `cubictcp.cwnd_unrestricted` 路径的调用，并结合 QUIC 协议栈（如 quiche/QUIC-go）受影响的现象反推根因。最终通过修正 idle 测量逻辑——区分 RTT 采样等待与应用真正未发数据——修复了问题。此 bug 体现了内核 TCP 状态机与现代 QUIC 用户态协议栈共享底层假设时的耦合风险，是内核网络栈拥塞控制路径的典型回归案例，值得关注 CUBIC/BBR 维护者及 QUIC 性能调优者参考。",
+        "source": "Cloudflare Blog",
+        "tags": [
+          "Linux内核网络",
+          "TCP拥塞控制",
+          "CUBIC",
+          "QUIC"
+        ],
+        "readingTime": 8,
+        "relevance": "high"
+      }
+    ]
   },
   "tagStats": {
-    "SmartNIC": 6,
-    "性能建模": 1,
-    "硬件卸载": 3,
-    "高速网络": 2,
-    "eBPF": 1,
-    "XDP": 1,
+    "kernel busy poll": 1,
+    "NAPI": 2,
+    "virtual networking": 1,
+    "low-latency": 1,
     "路由": 1,
-    "驱动": 1,
-    "TCP offload": 1,
+    "包处理": 1,
     "旁路": 1,
-    "data-path acceleration": 1,
-    "Linux内核网络栈": 1,
+    "Linux内核网络": 1,
+    "kernel-busy-polling": 1,
+    "low-latency-networking": 1,
+    "energy-efficiency": 1,
+    "DPU": 1,
+    "BlueField-2": 1,
+    "middlebox offload": 1,
+    "connection tracking": 1,
+    "SmartNIC": 2,
+    "BlueField-DPU": 1,
+    "MPI-offload": 1,
+    "HPC": 1,
+    "DPU表征": 1,
+    "BlueField": 1,
+    "RDMA卸载": 1,
+    "TCP/IP网络旁路": 1,
+    "IDS": 1,
+    "硬件卸载": 1,
+    "Suricata": 1,
     "TCP/IP": 1,
-    "高性能网络": 1,
-    "内核重构": 1,
-    "SmartNIC卸载": 1,
-    "可编程数据面": 1,
-    "协议无关转发": 1,
-    "IoT加速": 1,
-    "hardware-offloaded-stack": 1,
-    "network-observability": 1,
-    "kernel-bypass": 1,
-    "qdisc": 1,
-    "AQM": 1,
-    "CoDel": 1,
-    "flow-completion-time": 1,
-    "网络栈卸载": 2,
-    "数据中心网络": 1,
-    "FPGA-Offload": 1,
-    "Priority-Traffic-Management": 1,
-    "Hardware-Acceleration": 1,
-    "Linux网络栈": 1,
-    "时间隔离": 1,
-    "混合关键性": 1,
-    "汽车以太网": 1
+    "驱动": 1,
+    "网络优化": 1,
+    "性能": 1,
+    "SmartNIC offload": 1,
+    "MPI通信卸载": 1,
+    "BlueField DPU": 1,
+    "HPC高速网络": 1,
+    "TCP拥塞控制": 1,
+    "CUBIC": 1,
+    "QUIC": 1
   }
 }

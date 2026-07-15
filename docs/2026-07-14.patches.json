@@ -1,6 +1,6 @@
 {
   "date": "2026-07-14",
-  "fetchedAt": "2026-07-15T12:09:53+0800",
+  "fetchedAt": "2026-07-15T15:17:22+0800",
   "totals": {
     "inReview": 19,
     "merged": 21,
@@ -22,14 +22,14 @@
       "state": "new",
       "submitter": "Jiri Pirko",
       "date": "2026-07-14T14:29:27",
-      "summary": "该补丁为 RDMA 子系统新增一个 kselftest 测试脚本 rxe_netns_names.sh，用于验证 RXE（软件 RDMA 设备）在不同网络命名空间（netns）下的设备命名行为。测试场景包括跨命名空间的重复名称处理、设备移动时的冲突处理、带重命名的移动操作以及同一命名空间内的重命名请求。同时更新了 RDMA selftests 的 Makefile 和 config 文件，加入 CONFIG_DUMMY 和 CONFIG_NET_NS 依赖。该改动属于网络栈外围的测试增强，主要涉及网络命名空间与 RDMA 设备标识的交互，对内核网络行为验证有意义但非核心协议栈变更。",
+      "summary": "该补丁为 RDMA 子系统添加了一个 kselftest 脚本（rxe_netns_names.sh），用于测试 RXE（软件 RDMA 驱动）在不同网络命名空间下的设备命名行为。测试覆盖跨命名空间的重复名称检测、移动冲突处理、移动并改名、以及同命名空间内的改名请求等场景。该改动涉及 netns 中 RDMA 设备的命名与重命名逻辑验证，依赖 CONFIG_DUMMY、CONFIG_NET_NS、CONFIG_RDMA_RXE 等配置，属于容器网络场景下的 RDMA 设备管理测试。",
       "tags": [
-        "Linux内核网络",
+        "容器网络",
         "驱动",
         "性能"
       ],
       "relevance": "medium",
-      "readingTime": 3
+      "readingTime": 2
     },
     {
       "id": 14686701,
@@ -46,14 +46,14 @@
       "state": "new",
       "submitter": "Jiri Pirko",
       "date": "2026-07-14T14:29:21",
-      "summary": "该补丁针对 RDMA cgroup 控制器中跨网络命名空间的设备命名歧义问题。RDMA 设备名仅在同一 netns 内唯一，但 RDMA cgroup 可管控来自多个命名空间的设备，导致 cgroup 输出混乱且写入限制时可能选错设备。方案是引入系统级 RDMA 设备索引（index=N），对同名设备进行消歧：全局唯一名称保持原有 UAPI 不变，重名时强制要求指定索引，纯名称的歧义写入返回 -ENOTUNIQ。同时在文档中说明新语法（如 \"rxe0 index=5 hca_handle=2\"），并修改 cgroup/rdma.c 与 drivers/infiniband/core/cgroup.c 以支持该机制。",
+      "summary": "该补丁修改 RDMA cgroup 控制器，解决跨网络命名空间的设备命名歧义问题。由于 RDMA 设备名仅在同一 netns 内唯一，当 cgroup 需要统计来自多个 netns 的设备资源时，重复名称会导致 cgroup 输出和 limit 写入产生歧义。补丁引入系统级 RDMA 设备索引（index=N）来区分重名设备，保留唯一名称的原有 UAPI；对歧义名称的纯名称写入返回 -ENOTUNIQ，管理员可通过索引获取完整设备视图。同时更新了 cgroup-v1/rdma.rst 和 cgroup-v2.rst 文档说明新格式。",
       "tags": [
-        "驱动",
-        "容器网络",
-        "Linux内核网络"
+        "Linux内核网络",
+        "虚拟化",
+        "性能"
       ],
       "relevance": "medium",
-      "readingTime": 4
+      "readingTime": 5
     },
     {
       "id": 14686631,
@@ -70,14 +70,14 @@
       "state": "new",
       "submitter": "Maciej Fijalkowski",
       "date": "2026-07-14T14:07:18",
-      "summary": "该补丁修复了 AF_XDP generic xmit 路径在多缓冲区（multi-buffer）Tx 处理中的资源泄漏问题。当分片报文描述符数量超过 MAX_SKB_FRAGS，或分片中包含非法描述符时，剩余的描述符此前会被静默丢弃无法回收。新增 xdp_sock::drain_cont 标志位，在溢出发生时持续消费 Tx 环上的描述符并通过新增的 xsk_cq_submit_addr_single_locked 辅助函数将它们直接放入 CQ，从而保证用户态能够正确回收这些描述符。该修复完善了 AF_XDP 多缓冲区 Tx 路径的健壮性，避免了描述符泄漏。",
+      "summary": "该补丁修复 AF_XDP 通用 Xmit 路径中多缓冲区（multi-buffer）Tx 逻辑的缺陷。当 xsk_build_skb() 构建 SKB 时遇到描述符数量超过 MAX_SKB_FRAGS 或包含无效描述符的情况，后续的 continuation 描述符会丢失且无法再次访问。补丁在 xdp_sock 结构中新增 drain_cont 标志位，当该标志置位时持续消费 AF_XDP Tx 环上剩余的描述符并直接放入完成队列（CQ），同时将 cq 地址提交逻辑封装为独立函数 xsk_cq_submit_addr_single_locked。该修复解决了描述符泄漏问题，确保 Tx 环与 CQ 之间描述符流转的正确性，避免因描述符丢失导致的卡死或资源不一致。",
       "tags": [
         "XDP",
-        "包处理",
-        "性能"
+        "eBPF",
+        "包处理"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 6
     },
     {
       "id": 14686630,
@@ -94,10 +94,10 @@
       "state": "new",
       "submitter": "Maciej Fijalkowski",
       "date": "2026-07-14T14:07:17",
-      "summary": "该补丁修复了 AF_XDP 多缓冲区发送路径中 xsk_drop_skb() 导致的缓冲区泄漏问题。在三种丢弃部分构建的多缓冲 skb 的场景下（xsk_build_skb 的 -EOVERFLOW 路径、__xsk_generic_xmit 循环清理、xsk_release 关闭 socket），虽然已通过 xskq_cons_release 消费了 TX 描述符并预留了 CQ 槽位，但 xsk_drop_skb() 调用的 xsk_consume_skb() 会通过 xsk_cq_cancel_locked() 取消 CQ 预留，导致缓冲区地址永远不会出现在完成队列中，用户态永久丢失这些缓冲区。修复方法是将 xsk_consume_skb() 改为 consume_skb()，触发已有的 xsk_destruct_skb 析构函数（通过 xsk_cq_submit_addr_locked() 提交缓冲区地址），同时显式设置 xs->skb = NULL，并在 xsk_build_skb() 中保存最后一个描述符地址以确保所有片段地址被正确提交。",
+      "summary": "该补丁修复 AF_XDP 多缓冲区 Tx 路径中 `xsk_drop_skb()` 导致的缓冲区泄漏问题。当部分构建的多缓冲 skb 被丢弃（-EOVERFLOW、无效描述符或 socket 关闭场景）时，原代码调用 `xsk_consume_skb()` 取消了 CQ 预留槽位（xsk_cq_cancel_locked），导致缓冲区地址永远不会出现在完成队列中，用户态永久丢失这些缓冲区。修复方案是将 `xsk_consume_skb()` 替换为 `consume_skb()`，触发已有的 `xsk_destruct_skb` 析构函数，通过 `xsk_cq_submit_addr_locked()` 将缓冲区地址正确提交到 CQ；同时额外将描述符地址存入 `xsk_addr->addrs` 数组并在 drop 后将 `xs->skb` 置空，避免悬挂引用。",
       "tags": [
         "XDP",
-        "驱动",
+        "eBPF",
         "包处理"
       ],
       "relevance": "high",
@@ -118,14 +118,13 @@
       "state": "new",
       "submitter": "Yizhou Zhao",
       "date": "2026-07-14T12:26:17",
-      "summary": "该补丁修复 IPv4 列表接收路径中的路由提示(route hint)复用安全漏洞。原先 ip_can_use_hint() 仅比较目的地址和 TOS 即复用前一 skb 的 dst，对于转发路由会跳过 fib_validate_source()，导致不同源地址的报文可绕过严格 rp_filter 源地址校验。补丁在复用条件中新增源地址匹配（ip_hdr(hint)->saddr == iph->saddr），确保仅同源/同目的/同 TOS 的报文走快速路径，源地址变化的报文回归正常路由查找与源校验流程，从而修复严格反向路径过滤被绕过的安全问题。",
+      "summary": "该补丁修复了 IPv4 列表接收（ip_list_rcv）中路由提示（route hint）复用逻辑的安全缺陷。原逻辑在 ip_can_use_hint() 中仅比较目的地址和 TOS，对于转发路由 ip_route_use_hint() 会跳过 fib_validate_source()，导致不同源地址的数据包可复用前一个数据包的转发 dst，从而绕过 ingress 网卡的 strict rp_filter 等源地址校验。补丁增加对源地址（saddr）匹配的检查，只有同源/同目的/同 TOS 的包才走快速路径，不同源的包则走正常路由查找与校验流程，从而在保持性能优化的同时恢复正确的源地址验证。",
       "tags": [
         "TCP/IP",
-        "包处理",
-        "Linux内核网络"
+        "包处理"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14686106,
@@ -142,14 +141,14 @@
       "state": "new",
       "submitter": "Michael Bommarito",
       "date": "2026-07-14T11:49:03",
-      "summary": "修复 IPv6 ILA（Identifier Locator Addressing）子系统中 `ila_csum_adjust_transport()` 与 `ila_update_ipv6_locator()` 的 use-after-free 漏洞。原代码在调用 `pskb_may_pull()` 之前缓存了 `ip6h = ipv6_hdr(skb)`，但对于非线性 skb，`pskb_may_pull()` 可能触发 `__pskb_pull_tail()` / `pskb_expand_head()` 释放旧 skb 头部，使缓存的 `ip6h` 成为悬空指针，后续 `get_csum_diff()` 及写入新 locator 的操作会读取已释放内存（KASAN 报告 slab-use-after-free）。修复方案是在每次 `pskb_may_pull()` 之后重新加载 `ip6h`，并在 `ila_update_ipv6_locator()` 的 `ILA_CSUM_ADJUST_TRANSPORT` 分支中单独重载 `ip6h` 和 `iaddr`，而 neutral-map 模式不 pull skb 故保留缓存指针不变。该问题影响经过配置 ILA csum-adjust-transport 路由或接收端映射的所有 IPv6 数据包，触发无需认证但路由/映射配置需 CAP_NET_ADMIN。",
+      "summary": "该补丁修复 ILA（Identifier-Locator Addressing，IPv6 标识符-定位符寻址）模块中的一个 use-after-free 漏洞。`ila_csum_adjust_transport()` 在调用 `pskb_may_pull()` 之前缓存了 `ip6h = ipv6_hdr(skb)` 指针，但对于非线性的 skb，`pskb_may_pull()` 可能通过 `__pskb_pull_tail()` / `pskb_expand_head()` 释放旧的 skb head，导致后续 `get_csum_diff(ip6h, p)` 及 `ila_update_ipv6_locator()` 写操作访问已释放内存（KASAN 报告 slab-use-after-free）。修复方案是：TCP/UDP/ICMP6 分支在 `pskb_may_pull()` 之后重新获取 `ip6h`；`ila_update_ipv6_locator()` 仅在 ILA_CSUM_ADJUST_TRANSPORT 路径下重新加载 `ip6h` 与 `iaddr`，neutral-map 模式不 pull 故保持原缓存指针。该漏洞需要 CAP_NET_ADMIN 配置触发路由，但触发包未认证即可触发。",
       "tags": [
         "TCP/IP",
         "包处理",
-        "Linux内核网络"
+        "性能"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14685598,
@@ -166,13 +165,12 @@
       "state": "new",
       "submitter": "Zhixing Chen",
       "date": "2026-07-14T09:19:41",
-      "summary": "该补丁针对 PPP 驱动（drivers/net/ppp/ppp_generic.c）的统计代码进行清理。原先的 ppp_get_stats() 在处理 SIOCGPPPSTATS ioctl 路径时，手动遍历 per-cpu 统计变量（pcpu_sw_netstats）进行聚合，而已有的 ppp_get_stats64() 已实现了相同逻辑。补丁删除了 ioctl 路径中的重复代码，直接调用 ppp_get_stats64() 获取 rtnl_link_stats64 结构体，再映射回 struct ppp_stats 字段。改动减少约 9 行代码，统一了两条统计路径的数据来源，确保 ioctl 路径与 netdev stats64 路径返回一致的结果，避免了未来维护时不同步的风险。属于驱动层的代码重构，无功能或性能影响。",
+      "summary": "该补丁针对 PPP 通用驱动（drivers/net/ppp/ppp_generic.c）进行代码清理。原有的 ppp_get_stats() 在为遗留 SIOCGPPPSTATS ioctl 路径填充 struct ppp_stats 时，手动通过 for_each_possible_cpu 遍历每 CPU 的 pcpu_sw_netstats 来聚合收发包和字节计数，与 ppp_get_stats64() 的逻辑重复。补丁改为直接调用 ppp_get_stats64() 获取 rtnl_link_stats64，再将 rx/tx_packets 和 rx/tx_bytes 赋值给 st->p 的对应字段，错误计数也从 dev->stats 统一读取。这消除了 ioctl 路径中重复的 per-CPU 聚合代码，使两条统计路径行为一致，属于纯粹的代码重构，无功能性变更。",
       "tags": [
         "驱动",
-        "性能",
         "包处理"
       ],
-      "relevance": "medium",
+      "relevance": "high",
       "readingTime": 2
     },
     {
@@ -190,13 +188,13 @@
       "state": "new",
       "submitter": "Igor Putko",
       "date": "2026-07-14T08:25:11",
-      "summary": "该补丁修改 net/core/datagram.c，将数据报迭代辅助函数 __skb_datagram_iter() 和 skb_copy_datagram_from_iter() 中的 WARN_ON() 替换为 WARN_ON_ONCE()。在数据报分片迭代的快速路径中，若因畸形 skb 或驱动 bug 触发偏移检查，原有 WARN_ON() 会无限制地向 dmesg 写入日志，造成严重的 I/O 延迟开销，并可能被利用进行日志洪泛导致 DoS 或系统不稳定。改为 WARN_ON_ONCE() 后，异常首次发生仍会上报便于调试，但不会在重复触发时持续刷屏。",
+      "summary": "该补丁修改 net/core/datagram.c，将数据报分片迭代辅助函数 __skb_datagram_iter() 和 skb_copy_datagram_from_iter() 中的 WARN_ON() 替换为 WARN_ON_ONCE()。原代码在快速路径包处理中检测到非法缓冲区偏移时会无限刷写内核日志，导致严重 I/O 延迟甚至日志洪水 DoS。改用 WARN_ON_ONCE 后仅首次触发时告警，既保留调试能力又避免日志泛滥。属于网络子系统核心 socket/sk_buff 路径的健壮性修复。",
       "tags": [
         "包处理",
         "性能",
         "Linux内核网络"
       ],
-      "relevance": "medium",
+      "relevance": "high",
       "readingTime": 2
     },
     {
@@ -475,14 +473,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-10T18:09:15",
-      "summary": "《Fix unused nskb warning in bpf_icmp_send》主要围绕“Declare nskb inside the IPv4 and IPv6 case blocks so it is only present when the cor...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "该补丁修复了 BPF kfunc `bpf_icmp_send` 中 `nskb` 变量的未使用告警。原代码在函数顶部声明 `nskb`，但仅在 IPv4 和 IPv6 的 switch case 分支中使用。补丁将变量声明移入各自 case 块的作用域内（用大括号包裹），使其仅在对应代码路径下可见，从而消除编译器告警。该修改属于代码清理类修复，不影响运行逻辑，但提升了不同编译配置（如 CONFIG_INET/CONFIG_IPV6 单独禁用）下的构建清洁度。",
       "tags": [
         "eBPF",
         "TCP/IP",
         "包处理"
       ],
-      "relevance": "low",
-      "readingTime": 3
+      "relevance": "high",
+      "readingTime": 2
     },
     {
       "id": 14678106,
@@ -499,11 +497,11 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:21",
-      "summary": "该补丁修复 XFRM 子系统下 IPTFS（IP Traffic Flow Security）功能中 iptfs_skb_add_frags() 函数未正确传递 SKBFL_SHARED_FRAG 标志位的缺陷。当源 SKB 携带共享 frag（如 page-pool 接收路径产生的），拷贝到内部 SKB 时若不标记 shared 状态，ESP 解密的 esp_input() 会走 no-COW 快速路径原地写解密数据，而外层 IPTFS SKB 仍引用这些页面，造成内存破坏甚至内核 panic。补丁在循环内 __skb_frag_ref() 后无条件设置 SKBFL_SHARED_FRAG，与内核其它 frag 传递辅助函数（skb_try_coalesce、skb_segment 等）保持一致。",
+      "summary": "该补丁修复了 xfrm IPTFS 中 iptfs_skb_add_frags() 函数未正确传播 SKBFL_SHARED_FRAG 标志的问题。当从源 SKB 复制 frag 引用到新 SKB 时，仅增加了页面引用计数但未设置共享标志，导致后续嵌套传输模式 SA 的 esp_input() 走 no-COW 快速路径原地解密，覆盖仍被外层 IPTFS SKB 引用的页面，从而引发内存损坏甚至内核 panic。补丁在 __skb_frag_ref() 和 nr_frags++ 后无条件设置 SKBFL_SHARED_FRAG，与 skb_segment、skb_gro_receive 等其他 frag 传输辅助函数保持一致。",
       "tags": [
+        "TCP/IP",
         "Linux内核网络",
-        "包处理",
-        "性能"
+        "包处理"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -523,12 +521,12 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:16",
-      "summary": "《avoid double free on send error》主要围绕“Qianyu Luo <qianyuluo3@gmail.com> nat_keepalive_send() frees the keepalive skb whene...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "该补丁修复 XFRM（IPsec）子系统中 NAT keepalive 功能的双重释放（double free）缺陷。原代码在 `nat_keepalive_send()` 派发函数中错误地对发送失败的 skb 调用 `kfree_skb()`，但一旦 skb 被 `ip_build_and_send_pkt()` 或 `ip6_xmit()` 接管后，网络栈可能已消费该 skb，再次释放会导致内存安全问题。修复方案是将 skb 释放逻辑下沉到 `nat_keepalive_send_ipv4()` 和 `nat_keepalive_send_ipv6()` 中，仅在调用方仍持有 skb 所有权时（路由查找失败等 pre-handoff 阶段）释放；派发函数只负责协议族路由和 unsupported-family 的清理。",
       "tags": [
         "TCP/IP",
-        "包处理"
+        "Linux内核网络"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {
@@ -546,14 +544,14 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:14",
-      "summary": "该补丁修复了 XFRM（IPsec）异步加密场景下返回值语义混乱的问题。validate_xmit_xfrm() 原本对\"丢包\"和\"被异步加密盗用（-EINPROGRESS）\"都返回 NULL，调用者无法区分，导致 __dev_queue_xmit() 在虚拟/网桥设备（noqueue qdisc）上错误地将已被异步接管、稍后通过 xfrm_dev_resume() 投递的 skb 判为 ENOMEM 失败。改动包括：validate_xmit_xfrm() 在异步场景改回 ERR_PTR(-EINPROGRESS)；__dev_queue_xmit() 检测到 -EINPROGRESS 时返回 NET_XMIT_SUCCESS；validate_xmit_skb_list() 使用 IS_ERR_OR_NULL() 避免误将错误指针加入传输列表。",
+      "summary": "该补丁修复了 XFRM（IPsec）异步加密场景下网络设备发送路径的错误返回问题。`validate_xmit_xfrm()` 此前对\"报文被丢弃\"和\"报文被异步加密窃取（-EINPROGRESS）\"两种情况都返回 NULL，导致 `__dev_queue_xmit()` 无法区分，在虚拟/网桥接口上错误地向调用者返回 -ENOMEM。修复方案是让 `validate_xmit_xfrm()` 在异步场景下返回 `ERR_PTR(-EINPROGRESS)`，更新 `__dev_queue_xmit()` 检测该错误指针并返回 `NET_XMIT_SUCCESS`，同时用 `IS_ERR_OR_NULL()` 保护 `validate_xmit_skb_list()` 避免将正在异步处理的报文误加入已发送列表。该修改正确处理了异步 IPsec offload 的语义，避免了上层协议收到错误的返回值。",
       "tags": [
+        "TCP/IP",
         "包处理",
-        "路由",
         "性能"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14676481,
@@ -570,7 +568,7 @@
       "state": "accepted",
       "submitter": "Admin",
       "date": "2026-07-09T18:27:59",
-      "summary": "该补丁修复 bpf_cpumask_populate() kfunc 的验证器安全问题。原实现中目标参数类型为 `struct cpumask *`，允许通过 bitmap_copy() 写入，但验证器会接受从只读 kfunc（如 scx_bpf_get_online_cpumask()）返回的借用 cpumask 指针作为可写目标，破坏了所有权语义。修改将目标改为 `struct bpf_cpumask *`，使其遵循其他可变 cpumask kfunc 的所有权规则；只读查询 kfunc 仍接受 `const struct cpumask *` 输入。同时调整了 bitmap_copy() 调用以正确访问 bpf_cpumask 内部的 cpumask 字段。",
+      "summary": "该补丁修复了 bpf_cpumask_populate() kfunc 的验证器安全问题。原实现将目标参数声明为 struct cpumask *，导致 BPF 验证器接受来自只读 kfunc（如 scx_bpf_get_online_cpumask()）返回的借用 cpumask 指针作为可写目标，违反了所有权规则。补丁将目标类型改为 struct bpf_cpumask *，与其它可变 cpumask kfunc 保持一致的拥有权语义，确保只有真正可写入的 BPF cpumask 对象才能被 populate。查询类 kfunc 仍接受 const struct cpumask * 输入，行为不变。",
       "tags": [
         "eBPF",
         "Linux内核网络"
@@ -593,11 +591,11 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:49:00",
-      "summary": "该补丁为 BPF selftests 添加 `bpf_icmp_send` 无路由场景的测试用例。在正常的 cgroup_skb 路径中，skb 已被路由，但在 BPF_PROG_TEST_RUN 中通过 `bpf_prog_test_run_skb` 创建的 skb 缺少 dst 路由信息，因此 `bpf_icmp_send` 会提前静默返回。补丁通过构造 IPv4/IPv6 测试报文，调用 BPF 程序触发 ICMP_DEST_UNREACH / ICMPV6_DEST_UNREACH 的发送路径，验证 kfunc 在缺少路由时返回 -ENETUNREACH，确保错误路径的契约被正确暴露给用户。",
+      "summary": "本补丁为 bpf_icmp_send kfunc 新增了一个 selftests 测试用例，专门覆盖\"无路由\"场景。在正常 cgroup_skb 路径中，skb 已经经过路由，但通过 BPF_PROG_TEST_RUN + bpf_prog_test_run_skb 构造的测试报文缺少 dst 路由信息，导致 icmp_send 会因早期返回而静默失败。该测试验证此时 kfunc 应返回 -ENETUNREACH，确保对返回码的正确性进行回归覆盖。涉及 IPv4 和 IPv6 两种地址族，分别设置 ICMP_DEST_UNREACH 和 ICMPV6_DEST_UNREACH 类型进行测试。",
       "tags": [
         "eBPF",
         "包处理",
-        "TCP/IP"
+        "Linux内核网络"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -617,14 +615,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:59",
-      "summary": "本补丁为 BPF 子系统新增 selftest，测试 `bpf_icmp_send` kfunc 的递归保护机制。测试挂载 BPF 程序到 root cgroup，当程序调用 `bpf_icmp_send` 发送 ICMP 不可达报文时，该报文会重新触发同一 BPF 程序（即递归场景）。若不加以防护将导致无限循环，因此 kfunc 应在检测到递归时提前返回 -EBUSY。该机制保障了 cgroup 钩子场景下 ICMP 发送的安全性与正确性。",
+      "summary": "本补丁为 BPF 子系统新增 selftest，测试 bpf_icmp_send kfunc 的递归处理逻辑。该测试附加到 root cgroup 上，确保 kfunc 生成的 ICMP 包能够再次触发同一个 BPF 程序，从而验证当 kfunc 被自身产生的 ICMP 包递归触发时，能够提前中止并正确返回 -EBUSY 错误码，避免无限递归循环。这是对 bpf_icmp_send kfunc 安全机制的补充测试，属于 BPF 与网络协议栈交互的验证工作。",
       "tags": [
         "eBPF",
         "包处理",
-        "Netfilter"
+        "Linux内核网络"
       ],
-      "relevance": "high",
-      "readingTime": 2
+      "relevance": "medium",
+      "readingTime": 3
     },
     {
       "id": 14676109,
@@ -641,14 +639,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:58",
-      "summary": "该补丁为 bpf_icmp_send kfunc 的 cgroup_skb selftest 添加 IPv6 支持。关键改动包括：定义 ICMPv6 相关常量（ICMPV6_DEST_UNREACH、ICMPV6_REJECT_ROUTE）；在 connect_to_fd_nonblock 中针对 AF_INET6 套接字设置 IPV6_RECVERR 选项，确保 TCP 握手过程中产生的 ICMPv6 错误能被正确接收，否则 ipv6_icmp_error 会忽略这些错误。BPF 测试程序 icmp_send.c 同步扩展以覆盖 IPv6 场景。",
+      "summary": "该补丁为 selftests/bpf 中的 cgroup_skb 测试添加了 IPv6 支持，扩展 bpf_icmp_send kfunc 的测试覆盖范围。关键改动是在 `connect_to_fd_nonblock` 中为 IPv6 socket 设置 `IPV6_RECVERR` 选项，这是因为在 TCP 握手过程中，IPv6 协议栈（`net/ipv6/datagram.c:ipv6_icmp_error`）默认会忽略 ICMPv6 错误，必须通过该 socket 选项才能正确接收并处理目的地不可达（ICMPV6_DEST_UNREACH）等错误，从而在 BPF cgroup_skb 钩子中触发 ICMP 发送逻辑的测试验证。",
       "tags": [
         "eBPF",
-        "包处理",
-        "性能"
+        "TCP/IP",
+        "包处理"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14676108,
@@ -665,14 +663,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:57",
-      "summary": "该补丁为 BPF kfunc `bpf_icmp_send` 添加了 cgroup_skb 场景下的 selftest。测试通过创建一个 server/client 对，在 cgroup egress 方向 attach 一个 cgroup_skb 程序，在客户端 egress 路径上调用 `bpf_icmp_send` 主动回送 ICMP Destination Unreachable 消息。测试采用非阻塞 connect 以避免等待 TCP 三次握手超时，并通过 socket 错误队列（error queue）读取 ICMP 不可达错误码以验证功能正确性。涉及 BPF kfunc、cgroup_skb 钩子、ICMP 错误注入及 TCP 错误处理路径（tcp_v4_err）。",
+      "summary": "《selftests/bpf: add bpf_icmp_send kfunc cgroup_skb tests》主要围绕“This test opens a server and client, enters a new cgroup, attach a cgroup_skb progra...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "eBPF",
         "TCP/IP",
         "包处理"
       ],
-      "relevance": "high",
-      "readingTime": 4
+      "relevance": "low",
+      "readingTime": 3
     },
     {
       "id": 14676107,
@@ -689,13 +687,13 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:56",
-      "summary": "该补丁为 BPF 新增 kfunc `bpf_icmp_send`，允许 cgroup_skb 类型的 BPF 程序在阻断流量时向对端发送 ICMP 目的不可达报文（替代静默丢包），从而改善策略拦截的反馈体验。实现上复用 netfilter reject 路径，但因 cgroup_skb 仅允许只读访问 skb，需先克隆 skb 再发送 ICMP；通过递归检测避免 ICMP 错误报文二次触发同一 BPF 造成循环。当前仅支持 ICMP_DEST_UNREACH/ICMPV6_DEST_UNREACH，扩展性通过 type 参数预留。同时增加 dst 合法性校验，应对 bpf_prog_test_run_skb 合成 skb 无路由、metadata dst 等特殊场景。",
+      "summary": "《add bpf_icmp_send kfunc》主要围绕“This is needed in the context of Tetragon to provide improved feedback (in contrast...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "eBPF",
-        "包处理",
-        "Linux内核网络"
+        "Netfilter",
+        "包处理"
       ],
-      "relevance": "high",
+      "relevance": "low",
       "readingTime": 3
     },
     {
