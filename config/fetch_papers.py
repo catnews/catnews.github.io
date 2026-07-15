@@ -29,30 +29,50 @@ LLM_DELAY_MAX = 5
 ARXIV_DELAY = 3
 
 SEARCH_KEYWORDS = [
-    "Linux kernel network",
-    "Linux eBPF networking",
-    "Linux XDP data path",
-    "Linux TCP IP kernel",
-    "Linux socket performance",
-    "Linux netfilter iptables",
-    "Linux network driver",
-    "Linux kernel bypass",
-    "Linux packet processing",
-    "Linux virtio network",
-    "Linux network optimization",
-    "Linux skb networking",
-    "Linux netdev kernel",
-    "Linux vhost networking",
-    "Linux network namespace kernel",
+    # 核心代码符号 / 子系统（精确）
+    "Linux sk_buff kernel",
+    "Linux net_device kernel",
+    "Linux netdev mailing list",
     "Linux qdisc traffic control",
-    "Linux container networking",
-    "Linux CNI networking",
-    "Linux Kubernetes networking",
+    "Linux netlink kernel",
+    "Linux ethtool network",
+    # XDP / eBPF / 数据面
+    "Linux XDP data path",
+    "Linux eBPF networking",
+    "Linux AF_XDP zero copy",
+    "Linux BPF network program",
+    "Linux sock_map sockhash",
+    # netfilter / conntrack
+    "Linux netfilter nftables",
     "Linux conntrack netfilter",
-    "Linux network performance tuning",
-    "Linux TCP performance optimization",
-    "Linux AF_XDP performance",
-    "Linux io_uring networking",
+    "Linux iptables kernel",
+    # TCP / 协议栈
+    "Linux TCP IP stack kernel",
+    "Linux TCP congestion kernel",
+    "Linux socket kernel performance",
+    # 虚拟化 / 内核 bypass
+    "Linux virtio network",
+    "Linux vhost_net vhost-net",
+    "Linux kernel bypass networking",
+    # 容器网络（仅与内核相关）
+    "Linux network namespace kernel",
+    "Linux veth kernel",
+    "Linux Cilium eBPF",
+    "Linux tc flower kernel",
+    # 驱动 / 中断
+    "Linux network driver kernel",
+    "Linux NAPI softirq network",
+    # 其他
+    "Linux io_uring network",
+    "Linux kernel network",  # 兜底宽词，仍保留
+    # SmartNIC offload / kernel bypass / 用户态高速网络栈
+    "SmartNIC offload network stack",
+    "off-path SmartNIC TCP",
+    "BlueField network offload",
+    "DPDK kernel bypass network",
+    "RDMA Linux kernel network",
+    "hardware-offloaded network stack",
+    "userspace network stack Linux",
 ]
 
 HOT_TOPIC_KEYWORDS = [
@@ -241,6 +261,56 @@ KERNEL_ANCHOR_KEYWORDS = [
     "vhost",
 ]
 
+# 仅在 Linux 内核网络源码 / 子系统上下文中才会出现的术语。
+# 用于 passes_domain_gate 的硬锚点：必须命中至少一个，才认为论文
+# 可能真正触及 Linux 内核网络代码路径，而非通用网络研究。
+KERNEL_SPECIFIC_TERMS = [
+    # 核心 skb / 设备 / sock 结构
+    "sk_buff", "skb", "net_device", "netdev",
+    "sock_map", "sockmap", "sockhash",
+    "bpf_prog", "bpf_sk", "bpf_xdp", "bpf_redirect", "bpf_map", "bpf_sk_lookup",
+    "napi", "softirq", "netif_rx", "netif_receive_skb", "dev_queue_xmit",
+    "ndo_start_xmit", "ip_rcv", "nf_hook", "nf_hook_slow",
+    "tcp_sock", "tcp_v4", "tcp_v6", "tcp_listen",
+    # 子系统 / 工具
+    "qdisc", "netlink", "ethtool", "iproute2",
+    "ip_tables", "iptables", "nf_tables", "nftables", "nft_",
+    "conntrack", "nf_conntrack",
+    # 多队列 / 协议卸载
+    "xps", "rps", "rfs", " gro ", " gso ", " tso ", " rss ",
+    # 虚拟化
+    "virtio-net", "virtio_net", "vhost-net", "vhost_net",
+    "af_xdp", "afxdp", "xdp_buff", "xdp_redirect", "xdp_meta",
+    # 命名空间
+    "net_namespace", "netns", " veth ",
+    # 内核子系统短语（宽松但内核专属）
+    "kernel network stack",
+    "kernel networking stack",
+    "kernel networking subsystem",
+    "kernel network subsystem",
+    "linux networking stack",
+    "linux network stack",
+    "linux kernel network",
+    "kernel tcp/ip",
+    "kernel tcp stack",
+    # SmartNIC offload / kernel bypass / 用户态高速网络栈
+    # （AGENTS.md 高级特性 "Kernel Bypass (DPDK, user-space networking)" 范畴）
+    "smartnic",
+    "off-path smartnic",
+    "hardware-offloaded network stack",
+    "hardware offloaded network",
+    "kernel bypass",
+    " dpdk ",
+    "rdma ibv",
+    "bluefield",
+    "dpu network",
+    "userspace network stack",
+    "user-space network stack",
+    "user space network stack",
+    # 其他
+    "proc/sys/net", "sysctl net", "rxhash", "kfunc",
+]
+
 NETWORK_ANCHOR_KEYWORDS = [
     "network",
     "networking",
@@ -276,15 +346,22 @@ MIN_PAPERS_TARGET = 12
 MIN_NEWS_TARGET = 8
 ENABLE_NEWS = True
 
-PAPER_PROMPT = """你是一个专业的论文筛选助手。分析论文是否与 Linux 内核网络子系统直接相关。
+PAPER_PROMPT = """你是 Linux 内核网络论文筛选专家。严格判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
 
-Linux 内核网络相关主题：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter/nftables、Kernel Bypass、Virtio/vHost、网络驱动、路由/网桥/包处理。
-重点关注热点：容器网络（Kubernetes/CNI/netns/veth/OVS/Cilium）与 Linux 内核网络性能优化（延迟/吞吐/调度/benchmark）。
+判断维度（kernelNetworkScope）：
+- kernel_internal: 论文直接修改 / 分析 / 评估 Linux 内核网络源码路径（如 sk_buff 处理、netfilter hook、qdisc 调度、XDP 数据面、virtio-net 驱动、napi 轮询、tcp 协议栈内部）。
+- kernel_interface: 论文通过内核暴露的稳定接口（socket / netlink / setsockopt / tc / BPF hook / ip / ethtool）使用或扩展内核网络能力，但不深入内核源码。
+- kernel_bypass_offload: SmartNIC offload / DPDK / RDMA / DPU / 用户态高速网络栈研究（如 SmartNIC-centric network stack、BlueField-3、off-path smartnic、hardware-offloaded network stack、microkernel-based baseline 等），通过旁路 / 卸载方式提供与内核网络并行的高速数据面。
+- userspace_application: 论文聚焦用户态应用层 / 容器编排 / 微服务 / 虚拟机用户态应用（如 Kubernetes / Docker / Cilium 控制面、HTTP/gRPC 应用层、机器学习训练网络等），未触内核代码也未做高速网络栈研究。
+- unrelated: 与 Linux 内核网络无关（其他 OS、应用层 ML/HTTP、IoT、传感器网络、推荐系统等）。
 
-返回JSON格式：
-{"relevance": "high/medium/low/none", "summary": "中文总结150-300字", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
+输出 JSON：
+{"kernelNetworkScope": "kernel_internal|kernel_interface|kernel_bypass_offload|userspace_application|unrelated", "relevance": "high|medium|low|none", "reason": "20-50字简述判断依据", "summary": "中文总结150-300字", "tags": ["3-4个最重要标签"], "readingTime": 分钟数}
 
-注意：tags数组最多包含3-4个最重要的标签，不要过多。"""
+强约束：
+1. relevance 必须与 kernelNetworkScope 一致：kernel_internal→high/medium；kernel_interface→medium/low；kernel_bypass_offload→medium/low；userspace_application→low；unrelated→none。
+2. 若论文仅讨论 Kubernetes/Docker 等编排面或纯应用层网络，未触内核代码也未做高速网络栈研究，强制 userspace_application→low。
+3. tags 数组最多 3-4 个最重要标签，不要过多。"""
 
 NEWS_PROMPT = """你是一个技术资讯筛选助手。分析文章是否与 Linux 内核网络相关。
 
@@ -360,14 +437,19 @@ def call_minimax(prompt, system_prompt, max_retries=3, max_tokens=500):
     
     return None
 
-QUICK_FILTER_PROMPT = """你是论文筛选助手。快速判断文章是否与Linux内核网络子系统直接相关。
+QUICK_FILTER_PROMPT = """你是 Linux 内核网络论文初筛助手。快速判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
 
-Linux内核网络：TCP/IP协议栈、Socket API、eBPF/XDP、Netfilter、Kernel Bypass、Virtio、网络驱动、路由/网桥。
-优先关注：容器网络（Kubernetes/CNI/netns/veth）和网络性能优化（latency/throughput/qdisc/tc）。
+严格标准：必须直接涉及 Linux 内核网络代码 / 实现，或属于 SmartNIC offload / DPDK / RDMA / DPU / 用户态高速网络栈等 kernel bypass 类研究，而非通用网络研究或纯应用层。
 
-严格标准：必须直接涉及Linux内核网络代码/实现，而非通用网络研究。
+判断维度（kernelNetworkScope）：
+- kernel_internal: 论文直接修改 / 分析 / 评估 Linux 内核网络源码路径。
+- kernel_interface: 论文通过内核暴露的稳定接口（socket / netlink / tc / BPF hook / ethtool）使用或扩展内核网络能力，但不深入内核源码。
+- kernel_bypass_offload: SmartNIC offload / DPDK / RDMA / DPU / 用户态高速网络栈研究（与内核网络并行的高速数据面）。
+- userspace_application: 论文聚焦用户态应用层 / 容器编排 / 微服务（如 Kubernetes / Docker 控制面），未触内核代码也未做高速网络栈研究。
+- unrelated: 与 Linux 内核网络无关。
 
-返回JSON：{"relevance": "high/medium/low/none"}"""
+输出 JSON：{"kernelNetworkScope": "kernel_internal|kernel_interface|kernel_bypass_offload|userspace_application|unrelated", "relevance": "high|medium|low|none"}
+强约束：kernel_internal→high/medium；kernel_interface→medium/low；kernel_bypass_offload→medium/low；userspace_application→low；unrelated→none。"""
 
 def quick_filter_relevance(title, abstract):
     if not passes_domain_gate(title, abstract):
@@ -386,11 +468,39 @@ def quick_filter_relevance(title, abstract):
         json_match = re.search(r'\{[^{}]+\}', response)
         if json_match:
             result = json.loads(json_match.group())
-            return result.get('relevance', 'none')
+            scope = result.get('kernelNetworkScope', '')
+            rel = result.get('relevance', 'none')
+            return reconcile_relevance(scope, rel)
     except:
         pass
 
     return heuristic_relevance(title, abstract)
+
+def reconcile_relevance(scope, relevance):
+    """根据 LLM 给出的 kernelNetworkScope 强制校正 relevance。
+
+    校正规则与 PAPER_PROMPT 中的强约束保持一致，避免 LLM 自身
+    在 summary 中表述"无关"但 relevance 字段仍标 medium 的矛盾。
+    """
+    scope = (scope or '').strip().lower()
+    relevance = (relevance or 'none').strip().lower()
+    if relevance not in ('high', 'medium', 'low', 'none'):
+        relevance = 'none'
+
+    if scope == 'kernel_internal':
+        return relevance if relevance in ('high', 'medium') else 'medium'
+    if scope == 'kernel_interface':
+        return relevance if relevance in ('medium', 'low') else 'low'
+    if scope == 'kernel_bypass_offload':
+        # SmartNIC offload / DPDK / RDMA / 用户态高速网络栈等
+        # 旁路研究：放宽为 medium/low，不强制 low
+        return relevance if relevance in ('medium', 'low') else 'medium'
+    if scope == 'userspace_application':
+        return 'low'
+    if scope == 'unrelated':
+        return 'none'
+    # LLM 没给出 scope（news / 兜底场景）：保持原 relevance
+    return relevance
 
 def keyword_hit_count(text):
     text_lower = (text or "").lower()
@@ -442,21 +552,25 @@ def passes_domain_gate(title, abstract, source=""):
         if "linux" not in merged and "kernel" not in merged:
             return False
 
-    kernel_hit = any(keyword in merged for keyword in KERNEL_ANCHOR_KEYWORDS)
+    # 硬锚点：必须命中至少 1 个内核专属词（KERNEL_SPECIFIC_TERMS）
+    # + 1 个网络通用词，才认为可能真正涉及 Linux 内核网络代码。
+    # 否则像 "tcp"/"socket" 这种通用词不应单独作为内核证据。
+    kernel_specific_hit = any(term in merged for term in KERNEL_SPECIFIC_TERMS)
     network_hit = any(keyword in merged for keyword in NETWORK_ANCHOR_KEYWORDS)
 
-    if not kernel_hit or not network_hit:
+    if not network_hit:
         return False
 
+    if kernel_specific_hit:
+        return True
+
+    # LWN 文章 / 资讯可能描述内核讨论但 abstract 不含源码符号，保留例外：
+    # 仅当 network_hit 成立，且 source 为 LWN 时放行进入 LLM 判断。
     if source == "LWN.net":
         return True
 
-    hot_score = hot_topic_score(merged)
-    keyword_hits = keyword_hit_count(merged)
-    if hot_score <= 0 and keyword_hits < 2:
-        return False
-
-    return True
+    # 论文类：无内核专属词一律挡下，由 LLM 再筛
+    return False
 
 def prioritize_items(items, content_field="abstract"):
     def score(item):
@@ -530,6 +644,9 @@ def analyze_item_with_llm(title, content, is_news=False):
             result = json.loads(json_match.group())
             if 'tags' in result and len(result['tags']) > 4:
                 result['tags'] = result['tags'][:4]
+            # 用 kernelNetworkScope 强制校正 relevance，避免 LLM 自相矛盾
+            scope = result.get('kernelNetworkScope', '')
+            result['relevance'] = reconcile_relevance(scope, result.get('relevance', 'none'))
             return result
     except:
         pass
@@ -548,9 +665,15 @@ def fetch_arxiv_papers(query, max_results=8):
         try:
             print(f"  Waiting {ARXIV_DELAY}s for arXiv...")
             time.sleep(ARXIV_DELAY)
-            
+
+            # arXiv API 把空格当作 OR 分隔符，所以多 token query 必须显式
+            # 用 AND 连接每个 all:token，否则只有第一个 token 受 all: 限定，
+            # 命中量爆炸且召回质量极差。
+            tokens = [t for t in query.split() if t]
+            search_query = " AND ".join(f"all:{t}" for t in tokens) if tokens else f"all:{query}"
+
             params = {
-                "search_query": f"all:{query}",
+                "search_query": search_query,
                 "start": 0,
                 "max_results": max_results,
                 "sortBy": "submittedDate",
