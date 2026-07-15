@@ -1,8 +1,221 @@
 {
   "date": "2026-07-15",
   "categories": {
-    "papers": [],
+    "papers": [
+      {
+        "title": "LogNIC: A High-Level Performance Model for SmartNICs",
+        "url": "https://www.semanticscholar.org/paper/5af33a09cd39080597ef8fe2e599901a7c90d5ab",
+        "summary": "LogNIC提出了一种针对SmartNIC的高层次性能建模框架，旨在简化SmartNIC辅助方案的开发。当前在数据中心和企业集群中，SmartNIC已成为不可或缺的高性能通信基础设施，提供in-network computing能力。然而，为SmartNIC编写高效程序仍然复杂且繁琐，需要程序员深入理解SmartNIC底层硬件架构。LogNIC通过提供抽象的性能模型，使开发者能够在高层快速评估和优化SmartNIC加速方案，降低了SmartNIC编程门槛。该工作对采用BlueField等DPU/SmartNIC进行硬件卸载高速网络的研究具有重要参考价值，为kernel-bypass与硬件卸载方案的性能预测提供了方法论支持。",
+        "summary_en": "SmartNICs have become an indispensable communication fabric and computing substrate in today’s data centers and enterprise clusters, providing in-netw...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "性能建模",
+          "硬件卸载",
+          "高速网络"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 6
+      },
+      {
+        "title": "Closed-Loop CPU-Aware Traffic Control for SDN-Enabled 5G/6G Networks in Open vSwitch Dataplanes",
+        "url": "https://doi.org/10.3390/smartcities9060091",
+        "summary": "这篇研究工作《Closed-Loop CPU-Aware Traffic Control for SDN-Enabled 5G/6G Networks in Open vSwitch Dataplanes》与eBPF、XDP、路由相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：Closed-Loop CPU-Aware Traffic Control for SDN-Enabled 5G/6G Networks in Open vSw...",
+        "summary_en": "This paper presents a closed-loop, CPU-aware traffic-control framework for SDN in 5G/6G multi-tenant edge environments based on commodity KVM/OVS infr...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "路由",
+          "驱动"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 10
+      },
+      {
+        "title": "FlexTOE: Flexible TCP Offload with Fine-Grained Parallelism",
+        "url": "http://arxiv.org/abs/2110.10919v2",
+        "summary": "FlexTOE提出了一种灵活且高性能的TCP卸载引擎（TOE），将TCP数据面处理几乎全部从主机CPU卸载到SmartNIC上执行。其设计目标是消除主机侧的TCP数据路径开销，同时保持高度可定制性，可与其他TCP协议栈（如Linux内核TCP）互通。FlexTOE聚焦于已建立连接的数据面卸载，避免复杂的控制逻辑处理，简化了硬件实现复杂度。它兼容POSIX socket接口，在恶劣网络条件下表现出良好鲁棒性。该工作属于典型的kernel bypass/offload路线，通过SmartNIC提供与Linux内核网络栈并行的高速数据面，适用于数据中心高吞吐低延迟场景，是研究主机侧网络栈卸载与RDMA/SmartNIC数据面设计的重要参考。",
+        "summary_en": "FlexTOE is a flexible, yet high-performance TCP offload engine (TOE) to SmartNICs. FlexTOE eliminates almost all host data-path TCP processing and is ...",
+        "source": "arXiv",
+        "tags": [
+          "TCP offload",
+          "SmartNIC",
+          "旁路",
+          "data-path acceleration"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 10
+      },
+      {
+        "title": "Joyride: Rethinking Linux's network stack design for better performance, security, and reliability",
+        "url": "http://arxiv.org/abs/2509.25015v1",
+        "summary": "Joyride 论文针对现代分布式计算（科学计算、数据挖掘、机器学习等）对低延迟、高吞吐、高安全与高可靠性的需求，指出传统 Linux TCP/IP 协议栈在面对 100Gbps 及以上高速网卡时存在的诸多问题。这些问题主要源于 Linux 网络栈的传统设计假设（如 sk_buff 分配拷贝开销、socket 层抽象、协议处理路径过长等）。Joyride 提出对 Linux 网络栈架构进行根本性重新设计，以同时改善性能、安全性和可靠性。该工作直接修改 Linux 内核网络子系统代码路径，是典型的内核网络栈内部研究，对未来高速网络环境下的操作系统网络设计具有重要参考价值。",
+        "summary_en": "Contemporary distributed computing workloads, including scientific computation, data mining, and machine learning, increasingly demand OS networking w...",
+        "source": "arXiv",
+        "tags": [
+          "Linux内核网络栈",
+          "TCP/IP",
+          "高性能网络",
+          "内核重构"
+        ],
+        "readingTime": 15,
+        "relevance": "high",
+        "innovationScore": 4
+      },
+      {
+        "title": "Adaptive SmartNIC Offloading for Unleashing the Performance of Protocol-Oblivious Forwarding",
+        "url": "https://www.semanticscholar.org/paper/93e7d40f4359a707e0034dcd8547b736a0b5466f",
+        "summary": "本文研究面向物联网（IoT）场景下协议无关转发（Protocol-Oblivious Forwarding, POF）的SmartNIC自适应卸载方案。针对PDP（可编程数据面）中软件实现的POF性能瓶颈问题，论文提出将流表等关键数据结构卸载到SmartNIC硬件上，通过硬件加速提升数据包处理的吞吐和时延。论文设计了自适应卸载机制，根据流表规模、流量特征等动态决定哪些表项应驻留在SmartNIC的板载内存中，从而在硬件资源受限的情况下最大化卸载收益。该方案在保留软件可编程性的同时利用SmartNIC的并行处理能力，为异构IoT网络中的高速包处理提供了可行的软硬协同路径。",
+        "summary_en": "The growth of Internet of Things (IoT) has led to the convergence of heterogeneous networking systems powered by various protocols, and consequently t...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC卸载",
+          "可编程数据面",
+          "协议无关转发",
+          "IoT加速"
+        ],
+        "readingTime": 12,
+        "relevance": "medium",
+        "innovationScore": 6
+      },
+      {
+        "title": "Understanding the Micro-Behaviors of Hardware Offloaded Network Stacks with Lumina",
+        "url": "https://www.semanticscholar.org/paper/9212c5f733c396a2c1ef57e0ecc290addf6b2273",
+        "summary": "随着数据中心对高吞吐、超低时延和低CPU开销的需求增长，硬件卸载网络栈（如基于SmartNIC/DPU的offloaded stack）被广泛部署。然而，这类硬件栈对测试工具提出了独特挑战：传统面向软件网络栈的测试方法难以捕捉其内部微行为。Lumina提出了一套针对硬件卸载网络栈的观测与测试框架，能够深入剖析硬件数据路径中的包处理、调度、资源管理等微行为，帮助用户理解并充分利用硬件卸载栈的极致性能。该工作与Linux内核网络子系统高度互补，因内核TCP/IP栈正面临被旁路/卸载的架构演进趋势，但Lumina本身聚焦于硬件卸载侧而非内核源码修改。",
+        "summary_en": "Hardware offloaded network stacks are widely adopted in modern datacenters to meet the demand for high throughput, ultra-low latency and low CPU overh...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "hardware-offloaded-stack",
+          "SmartNIC",
+          "network-observability",
+          "kernel-bypass"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 2
+      },
+      {
+        "title": "Age-Based CoDel and His Friends. Improving the Linux Scheduler with 2-Level AQM Disciplines",
+        "url": "https://www.semanticscholar.org/paper/f7b497740d994d2767896c6f831baf01071ead1d",
+        "summary": "该论文研究将主动队列管理（AQM）算法（如CoDel、FQ-CoDel、PIE）与基于年龄的调度策略（如Least Attained Service、Two-Level Processor Sharing）相结合，以改进Linux内核数据包调度器的网络性能。AQM算法管理队列长度并保证公平带宽分配，而age-based调度通过优先处理新流来降低流完成时间（FCT）。论文在Linux qdisc框架内实现2级AQM调度策略，针对kernel内部的排队规则（qdisc）代码路径进行修改与评估，旨在降低平均流完成时间并提升网络吞吐。属于Linux内核网络子系统调度层面的直接研究。",
+        "summary_en": "We study the combination of Active Queue Management (AQM) techniques and age-based scheduling disciplines to improve network performance in the Linux ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "qdisc",
+          "AQM",
+          "CoDel",
+          "flow-completion-time"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "FlexiNS: A SmartNIC-Centric, Line-Rate and Flexible Network Stack",
+        "url": "https://www.semanticscholar.org/paper/75aa494ad2347d647af68243601ec82101cebd10",
+        "summary": "FlexiNS针对现有CPU-centric网络栈在高速网络下开销过大、纯硬件卸载方案灵活性不足的问题，提出将网络栈卸载到off-path SmartNIC的方案。论文在SmartNIC上同时实现控制面灵活性和数据面线速转发能力，在控制面保留软件可编程性，在数据面通过硬件加速保证线速吞吐。该工作属于DPU/SmartNIC卸载方向，为数据中心提供兼顾灵活性与高性能的网络栈替代方案，与Linux内核网络栈形成并行的高速数据面路径。",
+        "summary_en": "As the gap between network and CPU speeds rapidly increases, the CPU-centric network stack proves inadequate due to excessive CPU and memory overhead....",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "网络栈卸载",
+          "硬件卸载",
+          "数据中心网络"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 1
+      },
+      {
+        "title": "Enabling Time-Aware Priority Traffic Management over Distributed FPGA Nodes",
+        "url": "http://arxiv.org/abs/2509.26043v1",
+        "summary": "本文探讨网络接口卡（NIC）从简单数据收发设备演进为复杂异构系统的过程，重点研究基于FPGA的分布式网络节点上的时间感知优先级流量管理。随着NIC不断卸载主机CPU的包处理任务（如压缩/解压、校验和计算等），FPGA等可编程硬件成为实现灵活数据面卸载的关键平台。论文提出在分布式FPGA节点上实现时间感知的流量调度机制，以保障关键流量的低延迟传输。该工作属于SmartNIC/FPGA硬件卸载方向，与Linux内核旁路高速网络栈研究密切相关，但并未直接修改内核网络代码路径，而是通过硬件卸载方式提供并行的高速数据面能力。",
+        "summary_en": "Network Interface Cards (NICs) greatly evolved from simple basic devices moving traffic in and out of the network to complex heterogeneous systems off...",
+        "source": "arXiv",
+        "tags": [
+          "SmartNIC",
+          "FPGA-Offload",
+          "Priority-Traffic-Management",
+          "Hardware-Acceleration"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 7
+      },
+      {
+        "title": "Towards Timing Isolation for Mixed-Criticality Communication in Software-Defined Vehicles",
+        "url": "http://arxiv.org/abs/2508.13652v2",
+        "summary": "随着汽车行业向基于Linux的集中式架构转型，确保混合关键性应用的可预测执行变得至关重要。然而，Linux网络栈的并发使用会带来干扰，导致延迟和抖动不可预测。本文提出一种分层软件架构，对汽车以太网通信实施时间隔离机制。该架构旨在解决Linux内核网络栈中多租户/多关键性应用共享网络资源时产生的干扰问题，通过在内核网络调度层面引入隔离保证，实现混合关键性通信的确定性时延。论文结合汽车功能安全（ISO 26262）和实时系统需求，探索了Linux网络栈在车载中央计算平台中的实时性增强方案。",
+        "summary_en": "As the automotive industry transitions toward centralized Linux-based architectures, ensuring the predictable execution of mixed-criticality applicati...",
+        "source": "arXiv",
+        "tags": [
+          "Linux网络栈",
+          "时间隔离",
+          "混合关键性",
+          "汽车以太网"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 6
+      },
+      {
+        "title": "SmartNS: Enabling Line-rate and Flexible Network Stack with SmartNIC",
+        "url": "https://www.semanticscholar.org/paper/51bd7dc90f7c006900d7f69dc5e2ccbfe2e1e804",
+        "summary": "SmartNS针对CPU-centric网络栈在高带宽场景下CPU和内存开销过大的问题，提出将网络栈灵活卸载到SmartNIC的方案。现有硬件卸载方案灵活性不足，而朴素卸载方案也存在效率问题。SmartNS旨在结合SmartNIC的可编程性和硬件卸载的高性能优势，提供线速且灵活的网络栈处理能力，绕过传统内核网络数据面实现高性能数据通路。",
+        "summary_en": "As the gap between network and CPU speeds rapidly increases, the CPU-centric network stack proves inadequate due to excessive CPU and memory overheads...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "网络栈卸载",
+          "高速网络",
+          "硬件卸载"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 1
+      }
+    ],
     "news": []
   },
-  "tagStats": {}
+  "tagStats": {
+    "SmartNIC": 6,
+    "性能建模": 1,
+    "硬件卸载": 3,
+    "高速网络": 2,
+    "eBPF": 1,
+    "XDP": 1,
+    "路由": 1,
+    "驱动": 1,
+    "TCP offload": 1,
+    "旁路": 1,
+    "data-path acceleration": 1,
+    "Linux内核网络栈": 1,
+    "TCP/IP": 1,
+    "高性能网络": 1,
+    "内核重构": 1,
+    "SmartNIC卸载": 1,
+    "可编程数据面": 1,
+    "协议无关转发": 1,
+    "IoT加速": 1,
+    "hardware-offloaded-stack": 1,
+    "network-observability": 1,
+    "kernel-bypass": 1,
+    "qdisc": 1,
+    "AQM": 1,
+    "CoDel": 1,
+    "flow-completion-time": 1,
+    "网络栈卸载": 2,
+    "数据中心网络": 1,
+    "FPGA-Offload": 1,
+    "Priority-Traffic-Management": 1,
+    "Hardware-Acceleration": 1,
+    "Linux网络栈": 1,
+    "时间隔离": 1,
+    "混合关键性": 1,
+    "汽车以太网": 1
+  }
 }

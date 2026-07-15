@@ -1,15 +1,15 @@
 {
   "date": "2026-07-15",
   "papers": {
-    "raw": 206,
-    "dedup": 105,
-    "quick_high_medium": 0,
-    "fill_medium_high": 6,
+    "raw": 225,
+    "dedup": 124,
+    "quick_high_medium": 11,
+    "fill_medium_high": 0,
     "fill_low": 0,
-    "hotspot_final": 0,
-    "final": 0,
-    "dedup_rate": "51.0%",
-    "final_rate": "0.0%"
+    "hotspot_final": 8,
+    "final": 11,
+    "dedup_rate": "55.1%",
+    "final_rate": "8.9%"
   },
   "news": {
     "raw": 13,
