@@ -356,12 +356,14 @@ PAPER_PROMPT = """你是 Linux 内核网络论文筛选专家。严格判断论�
 - unrelated: 与 Linux 内核网络无关（其他 OS、应用层 ML/HTTP、IoT、传感器网络、推荐系统等）。
 
 输出 JSON：
-{"kernelNetworkScope": "kernel_internal|kernel_interface|kernel_bypass_offload|userspace_application|unrelated", "relevance": "high|medium|low|none", "reason": "20-50字简述判断依据", "summary": "中文总结150-300字", "tags": ["3-4个最重要标签"], "readingTime": 分钟数}
+{"kernelNetworkScope": "kernel_internal|kernel_interface|kernel_bypass_offload|userspace_application|unrelated", "relevance": "high|medium|low|none", "reason": "20-50字简述判断依据", "summary": "中文总结220-360字", "tags": ["3-4个最重要标签"], "readingTime": 分钟数}
 
 强约束：
 1. relevance 必须与 kernelNetworkScope 一致：kernel_internal→high/medium；kernel_interface→medium/low；kernel_bypass_offload→medium/low；userspace_application→low；unrelated→none。
 2. 若论文仅讨论 Kubernetes/Docker 等编排面或纯应用层网络，未触内核代码也未做高速网络栈研究，强制 userspace_application→low。
-3. tags 数组最多 3-4 个最重要标签，不要过多。"""
+3. tags 数组最多 3-4 个最重要标签，不要过多。
+4. summary 必须说明论文的主要内容和关注点，按自然段覆盖：研究问题/背景、核心方法或系统设计、实验评估或结论、与 Linux 内核网络/旁路高速网络的关系、读者应关注的限制或落地点。
+5. summary 禁止使用“主要围绕某某进行调整”“实现与优化”“建议重点关注”等空泛模板；不能只翻译标题，必须从摘要中提取具体对象、机制、指标或场景。"""
 
 NEWS_PROMPT = """你是一个技术资讯筛选助手。分析文章是否与 Linux 内核网络相关。
 
@@ -465,9 +467,8 @@ def quick_filter_relevance(title, abstract):
         return heuristic_relevance(title, abstract)
     
     try:
-        json_match = re.search(r'\{[^{}]+\}', response)
-        if json_match:
-            result = json.loads(json_match.group())
+        result = parse_json_object(response)
+        if result:
             scope = result.get('kernelNetworkScope', '')
             rel = result.get('relevance', 'none')
             return reconcile_relevance(scope, rel)
@@ -602,6 +603,46 @@ def fallback_summary(content, min_len=90):
         return clipped
     return f"{clipped}..."
 
+def is_generic_summary(text):
+    generic_patterns = [
+        "主要围绕",
+        "进行调整",
+        "实现与优化",
+        "建议重点关注",
+        "相关的细节",
+        "问题定义、方法设计与性能影响",
+    ]
+    normalized = (text or "").strip()
+    if len(normalized) < 120:
+        return True
+    return any(pattern in normalized for pattern in generic_patterns)
+
+def extract_focus_terms(text, limit=6):
+    candidates = []
+    for keyword, tag in DOMAIN_KEYWORDS.items():
+        if keyword in (text or "").lower() and tag not in candidates:
+            candidates.append(tag)
+        if len(candidates) >= limit:
+            break
+    return candidates
+
+def extract_abstract_sentences(content, max_sentences=3):
+    normalized = re.sub(r"\s+", " ", content or "").strip()
+    if not normalized:
+        return []
+    pieces = re.split(r"(?<=[.!?])\s+", normalized)
+    sentences = []
+    for piece in pieces:
+        clean = piece.strip()
+        if len(clean) < 30:
+            continue
+        sentences.append(clean)
+        if len(sentences) >= max_sentences:
+            break
+    if not sentences and normalized:
+        sentences.append(normalized[:260])
+    return sentences
+
 def contains_chinese(text):
     if not isinstance(text, str):
         return False
@@ -609,41 +650,63 @@ def contains_chinese(text):
 
 def chinese_fallback_summary(title, content, tags, is_news=False):
     topic = "技术资讯" if is_news else "研究工作"
-    tag_text = "、".join(tags[:3]) if tags else "Linux内核网络"
-    brief = re.sub(r"\s+", " ", (content or "").strip())
-    if len(brief) > 80:
-        brief = brief[:80] + "..."
-    if not brief:
-        brief = "原文摘要信息有限，建议结合论文或文章原文进一步确认实现细节。"
+    focus_terms = tags[:3] or extract_focus_terms(f"{title} {content}", limit=3)
+    tag_text = "、".join(focus_terms) if focus_terms else "Linux内核网络"
+    sentences = extract_abstract_sentences(content, max_sentences=3)
+    if sentences:
+        brief = " ".join(sentences)
+        if len(brief) > 360:
+            brief = brief[:360].rstrip() + "..."
+    else:
+        brief = "原文摘要信息有限，需要结合论文原文确认实验设置、系统边界和实现细节。"
     return (
-        f"这篇{topic}《{title}》与{tag_text}相关，内容聚焦 Linux 内核网络场景下的"
-        f"实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：{brief}"
+        f"这篇{topic}《{title}》被归入{tag_text}方向。摘要显示，其核心内容是：{brief} "
+        f"阅读时应重点核对三点：它是否直接触达 Linux 内核网络路径或旁路数据面，方法相比现有协议栈/用户态方案解决了什么瓶颈，以及实验是否给出吞吐、时延、CPU 开销或可部署性证据。"
     )
+
+def parse_json_object(response):
+    if not response:
+        return None
+    start = response.find('{')
+    end = response.rfind('}')
+    if start == -1 or end == -1 or end <= start:
+        return None
+    try:
+        return json.loads(response[start:end + 1])
+    except json.JSONDecodeError:
+        json_match = re.search(r'\{[^{}]+\}', response)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except json.JSONDecodeError:
+                return None
+    return None
 
 def analyze_item_with_llm(title, content, is_news=False):
     prompt = f"""标题：{title}
-内容：{content[:400]}
+内容：{content[:1800]}
 
-请分析并返回JSON，tags最多3-4个。"""
+请分析并返回JSON，tags最多3-4个。论文 summary 要具体说明主要内容、方法、评估结论和关注点。"""
     
     system_prompt = NEWS_PROMPT if is_news else PAPER_PROMPT
-    response = call_minimax(prompt, system_prompt)
+    response = call_minimax(prompt, system_prompt, max_tokens=700 if is_news else 1000)
     
     if not response:
         inferred_relevance = heuristic_relevance(title, content)
         return {
             "relevance": inferred_relevance if inferred_relevance != "none" else "low",
-            "summary": fallback_summary(content, min_len=80 if is_news else 120),
+            "summary": chinese_fallback_summary(title, content, infer_tags(f"{title} {content}"), is_news=is_news),
             "tags": infer_tags(f"{title} {content}"),
             "readingTime": 3 if is_news else 5,
         }
     
     try:
-        json_match = re.search(r'\{[^{}]+\}', response)
-        if json_match:
-            result = json.loads(json_match.group())
+        result = parse_json_object(response)
+        if result:
             if 'tags' in result and len(result['tags']) > 4:
                 result['tags'] = result['tags'][:4]
+            if is_generic_summary(result.get('summary', '')):
+                result['summary'] = chinese_fallback_summary(title, content, result.get('tags', []), is_news=is_news)
             # 用 kernelNetworkScope 强制校正 relevance，避免 LLM 自相矛盾
             scope = result.get('kernelNetworkScope', '')
             result['relevance'] = reconcile_relevance(scope, result.get('relevance', 'none'))
@@ -654,7 +717,7 @@ def analyze_item_with_llm(title, content, is_news=False):
     inferred_relevance = heuristic_relevance(title, content)
     return {
         "relevance": inferred_relevance if inferred_relevance != "none" else "low",
-        "summary": fallback_summary(content, min_len=80 if is_news else 120),
+        "summary": chinese_fallback_summary(title, content, infer_tags(f"{title} {content}"), is_news=is_news),
         "tags": infer_tags(f"{title} {content}"),
         "readingTime": 3 if is_news else 5,
     }
@@ -1287,13 +1350,14 @@ def ensure_non_empty_summary(text, fallback_text):
 
 def sanitize_item(item, is_news=False):
     default_minutes = 3 if is_news else 5
-    merged_for_fallback = f"{item.get('title', '')} {item.get('summary', '')}"
+    source_text = item.get("summary_en") or item.get("abstract") or item.get("summary") or ""
+    merged_for_fallback = f"{item.get('title', '')} {source_text}"
     item["tags"] = normalize_tags(item.get("tags", []), max_tags=4)
     item["summary"] = ensure_non_empty_summary(
         item.get("summary", ""),
-        fallback_summary(merged_for_fallback, min_len=80 if is_news else 120),
+        chinese_fallback_summary(item.get("title", ""), merged_for_fallback, item["tags"], is_news=is_news),
     )
-    if not contains_chinese(item["summary"]):
+    if not contains_chinese(item["summary"]) or is_generic_summary(item["summary"]):
         item["summary"] = chinese_fallback_summary(
             item.get("title", ""),
             merged_for_fallback,
@@ -1589,7 +1653,7 @@ def main():
                 "title": paper['title'],
                 "url": paper['url'],
                 "summary": analysis.get('summary', ''),
-                "summary_en": paper['abstract'][:150] + "...",
+                "summary_en": paper['abstract'][:600] + ("..." if len(paper['abstract']) > 600 else ""),
                 "source": paper['source'],
                 "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                 "readingTime": analysis.get('readingTime', 5),
@@ -1610,7 +1674,7 @@ def main():
                 "title": paper['title'],
                 "url": paper['url'],
                 "summary": analysis.get('summary', ''),
-                "summary_en": paper['abstract'][:150] + "...",
+                "summary_en": paper['abstract'][:600] + ("..." if len(paper['abstract']) > 600 else ""),
                 "source": paper['source'],
                 "tags": normalize_tags(analysis.get('tags', []), max_tags=4),
                 "readingTime": analysis.get('readingTime', 5),

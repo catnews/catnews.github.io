@@ -1965,13 +1965,22 @@
             return typeof text === 'string' && /[\u4e00-\u9fff]/.test(text);
         }
 
+        function isGenericSummary(text) {
+            if (typeof text !== 'string') return true;
+            const normalized = text.trim();
+            if (normalized.length < 80) return true;
+            return /主要围绕|进行调整|实现与优化|建议重点关注|问题定义、方法设计与性能影响|相关的细节/.test(normalized);
+        }
+
         function ensureChineseSummary(item) {
             const summary = item && item.summary ? String(item.summary).trim() : '';
-            if (summary && hasChineseText(summary)) return summary;
+            if (summary && hasChineseText(summary) && !isGenericSummary(summary)) return summary;
             const title = (item && item.title) ? item.title : '该论文';
             const tags = Array.isArray(item?.tags) ? item.tags.slice(0, 3) : [];
             const tagText = tags.length ? tags.join('、') : 'Linux内核网络';
-            return `《${title}》与${tagText}相关。建议重点关注其内核路径、优化方法与性能评估结果。`;
+            const abstract = item && item.summary_en ? String(item.summary_en).replace(/\s+/g, ' ').trim() : '';
+            const clipped = abstract ? `摘要线索：${abstract.slice(0, 260)}${abstract.length > 260 ? '...' : ''}` : '当前数据未提供足够摘要线索。';
+            return `《${title}》归入${tagText}方向。${clipped} 阅读时应重点核对它解决的网络栈/旁路数据面问题、采用的核心机制、实验指标以及与 Linux 内核网络路径的实际关联。`;
         }
 
         function normalizeSourceClass(source) {
