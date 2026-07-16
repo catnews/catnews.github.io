@@ -1,21 +1,21 @@
 {
   "date": "2026-07-16",
   "papers": {
-    "raw": 217,
-    "dedup": 110,
-    "quick_high_medium": 2,
+    "raw": 225,
+    "dedup": 116,
+    "quick_high_medium": 0,
     "fill_medium_high": 0,
     "fill_low": 0,
     "hotspot_final": 0,
-    "final": 2,
-    "dedup_rate": "50.7%",
-    "final_rate": "1.8%"
+    "final": 0,
+    "dedup_rate": "51.6%",
+    "final_rate": "0.0%"
   },
   "news": {
     "raw": 15,
     "dedup": 5,
-    "preprocessed": 0,
-    "quick_high_medium": 1,
+    "preprocessed": 1,
+    "quick_high_medium": 0,
     "fill_medium_high": 0,
     "fill_low": 0,
     "hotspot_final": 0,

@@ -1,6 +1,6 @@
 {
   "date": "2026-07-15",
-  "fetchedAt": "2026-07-16T06:24:53+0800",
+  "fetchedAt": "2026-07-16T09:46:31+0800",
   "totals": {
     "inReview": 23,
     "merged": 23,
@@ -22,14 +22,14 @@
       "state": "rfc",
       "submitter": "Leon Hwang",
       "date": "2026-07-15T14:53:26",
-      "summary": "该补丁为 TCP 协议栈新增 per-namespace sysctl `net.ipv4.tcp_purge_receive_queue`，用于解决 CLOSE_WAIT 状态下收到 RST 时接收队列未释放 SKB 导致 page pool 页无法回收的问题。RFC 9293 规定此场景应刷新所有段队列，但当前内核实现并未清空接收队列。补丁在 tcp_input.c 的 RST 处理路径中增加条件分支：当 sysctl 启用时，调用 skb_queue_purge 立即释放 SKB 及其持有的 page pool 内存。默认关闭以保持向后兼容，涉及 sysctl 注册、netns 字段添加及文档更新，修改 51 行属于非侵入式增强。",
+      "summary": "该补丁为 TCP 子系统新增了一个网络命名空间级别的 sysctl 开关 net.ipv4.tcp_purge_receive_queue（默认关闭）。问题在于：当处于 CLOSE_WAIT 状态的 TCP 套接字收到 RST 报文时，当前实现不清空其接收队列，导致队列中的 SKB 一直占用到应用层主动 close 套接字为止，进而使得 SKB 持有的 page pool 页无法释放，整个 page pool 也无法被回收。RFC 9293 3.10.7.4 节明确要求收到 RST 时应 flush 所有段队列，但内核未实现。补丁在 tcp_input.c 的 RST 处理路径中加入条件性 skb_queue_purge 调用，配合新 sysctl 控制开关，使 SKB 与关联 page pool 内存能及时释放，便于存在大量短连接或 CLOSE_WAIT 异常关闭场景下的资源回收。",
       "tags": [
         "TCP/IP",
-        "性能",
-        "Linux内核网络"
+        "Socket",
+        "性能"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14688812,
@@ -46,12 +46,12 @@
       "state": "new",
       "submitter": "Alessio Faina",
       "date": "2026-07-15T12:28:59",
-      "summary": "该补丁针对 selftests/net 中的 SRv6 End.DT46 L3VPN 测试脚本，增加了对 iproute2 版本的检查。当本机 iproute2 版本低于 5.14.0（缺少 End.DT46 支持）时，直接跳过整个测试，避免因用户态工具版本过旧导致的误报失败。该机制通过调用 `ip route add help` 并 grep 'End.DT46' 关键字判断功能可用性，否则以 ksft_skip 退出，从而让内核回移植场景下的测试结果更准确。",
+      "summary": "该补丁修改了 Linux 内核 selftests/net 目录下的 SRv6 End.DT46 L3VPN 测试脚本。当系统的 iproute2 版本低于 5.14.0（2021 年 9 月发布）时，不支持 End.DT46 功能，会导致测试失败。新增 `test_iproute2_supp_or_ksft_skip` 函数，通过检查 `ip route add help` 输出是否包含 'End.DT46' 关键字来判断用户态工具是否具备所需能力，若不支持则使用 ksft_skip 跳过整个测试套件，避免在已回移植新内核特性但用户态 iproute2 较旧的系统上产生误报失败。",
       "tags": [
-        "TCP/IP",
-        "路由"
+        "路由",
+        "Linux内核网络"
       ],
-      "relevance": "medium",
+      "relevance": "high",
       "readingTime": 2
     },
     {
@@ -69,11 +69,13 @@
       "state": "new",
       "submitter": "Kiran Kella",
       "date": "2026-07-15T11:07:01",
-      "summary": "《fix NULL genl_sock deref race with concurrent netns teardown》主要围绕“The race occurs between network namespace removal and PSP device unregistration. Whe...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "该补丁修复 PSP（Protocol Service Proxy）设备注销与网络命名空间销毁之间的并发竞争导致的 NULL 指针解引用问题。当 netns 通过 cleanup_net() 销毁时，genl_pernet_exit() 会将 net->genl_sock 置为 NULL；同时 PSP 设备注销路径调用的 psp_nl_multicast_per_ns() 仍可能访问该 socket，从而在 netlink_has_listeners(NULL) 处崩溃。修复方法是将裸的 dev_net() 调用替换为 maybe_get_net()，若命名空间已处于 dying 状态则返回 NULL 跳过通知；通过持有命名空间引用确保 genl_sock 在 build_ntf() 和 genlmsg_multicast_netns() 使用期间仍然有效，关联设备的 assoc_net 也做了同样的处理。",
       "tags": [
+        "Linux内核网络",
+        "驱动",
         "容器网络"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {
@@ -91,14 +93,14 @@
       "state": "new",
       "submitter": "Doruk Tan Ozturk",
       "date": "2026-07-15T05:56:48",
-      "summary": "该补丁修复了 GENEVE 隧道 changelink 操作的权限检查漏洞。geneve_changelink() 会作用于两个 netns：dev_net(dev) 和 underlay 所在的 sticky netns (geneve->net)。原有 rtnl changelink 路径仅检查 dev_net(dev) 中的 CAP_NET_ADMIN，当设备被创建或移动到其他 netns 时，调用者在该 netns 中虽无权限但仍能修改 geneve 设备并重新打开 underlay socket。补丁在 geneve_changelink() 入口处添加 rtnl_dev_link_net_capable(dev, geneve->net) 检查，要求调用者在 underlay netns 也具备 CAP_NET_ADMIN，与 ipgre_changelink() 等保持一致，防止跨 netns 的权限提升。",
+      "summary": "这是 GENEVE 隧道驱动（drivers/net/geneve.c）的安全加固补丁。GENEVE 隧道的 changelink 操作涉及两个网络命名空间：设备所在的 dev_net(dev) 以及承载底层 underlay socket 的 geneve->net。原有 rtnl changelink 路径仅校验 dev_net(dev) 的 CAP_NET_ADMIN，导致在 dev 所在 netns 拥有权限但不在 geneve->net 拥有权限的调用者可以改写隧道配置并重新打开 underlay socket。补丁在 geneve_changelink() 入口处、解析任何属性之前，调用 rtnl_dev_link_net_capable(dev, geneve->net) 进行权限校验，行为与 ipgre_changelink() 及同系列补丁一致，拒绝越权操作并返回 -EPERM。",
       "tags": [
         "驱动",
-        "路由",
+        "虚拟化",
         "容器网络"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 2
     },
     {
       "id": 14688062,
@@ -115,14 +117,14 @@
       "state": "new",
       "submitter": "Doruk Tan Ozturk",
       "date": "2026-07-15T05:56:47",
-      "summary": "该补丁为 VXLAN 隧道的 changelink 操作添加安全加固。在 vxlan_changelink() 入口处增加 rtnl_dev_link_net_capable() 权限检查，要求调用者不仅在设备所在网络命名空间（dev_net(dev)）拥有 CAP_NET_ADMIN，还需在 VXLAN 底层 underlay socket 所在的粘性命名空间（vxlan->net）拥有该权限。当设备在不同 netns 中创建或移动时，rtnl 原有 changelink 路径仅校验 dev_net(dev)，导致特权用户可绕过 underlay netns 的权限检查，篡改底层 socket 配置甚至重新打开底层套接字。修复方式与 ipgre_changelink() 等同类变更保持一致，在解析任何属性之前即进行拦截，从而修复跨 netns 提权安全隐患。",
+      "summary": "该补丁修复了 vxlan 模块中 changelink 操作的安全漏洞。vxlan 设备的底层（underlay）socket 可能位于与设备自身不同的网络命名空间（vxlan->net）中，原有代码仅校验调用者在 dev_net(dev) 中具有 CAP_NET_ADMIN 权限，导致在 vxlan->net 中无权限的用户可绕过检查篡改底层 socket 配置。补丁在 vxlan_changelink() 入口处添加 rtnl_dev_link_net_capable() 校验，确保调用者在底层 netns 中也具备 CAP_NET_ADMIN 权限，与 ipgre_changelink() 等同类隧道的修复方式保持一致。",
       "tags": [
-        "虚拟化",
-        "路由",
-        "容器网络"
+        "驱动",
+        "Linux内核网络",
+        "虚拟化"
       ],
       "relevance": "high",
-      "readingTime": 1
+      "readingTime": 3
     },
     {
       "id": 14687996,
@@ -139,7 +141,7 @@
       "state": "new",
       "submitter": "MingXuan",
       "date": "2026-07-15T03:35:36",
-      "summary": "该补丁修复 SCTP 协议 diag 接口（INET_DIAG_LOCALS/PEERS）中的内核栈残留信息泄露漏洞。原代码使用 sizeof(union sctp_addr)（28 字节）从 sctp_sockaddr_entry.a 拷贝到 netlink 属性中，但 sctp_v4_from_addr_param 等辅助函数仅初始化 sockaddr_in 部分（16 字节），剩余 12 字节未初始化却被原样拷贝到用户空间，任何能发起 SOCK_DIAG_BY_FAMILY 转储的进程都可读取这些栈残留数据。修复方案是根据 sa_family 动态计算实际初始化长度（AF_INET 取 sizeof(sockaddr_in)=16，否则取 sizeof(sockaddr_in6)=28），先 memset 清零 sockaddr_storage，再 memcpy 只写入已初始化区域，从根本上消除未初始化尾部被读取的风险。",
+      "summary": "该补丁修复了 SCTP 诊断接口（inet_diag）中向用户态泄漏内核栈未初始化数据的漏洞。在处理 INET_DIAG_LOCALS/PEERS 属性时，原代码直接 memcpy sizeof(union sctp_addr)（28 字节），但 IPv4 地址场景下仅初始化了 sockaddr_in 的 16 字节，导致 12 字节的栈残留数据被原样拷贝给用户态。修复方案改为先根据 sa_family 区分地址族并计算实际有效长度（AF_INET 取 16 字节，其他取 28 字节），先 memset 清零整个槽位再 memcpy 已初始化部分，避免读取未初始化尾部。该改动属于安全修复（信息泄露），影响所有能发起 IPPROTO_SCTP 诊断转储的进程。",
       "tags": [
         "TCP/IP",
         "Socket"
@@ -162,11 +164,11 @@
       "state": "new",
       "submitter": "Ren Wei",
       "date": "2026-07-15T01:50:11",
-      "summary": "该补丁修复了 SCTP UDP 隧道套接字在网络命名空间销毁时未正确关闭的问题。当 sysctl net.sctp.udp_port 被设置时，proc_sctp_do_udp_port() 会在每个网络命名空间中启动 SCTP UDP 隧道套接字，但在命名空间退出路径中没有停止这些套接字，导致命名空间销毁时 UDP 隧道套接字仍然存在。补丁在 sctp_ctrlsock_exit() 中注销 sysctl 表后、销毁控制套接字前，调用 sctp_udp_sock_stop(net) 关闭 UDP 隧道套接字，防止新的 sysctl 写入与套接字释放产生竞态，并保证在控制套接字销毁前正确释放隧道套接字。",
+      "summary": "该补丁修复了 SCTP 协议在网络命名空间（netns）销毁时的资源泄漏问题。SCTP 通过 net.sctp.udp_port sysctl 启用 UDP 隧道套接字，但原有的 netns 退出路径（sctp_ctrlsock_exit）没有关闭这些 UDP 隧道套接字，导致命名空间被销毁后仍有残留套接字，可能引发 use-after-free 等问题。修复方案是在注销 sysctl 表之后、销毁控制端点之前，调用 sctp_udp_sock_stop(net) 来关闭 UDP 隧道套接字，从而避免 sysctl 写入与套接字释放之间的竞争。改动仅一行，属于关键的资源清理补丁。",
       "tags": [
         "TCP/IP",
         "Socket",
-        "Linux内核网络"
+        "包处理"
       ],
       "relevance": "high",
       "readingTime": 2
@@ -186,14 +188,13 @@
       "state": "new",
       "submitter": "Ren Wei",
       "date": "2026-07-15T01:50:10",
-      "summary": "该补丁修复了 SCTP 协议中 `net.sctp.auth_enable` sysctl 在网络命名空间销毁过程中引发的 use-after-free 漏洞。原实现中，per-net sysctl 注册在 `sctp_defaults_init()` 中完成，而控制 socket 在后续的 `sctp_ctrlsock_init()` 中才创建，导致命名空间拆除时出现时间窗口：`inet_ctl_sock_destroy()` 已释放控制 socket 但 sysctl 文件仍可写。修复方案是将 sysctl 注册移入 `sctp_ctrlsock_init()`，在控制 socket 创建成功后再注册；拆除时则先注销 sysctl 再销毁控制 socket，保证生命周期严格对齐，并增强 `sctp_sysctl_net_unregister()` 容错。",
+      "summary": "该补丁修复了 SCTP 协议中 `auth_enable` sysctl 在网络命名空间销毁时的 use-after-free（UAF）漏洞。问题根因在于 SCTP 的 per-net sysctl 注册（sctp_defaults_init）与控制 socket 创建（sctp_ctrlsock_init）分离，导致存在时间窗口：初始化时 ctl_sock 尚未创建即可写入 sysctl，销毁时 ctl_sock 已释放但 sysctl 仍可写。修复方案是将 sysctl 注册移至 sctp_ctrlsock_init 中 ctl_sock 创建成功之后，并在 sctp_ctrlsock_exit 中销毁控制 socket 之前注销 sysctl 表。同时增强 sctp_sysctl_net_unregister 容错，允许 header 缺失并将指针置空，以便 init 错误路径与 exit 路径共享同一辅助函数。",
       "tags": [
         "TCP/IP",
-        "Socket",
         "Linux内核网络"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14687722,
@@ -210,13 +211,9 @@
       "state": "new",
       "submitter": "Rishikesh Jethwani",
       "date": "2026-07-14T22:29:15",
-      "summary": "该补丁修复了 mlx5e 驱动 kTLS RX 硬件卸载中因通道数缩减导致的越界访问问题。当 socket 启用 RX offload 时，会将通道索引保存在 priv_rx->rxq 中。若此后通过 'ethtool -L' 减少通道数，旧 socket 中保存的队列索引可能超出新的 priv->channels.num 范围，导致 resync_handle_work() 和 mlx5e_ktls_rx_resync() 中访问 priv->channels.c[] 时越界。补丁在两个 resync 入口处添加了 rxq 边界检查，越界时累加 tls_resync_req_skip 统计并在 workqueue 路径中取消异步请求、释放引用，实现优雅降级。",
-      "tags": [
-        "驱动",
-        "Socket",
-        "性能"
-      ],
-      "relevance": "high",
+      "summary": "《net/mlx5e: kTLS: guard RX resync against stale channel index》主要围绕“An RX offloaded socket stores its channel index in priv_rx->rxq when offload is enab...”进行调整，修正相关实现并降低维护成本。",
+      "tags": [],
+      "relevance": "low",
       "readingTime": 3
     },
     {
@@ -558,13 +555,13 @@
       "state": "accepted",
       "submitter": "Avinash Duduskar",
       "date": "2026-07-15T10:03:49",
-      "summary": "修复 BPF selftests 中 fib_lookup VLAN 测试在开启 IPv4 转发的宿主机上失败的问题。新建 netns 时会从 init_net 继承 net.ipv4.conf 的转发配置，导致期望 FWD_DISABLED 返回的测试用例因查询成功而失败。解决方法是在 setup_netns() 中将 /proc/sys/net/ipv4/conf/{all,default}/forwarding 显式置为 0，并由后续按设备写回需要的值；同时为 netns 测试臂添加一条路由，使解析成功的设备返回 SUCCESS 而非 NOT_FWDED，从而真正区分跨 netns VLAN 设备的转发行为。改动属于 BPF 测试基础设施对路由 FIB 查询语义的修正。",
+      "summary": "《selftests/bpf: Fix fib_lookup VLAN tests on hosts with forwa》主要围绕“The VLAN tests assume the test namespace starts with IPv4 forwarding off, but a new...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "eBPF",
-        "路由",
-        "容器网络"
+        "TCP/IP",
+        "路由"
       ],
-      "relevance": "high",
+      "relevance": "low",
       "readingTime": 3
     },
     {
@@ -582,10 +579,10 @@
       "state": "accepted",
       "submitter": "Ivan Vecera",
       "date": "2026-07-13T09:21:19",
-      "summary": "该补丁属于 iproute2（用户空间网络配置工具）而非 Linux 内核本身。它在 `ip link show` 详情输出中新增对 IFLA_DPLL_PIN 嵌套属性的解析，展示与网络接口关联的 DPLL（数字锁相环）恢复时钟引脚 ID，避免用户需要在 `dpll pin show` 与 `ip link` 之间交叉查找。该功能与网络接口的时钟同步（如 PTP、SyncE 等电信级定时特性）相关，属于驱动元信息的展示增强，对内核协议栈无实质改动。",
+      "summary": "该补丁属于 iproute2 用户态工具（而非 Linux 内核本身），修改 ip/ipaddress.c，使 `ip -d link show` 在显示网络接口详细信息时解析 IFLA_DPLL_PIN 嵌套属性，从中提取 DPLL_A_PIN_ID 并以 'dpll-pin <id>' 格式输出。DPLL（数字锁相环）用于网络接口的时钟同步和恢复。该改动方便用户直接在 ip link 输出中查看接口关联的 DPLL 恢复时钟引脚，无需再交叉参考 dpll pin 子系统输出。属于用户态展示增强，对内核网络行为无直接影响。",
       "tags": [
         "驱动",
-        "Linux内核网络"
+        "性能"
       ],
       "relevance": "low",
       "readingTime": 2
@@ -605,13 +602,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-10T18:09:15",
-      "summary": "该补丁修复了 BPF kfunc `bpf_icmp_send`（位于 net/core/filter.c）中未使用变量 `nskb` 的编译告警。原本 `nskb` 在函数顶部声明，但由于 IPv4 和 IPv6 分支分别受 `IS_ENABLED(CONFIG_INET)` 和 `IS_ENABLED(CONFIG_IPV6)` 保护编译，当只启用其中一个协议栈时，另一个分支的 `nskb` 不会被使用，从而触发 unused-variable 警告。修复方法是将 `nskb` 的声明移到各自 case 块内部（通过添加大括号创建局部作用域），使变量仅在对应协议被编译时存在，消除告警。",
+      "summary": "《Fix unused nskb warning in bpf_icmp_send》主要围绕“Declare nskb inside the IPv4 and IPv6 case blocks so it is only present when the cor...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "eBPF",
+        "TCP/IP",
         "包处理"
       ],
-      "relevance": "high",
-      "readingTime": 2
+      "relevance": "low",
+      "readingTime": 3
     },
     {
       "id": 14678106,
@@ -628,14 +626,14 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:21",
-      "summary": "该补丁修复了 XFRM/IPTFS 子系统中 iptfs_skb_add_frags() 函数的一个内存破坏 bug。原代码在拷贝 frag 引用并递增 page 引用计数后，未将 SKBFL_SHARED_FRAG 标志传播到目标 SKB 的 skb_shinfo->flags 上。当源 SKB 携带共享 frag（如来自 page-pool 后端的收包路径）时，新建的内层 SKB 看起来像是私有拥有 frag，导致后续 esp_input() 走 no-COW 快速路径直接就地解密，写覆盖外层 IPTFS SKB 仍引用的页面，引发内核可见的内存破坏甚至 panic。修复方式是在 __skb_frag_ref() 和 nr_frags++ 之后增加一行设置该标志，与内核中其他 frag 传输辅助函数保持一致。",
+      "summary": "该补丁修复了 xfrm/iptfs 模块中 iptfs_skb_add_frags() 函数未正确传递 SKBFL_SHARED_FRAG 标志的问题。当从源 SKB 拷贝 frag 引用到内部 SKB 时，虽然通过 __skb_frag_ref() 增加了页面引用计数，但未将 SKBFL_SHARED_FRAG 设置到目标 SKB 的 skb_shinfo->flags 中，导致 ESP 后续解密时误判为私有 frag 而走 no-COW 快速路径，直接对仍被外层 IPTFS SKB 引用的页面进行原地解密，进而引发内存破坏甚至内核 panic。补丁通过在循环中无条件设置 SKBFL_SHARED_FRAG 标志，与 skb_try_coalesce、skb_gro_receive 等内核其他 frag 传递助手保持一致。",
       "tags": [
-        "Linux内核网络",
+        "TCP/IP",
         "包处理",
         "性能"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14678112,
@@ -652,10 +650,9 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:16",
-      "summary": "该补丁修复 xfrm NAT keepalive 模块中 skb 双重释放的 bug。nat_keepalive_send() 在 ip_build_and_send_pkt() 或 ip6_xmit() 返回错误时调用 kfree_skb()，但这两个函数一旦接管 skb 后可能已消费并释放，导致 double free。修复方案是在 nat_keepalive_send_ipv4/ipv6() 中仅处理 skb 移交前的失败路径（如路由查找失败），由调用者在仍持有 skb 所有权时释放；nat_keepalive_send() 仅负责协议族分发和未支持协议族的清理。属于 IPsec (xfrm) 子系统的稳定性修复。",
+      "summary": "该补丁修复了 XFRM（IPsec）子系统 NAT keepalive 发送路径中的 double-free 问题。原先 nat_keepalive_send() 在底层 IPv4/IPv6 发送函数（ip_build_and_send_pkt 或 ip6_xmit）返回错误时统一调用 kfree_skb 释放 skb，但这两个函数一旦接管 skb 即使返回错误也可能已将其释放，导致重复释放。修复方案是将 kfree_skb 下沉到 nat_keepalive_send_ipv4/ipv6 中仅处理 skb 所有权仍属于调用方的预交付失败路径（如路由查找失败），而交付后的错误路径不再释放 skb，从而避免 double-free。",
       "tags": [
         "TCP/IP",
-        "Linux内核网络",
         "包处理"
       ],
       "relevance": "high",
@@ -676,13 +673,13 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:14",
-      "summary": "该补丁修复了 XFRM（IPsec）与网络设备层之间的错误传播问题。validate_xmit_xfrm() 之前对丢包和异步加密暂存（-EINPROGRESS）都返回 NULL，导致调用者无法区分。补丁将其改为对异步加密场景返回 ERR_PTR(-EINPROGRESS)，并更新 __dev_queue_xmit() 正确识别该错误码（返回 NET_XMIT_SUCCESS），同时让 validate_xmit_skb_list() 使用 IS_ERR_OR_NULL() 避免将暂存的包错误地加入发送列表。这修复了虚拟/网桥接口（noqueue qdisc）上误返回 -ENOMEM 的问题。",
+      "summary": "《propagate -EINPROGRESS from validate_xmit_xfrm()》主要围绕“Petr Wozniak <petr.wozniak@gmail.com> validate_xmit_xfrm() returns NULL both when a...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
-        "Linux内核网络",
-        "驱动",
-        "包处理"
+        "网桥",
+        "包处理",
+        "性能"
       ],
-      "relevance": "high",
+      "relevance": "low",
       "readingTime": 3
     },
     {
@@ -700,11 +697,10 @@
       "state": "accepted",
       "submitter": "Admin",
       "date": "2026-07-09T18:27:59",
-      "summary": "该补丁修复了 BPF kfunc bpf_cpumask_populate() 的类型安全问题。该函数原本接收 `struct cpumask *` 作为目标参数并使用 bitmap_copy() 写入，导致验证器允许只读 kfunc（如 scx_bpf_get_online_cpumask()）返回的借用 cpumask 指针作为可写目标，违反了所有权规则。修改后目标参数改为 `struct bpf_cpumask *`，使其与其他修改型 cpumask kfunc 遵循一致的所有权语义，同时查询类 kfunc 仍接受 `const struct cpumask *`。内部调用相应调整为通过 `cpumask->cpumask` 访问嵌套结构。这是 eBPF 验证器安全加固的一部分，影响 BPF cpumask 操作接口。",
+      "summary": "该补丁修复了 BPF 子系统中 bpf_cpumask_populate() kfunc 的类型安全漏洞。原实现将目标参数声明为 struct cpumask *，导致 BPF 验证器允许将只读 kfunc（如 scx_bpf_get_online_cpumask()）返回的借用 cpumask 指针作为可写目标，违反了所有权规则。修改后将目标类型改为 struct bpf_cpumask *，与其他可变 cpumask kfunc 保持一致的语义。同时更新了 scx 兼容头文件中的声明，并相应调整了内部 bitmap_copy 调用以正确访问嵌套的 cpumask 字段。",
       "tags": [
         "eBPF",
-        "Linux内核网络",
-        "性能"
+        "Linux内核网络"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -724,11 +720,11 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:49:00",
-      "summary": "本补丁为 bpf_icmp_send kfunc 新增 selftest，测试在 skb 无路由（dst 为空）情况下的行为。在正常 cgroup_skb 路径中 skb 通常已完成路由，但通过 BPF_PROG_TEST_RUN 和 bpf_prog_test_run_skb 创建的测试报文没有 dst 路由，此时 bpf_icmp_send 应提前返回 -ENETUNREACH。该测试分别覆盖 IPv4 和 IPv6 场景，通过 BPF_PROG_TEST_RUN 注入无路由的伪造报文，验证 kfunc 在缺少路由时正确返回网络不可达错误，确保错误处理路径的健壮性。",
+      "summary": "该补丁为 BPF 子系统新增了一个 selftest，测试 `bpf_icmp_send` kfunc 在 skb 缺少 dst 路由信息时的行为。在正常 cgroup_skb 路径中，skb 已经被路由过，但通过 BPF_PROG_TEST_RUN 配合 `bpf_prog_test_run_skb` 构造的测试包缺少路由信息，此时 icmp_send 会因早期返回而静默失败。测试验证该 kfunc 返回 -ENETUNREACH，覆盖 IPv4 和 IPv6 两种场景，确保 kfunc 在无路由条件下能正确报错而非静默失败。",
       "tags": [
         "eBPF",
         "包处理",
-        "性能"
+        "Linux内核网络"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -748,12 +744,13 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:59",
-      "summary": "《selftests/bpf: add bpf_icmp_send recursion test》主要围绕“This test is similar to test_icmp_send_unreach_cgroup but checks that, in case of re...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "该补丁为 BPF 子系统新增了一个 selftest，测试 bpf_icmp_send kfunc 的递归行为。测试场景是：当 BPF 程序调用 bpf_icmp_send kfunc 发送 ICMP 报文后，该 ICMP 报文会重新触发同一个 BPF 程序，此时 kfunc 应能提前检测到递归并返回 -EBUSY，避免无限循环。测试通过附加到 root cgroup 来确保 kfunc 生成的 ICMP 报文能再次命中 BPF 程序，验证 kfunc 的递归防护机制正确生效。",
       "tags": [
         "eBPF",
-        "包处理"
+        "包处理",
+        "Linux内核网络"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {
@@ -795,13 +792,13 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:57",
-      "summary": "《selftests/bpf: add bpf_icmp_send kfunc cgroup_skb tests》主要围绕“This test opens a server and client, enters a new cgroup, attach a cgroup_skb progra...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "本补丁为 bpf_icmp_send kfunc 新增 cgroup_skb 场景下的 selftests 测试。测试流程：开启服务端与客户端，将客户端移入新 cgroup，在出口挂载 cgroup_skb 程序，在客户端 egress 路径调用 bpf_icmp_send 向客户端回送 ICMP Destination Unreachable 控制消息，随后通过 error queue 读取并校验 ICMP unreach code 是否正确。客户端采用非阻塞连接以避免等待 TCP 三次握手超时；未设置 IP_RECVERR 也能收到错误，因为连接在握手初始阶段即被拒绝（详见 tcp_ipv4.c 中 tcp_v4_err 处理）。该测试完善了 BPF 辅助发送 ICMP 错误报文功能的验证覆盖。",
       "tags": [
         "eBPF",
         "TCP/IP",
         "包处理"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {
@@ -819,14 +816,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:56",
-      "summary": "《add bpf_icmp_send kfunc》主要围绕“This is needed in the context of Tetragon to provide improved feedback (in contrast...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "该补丁为 BPF 子系统新增了一个 kfunc `bpf_icmp_send`，允许 cgroup_skb 类型的 BPF 程序在丢弃/拦截数据包时回送 ICMP 控制消息（当前支持 ICMP_DEST_UNREACH 和 ICMPV6_DEST_UNREACH），主要用于 Tetragon 等基于 BPF 的安全策略场景，给被阻断的东西向流量提供更好的反馈而非静默丢弃。实现上借鉴了 netfilter reject target 路径，但有两个关键差异：1）克隆 skb 后再发送 ICMP，因为 cgroup_skb 钩子点只允许只读访问原 payload，且 BPF 程序可能仍选择 SK_PASS；2）增加递归检测，防止回送的 ICMP 错误报文再次触发同一个 BPF 程序造成死循环。同时处理了 dst 路由缺失或为 metadata 的边界情况，避免 test_run 合成 skb 路径下误报成功。",
       "tags": [
         "eBPF",
-        "Netfilter",
-        "包处理"
+        "包处理",
+        "TCP/IP"
       ],
-      "relevance": "low",
-      "readingTime": 3
+      "relevance": "high",
+      "readingTime": 8
     },
     {
       "id": 14675296,

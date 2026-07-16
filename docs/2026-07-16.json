@@ -1,69 +1,45 @@
 {
   "date": "2026-07-16",
   "categories": {
-    "papers": [
-      {
-        "title": "Plug &amp; Offload: Transparently Offloading TCP Stack onto Off-path SmartNIC with PnO-TCP.",
-        "url": "https://doi.org/10.48550/arXiv.2503.22930",
-        "summary": "该工作提出PnO-TCP（Plug & Offload TCP），目标是透明地将主机侧的TCP连接处理卸载到一颗off-path SmartNIC上运行。论文背景在于传统on-path SmartNIC需要直接转发数据包，部署复杂且侵入数据面，而off-path架构将SmartNIC作为TCP状态的协处理器/卸载器，主机仍负责实际收发，但TCP连接状态机、拥塞控制、重传等热路径逻辑被搬到SmartNIC固件/软件中执行，以释放主机CPU、提升性能可预测性。核心方法强调Plug & Offload式的透明部署：不修改应用程序socket接口，不重写内核TCP，而是通过SmartNIC侧运行的TCP卸载引擎接管连接，对主机暴露与内核TCP等价的行为，从而降低落地门槛。系统设计层面需要解决主机与SmartNIC之间的连接状态同步、事件分发（收发完成通知、ACK/重传触发）以及与现有socket语义兼容等问题。读者应关注其与Linux内核TCP的兼容边界：哪些TCP语义被卸载，哪些仍由主机协议栈处理；off-path模型相对on-path DPDK/SmartNIC方案在吞吐、尾延迟和CPU占用上的权衡；以及在普通网卡环境下的可移植性和对RDMA/RoCE等并行高速路径的关系。",
-        "summary_en": "Venue: CoRR",
-        "source": "DBLP",
-        "tags": [
-          "TCP offload",
-          "SmartNIC",
-          "off-path offload",
-          "旁路"
-        ],
-        "readingTime": 12,
-        "relevance": "medium",
-        "innovationScore": 2
-      },
-      {
-        "title": "Testing the OpenvSwitch module of the Linux kernel network subsystem",
-        "url": "https://www.semanticscholar.org/paper/21167c1a29208f6a6020ccabc23c5bf8e741e12f",
-        "summary": "论文聚焦Linux内核网络子系统中OpenvSwitch（OVS）模块的安全性测试，属于ISP RAS Linux验证中心项目的一部分。背景指出Linux作为全球主流操作系统，其内核代码质量直接影响上层产品的可靠性与安全性，而当前每年新发现错误数量与未修复旧错误的累积表明现有测试手段仍不足。研究方法结合架构分析与模糊测试（fuzzing）两类手段：前者通过梳理OVS模块的内部结构、关键数据流（如datapath、flow table处理、netlink接口交互）来识别潜在攻击面与危险代码路径；后者选用业界广泛使用的syzkaller作为模糊测试工具，针对OVS内核模块的入口（特别是netlink配置面与datapath fast path）构造输入并尝试触发崩溃、内存错误等异常。评估结果显示，研究在OVS模块中发现了一个真实缺陷，该缺陷已被接受合入Linux内核主分支（mainline），证明该测试方案对内核网络子系统代码具备实际漏洞发现能力。读者应关注的是：论文侧重测试方法与流程经验而非OVS内部协议细节；所发现的单个bug虽验证了方法有效性，但OVS作为复杂的数据通路模块，仍有大量未覆盖路径（如特定action组合、tunnel处理、conntrack交互）值得后续持续模糊测试；其方法可推广至netfilter、tc等其他内核网络子系统的安全性评估。",
-        "summary_en": "This paper presents the experience of researching the security of the OpenvSwitch module of the Linux kernel network subsystem. Today Linux is one of the most popular operating systems in the world. The quality of the code of this OS (and in particular its kernel) directly affects the reliability and security of the entire range of products based on it. The international community of Linux developers is making great efforts to improve its reliability, using all kinds of testing methods and error detections. However, the number of new errors detected annually and the number of old errors that h...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "OpenvSwitch",
-          "fuzzing",
-          "syzkaller",
-          "kernel-security"
-        ],
-        "readingTime": 4,
-        "relevance": "high",
-        "innovationScore": 4
-      }
-    ],
+    "papers": [],
     "news": [
       {
-        "title": "Cilium 1.19, Network Policy enhancements, Multi Pool IPAM goes stable, IPv6 progress, and more!",
-        "url": "https://isovalent.com/blog/post/cilium-119-ztunnel-transparent-encryption-multi-pool-ipam-goes-stable-ipv6-progress-and-more?&utm_medium=referral&utm_campaign=cilium-blog",
-        "summary": "Cilium 1.19 发布，重点改进包括：Network Policy 增强（更细粒度的 L7 策略控制、策略审计与可观测性）；Multi Pool IPAM 正式 GA，支持多 IP 池隔离 Pod IP 分配，适配 IPv4/IPv6 双栈及多租户场景；IPv6 在数据面与控制面的成熟度提升，涵盖 IPv6 策略路由、SRv6 实验性支持。该版本深度依赖 Linux 内核 eBPF/XDP/TC hook 实现数据面加速与策略执行，网络栈相关性强。多池 IPAM 对集群规模扩展、地址规划及与内核网络子系统交互有直接影响，Network Policy 增强涉及 eBPF map 状态机更新。关注点：1.19 在 eBPF 内核兼容范围（内核版本要求）、XDP 卸载到 SmartNIC 的支持变化、IPv6 策略在 Cilium eBPF datapath 下的端到端验证结果。",
-        "source": "Cilium Blog",
-        "tags": [
-          "容器网络",
-          "eBPF",
-          "Kubernetes网络",
-          "IPv6"
+        "title": "LWN.net Weekly Edition for July 9, 2026",
+        "url": "https://lwn.net/Articles/1080835/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for July 9, 2026 This edition contains the following feature content: Progress in modernizing kernel cryptography : Eric Biggers shares his work on making the kernel's cryptographic APIs simpler. The kernel's iomap layer : an overview of the kernel's iomap layer. Continued coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : Limiting negative dentries : a discussion about the role of negative directory cache entries and their impacts on performance. Faster RCUs and lockless memory allocation : two sessions touching on improvements to memory allocation and freeing, in the kernel and specific to BPF. Two LLM-assisted memory-management patch sets : a discussion about different approaches to the use of LLMs in kernel development. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (none posted) Progress in modernizing kernel cryptography By Joe Brockmeier July 8, 2026 LSS NA At the 202",
+        "summary": "在 2026 年北美 Linux 安全峰会上，内核 crypto 与 CRC 库维护者 Eric Biggers 分享了内核加密框架现代化进展。传统 crypto API 自 2002 年沿用至今，存在使用复杂、运行慢、对现代 CPU 加速优化不足等问题，且因按名称动态分配算法，缺少链接期依赖，常常在运行时才失败，也无法在 early init 阶段使用。Biggers 以 HMAC-SHA256 为例演示：传统 API 需要动态分配 crypto_shash 对象、设置密钥、分配同步 hash 描述符、多次错误检查并在最后释放资源；在 x86_64 + 6.12 内核上基准测试显示，仅 38% 时间用于真正的 SHA-256 计算，其余时间都消耗在 API 开销上。新的库式 API（如 6.17 内核新增的 hmac_sha256_usingrawkey）只需单次函数调用，函数永远成功、无需错误处理、可在任何上下文运行、采用标准链接期依赖，并加入 FIPS-140 自检，对短输入约提速 2.5 倍。另一例 ChaCha20-Poly1305 AEAD 算法中，传统 API 还要求将数据组织进 scatter-gather 列表、正确处理 vmalloc/stack 区域并防范异步完成带来的 use-after-free，而库函数 chacha20poly1305_encrypt 直接同步执行、返回 void，类似 memcpy 的使用体验。截至 7.1 内核，crypto 与 CRC 库已覆盖大量算法（约一半在过去一年半加入），但 AES 加密模式等关键算法仍在补齐中。",
+        "keyPoints": [
+          "演讲背景与作者身份：在 2026 年北美 Linux 安全峰会上，crypto 与 CRC 库维护者 Eric Biggers 介绍内核加密框架存在的问题与库式 API 现代化进展；他还维护 fscrypt 库和 fs-verity 支持层。",
+          "传统 crypto API 的定位与历史：自 2002 年起存在于内核树顶层 crypto 目录中，既包含加密算法也包含 CRC 等非加密算法，用于存储/网络加密、生成随机数、固件完整性校验、抗拒绝服务等内核场景。",
+          "传统 API 的核心缺陷：按算法名字符串动态分配对象、缺少链接期依赖导致运行时失败、需要大量错误处理代码、无法在 early init 阶段使用（需 crypto 子系统先初始化）、对现代 CPU 加速优化不足，整体复杂、难用且慢。",
+          "HMAC-SHA256 传统 API 示例步骤：先用 crypto_alloc_shash(\"hmac(sha256)\", 0, 0) 分配对象并检查错误，再用 crypto_shash_setkey 设置密钥，然后用 SHASH_DESC_ON_STACK 宏分配同步 hash 描述符、初始化 desc->tfm，调用 crypto_shash_digest 计算，最后 shash_desc_zero 清零栈敏感数据、检查错误并释放对象。",
+          "传统 API 常见 bug 与失败原因：crypto_shash 分配在某些系统失败的原因是 CRYPTO_HMAC 与 CRYPTO_SHA256 未在 Kconfig 中启用，由于按名加载算法无链接期依赖，编译通过但运行时才暴露问题。",
+          "HMAC-SHA256 性能瓶颈实测：在 x86_64 + 6.12 内核上的基准测试显示，仅 38% 时间用于真正的 SHA-256 计算，绝大部分时间消耗在传统 crypto API 的开销上。",
+          "新库式 API 的优势：Biggers 在 6.17 内核新增 hmac_sha256_usingrawkey 等库函数，函数永远成功、调用者无需错误处理、可在任何内核上下文运行、采用标准链接期依赖不会运行时失败，并加入 FIPS-140 加密算法自检以兼容 FIPS 认证，对短输入约比传统 API 快 2.5 倍。",
+          "WireGuard 引入的库式先例：2019 年为支持 WireGuard 已在内核中以库函数形式添加部分加密算法，证明了库式 API 的可行性，例如 chacha20poly1305_encrypt 就是当时加入并沿用至今。",
+          "ChaCha20-Poly1305 AEAD 传统 API 复杂度：除分配 AEAD 变换对象和设置密钥外，还必须把数据组织进 scatter-gather 列表；若数据位于栈或 vmalloc 区，需要更复杂的列表初始化代码，Biggers 表示几乎没人第一次提交就能写对；此外请求可能异步完成，调用者必须等待完成后再释放数据，否则会引入 use-after-free 漏洞。",
+          "ChaCha20-Poly1305 库式 API 的简化：调用 chacha20poly1305_encrypt(dst, src, src_len, ad, ad_len, nonce, key) 即可完成加密，同步执行、返回 void、适用于任何上下文，使用体验类似 memcpy。",
+          "库式 API 的设计理念：直接提供一个完成所需工作的函数，不要求动态分配内存拷贝对象或调用多个辅助函数，与内核其他子系统长期使用库函数的惯例一致。",
+          "当前覆盖情况与未完成工作：截至 7.1 内核，crypto 与 CRC 库已支持大量算法（过去约一年半新增了一半），但 AES 加密模式等关键算法仍未提供库式实现，Biggers 表示正在补齐这些缺失部分。",
+          "演讲还同时介绍了内核 iomap 层概述、负 dentry 缓存条目限制、更快的 RCU 与无锁内存分配、以及关于用 LLM 辅助内存管理补丁集的两场讨论，构成本期 LWN Weekly 的主要专题内容。"
         ],
-        "readingTime": 6,
-        "relevance": "high"
+        "source": "LWN.net",
+        "tags": [
+          "内核加密",
+          "crypto API 现代化",
+          "Linux 安全峰会",
+          "内核库函数"
+        ],
+        "readingTime": 10,
+        "relevance": "high",
+        "access": "free"
       }
     ]
   },
   "tagStats": {
-    "TCP offload": 1,
-    "SmartNIC": 1,
-    "off-path offload": 1,
-    "旁路": 1,
-    "OpenvSwitch": 1,
-    "fuzzing": 1,
-    "syzkaller": 1,
-    "kernel-security": 1,
-    "容器网络": 1,
-    "eBPF": 1,
-    "Kubernetes网络": 1,
-    "IPv6": 1
+    "内核加密": 1,
+    "crypto API 现代化": 1,
+    "Linux 安全峰会": 1,
+    "内核库函数": 1
   }
 }
