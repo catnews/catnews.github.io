@@ -14,7 +14,9 @@ This is a standalone module imported by fetch_papers.py.
 - The patchwork API has a quirk: ?project_id=<int> silently falls back to
   "Linux Input" for unknown ids. The reliable query is ?project=<link_name>.
 - Apply domain gate (Linux kernel + network) and run MiniMax LLM for
-  Chinese summary + tags + readingTime.
+  Chinese summary + tags + readingTime. Every surviving patch gets an
+  LLM summary; calls run concurrently via a thread pool to amortize
+  latency (see summarize_patches).
 - Write docs/<YYYY-MM-DD>.patches.json
 """
 import json
@@ -24,6 +26,7 @@ import re
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 
 PATCHWORK_API = "https://patchwork.kernel.org/api/patches/"
@@ -217,13 +220,24 @@ PATCH_SUMMARY_PROMPT = """你是 Linux 内核网络补丁分析助手。阅读�
 判断它是否属于 Linux 内核网络子系统（TCP/IP 协议栈 / eBPF / XDP / Netfilter /
 网络驱动 / 路由网桥 / virtio-net / 网络性能优化等）。
 
-如果属于，用 100-200 字中文总结它改动的核心点（实现机制 / 解决的问题 / 性能影响）。
+如果属于，用 100-200 字中文总结它改动的核心点：必须具体到被修改的内核对象 /
+函数 / 数据结构（如 sk_buff、napi、qdisc、conntrack、tcp_sock、virtio_net、
+bpf_prog、xdp_buff 等）、改动机制（新增 / 替换 / 移除 / 优化）、要解决的问题、
+对性能或正确性的影响。如果补丁正文给出测试数据、benchmark 或具体数值，必须引用。
+
+强约束：
+1. summary 严禁复述、引用或翻译 patch 标题；不要以《标题》、
+   "本补丁"、"该补丁"等开头提及标题；摘要直接陈述改动的对象与机制。
+2. summary 严禁空泛套话，例如"主要围绕...进行调整"、"实现与优化"、
+   "建议重点关注"、"参考信息："、"归入"、"被归入"、"阅读时重点核对三点"等。
+3. 如果补丁正文信息不足，必须直说"补丁正文未提供 X 信息"，禁止用模板凑字数。
+
 如果不属于 Linux 内核网络，relevance 设为 'none'。
 
 返回严格的 JSON 格式：
 {
   "relevance": "high/medium/low/none",
-  "summary": "中文总结",
+  "summary": "中文总结，不复述标题",
   "tags": ["从下列标签中选 2-3 个：eBPF, XDP, TCP/IP, Socket, Netfilter, 路由, 网桥, 驱动, 包处理, 虚拟化, 性能, 容器网络, Linux内核网络"],
   "readingTime": 整数分钟数
 }"""
@@ -379,63 +393,113 @@ def _infer_tags_from_text(text, max_tags=3):
     return out
 
 
+def _process_single_patch(p, call_minimax_fn, gate_fn, excluded_fn):
+    """Process one patch end-to-end inside a worker thread.
+
+    Steps: load detail -> domain gate -> LLM summary -> heuristic fallback.
+    Returns the patched dict (with summary/tags/relevance/readingTime) on
+    success, or None if filtered out by gate / skipped as unrelated.
+    """
+    try:
+        _load_patch_detail(p)
+    except Exception as e:
+        print(f"  [lore] detail fetch failed for {p.get('id')}: {e}", flush=True)
+        return None
+
+    raw = p.get("raw") or {}
+    gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
+    if not passes_domain({"title": p.get("title", ""), "summary": gate_text},
+                         gate_fn, excluded_fn):
+        print(f"  [lore] skip (gate) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
+        return None
+
+    parsed = None
+    if call_minimax_fn:
+        prompt = _format_patch_for_prompt(p)
+        resp = _call_minimax_summary(call_minimax_fn, prompt)
+        parsed = _parse_summary_response(resp)
+
+    if not parsed:
+        # LLM path exhausted (call failure / unparseable response). Keep a
+        # heuristic summary so the patch still shows up in the feed, but
+        # mark relevance as low to signal it was not LLM-summarized.
+        fallback_text = (raw.get("content") or p.get("title", "")).strip()
+        if not fallback_text:
+            return None
+        parsed = {
+            "relevance": "low",
+            "summary": _chinese_fallback(p.get("title", ""), fallback_text),
+            "tags": _infer_tags_from_text(gate_text),
+            "readingTime": 3,
+        }
+
+    if parsed.get("relevance") == "none":
+        print(f"  [lore] skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
+        return None
+
+    p["summary"] = parsed["summary"]
+    p["tags"] = parsed["tags"]
+    p["relevance"] = parsed["relevance"]
+    p["readingTime"] = parsed["readingTime"]
+    # Drop raw to keep JSON small
+    p.pop("raw", None)
+    return p
+
+
 def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
-                      limit=None, llm_budget=8, delay_min=2, delay_max=4):
-    """Run domain gate + (LLM summary for the first llm_budget patches) on a
-    list of normalized patches.
+                      limit=None, max_workers=4, llm_budget=None,
+                      delay_min=None, delay_max=None):
+    """Run domain gate + LLM summary on every patch, in parallel.
 
     Behavior:
       * Domain gate is applied to every patch; non-networking patches are
         dropped entirely.
-      * The first llm_budget net patches get full LLM Chinese summary.
-      * Remaining net patches (up to `limit`) get a heuristic Chinese
-        summary derived from the title + diff head — so the user still sees
-        ALL of yesterday's netdev activity, not just the top N.
-      * If `call_minimax_fn` is None, all entries get the heuristic path.
+      * EVERY network patch now goes through the LLM (the previous
+        ``llm_budget`` cap that limited LLM calls to the first N net
+        patches has been removed). The historical ``llm_budget`` parameter
+        is kept in the signature for backward compatibility but ignored.
+      * Calls are executed concurrently via ThreadPoolExecutor to amortize
+        MiniMax latency; ``max_workers`` bounds concurrency to avoid
+        tripping rate limits.
+      * If ``call_minimax_fn`` is None, every patch falls back to the
+        heuristic path.
+      * Output order follows input order (filtered to entries that
+        survived the gate).
     """
-    results = []
-    llm_used = 0
-    for p in patches:
-        if limit and len(results) >= limit:
-            break
-        # Fetch full content if not already loaded
-        _load_patch_detail(p)
-        raw = p.get("raw") or {}
-        gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
-        if not passes_domain({"title": p.get("title", ""), "summary": gate_text},
-                             gate_fn, excluded_fn):
-            print(f"  [lore] skip (gate) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
-            continue
-        parsed = None
-        if call_minimax_fn and llm_used < llm_budget:
-            prompt = _format_patch_for_prompt(p)
-            resp = _call_minimax_summary(call_minimax_fn, prompt)
-            parsed = _parse_summary_response(resp)
-            if parsed:
-                llm_used += 1
-        if not parsed:
-            fallback_text = (raw.get("content") or p.get("title", "")).strip()
-            if not fallback_text:
-                continue
-            parsed = {
-                "relevance": "low",
-                "summary": _chinese_fallback(p.get("title", ""), fallback_text),
-                "tags": _infer_tags_from_text(gate_text),
-                "readingTime": 3,
-            }
-        if parsed.get("relevance") == "none":
-            print(f"  [lore] skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
-            continue
-        p["summary"] = parsed["summary"]
-        p["tags"] = parsed["tags"]
-        p["relevance"] = parsed["relevance"]
-        p["readingTime"] = parsed["readingTime"]
-        # Drop raw to keep JSON small
-        p.pop("raw", None)
-        results.append(p)
-        if call_minimax_fn and llm_used < llm_budget and delay_min and delay_max:
-            time.sleep(random.uniform(delay_min, delay_max))
-    return results
+    candidates = list(patches)
+    if limit and len(candidates) > limit:
+        candidates = candidates[:limit]
+
+    if not candidates:
+        return []
+
+    workers = max(1, int(max_workers or 1))
+    results_by_index = {}
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        future_to_index = {
+            executor.submit(
+                _process_single_patch,
+                p, call_minimax_fn, gate_fn, excluded_fn,
+            ): i
+            for i, p in enumerate(candidates)
+        }
+        done = 0
+        total = len(future_to_index)
+        for future in as_completed(future_to_index):
+            idx = future_to_index[future]
+            done += 1
+            try:
+                result = future.result()
+            except Exception as e:
+                print(f"  [lore] worker error on patch #{idx}: {e}", flush=True)
+                result = None
+            if result is not None:
+                results_by_index[idx] = result
+            if done % 10 == 0 or done == total:
+                print(f"  [lore] progress {done}/{total} (kept {len(results_by_index)})", flush=True)
+
+    return [results_by_index[i] for i in range(len(candidates)) if i in results_by_index]
 
 
 # ---------------- Writer ----------------
@@ -462,8 +526,8 @@ def write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)
 # ---------------- Top-level ----------------
 def run(docs_dir, target_date_str, *,
         call_minimax_fn, gate_fn, excluded_fn,
-        max_in_review=80, max_merged=DEFAULT_MAX_MERGED, llm_budget_per_side=8,
-        delay_min=2, delay_max=4):
+        max_in_review=80, max_merged=DEFAULT_MAX_MERGED, llm_budget_per_side=None,
+        max_workers=4, delay_min=None, delay_max=None):
     print(f"[lore] fetching netdevbpf patches for {target_date_str}", flush=True)
 
     # Compute the Beijing-day window in UTC, used as the early-stop boundary.
@@ -495,11 +559,9 @@ def run(docs_dir, target_date_str, *,
     merged_normalized = [_normalize_patch(p) for p in merged_raw]
 
     in_review = summarize_patches(call_minimax_fn, in_review_normalized, gate_fn, excluded_fn,
-                                  limit=max_in_review, llm_budget=llm_budget_per_side,
-                                  delay_min=delay_min, delay_max=delay_max)
+                                  limit=max_in_review, max_workers=max_workers)
     merged = summarize_patches(call_minimax_fn, merged_normalized, gate_fn, excluded_fn,
-                               limit=max_merged, llm_budget=llm_budget_per_side,
-                               delay_min=delay_min, delay_max=delay_max)
+                               limit=max_merged, max_workers=max_workers)
 
     fetched_at = datetime.now(BEIJING_TZ).strftime("%Y-%m-%dT%H:%M:%S%z")
     out_path = write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)

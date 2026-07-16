@@ -370,7 +370,7 @@ TECH_NEWS_REQUIRED_CONTEXT = [
     "throughput", "performance", "kernel", "linux", "ebpf", "xdp", "cilium",
 ]
 
-PAPER_PROMPT = """你是 Linux 内核网络论文筛选专家。严格判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
+PAPER_PROMPT = """你是 Linux 内核网络论文筛选与摘要专家。严格判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
 
 判断维度（kernelNetworkScope）：
 - kernel_internal: 论文直接修改 / 分析 / 评估 Linux 内核网络源码路径（如 sk_buff 处理、netfilter hook、qdisc 调度、XDP 数据面、virtio-net 驱动、napi 轮询、tcp 协议栈内部）。
@@ -380,14 +380,24 @@ PAPER_PROMPT = """你是 Linux 内核网络论文筛选专家。严格判断论�
 - unrelated: 与 Linux 内核网络无关（其他 OS、应用层 ML/HTTP、IoT、传感器网络、推荐系统等）。
 
 输出 JSON：
-{"kernelNetworkScope": "kernel_internal|kernel_interface|kernel_bypass_offload|userspace_application|unrelated", "relevance": "high|medium|low|none", "reason": "20-50字简述判断依据", "summary": "中文总结220-360字", "tags": ["3-4个最重要标签"], "readingTime": 分钟数}
+{"kernelNetworkScope": "kernel_internal|kernel_interface|kernel_bypass_offload|userspace_application|unrelated", "relevance": "high|medium|low|none", "reason": "20-50字简述判断依据", "summary": "中文总结220-400字", "tags": ["3-4个最重要标签"], "readingTime": 分钟数}
 
 强约束：
 1. relevance 必须与 kernelNetworkScope 一致：kernel_internal→high/medium；kernel_interface→medium/low；kernel_bypass_offload→medium/low；userspace_application→low；unrelated→none。
 2. 若论文仅讨论 Kubernetes/Docker 等编排面或纯应用层网络，未触内核代码也未做高速网络栈研究，强制 userspace_application→low。
 3. tags 数组最多 3-4 个最重要标签，不要过多。
-4. summary 必须说明论文的主要内容和关注点，按自然段覆盖：研究问题/背景、核心方法或系统设计、实验评估或结论、与 Linux 内核网络/旁路高速网络的关系、读者应关注的限制或落地点。
-5. summary 禁止使用“主要围绕某某进行调整”“实现与优化”“建议重点关注”等空泛模板；不能只翻译标题，必须从摘要中提取具体对象、机制、指标或场景。"""
+4. summary 必须为基于摘要原文的真实总结，按自然段覆盖：研究问题/背景、核心方法或系统设计（必须具体到数据结构 / 算法 / 机制名称）、实验评估（数据集、对比基线、关键指标如吞吐 / 时延 / CPU 占用 / 丢包率）、与 Linux 内核网络 / 旁路高速网络的关系、读者应关注的限制或落地点。长度 220-400 字。
+5. summary 严禁复述、引用或翻译论文标题；不要以 "《论文标题》"、"本文"、"该论文"、"这篇研究工作" 等开头提及标题；摘要开头直接陈述研究对象 / 问题。
+6. summary 严禁使用空泛套话，包括但不限于："主要围绕"、"进行调整"、"实现与优化"、"建议重点关注"、"可重点关注"、"参考信息："、"相关的细节"、"问题定义、方法设计与性能影响"、"内容聚焦 Linux 内核网络场景"、"原文摘要信息有限"、"当前数据未提供足够摘要线索"、"归入"、"被归入"、"阅读时重点核对"、"摘要线索显示"。
+7. summary 必须从摘要原文中提取具体名词（如 BBR、CUBIC、sk_buff、XDP、virtio-net、conntrack、tc、ethtool、NAPI、GRO/GSO、AF_XDP、BlueField-3、P4、PQC、SmartNIC、DPDK、RDMA 等）、具体数值（如 10Gbps、100us、2x throughput）、具体方法名 / 系统名，不能只给形容词描述。
+8. 如果摘要原文信息不足，summary 必须直说 "原摘要未提供 X 信息"，禁止用模板化套话凑字数。
+
+反例（禁止）：
+"这篇研究工作《...》与eBPF、XDP、路由相关，内容聚焦 Linux 内核网络场景下的实现与优化。可重点关注其问题定义、方法设计与性能影响。参考信息：..."
+
+正例（要求）：
+"研究在多链路回传场景下评估 MPTCP 与 MPQUIC 在 eMBB / mMTC 混合流量下的拥塞控制行为。基于 Linux 内核 MPTCP 子系统构建实验床，对比 coupled / OLIA / BALIA 等拥塞控制算法在共享链路争用下的吞吐分配与队列堆积。结果显示 MPQUIC 在短流 mMTC 场景下延迟优于 MPTCP，但长流吞吐稳定性下降。该工作面向 5G 回传场景，不直接修改内核网络代码路径，仅通过 socket 层调用评估；对内核网络维护者的参考价值在于 MPQUIC / MPTCP 互操作边界与拥塞窗口共享机制的实测对比。"
+"""
 
 NEWS_PROMPT = """你是一个技术资讯筛选助手。严格分析文章是否与 Linux 内核网络、eBPF/XDP、内核网络性能、容器网络数据面、SmartNIC/DPU/DPDK/RDMA 等高速网络路径相关。
 
@@ -395,14 +405,14 @@ NEWS_PROMPT = """你是一个技术资讯筛选助手。严格分析文章是否
 排除：泛云产品发布、纯安全营销、通用 Kubernetes 运维、HTTP/应用层服务、与 Linux 网络栈无直接关系的公司新闻。
 
 返回JSON格式：
-{"relevance": "high/medium/low/none", "summary": "中文总结120-240字，说明具体技术点和为什么值得关注", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
+{"relevance": "high/medium/low/none", "summary": "中文总结120-240字，说明具体技术点和为什么值得关注，不要复述标题", "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
 
 注意：只有明确命中 Linux 网络/eBPF/XDP/SmartNIC/DPDK/RDMA/Cilium 数据面等技术点时才给 high/medium；tags数组最多包含3-4个最重要的标签，不要过多。"""
 
 LWN_SUMMARY_PROMPT = """你是一个技术文章总结助手。请阅读LWN.net的文章内容，提取与Linux内核网络相关的重要信息。
 
 返回JSON格式：
-{"summary": "中文总结280-600字，覆盖背景、核心变化、实现机制、影响，不要过度压缩", "keyPoints": ["按原文重要信息输出完整条目列表，数量不要人为限制，尽可能覆盖完整内容"], "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
+{"summary": "中文总结280-600字，覆盖背景、核心变化、实现机制、影响，不要过度压缩，不要复述标题", "keyPoints": ["按原文重要信息输出完整条目列表，数量不要人为限制，尽可能覆盖完整内容"], "tags": ["3-4个最主要标签"], "readingTime": 分钟数}
 
 注意：
 1. 不要只写结论，必须保留文章里的关键技术细节。
@@ -649,13 +659,108 @@ def is_generic_summary(text):
         "进行调整",
         "实现与优化",
         "建议重点关注",
+        "可重点关注",
+        "参考信息：",
         "相关的细节",
         "问题定义、方法设计与性能影响",
+        "内容聚焦 Linux 内核网络场景",
+        "原文摘要信息有限",
+        "当前数据未提供足够摘要线索",
+        "归入",
+        "被归入",
+        "摘要线索显示",
+        "阅读时重点核对",
+        "摘要线索",
     ]
     normalized = (text or "").strip()
     if len(normalized) < 120:
         return True
-    return any(pattern in normalized for pattern in generic_patterns)
+    return any(pattern in normalized for pattern in generic_patterns) or re.search(r"被归入.*方向。摘要显示", normalized) is not None
+
+def has_usable_abstract(abstract, title="", min_len=80):
+    normalized = re.sub(r"\s+", " ", abstract or "").strip()
+    normalized_title = re.sub(r"\s+", " ", title or "").strip()
+    if not normalized:
+        return False
+    if normalized_title and normalized.lower() == normalized_title.lower():
+        return False
+    if normalized.lower().startswith("venue:"):
+        return False
+    words = re.findall(r"[A-Za-z0-9_+-]+", normalized)
+    return len(normalized) >= min_len and len(words) >= 10
+
+def _normalize_title_for_match(title):
+    """Lowercase, collapse whitespace, strip bracket prefixes used in
+    patch / paper titles, so that LLM summary openings like "研究了..."
+    or "Research on ..." can be matched even when the summary dropped a
+    colon or reordered words.
+    """
+    text = (title or "").strip().lower()
+    # Drop leading [PATCH]/[RFC]/[net-next]/version prefixes
+    text = re.sub(r"^\s*\[[^\]]*\]\s*", "", text)
+    text = re.sub(r"^\s*\d+/\d+\s+", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def strip_title_from_summary(title, summary):
+    """Remove the paper title from the beginning of `summary`.
+
+    LLMs commonly start summaries with "《title》..." or "title: ..." or
+    "这篇研究工作《title》..." — all of these echo the title verbatim
+    and are not allowed per the prompt. This helper strips such
+    openings so the published summary begins with content, not the
+    title. We only strip a *prefix*; later mentions of the title inside
+    the body are left alone to avoid corrupting technical statements.
+    """
+    cleaned = (summary or "").strip()
+    normalized_title = (title or "").strip()
+    if not cleaned or not normalized_title:
+        return cleaned
+
+    title_lower = _normalize_title_for_match(normalized_title)
+    cleaned_lower = cleaned.lower().lstrip()
+
+    # 1) Common LLM template openings that wrap the title verbatim.
+    title_pattern = re.escape(normalized_title)
+    title_pattern_lower = re.escape(title_lower)
+    replacements = [
+        # 这篇(研究工作|技术资讯)?《title》被归入(...)方向。摘要显示，其核心内容是:?
+        (rf"^这篇(?:研究工作|技术资讯|论文|文章)?《{title_pattern}》被归入([^。]+)方向。摘要显示，其核心内容是[:：]?\s*", ""),
+        # 这篇(研究工作|...)?《title》与(...)相关，
+        (rf"^这篇(?:研究工作|技术资讯|论文|文章)?《{title_pattern}》与([^，。]+)相关，", ""),
+        # 《title》归入(...)方向。
+        (rf"^《{title_pattern}》归入([^。]+)方向。", ""),
+        # 这篇(研究工作|...)《title》...（其他任意衔接）
+        (rf"^这篇(?:研究工作|技术资讯|论文|文章)?《{title_pattern}》[:：，,。]?\s*", ""),
+        # 《title》[:：，,。-]?
+        (rf"^《{title_pattern}》[:：，,。\-—]?\s*", ""),
+        # title[:：，,。-]? （裸标题开头）
+        (rf"^{title_pattern}[:：，,。\-—]?\s*", ""),
+        # "本文介绍了《title》" / "该论文《title》..." / "本研究《title》..."
+        (rf"^(?:本文|该论文|本研究|这项研究|这项工作|这项论文|这篇论文)[:：,，]?\s*(?:介绍|提出|讨论|研究|分析|探索)?了?\s*《{title_pattern}》[:：，,。]?\s*", ""),
+        (rf"^(?:本文|该论文|本研究|这项研究|这项工作|这项论文|这篇论文|本研究)[:：,，]?\s*(?:介绍|提出|讨论|研究|分析|探索)?了?\s*{title_pattern}[:：，,。\-—]?\s*", ""),
+    ]
+    for pattern, replacement in replacements:
+        new_cleaned = re.sub(pattern, replacement, cleaned).strip()
+        if new_cleaned != cleaned:
+            cleaned = new_cleaned
+            cleaned_lower = cleaned.lower().lstrip()
+
+    # 2) Case-insensitive fallback: if the summary still starts with the
+    # title verbatim (LLM may use different casing / spacing), strip it.
+    if cleaned_lower.startswith(title_lower):
+        cleaned = cleaned[len(title_lower):].lstrip(" :：，,。\\-—").strip()
+
+    # 3) Strip a leading "本文 / 该论文 / 本研究 ..." connective if the
+    # title was already removed above, so the summary starts with content.
+    cleaned = re.sub(
+        r"^(?:本文|该论文|本研究|这项研究|这项工作|这项论文|这篇论文|这篇研究工作|这篇技术资讯)[:：,，]?\s*(?:介绍|提出|讨论|研究|分析|探索|聚焦|围绕|总结|阐述|说明)?了?\s*[:：,，]?\s*",
+        "",
+        cleaned,
+    ).strip()
+
+    return cleaned
 
 def extract_focus_terms(text, limit=6):
     candidates = []
@@ -689,20 +794,19 @@ def contains_chinese(text):
     return re.search(r"[\u4e00-\u9fff]", text) is not None
 
 def chinese_fallback_summary(title, content, tags, is_news=False):
-    topic = "技术资讯" if is_news else "研究工作"
-    focus_terms = tags[:3] or extract_focus_terms(f"{title} {content}", limit=3)
-    tag_text = "、".join(focus_terms) if focus_terms else "Linux内核网络"
-    sentences = extract_abstract_sentences(content, max_sentences=3)
+    """Heuristic fallback when LLM is unavailable or returns a generic
+    summary. Provide a short Chinese lead plus the original abstract's
+    key sentences, without echoing the paper title and without templated
+    filler like "归入...方向。阅读时重点核对三点...".
+    """
+    source_content = content if has_usable_abstract(content, title, min_len=60) else ""
+    sentences = extract_abstract_sentences(source_content, max_sentences=4)
     if sentences:
         brief = " ".join(sentences)
-        if len(brief) > 360:
-            brief = brief[:360].rstrip() + "..."
-    else:
-        brief = "原文摘要信息有限，需要结合论文原文确认实验设置、系统边界和实现细节。"
-    return (
-        f"这篇{topic}《{title}》被归入{tag_text}方向。摘要显示，其核心内容是：{brief} "
-        f"阅读时应重点核对三点：它是否直接触达 Linux 内核网络路径或旁路数据面，方法相比现有协议栈/用户态方案解决了什么瓶颈，以及实验是否给出吞吐、时延、CPU 开销或可部署性证据。"
-    )
+        if len(brief) > 480:
+            brief = brief[:480].rstrip() + "..."
+        return f"原摘要要点：{brief}"
+    return "原摘要信息不足，建议打开原文查看研究目标、方法与实验设置。"
 
 def parse_json_object(response):
     if not response:
@@ -1465,19 +1569,20 @@ def ensure_non_empty_summary(text, fallback_text):
 def sanitize_item(item, is_news=False):
     default_minutes = 3 if is_news else 5
     source_text = item.get("summary_en") or item.get("abstract") or item.get("summary") or ""
-    merged_for_fallback = f"{item.get('title', '')} {source_text}"
+    fallback_source = source_text if has_usable_abstract(source_text, item.get("title", ""), min_len=60) else ""
     item["tags"] = normalize_tags(item.get("tags", []), max_tags=4)
     item["summary"] = ensure_non_empty_summary(
         item.get("summary", ""),
-        chinese_fallback_summary(item.get("title", ""), merged_for_fallback, item["tags"], is_news=is_news),
+        chinese_fallback_summary(item.get("title", ""), fallback_source, item["tags"], is_news=is_news),
     )
     if not contains_chinese(item["summary"]) or is_generic_summary(item["summary"]):
         item["summary"] = chinese_fallback_summary(
             item.get("title", ""),
-            merged_for_fallback,
+            fallback_source,
             item["tags"],
             is_news=is_news,
         )
+    item["summary"] = strip_title_from_summary(item.get("title", ""), item["summary"])
     item["readingTime"] = to_int(item.get("readingTime", default_minutes), default_minutes)
     if item.get("relevance") not in ["high", "medium", "low", "none"]:
         item["relevance"] = "low"
@@ -1623,6 +1728,14 @@ def main():
     stats["paper_candidates_raw"] = len(paper_candidates)
     
     paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
+    before_abstract_gate = len(paper_candidates)
+    paper_candidates = [
+        paper for paper in paper_candidates
+        if has_usable_abstract(paper.get("abstract", ""), paper.get("title", ""))
+    ]
+    dropped_no_abstract = before_abstract_gate - len(paper_candidates)
+    if dropped_no_abstract:
+        print(f"  Dropped {dropped_no_abstract} paper candidates without usable abstracts")
     paper_candidates = prioritize_items(paper_candidates, "abstract")
     stats["paper_candidates_dedup"] = len(paper_candidates)
     
