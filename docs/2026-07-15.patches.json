@@ -1,10 +1,10 @@
 {
   "date": "2026-07-15",
-  "fetchedAt": "2026-07-16T09:46:31+0800",
+  "fetchedAt": "2026-07-16T10:10:48+0800",
   "totals": {
-    "inReview": 23,
-    "merged": 23,
-    "rfc": 7
+    "inReview": 7,
+    "merged": 22,
+    "rfc": 1
   },
   "inReview": [
     {
@@ -22,14 +22,13 @@
       "state": "rfc",
       "submitter": "Leon Hwang",
       "date": "2026-07-15T14:53:26",
-      "summary": "该补丁为 TCP 子系统新增了一个网络命名空间级别的 sysctl 开关 net.ipv4.tcp_purge_receive_queue（默认关闭）。问题在于：当处于 CLOSE_WAIT 状态的 TCP 套接字收到 RST 报文时，当前实现不清空其接收队列，导致队列中的 SKB 一直占用到应用层主动 close 套接字为止，进而使得 SKB 持有的 page pool 页无法释放，整个 page pool 也无法被回收。RFC 9293 3.10.7.4 节明确要求收到 RST 时应 flush 所有段队列，但内核未实现。补丁在 tcp_input.c 的 RST 处理路径中加入条件性 skb_queue_purge 调用，配合新 sysctl 控制开关，使 SKB 与关联 page pool 内存能及时释放，便于存在大量短连接或 CLOSE_WAIT 异常关闭场景下的资源回收。",
+      "summary": "《Add net.ipv4.tcp_purge_receive_queue sysctl》主要围绕“Introduce a new sysctl knob, net.ipv4.tcp_purge_receive_queue, to address an unrelea...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "TCP/IP",
-        "Socket",
-        "性能"
+        "包处理"
       ],
-      "relevance": "high",
-      "readingTime": 4
+      "relevance": "low",
+      "readingTime": 3
     },
     {
       "id": 14688812,
@@ -46,12 +45,12 @@
       "state": "new",
       "submitter": "Alessio Faina",
       "date": "2026-07-15T12:28:59",
-      "summary": "该补丁修改了 Linux 内核 selftests/net 目录下的 SRv6 End.DT46 L3VPN 测试脚本。当系统的 iproute2 版本低于 5.14.0（2021 年 9 月发布）时，不支持 End.DT46 功能，会导致测试失败。新增 `test_iproute2_supp_or_ksft_skip` 函数，通过检查 `ip route add help` 输出是否包含 'End.DT46' 关键字来判断用户态工具是否具备所需能力，若不支持则使用 ksft_skip 跳过整个测试套件，避免在已回移植新内核特性但用户态 iproute2 较旧的系统上产生误报失败。",
+      "summary": "修改 selftests/net 下的 srv6_end_dt46_l3vpn_test.sh 脚本，新增 shell 函数 test_iproute2_supp_or_ksft_skip()，通过执行 `ip route add help` 并 grep \"End.DT46\" 关键字来探测用户态 iproute2 是否支持 SRv6 End.DT46 行为（对应 iproute2 ≥ 5.14.0）。若探测失败，则以 ksft_skip 状态码直接退出整个测试套件，避免因用户态工具版本过旧而误报 host_vpn_tests 全部 FAIL（IPv6/IPv4 主机连通性等 8 个子用例）。该函数在 root 权限检查与 `command -v ip` 检查之后、modprobe vrf 之前被调用，对内核运行路径无影响，仅修复后端回溯环境中 CI 假阳性失败问题。",
       "tags": [
-        "路由",
-        "Linux内核网络"
+        "Linux内核网络",
+        "路由"
       ],
-      "relevance": "high",
+      "relevance": "medium",
       "readingTime": 2
     },
     {
@@ -69,13 +68,11 @@
       "state": "new",
       "submitter": "Kiran Kella",
       "date": "2026-07-15T11:07:01",
-      "summary": "该补丁修复 PSP（Protocol Service Proxy）设备注销与网络命名空间销毁之间的并发竞争导致的 NULL 指针解引用问题。当 netns 通过 cleanup_net() 销毁时，genl_pernet_exit() 会将 net->genl_sock 置为 NULL；同时 PSP 设备注销路径调用的 psp_nl_multicast_per_ns() 仍可能访问该 socket，从而在 netlink_has_listeners(NULL) 处崩溃。修复方法是将裸的 dev_net() 调用替换为 maybe_get_net()，若命名空间已处于 dying 状态则返回 NULL 跳过通知；通过持有命名空间引用确保 genl_sock 在 build_ntf() 和 genlmsg_multicast_netns() 使用期间仍然有效，关联设备的 assoc_net 也做了同样的处理。",
+      "summary": "《fix NULL genl_sock deref race with concurrent netns teardown》主要围绕“The race occurs between network namespace removal and PSP device unregistration. Whe...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
-        "Linux内核网络",
-        "驱动",
         "容器网络"
       ],
-      "relevance": "high",
+      "relevance": "low",
       "readingTime": 3
     },
     {
@@ -93,14 +90,12 @@
       "state": "new",
       "submitter": "Doruk Tan Ozturk",
       "date": "2026-07-15T05:56:48",
-      "summary": "这是 GENEVE 隧道驱动（drivers/net/geneve.c）的安全加固补丁。GENEVE 隧道的 changelink 操作涉及两个网络命名空间：设备所在的 dev_net(dev) 以及承载底层 underlay socket 的 geneve->net。原有 rtnl changelink 路径仅校验 dev_net(dev) 的 CAP_NET_ADMIN，导致在 dev 所在 netns 拥有权限但不在 geneve->net 拥有权限的调用者可以改写隧道配置并重新打开 underlay socket。补丁在 geneve_changelink() 入口处、解析任何属性之前，调用 rtnl_dev_link_net_capable(dev, geneve->net) 进行权限校验，行为与 ipgre_changelink() 及同系列补丁一致，拒绝越权操作并返回 -EPERM。",
+      "summary": "《require CAP_NET_ADMIN in the device netns for changelink》主要围绕“A tunnel changelink() operates on at most two netns, dev_net(dev) and the sticky und...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
-        "驱动",
-        "虚拟化",
         "容器网络"
       ],
-      "relevance": "high",
-      "readingTime": 2
+      "relevance": "low",
+      "readingTime": 3
     },
     {
       "id": 14688062,
@@ -117,11 +112,11 @@
       "state": "new",
       "submitter": "Doruk Tan Ozturk",
       "date": "2026-07-15T05:56:47",
-      "summary": "该补丁修复了 vxlan 模块中 changelink 操作的安全漏洞。vxlan 设备的底层（underlay）socket 可能位于与设备自身不同的网络命名空间（vxlan->net）中，原有代码仅校验调用者在 dev_net(dev) 中具有 CAP_NET_ADMIN 权限，导致在 vxlan->net 中无权限的用户可绕过检查篡改底层 socket 配置。补丁在 vxlan_changelink() 入口处添加 rtnl_dev_link_net_capable() 校验，确保调用者在底层 netns 中也具备 CAP_NET_ADMIN 权限，与 ipgre_changelink() 等同类隧道的修复方式保持一致。",
+      "summary": "在 drivers/net/vxlan/vxlan_core.c 的 vxlan_changelink() 入口处新增 rtnl_dev_link_net_capable(dev, vxlan->net) 权限校验，校验失败直接返回 -EPERM，且该检查在解析任何 nlattr 属性之前完成。改动针对 vxlan 设备跨 netns 场景下的安全缺陷：vxlan_changelink 操作涉及两个网络命名空间（dev_net(dev) 与粘性 underlay 命名空间 vxlan->net），rtnl 链路变更路径原先仅对 dev_net(dev) 检查 CAP_NET_ADMIN，导致在 dev 所属 netns 拥有权限、但在 vxlan->net 中无权限的调用者仍可通过 vxlan_config_validate(vxlan->net, ...) 改写 underlay 配置并重新打开该 netns 下的 underlay socket。新增校验与 ipgre_changelink() 及同系列补丁保持一致，修复 CVE 类权限绕过问题，属于纯安全加固，对性能无影响。",
       "tags": [
         "驱动",
-        "Linux内核网络",
-        "虚拟化"
+        "虚拟化",
+        "容器网络"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -141,10 +136,11 @@
       "state": "new",
       "submitter": "MingXuan",
       "date": "2026-07-15T03:35:36",
-      "summary": "该补丁修复了 SCTP 诊断接口（inet_diag）中向用户态泄漏内核栈未初始化数据的漏洞。在处理 INET_DIAG_LOCALS/PEERS 属性时，原代码直接 memcpy sizeof(union sctp_addr)（28 字节），但 IPv4 地址场景下仅初始化了 sockaddr_in 的 16 字节，导致 12 字节的栈残留数据被原样拷贝给用户态。修复方案改为先根据 sa_family 区分地址族并计算实际有效长度（AF_INET 取 16 字节，其他取 28 字节），先 memset 清零整个槽位再 memcpy 已初始化部分，避免读取未初始化尾部。该改动属于安全修复（信息泄露），影响所有能发起 IPPROTO_SCTP 诊断转储的进程。",
+      "summary": "修复 net/sctp/diag.c 中 INET_DIAG_LOCALS/PEERS 属性的内核栈残留信息泄漏。函数 inet_diag_msg_sctpladdrs_fill() 与 inet_diag_msg_sctpaddrs_fill() 此前一律按 sizeof(union sctp_addr)=28 字节从 sctp_sockaddr_entry.a 或 transport 的 ipaddr 拷贝到 netlink 属性，再用 memset 补零 28..sockaddr_storage 之间的尾部。但 IPv4 地址填充函数 sctp_v4_from_addr_param()、sctp_v4_from_skb() 只初始化 sockaddr_in 部分（16 字节），union sctp_addr 中偏移 16..27 的 12 字节（仅 sockaddr_in6 使用）从未初始化，通过 sctp_add_bind_addr() 原样传递后被 diag 直接拷贝至用户空间，每条地址泄漏 12 字节内核栈数据。修改方案改为先根据 sa_family 计算实际已初始化长度（AF_INET 取 sizeof(struct sockaddr_in)=16，否则取 sizeof(struct sockaddr_in6)=28），先 memset 清零整个 sockaddr_storage 槽，再 memcpy 实际长度，从而避免读取未初始化尾部，杜绝栈泄漏。涉及两个 diag 填充函数，共 +12/-5 行。",
       "tags": [
         "TCP/IP",
-        "Socket"
+        "Socket",
+        "包处理"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -164,379 +160,14 @@
       "state": "new",
       "submitter": "Ren Wei",
       "date": "2026-07-15T01:50:11",
-      "summary": "该补丁修复了 SCTP 协议在网络命名空间（netns）销毁时的资源泄漏问题。SCTP 通过 net.sctp.udp_port sysctl 启用 UDP 隧道套接字，但原有的 netns 退出路径（sctp_ctrlsock_exit）没有关闭这些 UDP 隧道套接字，导致命名空间被销毁后仍有残留套接字，可能引发 use-after-free 等问题。修复方案是在注销 sysctl 表之后、销毁控制端点之前，调用 sctp_udp_sock_stop(net) 来关闭 UDP 隧道套接字，从而避免 sysctl 写入与套接字释放之间的竞争。改动仅一行，属于关键的资源清理补丁。",
+      "summary": "在 net/sctp/protocol.c 的 sctp_ctrlsock_exit()（per-netns 的 SCTP 控制套接字析构回调，位于 sctp_sysctl_net_unregister(net) 之后、inet_ctl_sock_destroy() 之前）中新增一行调用 sctp_udp_sock_stop(net)，在网络命名空间销毁时关闭该 netns 下通过 net.sctp.udp_port sysctl 启动的 per-net SCTP UDP tunneling socket。修复了 commit 046c052b475e 引入的缺陷：原 netns exit 路径未停止 UDP tunnel socket，导致 netns 被销毁时这些 socket 仍处于已安装状态，可能与后续 sysctl 写入产生竞争。改动在注销 sysctl 表之后释放 socket，确保关闭顺序正确，避免遗留资源。",
       "tags": [
         "TCP/IP",
         "Socket",
-        "包处理"
+        "容器网络"
       ],
       "relevance": "high",
       "readingTime": 2
-    },
-    {
-      "id": 14687901,
-      "title": "[net,v3,1/2] sctp: avoid auth_enable sysctl UAF during netns teardown",
-      "url": "https://lore.kernel.org/r/390cd5e91ed60eea27b0b64d0468301a9e73b808.1784033357.git.roxy520tt@gmail.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/390cd5e91ed60eea27b0b64d0468301a9e73b808.1784033357.git.roxy520tt@gmail.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/390cd5e91ed60eea27b0b64d0468301a9e73b808.1784033357.git.roxy520tt@gmail.com/mbox/",
-      "hash": "0f37725a841244c44d1df12abc5b1fec3a6abd00",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "new",
-      "submitter": "Ren Wei",
-      "date": "2026-07-15T01:50:10",
-      "summary": "该补丁修复了 SCTP 协议中 `auth_enable` sysctl 在网络命名空间销毁时的 use-after-free（UAF）漏洞。问题根因在于 SCTP 的 per-net sysctl 注册（sctp_defaults_init）与控制 socket 创建（sctp_ctrlsock_init）分离，导致存在时间窗口：初始化时 ctl_sock 尚未创建即可写入 sysctl，销毁时 ctl_sock 已释放但 sysctl 仍可写。修复方案是将 sysctl 注册移至 sctp_ctrlsock_init 中 ctl_sock 创建成功之后，并在 sctp_ctrlsock_exit 中销毁控制 socket 之前注销 sysctl 表。同时增强 sctp_sysctl_net_unregister 容错，允许 header 缺失并将指针置空，以便 init 错误路径与 exit 路径共享同一辅助函数。",
-      "tags": [
-        "TCP/IP",
-        "Linux内核网络"
-      ],
-      "relevance": "high",
-      "readingTime": 4
-    },
-    {
-      "id": 14687722,
-      "title": "[2/2] net/mlx5e: kTLS: guard RX resync against stale channel index",
-      "url": "https://lore.kernel.org/r/20260714222915.2334949-3-rjethwani@purestorage.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714222915.2334949-3-rjethwani@purestorage.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714222915.2334949-3-rjethwani@purestorage.com/mbox/",
-      "hash": "8aa61a2debae68d965ddc183f617054eece51181",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "new",
-      "submitter": "Rishikesh Jethwani",
-      "date": "2026-07-14T22:29:15",
-      "summary": "《net/mlx5e: kTLS: guard RX resync against stale channel index》主要围绕“An RX offloaded socket stores its channel index in priv_rx->rxq when offload is enab...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687721,
-      "title": "[1/2] net/mlx5e: kTLS: reject stale RX queue mapping on RX offload setup",
-      "url": "https://lore.kernel.org/r/20260714222915.2334949-2-rjethwani@purestorage.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714222915.2334949-2-rjethwani@purestorage.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714222915.2334949-2-rjethwani@purestorage.com/mbox/",
-      "hash": "750426805a4b588c0cf9478db8aedb0bc84be9cb",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "new",
-      "submitter": "Rishikesh Jethwani",
-      "date": "2026-07-14T22:29:14",
-      "summary": "《net/mlx5e: kTLS: reject stale RX queue mapping on RX offload》主要围绕“mlx5e_ktls_sk_get_rxq() treats only the -1 sentinel from sk_rx_queue_get() as specia...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687698,
-      "title": "[net,v3] rds: tcp: hold the RCU lock across ipv6_chk_addr() in rds_tcp_laddr_check()",
-      "url": "https://lore.kernel.org/r/20260714212239.1511269-1-xmei5@asu.edu",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714212239.1511269-1-xmei5@asu.edu/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714212239.1511269-1-xmei5@asu.edu/mbox/",
-      "hash": "298108dc0235efb8d00ac92814c349ab7fd833ef",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "new",
-      "submitter": "Xiang Mei",
-      "date": "2026-07-14T21:22:39",
-      "summary": "《hold the RCU lock across ipv6_chk_addr() in rds_tcp_laddr_ch》主要围绕“rds_tcp_laddr_check() looks up a scoped IPv6 interface with dev_get_by_index_rcu(),...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "TCP/IP"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687649,
-      "title": "[v3,2/2] bpf, sockmap: handle spurious tcp_msg_wait_data() wakeup",
-      "url": "https://lore.kernel.org/r/20260714203927.32289-3-nnamdio@gmail.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714203927.32289-3-nnamdio@gmail.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714203927.32289-3-nnamdio@gmail.com/mbox/",
-      "hash": "ecc10bd4d7df5df8726966e1604b72dc0f9de030",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "superseded",
-      "submitter": "Nnamdi Onyeyiri",
-      "date": "2026-07-14T20:39:27",
-      "summary": "《bpf, sockmap: handle spurious tcp_msg_wait_data() wakeup》主要围绕“This selftest exercises the tcp_bpf_recvmsg() and tcp_bpf_recvmsg_parser() functions...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "TCP/IP"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687648,
-      "title": "[v3,1/2] bpf, sockmap: handle spurious tcp_msg_wait_data() wakeup",
-      "url": "https://lore.kernel.org/r/20260714203927.32289-2-nnamdio@gmail.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714203927.32289-2-nnamdio@gmail.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714203927.32289-2-nnamdio@gmail.com/mbox/",
-      "hash": "f7b44dffdde39efcb5ea355ac294c6c875ae6105",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "superseded",
-      "submitter": "Nnamdi Onyeyiri",
-      "date": "2026-07-14T20:39:26",
-      "summary": "《bpf, sockmap: handle spurious tcp_msg_wait_data() wakeup》主要围绕“recvfrom()/recv() are documented as only returning EAGAIN for blocking sockets when...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "TCP/IP"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687318,
-      "title": "[net,v5] tipc: serialize udp bearer replicast list updates",
-      "url": "https://lore.kernel.org/r/20260714192140.1810202-1-bestswngs@gmail.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714192140.1810202-1-bestswngs@gmail.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714192140.1810202-1-bestswngs@gmail.com/mbox/",
-      "hash": "0656ac0bb8717df8f74adfa5726d599a2dfb2aca",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "changes-requested",
-      "submitter": "Weiming Shi",
-      "date": "2026-07-14T19:21:40",
-      "summary": "《serialize udp bearer replicast list updates》主要围绕“tipc_udp_rcast_add() and cleanup_bearer() both 更新 ub->rcast.list with list_add_rcu()...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "TCP/IP"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687299,
-      "title": "[RFC,10/10] MAINTAINERS: add entry for Rockchip XPCS driver",
-      "url": "https://lore.kernel.org/r/20260714191341.690906-11-coiaprant@gmail.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714191341.690906-11-coiaprant@gmail.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714191341.690906-11-coiaprant@gmail.com/mbox/",
-      "hash": "4a98476bf23c5fa3ace22b69f126eaae47a83e20",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": true,
-      "isSeries": false,
-      "state": "rfc",
-      "submitter": "Coia Prant",
-      "date": "2026-07-14T19:08:38",
-      "summary": "《add entry for Rockchip XPCS driver》主要围绕“新增 a MAINTAINERS entry for the Rockchip RK3568 XPCS platform driver and its device t...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "TCP/IP",
-        "驱动"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687227,
-      "title": "[6.16.y,4/6] bpf: Skip redundant IBPB in pack allocator",
-      "url": "https://lore.kernel.org/r/20260714-cbpf-jit-spray-hardening-6-16-y-v1-4-2fc3e16263ac@linux.intel.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-cbpf-jit-spray-hardening-6-16-y-v1-4-2fc3e16263ac@linux.intel.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-cbpf-jit-spray-hardening-6-16-y-v1-4-2fc3e16263ac@linux.intel.com/mbox/",
-      "hash": "9aecd34adf0bca9cd40659130c6284ec7a2f5fec",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "superseded",
-      "submitter": "Pawan Gupta",
-      "date": "2026-07-14T18:59:26",
-      "summary": "《Skip redundant IBPB in pack allocator》主要围绕“commit a23c1c5396a91680703360d1ee28a44657c503c4 upstream. bpf_prog_pack_alloc() issu...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "TCP/IP"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687107,
-      "title": "[RFC,net-next,6/6] selftests/bpf: Use non-trivial test payload in xdp_context tests",
-      "url": "https://lore.kernel.org/r/20260714-bpf-meta-inside-skb-ext-v1-6-5871c07a8dd6@cloudflare.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-6-5871c07a8dd6@cloudflare.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-6-5871c07a8dd6@cloudflare.com/mbox/",
-      "hash": "0d5ef38c143c51ed8c091fe3ac7185bde9ce46fb",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": true,
-      "isSeries": false,
-      "state": "rfc",
-      "submitter": "Jakub Sitnicki",
-      "date": "2026-07-14T17:48:25",
-      "summary": "《selftests/bpf: Use non-trivial test payload in xdp_context t》主要围绕“替换 the sequential test payload pattern (0x01..0x38) with higher-entropy values that...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "XDP",
-        "TCP/IP"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687106,
-      "title": "[RFC,net-next,5/6] selftests/bpf: Test skb_ext scrubbing across tunnels and veths",
-      "url": "https://lore.kernel.org/r/20260714-bpf-meta-inside-skb-ext-v1-5-5871c07a8dd6@cloudflare.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-5-5871c07a8dd6@cloudflare.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-5-5871c07a8dd6@cloudflare.com/mbox/",
-      "hash": "49a6a9e6414f9647c6c638a843f2f3277b7189da",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": true,
-      "isSeries": false,
-      "state": "rfc",
-      "submitter": "Jakub Sitnicki",
-      "date": "2026-07-14T17:48:24",
-      "summary": "《selftests/bpf: Test skb_ext scrubbing across tunnels and vet》主要围绕“新增 tests for BPF_SKB_EXT_F_NO_SCRUB covering extension survival and scrubbing across...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "XDP",
-        "路由"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687109,
-      "title": "[RFC,net-next,4/6] selftests/bpf: Add tests for bpf_dynptr_from_skb_ext",
-      "url": "https://lore.kernel.org/r/20260714-bpf-meta-inside-skb-ext-v1-4-5871c07a8dd6@cloudflare.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-4-5871c07a8dd6@cloudflare.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-4-5871c07a8dd6@cloudflare.com/mbox/",
-      "hash": "e509650ea0d3d8e8f772adda40d22c38c507edca",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": true,
-      "isSeries": false,
-      "state": "rfc",
-      "submitter": "Jakub Sitnicki",
-      "date": "2026-07-14T17:48:23",
-      "summary": "《selftests/bpf: Add tests for bpf_dynptr_from_skb_ext》主要围绕“Test the bpf_dynptr_from_skb_ext() kfunc and skb_ext survival across network stack h...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "包处理"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687104,
-      "title": "[RFC,net-next,3/6] bpf: Allow skb extensions to survive packet scrubbing",
-      "url": "https://lore.kernel.org/r/20260714-bpf-meta-inside-skb-ext-v1-3-5871c07a8dd6@cloudflare.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-3-5871c07a8dd6@cloudflare.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-3-5871c07a8dd6@cloudflare.com/mbox/",
-      "hash": "b932cc7f6af1d14a73a3d0808916229d317ed8f0",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": true,
-      "isSeries": false,
-      "state": "rfc",
-      "submitter": "Jakub Sitnicki",
-      "date": "2026-07-14T17:48:22",
-      "summary": "《Allow skb extensions to survive packet scrubbing》主要围绕“skb_scrub_packet() drops all skb extensions unconditionally via skb_ext_reset(). It...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "TCP/IP",
-        "路由"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687108,
-      "title": "[RFC,net-next,1/6] bpf: Introduce per-packet metadata storage for BPF programs",
-      "url": "https://lore.kernel.org/r/20260714-bpf-meta-inside-skb-ext-v1-1-5871c07a8dd6@cloudflare.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-1-5871c07a8dd6@cloudflare.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714-bpf-meta-inside-skb-ext-v1-1-5871c07a8dd6@cloudflare.com/mbox/",
-      "hash": "14075500a1eaec815433494ce4ecb389811751d0",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": true,
-      "isSeries": false,
-      "state": "rfc",
-      "submitter": "Jakub Sitnicki",
-      "date": "2026-07-14T17:48:20",
-      "summary": "《Introduce per-packet metadata storage for BPF programs》主要围绕“BPF programs attached at different points in the network stack have no way to pass d...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "eBPF",
-        "XDP",
-        "包处理"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687102,
-      "title": "[net,v3,2/2] tipc: fix NULL deref in tipc_named_node_up() on empty publication list",
-      "url": "https://lore.kernel.org/r/20260714174110.1571033-3-bestswngs@gmail.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714174110.1571033-3-bestswngs@gmail.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714174110.1571033-3-bestswngs@gmail.com/mbox/",
-      "hash": "82ed51e744aacf73fdd7e64e5829af2209545ca6",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "new",
-      "submitter": "Weiming Shi",
-      "date": "2026-07-14T17:41:10",
-      "summary": "《fix NULL deref in tipc_named_node_up() on empty publication》主要围绕“named_distribute() ends by stamping the last_bulk flag on the tail skb via buf_msg(s...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "TCP/IP",
-        "包处理"
-      ],
-      "relevance": "low",
-      "readingTime": 3
-    },
-    {
-      "id": 14687101,
-      "title": "[net,v3,1/2] tipc: guard against empty list in tipc_node_xmit()",
-      "url": "https://lore.kernel.org/r/20260714174110.1571033-2-bestswngs@gmail.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714174110.1571033-2-bestswngs@gmail.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260714174110.1571033-2-bestswngs@gmail.com/mbox/",
-      "hash": "faf87ac7da37a0adf3ad7dcef603e406bdac003a",
-      "commitRef": null,
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "new",
-      "submitter": "Weiming Shi",
-      "date": "2026-07-14T17:41:09",
-      "summary": "《guard against empty list in tipc_node_xmit()》主要围绕“tipc_node_xmit() passes @list to tipc_lxc_xmit(), which dereferences buf_msg(skb_pee...”进行调整，修正相关实现并降低维护成本。",
-      "tags": [
-        "TCP/IP",
-        "包处理",
-        "性能"
-      ],
-      "relevance": "low",
-      "readingTime": 3
     }
   ],
   "merged": [
@@ -555,37 +186,14 @@
       "state": "accepted",
       "submitter": "Avinash Duduskar",
       "date": "2026-07-15T10:03:49",
-      "summary": "《selftests/bpf: Fix fib_lookup VLAN tests on hosts with forwa》主要围绕“The VLAN tests assume the test namespace starts with IPv4 forwarding off, but a new...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "修复 BPF selftests 中 fib_lookup VLAN 测试在开启了 IPv4 转发的宿主机上失败的问题。改动集中在 prog_tests/fib_lookup.c：(1) 在 setup_netns() 中创建 veth 设备前显式将 net.ipv4.conf.all/forwarding 与 net.ipv4.conf/default/forwarding 写为 \"0\"，防止新建 netns 从 init_net 继承转发配置，确保期望 BPF_FIB_LKUP_RET_FWD_DISABLED 的测试分支能正确触发；(2) 在 test_fib_lookup_vlan_netns 中补充一条路由，使当跨 netns 的 VLAN 设备被解析时 fib_lookup 返回 SUCCESS，从而使 NOT_FWDED 期望分支能真正区分 netns 隔离与转发关闭这两种情况，避免该测试变成恒真（tautology）。问题根源是 net.core.devconf_inherit_init_net 默认开启且 init_net 转发状态会被新 netns 继承，IPv6 不受影响因为使用编译期默认值。",
       "tags": [
         "eBPF",
-        "TCP/IP",
-        "路由"
+        "路由",
+        "容器网络"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
-    },
-    {
-      "id": 14682835,
-      "title": "[iproute2-next] ip: display DPLL pin information in link details",
-      "url": "https://lore.kernel.org/r/20260713092119.1536385-1-ivecera@redhat.com",
-      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260713092119.1536385-1-ivecera@redhat.com/",
-      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260713092119.1536385-1-ivecera@redhat.com/mbox/",
-      "hash": "e7ab76c70c91ba3a563514dceba1056b8282d1b8",
-      "commitRef": "20e860c632e314a9e985f8a549ff962c1cfcaf98",
-      "version": "",
-      "prefixes": [],
-      "isRfc": false,
-      "isSeries": false,
-      "state": "accepted",
-      "submitter": "Ivan Vecera",
-      "date": "2026-07-13T09:21:19",
-      "summary": "该补丁属于 iproute2 用户态工具（而非 Linux 内核本身），修改 ip/ipaddress.c，使 `ip -d link show` 在显示网络接口详细信息时解析 IFLA_DPLL_PIN 嵌套属性，从中提取 DPLL_A_PIN_ID 并以 'dpll-pin <id>' 格式输出。DPLL（数字锁相环）用于网络接口的时钟同步和恢复。该改动方便用户直接在 ip link 输出中查看接口关联的 DPLL 恢复时钟引脚，无需再交叉参考 dpll pin 子系统输出。属于用户态展示增强，对内核网络行为无直接影响。",
-      "tags": [
-        "驱动",
-        "性能"
-      ],
-      "relevance": "low",
-      "readingTime": 2
     },
     {
       "id": 14679165,
@@ -602,14 +210,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-10T18:09:15",
-      "summary": "《Fix unused nskb warning in bpf_icmp_send》主要围绕“Declare nskb inside the IPv4 and IPv6 case blocks so it is only present when the cor...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "针对 net/core/filter.c 中的 BPF kfunc bpf_icmp_send 进行编译告警修复。原函数在最外层声明 struct sk_buff *nskb，但实际只在 ETH_P_IP（CONFIG_INET）和 ETH_P_IPV6（CONFIG_IPV6）分支中使用，当某一子协议未编译时会产生 unused variable 告警。改动将 nskb 的声明下沉到 IPv4 与 IPv6 两个 case 块内部，并在 case 标签后增加大括号创建局部作用域，避免与 switch case 直通语义冲突。受影响对象为 bpf_icmp_send 内部的 sk_buff 变量声明方式，无功能或性能变化，仅消除 kernel test robot 报告的告警。",
       "tags": [
         "eBPF",
-        "TCP/IP",
-        "包处理"
+        "包处理",
+        "Linux内核网络"
       ],
-      "relevance": "low",
-      "readingTime": 3
+      "relevance": "high",
+      "readingTime": 2
     },
     {
       "id": 14678106,
@@ -626,14 +234,13 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:21",
-      "summary": "该补丁修复了 xfrm/iptfs 模块中 iptfs_skb_add_frags() 函数未正确传递 SKBFL_SHARED_FRAG 标志的问题。当从源 SKB 拷贝 frag 引用到内部 SKB 时，虽然通过 __skb_frag_ref() 增加了页面引用计数，但未将 SKBFL_SHARED_FRAG 设置到目标 SKB 的 skb_shinfo->flags 中，导致 ESP 后续解密时误判为私有 frag 而走 no-COW 快速路径，直接对仍被外层 IPTFS SKB 引用的页面进行原地解密，进而引发内存破坏甚至内核 panic。补丁通过在循环中无条件设置 SKBFL_SHARED_FRAG 标志，与 skb_try_coalesce、skb_gro_receive 等内核其他 frag 传递助手保持一致。",
+      "summary": "《propagate SKBFL_SHARED_FRAG in iptfs_skb_add_frags()》主要围绕“Chen YanJun <moomichen@tencent.com> When iptfs_skb_add_frags() copies frag reference...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "TCP/IP",
-        "包处理",
-        "性能"
+        "包处理"
       ],
-      "relevance": "high",
-      "readingTime": 4
+      "relevance": "low",
+      "readingTime": 3
     },
     {
       "id": 14678112,
@@ -650,9 +257,9 @@
       "state": "accepted",
       "submitter": "Steffen Klassert",
       "date": "2026-07-10T09:03:16",
-      "summary": "该补丁修复了 XFRM（IPsec）子系统 NAT keepalive 发送路径中的 double-free 问题。原先 nat_keepalive_send() 在底层 IPv4/IPv6 发送函数（ip_build_and_send_pkt 或 ip6_xmit）返回错误时统一调用 kfree_skb 释放 skb，但这两个函数一旦接管 skb 即使返回错误也可能已将其释放，导致重复释放。修复方案是将 kfree_skb 下沉到 nat_keepalive_send_ipv4/ipv6 中仅处理 skb 所有权仍属于调用方的预交付失败路径（如路由查找失败），而交付后的错误路径不再释放 skb，从而避免 double-free。",
+      "summary": "针对 net/xfrm/xfrm_nat_keepalive.c 中 nat_keepalive_send_ipv4()/nat_keepalive_send_ipv6() 的 skb 释放语义进行修正。原实现在 ipv4/ipv6 发送函数返回错误后由调用者 nat_keepalive_send() 统一 kfree_skb，但 ip_build_and_send_pkt() 与 ip6_xmit() 一旦接管 skb，错误返回时栈可能已消费 skb，导致 double-free。改动把 kfree_skb(skb) 移到 ipv4/ipv6 函数内部，仅在 skb 仍归调用方所有（ip_route_output_key / ip6_dst_lookup_flow 失败等路径）时释放；调用者 nat_keepalive_send() 不再重复释放，仅负责协议族分发与不支持族（EAFNOSUPPORT）的清理路径。涉及数据结构 sk_buff、函数 nat_keepalive_send_ipv4/ipv6、ip6_dst_lookup_flow、ip_route_output_key，影响 ESP-in-UDP NAT keepalive 路径的正确性。",
       "tags": [
-        "TCP/IP",
+        "Linux内核网络",
         "包处理"
       ],
       "relevance": "high",
@@ -697,10 +304,10 @@
       "state": "accepted",
       "submitter": "Admin",
       "date": "2026-07-09T18:27:59",
-      "summary": "该补丁修复了 BPF 子系统中 bpf_cpumask_populate() kfunc 的类型安全漏洞。原实现将目标参数声明为 struct cpumask *，导致 BPF 验证器允许将只读 kfunc（如 scx_bpf_get_online_cpumask()）返回的借用 cpumask 指针作为可写目标，违反了所有权规则。修改后将目标类型改为 struct bpf_cpumask *，与其他可变 cpumask kfunc 保持一致的语义。同时更新了 scx 兼容头文件中的声明，并相应调整了内部 bitmap_copy 调用以正确访问嵌套的 cpumask 字段。",
+      "summary": "修改 BPF kfunc bpf_cpumask_populate() 的目标参数类型，从 struct cpumask * 改为 struct bpf_cpumask *（定义于 kernel/bpf/cpumask.c）。原签名接受通用 struct cpumask *，导致验证器误将只读 kfunc（如 scx_bpf_get_online_cpumask()）返回的借用指针识别为可写目标，存在正确性漏洞。新签名下 populate 与其他可变 cpumask kfunc 遵循相同的所有权规则，只读查询 kfunc 仍接受 const struct cpumask *。实现中相应将 bitmap_copy() 调用调整为 cpumask_bits(&cpumask->cpumask)，通过 bpf_cpumask 包装类型取其内嵌 cpumask 字段的位图地址。同步修改 tools/sched_ext/include/scx/compat.bpf.h 中的兼容声明。该修复由 Fixes tag 指向 commit 950ad93df2fc，回归该 kfunc 的所有权语义一致性。",
       "tags": [
         "eBPF",
-        "Linux内核网络"
+        "包处理"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -720,13 +327,13 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:49:00",
-      "summary": "该补丁为 BPF 子系统新增了一个 selftest，测试 `bpf_icmp_send` kfunc 在 skb 缺少 dst 路由信息时的行为。在正常 cgroup_skb 路径中，skb 已经被路由过，但通过 BPF_PROG_TEST_RUN 配合 `bpf_prog_test_run_skb` 构造的测试包缺少路由信息，此时 icmp_send 会因早期返回而静默失败。测试验证该 kfunc 返回 -ENETUNREACH，覆盖 IPv4 和 IPv6 两种场景，确保 kfunc 在无路由条件下能正确报错而非静默失败。",
+      "summary": "《selftests/bpf: add bpf_icmp_send no route test》主要围绕“For normal live cgroup_skb paths, the skb should already be routed. The exception is...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "eBPF",
-        "包处理",
-        "Linux内核网络"
+        "路由",
+        "包处理"
       ],
-      "relevance": "high",
+      "relevance": "low",
       "readingTime": 3
     },
     {
@@ -744,13 +351,12 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:59",
-      "summary": "该补丁为 BPF 子系统新增了一个 selftest，测试 bpf_icmp_send kfunc 的递归行为。测试场景是：当 BPF 程序调用 bpf_icmp_send kfunc 发送 ICMP 报文后，该 ICMP 报文会重新触发同一个 BPF 程序，此时 kfunc 应能提前检测到递归并返回 -EBUSY，避免无限循环。测试通过附加到 root cgroup 来确保 kfunc 生成的 ICMP 报文能再次命中 BPF 程序，验证 kfunc 的递归防护机制正确生效。",
+      "summary": "在 tools/testing/selftests/bpf 下新增针对 bpf_icmp_send kfunc 递归场景的 selftest。新增 test_icmp_send_unreach_recursion() 用例，在 prog_tests/icmp_send_kfunc.c 中调用 setup_cgroup_environment() 与 get_root_cgroup() 将 BPF 程序挂载到根 cgroup，以保证 kfunc 生成的 ICMP 包会再次触发同一 BPF 程序形成递归；在 progs/icmp_send.c 中加入对应的 BPF 程序逻辑，断言当 bpf_icmp_send 检测到自身递归被再次触发时立即返回 -EBUSY，避免无限递归。补丁正文未提供具体的 benchmark 或性能数值，仅为功能正确性验证测试。",
       "tags": [
         "eBPF",
-        "包处理",
-        "Linux内核网络"
+        "包处理"
       ],
-      "relevance": "high",
+      "relevance": "medium",
       "readingTime": 3
     },
     {
@@ -792,13 +398,13 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:57",
-      "summary": "本补丁为 bpf_icmp_send kfunc 新增 cgroup_skb 场景下的 selftests 测试。测试流程：开启服务端与客户端，将客户端移入新 cgroup，在出口挂载 cgroup_skb 程序，在客户端 egress 路径调用 bpf_icmp_send 向客户端回送 ICMP Destination Unreachable 控制消息，随后通过 error queue 读取并校验 ICMP unreach code 是否正确。客户端采用非阻塞连接以避免等待 TCP 三次握手超时；未设置 IP_RECVERR 也能收到错误，因为连接在握手初始阶段即被拒绝（详见 tcp_ipv4.c 中 tcp_v4_err 处理）。该测试完善了 BPF 辅助发送 ICMP 错误报文功能的验证覆盖。",
+      "summary": "《selftests/bpf: add bpf_icmp_send kfunc cgroup_skb tests》主要围绕“This test opens a server and client, enters a new cgroup, attach a cgroup_skb progra...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
         "eBPF",
         "TCP/IP",
         "包处理"
       ],
-      "relevance": "high",
+      "relevance": "low",
       "readingTime": 3
     },
     {
@@ -816,14 +422,14 @@
       "state": "accepted",
       "submitter": "Mahe Tardy",
       "date": "2026-07-09T14:48:56",
-      "summary": "该补丁为 BPF 子系统新增了一个 kfunc `bpf_icmp_send`，允许 cgroup_skb 类型的 BPF 程序在丢弃/拦截数据包时回送 ICMP 控制消息（当前支持 ICMP_DEST_UNREACH 和 ICMPV6_DEST_UNREACH），主要用于 Tetragon 等基于 BPF 的安全策略场景，给被阻断的东西向流量提供更好的反馈而非静默丢弃。实现上借鉴了 netfilter reject target 路径，但有两个关键差异：1）克隆 skb 后再发送 ICMP，因为 cgroup_skb 钩子点只允许只读访问原 payload，且 BPF 程序可能仍选择 SK_PASS；2）增加递归检测，防止回送的 ICMP 错误报文再次触发同一个 BPF 程序造成死循环。同时处理了 dst 路由缺失或为 metadata 的边界情况，避免 test_run 合成 skb 路径下误报成功。",
+      "summary": "在 net/core/filter.c 中新增 BPF kfunc bpf_icmp_send，允许 cgroup_skb 等 BPF 程序在策略命中时向对端回送 ICMP 控制报文，弥补此前只能丢包而无法主动通知的不足。当前实现仅支持 ICMP_DEST_UNREACH（IPv4）和 ICMPV6_DEST_UNREACH（IPv6）两种类型，type/code 参数化以便后续扩展。实现上复用 netfilter reject target 的代码路径，但有两点关键差异：由于 cgroup_skb 钩点对 skb 为只读访问，kfunc 必须先克隆 skb 再调用 icmp_send；为防止 ICMP 错误报文再次触发同一 BPF 程序造成递归，引入重入检测，超出已克隆的 skb（如 metadata dst）会返回 -EOPNOTSUPP，避免在 bpf_prog_test_run_skb 合成无路由 skb 的场景下误报成功。返回 0 仅代表尝试发送，具体交付由网络栈决定，错误码 -EBUSY 表示触发重入保护，-EPROTONOSUPPORT 表示非 IP 协议族。",
       "tags": [
         "eBPF",
         "包处理",
-        "TCP/IP"
+        "性能"
       ],
       "relevance": "high",
-      "readingTime": 8
+      "readingTime": 4
     },
     {
       "id": 14675296,
@@ -863,14 +469,14 @@
       "state": "accepted",
       "submitter": "Ratheesh Kannoth",
       "date": "2026-07-09T03:50:16",
-      "summary": "《support u64-array values in devlink param show/set》主要围绕“新增 support for DEVLINK_VAR_ATTR_TYPE_U64_ARRAY parameters that carry multiple DEVLIN...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "在 iproute2 的 devlink/devlink.c 中新增 `struct devlink_param_u64_array` 结构及配套函数 `param_value_u64_array_free`、`param_value_nested_u64_attr_cb`、`param_value_u64_array_parse`，用于解析内核通过 netlink 下发的 `DEVLINK_VAR_ATTR_TYPE_U64_ARRAY` 类型参数。该类型参数载荷为多个 `DEVLINK_ATTR_PARAM_VALUE_DATA` 属性，解析回调自动适配 32/64 位载荷长度并通过 realloc 动态增长数组。`devlink dev/port param show` 命令输出新增按值数组格式打印，`devlink dev/port param set` 命令支持空格或逗号分隔的 u64 序列输入（如 npc_srch_order 的 32 元素搜索顺序数组）。改动仅限用户态命令行解析与打印层，新增约 223 行。",
       "tags": [
-        "TCP/IP",
-        "路由",
-        "驱动"
+        "驱动",
+        "Socket",
+        "Linux内核网络"
       ],
-      "relevance": "low",
-      "readingTime": 3
+      "relevance": "medium",
+      "readingTime": 4
     },
     {
       "id": 14674115,
@@ -933,12 +539,13 @@
       "state": "accepted",
       "submitter": "Mattia Meleleo",
       "date": "2026-07-08T16:55:01",
-      "summary": "《selftests/bpf: Test FIONREAD on a sockmap socket without a v》主要围绕“Mattia Meleleo <mattia.meleleo@coralogix.com> 新增 a test validating that FIONREAD on...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "在 tools/testing/selftests/bpf/prog_tests/sockmap_basic.c 中新增测试函数 test_sockmap_no_verdict_fionread，验证 TCP socket 被插入 BPF sockmap 且未挂载 verdict 程序时，对其调用 FIONREAD ioctl 能正确反映 sk_receive_queue 中已到达的数据量。测试通过 create_socket_pairs 建立 AF_INET/SOCK_STREAM 对端，将客户端 socket 写入 sock_map_rx，调用 xsend 发送 256 字节数据后，在对端上调用 ioctl(FIONREAD) 校验可用字节数。补丁正文未提供具体数值断言或 benchmark，仅添加测试用例以保障无 verdict 场景下 sockmap socket 收包队列可观测性不被破坏。",
       "tags": [
         "eBPF",
-        "TCP/IP"
+        "Socket",
+        "包处理"
       ],
-      "relevance": "low",
+      "relevance": "medium",
       "readingTime": 3
     },
     {
@@ -956,13 +563,13 @@
       "state": "accepted",
       "submitter": "Mattia Meleleo",
       "date": "2026-07-08T16:55:00",
-      "summary": "《bpf, sockmap: Account for receive queue in FIONREAD without》主要围绕“Mattia Meleleo <mattia.meleleo@coralogix.com> tcp_bpf_ioctl() answers SIOCINQ from p...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "在 sockmap/TCP 路径下，tcp_bpf_ioctl() 处理 SIOCINQ/FIONREAD 时仅从 psock->msg_tot_len（即 ingress_msg 队列字节数）取值；当 psock 未挂载 stream/skb verdict 程序时，数据留在 sk_receive_queue 中，FIONREAD 会错误返回 0，即使 read() 仍可读到数据。修复方法是在 tcp_bpf_ioctl() 中判断 psock 无 verdict 程序时，额外叠加 tcp_inq(sk) 的值（sk_receive_queue 字节数）；由于 ingress_msg 与 sk_receive_queue 两队列不相交，msg_tot_len 对其他 socket 重定向过来的字节仍正确统计。同时删除 include/linux/skmsg.h 中已无调用者的 sk_psock_msg_inq() 内联函数，缩减 skmsg 头文件体积。影响范围限定于 sockmap 场景的 FIONREAD 正确性，对正常 socket 行为无影响。",
       "tags": [
         "eBPF",
         "TCP/IP",
-        "包处理"
+        "Socket"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {
@@ -980,12 +587,13 @@
       "state": "accepted",
       "submitter": "Florian Westphal",
       "date": "2026-07-08T14:03:09",
-      "summary": "《ensure inner headers in ICMP errors are in headroom》主要围绕“Julian Anastasov <ja@ssi.bg> Sashiko points out that after stripping the outer heade...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "修改 net/netfilter/ipvs/ip_vs_core.c 中的 ip_vs_in_icmp() 函数。改动包括：(1) 对 ICMP 错误报文中的内层 IP 头部增加更严格的合法性校验，要求 version == 4 且 ihl >= 5，否则直接 NF_ACCEPT 丢弃；(2) 新增局部变量 hlen_ipip 保存内层 IP 头部长度（cih->ihl * 4），并将原来的 offset += cih->ihl * 4 替换为 pskb_pull(skb, hlen_ipip) 调用，确保内层头部被 pull 进 skb headroom；(3) 增加对内层头部及后续传输层头部长度的长度检查。该修复解决了通过 pskb_pull() 剥除外层头部后，ipv4_update_pmtu()、icmp_send()、IP_VS_DBG() 等函数访问内层头部时可能越界的问题，是 f2edb9f7706d（IPIP 被动 PMTUD）的回归修正。",
       "tags": [
-        "TCP/IP",
-        "包处理"
+        "Netfilter",
+        "包处理",
+        "Linux内核网络"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {
@@ -1026,12 +634,13 @@
       "state": "accepted",
       "submitter": "Florian Westphal",
       "date": "2026-07-08T14:03:07",
-      "summary": "《use parsed transport offset in TCP state lookup》主要围绕“Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn> TCP state handling reparses the skb to...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "修复 IPVS TCP 状态转换中 IPv6 传输层头部偏移解析错误。net/netfilter/ipvs/ip_vs_proto_tcp.c 中 tcp_state_transition() 函数原本对 IPv6 报文硬编码使用 sizeof(struct ipv6hdr)（40 字节）作为 TCP 头偏移，未考虑 IPv6 扩展头（如 Hop-by-Hop、Routing、Fragment 等）的存在，导致携带扩展头的 IPv6 报文在查询 TCP 状态时读到扩展头数据而非真实 TCP 头。改动将 skb_header_pointer 的偏移量替换为 ip_vs_fill_iph_skb() 已经解析并通过 iph_len 参数传递的真实传输层偏移，IPv4 及无扩展头 IPv6 场景下偏移与原值一致，行为不变。",
       "tags": [
+        "Netfilter",
         "TCP/IP",
         "包处理"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {
@@ -1049,13 +658,13 @@
       "state": "accepted",
       "submitter": "Florian Westphal",
       "date": "2026-07-08T14:03:05",
-      "summary": "《handle unreadable frags》主要围绕“sashiko reports: When an skb with unreadable fragments (such as from devmem TCP, whe...”进行调整，修正相关实现并降低维护成本。",
+      "summary": "针对 skb_frags_readable 返回 false 的不可读 frags 场景（如 devmem TCP），修正 Netfilter 子系统四处处理逻辑：xt_u32 模块在 skb_copy_bits 返回错误时通过 hotdrop 丢弃而非继续匹配；IPv6 连接跟踪重组的 find_prev_fhdr() 将 skb_copy_bits 失败时的 BUG() 改为 return -1，与 gather_frags 行为一致；nfnetlink_log 的 __build_packet_message() 将 BUG() 改为 goto nla_put_failure，并新增 nfulnl_get_copy_len() 在 frags 不可读时将 copy_len 截断为线性区长度 skb_headlen(skb)；nfnetlink_queue 同样在 skb_zerocopy helper 未复制 readable 标志的情况下限制为线性区拷贝，避免对不可读页执行 copy_bits 导致错误传播或崩溃。",
       "tags": [
-        "TCP/IP",
         "Netfilter",
-        "包处理"
+        "包处理",
+        "Linux内核网络"
       ],
-      "relevance": "low",
+      "relevance": "high",
       "readingTime": 3
     },
     {

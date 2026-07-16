@@ -2,44 +2,7 @@
   "date": "2026-07-16",
   "categories": {
     "papers": [],
-    "news": [
-      {
-        "title": "LWN.net Weekly Edition for July 9, 2026",
-        "url": "https://lwn.net/Articles/1080835/bigpage",
-        "abstract": "Welcome to the LWN.net Weekly Edition for July 9, 2026 This edition contains the following feature content: Progress in modernizing kernel cryptography : Eric Biggers shares his work on making the kernel's cryptographic APIs simpler. The kernel's iomap layer : an overview of the kernel's iomap layer. Continued coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : Limiting negative dentries : a discussion about the role of negative directory cache entries and their impacts on performance. Faster RCUs and lockless memory allocation : two sessions touching on improvements to memory allocation and freeing, in the kernel and specific to BPF. Two LLM-assisted memory-management patch sets : a discussion about different approaches to the use of LLMs in kernel development. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (none posted) Progress in modernizing kernel cryptography By Joe Brockmeier July 8, 2026 LSS NA At the 202",
-        "summary": "在 2026 年北美 Linux 安全峰会上，内核 crypto 与 CRC 库维护者 Eric Biggers 分享了内核加密框架现代化进展。传统 crypto API 自 2002 年沿用至今，存在使用复杂、运行慢、对现代 CPU 加速优化不足等问题，且因按名称动态分配算法，缺少链接期依赖，常常在运行时才失败，也无法在 early init 阶段使用。Biggers 以 HMAC-SHA256 为例演示：传统 API 需要动态分配 crypto_shash 对象、设置密钥、分配同步 hash 描述符、多次错误检查并在最后释放资源；在 x86_64 + 6.12 内核上基准测试显示，仅 38% 时间用于真正的 SHA-256 计算，其余时间都消耗在 API 开销上。新的库式 API（如 6.17 内核新增的 hmac_sha256_usingrawkey）只需单次函数调用，函数永远成功、无需错误处理、可在任何上下文运行、采用标准链接期依赖，并加入 FIPS-140 自检，对短输入约提速 2.5 倍。另一例 ChaCha20-Poly1305 AEAD 算法中，传统 API 还要求将数据组织进 scatter-gather 列表、正确处理 vmalloc/stack 区域并防范异步完成带来的 use-after-free，而库函数 chacha20poly1305_encrypt 直接同步执行、返回 void，类似 memcpy 的使用体验。截至 7.1 内核，crypto 与 CRC 库已覆盖大量算法（约一半在过去一年半加入），但 AES 加密模式等关键算法仍在补齐中。",
-        "keyPoints": [
-          "演讲背景与作者身份：在 2026 年北美 Linux 安全峰会上，crypto 与 CRC 库维护者 Eric Biggers 介绍内核加密框架存在的问题与库式 API 现代化进展；他还维护 fscrypt 库和 fs-verity 支持层。",
-          "传统 crypto API 的定位与历史：自 2002 年起存在于内核树顶层 crypto 目录中，既包含加密算法也包含 CRC 等非加密算法，用于存储/网络加密、生成随机数、固件完整性校验、抗拒绝服务等内核场景。",
-          "传统 API 的核心缺陷：按算法名字符串动态分配对象、缺少链接期依赖导致运行时失败、需要大量错误处理代码、无法在 early init 阶段使用（需 crypto 子系统先初始化）、对现代 CPU 加速优化不足，整体复杂、难用且慢。",
-          "HMAC-SHA256 传统 API 示例步骤：先用 crypto_alloc_shash(\"hmac(sha256)\", 0, 0) 分配对象并检查错误，再用 crypto_shash_setkey 设置密钥，然后用 SHASH_DESC_ON_STACK 宏分配同步 hash 描述符、初始化 desc->tfm，调用 crypto_shash_digest 计算，最后 shash_desc_zero 清零栈敏感数据、检查错误并释放对象。",
-          "传统 API 常见 bug 与失败原因：crypto_shash 分配在某些系统失败的原因是 CRYPTO_HMAC 与 CRYPTO_SHA256 未在 Kconfig 中启用，由于按名加载算法无链接期依赖，编译通过但运行时才暴露问题。",
-          "HMAC-SHA256 性能瓶颈实测：在 x86_64 + 6.12 内核上的基准测试显示，仅 38% 时间用于真正的 SHA-256 计算，绝大部分时间消耗在传统 crypto API 的开销上。",
-          "新库式 API 的优势：Biggers 在 6.17 内核新增 hmac_sha256_usingrawkey 等库函数，函数永远成功、调用者无需错误处理、可在任何内核上下文运行、采用标准链接期依赖不会运行时失败，并加入 FIPS-140 加密算法自检以兼容 FIPS 认证，对短输入约比传统 API 快 2.5 倍。",
-          "WireGuard 引入的库式先例：2019 年为支持 WireGuard 已在内核中以库函数形式添加部分加密算法，证明了库式 API 的可行性，例如 chacha20poly1305_encrypt 就是当时加入并沿用至今。",
-          "ChaCha20-Poly1305 AEAD 传统 API 复杂度：除分配 AEAD 变换对象和设置密钥外，还必须把数据组织进 scatter-gather 列表；若数据位于栈或 vmalloc 区，需要更复杂的列表初始化代码，Biggers 表示几乎没人第一次提交就能写对；此外请求可能异步完成，调用者必须等待完成后再释放数据，否则会引入 use-after-free 漏洞。",
-          "ChaCha20-Poly1305 库式 API 的简化：调用 chacha20poly1305_encrypt(dst, src, src_len, ad, ad_len, nonce, key) 即可完成加密，同步执行、返回 void、适用于任何上下文，使用体验类似 memcpy。",
-          "库式 API 的设计理念：直接提供一个完成所需工作的函数，不要求动态分配内存拷贝对象或调用多个辅助函数，与内核其他子系统长期使用库函数的惯例一致。",
-          "当前覆盖情况与未完成工作：截至 7.1 内核，crypto 与 CRC 库已支持大量算法（过去约一年半新增了一半），但 AES 加密模式等关键算法仍未提供库式实现，Biggers 表示正在补齐这些缺失部分。",
-          "演讲还同时介绍了内核 iomap 层概述、负 dentry 缓存条目限制、更快的 RCU 与无锁内存分配、以及关于用 LLM 辅助内存管理补丁集的两场讨论，构成本期 LWN Weekly 的主要专题内容。"
-        ],
-        "source": "LWN.net",
-        "tags": [
-          "内核加密",
-          "crypto API 现代化",
-          "Linux 安全峰会",
-          "内核库函数"
-        ],
-        "readingTime": 10,
-        "relevance": "high",
-        "access": "free"
-      }
-    ]
+    "news": []
   },
-  "tagStats": {
-    "内核加密": 1,
-    "crypto API 现代化": 1,
-    "Linux 安全峰会": 1,
-    "内核库函数": 1
-  }
+  "tagStats": {}
 }
