@@ -1,8 +1,48 @@
 {
   "date": "2026-07-17",
   "categories": {
-    "papers": [],
+    "papers": [
+      {
+        "title": "Yggdrasil: Reducing Network I/O Tax with (CXL-Based) Distributed Shared Memory",
+        "url": "https://www.semanticscholar.org/paper/43e90f026d53d181a84b5d603e333e7cac88ee04",
+        "summary": "针对高速网络硬件主机上通信密集型应用中Linux原生socket带来的显著I/O开销，提出Yggdrasil——基于CXL的分布式共享内存用户态高性能socket系统。该系统作为Linux socket的drop-in replacement保持API完全兼容，无需修改应用代码。其核心机制是利用CXL的分布式共享内存（DSM）实现跨主机通信，当DSM不可用时透明回退到Linux socket。架构上，控制面由可信用户态监控守护进程负责连接建立与访问控制，数据面采用进程间对等（P2P）通信模型。为弥合socket语义与DSM之间的差距，提出四项关键优化：(1) 透明的动态快/慢数据通路切换；(2) 去中心化的CXL内存管理；(3) 基于无锁队列的QoS感知动态数据轮询；(4) 语义感知的内存页迁移。实验在模拟和真实CXL硬件上展开，对比基线为Linux socket，在Memcached吞吐上达到8.2倍提升，在不同消息大小的微基准测试中延迟降低24~320倍。该工作面向多主机CXL内存互联场景，明确将内核TCP/IP栈与socket开销视为待优化的瓶颈，读者应关注其在真实CXL拓扑扩展性、与现有Linux socket语义兼容边界（字节流/可靠传输在DSM上的映射正确性）以及回退路径的性能拐点。对于Linux内核网络维护者，其参考价值在于：哪些socket调用热路径在内核侧产生的开销最具优化空间，以及用户态旁路方案对内核网络栈设计的反向压力。",
+        "summary_en": "In communication-intensive applications that run on hosts with high-speed network hardware, a common challenge arises from the significant burden placed on the native socket system within the OS. Researchers have devoted considerable effort to optimizing the kernel networking stack and moving the TCP/IP stack to user-space. In this paper, we describe a novel socket replacement solution, Yggdrasil, a CXL-based user-space high-performance socket system. Yggdrasil is fully compatible with Linux socket, making it a drop-in replacement for existing applications without the need for code modificatio...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "CXL",
+          "Distributed Shared Memory",
+          "Socket Bypass",
+          "User-space Networking"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 8
+      },
+      {
+        "title": "XDP Packet Mill: An L2 Frame Interception Framework",
+        "url": "https://www.semanticscholar.org/paper/083f9e55b149a406c51bdb842125c3df29a82ed2",
+        "summary": "针对现代 NIC 高包速率下传统 Linux 网络栈吞吐受限、而 DPDK 等内核旁路方案又会独占网卡、丢失特权指令兼容性并破坏 socket 应用生态的问题，提出 XDP Packet Mill 框架。该框架在网卡驱动层通过 XDP hook 拦截并处理 L2 帧，向用户态暴露零拷贝原语，支持 drop / modify / forward / duplicate / slice / merge 六种 L2 数据包操作；上层通过 AF_XDP socket 与既有 socket-based 应用保持兼容，从而在不要求应用改造的前提下完成多路径通信等高级协议实验与部署。评估在真实高性能以太网环境下，对 Mill 在 XDP native、XDP SKB、XDP zero-copy 三种模式下的吞吐特性进行对比测量，给出不同模式在包处理速率与 CPU 占用上的取舍数据。读者需注意：Mill 依赖支持 XDP 的 NIC 与驱动；zero-copy 模式同样受 AF_XDP umem 与 NIC 环形队列约束；该工作主要面向 L2 拦截场景，对 sk_buff / netfilter 上层路径无改动，对内核网络维护者的价值在于提供在 XDP 数据面复现多路径 / 隧道 / 过滤等实验的统一基线，并量化 native vs SKB vs zero-copy 的吞吐边界。",
+        "summary_en": "Traditional Linux network stacks struggle to handle the high packet rates of modern Network Interface Cards (NICs), pushing high-performance users towards kernel bypass solutions. But kernel bypass solutions introduce compatibility issues requiring exclusive access to network interfaces, lacking access to privileged instructions, and breaking existing application compatibility. To partially address these issues, Linux introduced eXpress Data Path (XDP), enabling programmable, efficient, user-space packet processing but still failing to provide compatibility with traditional socket-based applic...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "XDP",
+          "eBPF",
+          "kernel-bypass"
+        ],
+        "readingTime": 4,
+        "relevance": "high",
+        "innovationScore": 10
+      }
+    ],
     "news": []
   },
-  "tagStats": {}
+  "tagStats": {
+    "CXL": 1,
+    "Distributed Shared Memory": 1,
+    "Socket Bypass": 1,
+    "User-space Networking": 1,
+    "XDP": 1,
+    "eBPF": 1,
+    "kernel-bypass": 1
+  }
 }
