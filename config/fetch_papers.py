@@ -13,6 +13,7 @@ import time
 import random
 import html as html_lib
 import threading
+import socket
 
 # Process-wide MiniMax rate-limit throttle. Any worker that receives an
 # HTTP 429 sets `_MINIMAX_THROTTLE_UNTIL` to a future epoch timestamp;
@@ -31,11 +32,18 @@ OPENREVIEW_API = "https://api2.openreview.net/notes"
 MINIMAX_API = "https://api.minimaxi.com/v1/chat/completions"
 MINIMAX_MODEL = "MiniMax-M3"
 
-REQUEST_DELAY_MIN = 3
-REQUEST_DELAY_MAX = 5
+REQUEST_DELAY_MIN = 4
+REQUEST_DELAY_MAX = 7
 LLM_DELAY_MIN = 3
 LLM_DELAY_MAX = 5
-ARXIV_DELAY = 3
+ARXIV_DELAY = 5
+
+# Polite User-Agent identifying the bot and pointing to the project repo +
+# issues entry. Crossref looks for a mailto in UA to enter its polite pool;
+# we use the issues URL as the contact surface so we don't fabricate an
+# unreachable mailbox. arXiv / S2 / OpenAlex / DBLP all prefer a UA that
+# identifies the crawler rather than a generic browser string.
+APP_USER_AGENT = "CatNews/2.0 (https://github.com/catnews/catnews.github.io; contact: https://github.com/catnews/catnews.github.io/issues)"
 
 SEARCH_KEYWORDS = [
     # 核心代码符号 / 子系统（精确）
@@ -434,6 +442,79 @@ def random_delay(min_sec, max_sec):
     delay = random.uniform(min_sec, max_sec)
     print(f"  Waiting {delay:.1f}s...")
     time.sleep(delay)
+
+
+# ---------------- HTTP helper with rate-limit handling ----------------
+def _parse_retry_after(headers):
+    """Best-effort parse of Retry-After (delta-seconds or HTTP-date)."""
+    if not headers:
+        return 0
+    raw = headers.get("Retry-After")
+    if not raw:
+        return 0
+    raw = raw.strip()
+    try:
+        return max(0, int(raw))
+    except ValueError:
+        pass
+    # HTTP-date form - rare for these APIs; fall back to 0.
+    return 0
+
+
+def _http_get(url, *, as_json=True, timeout=30, retries=3, base_delay=15,
+              max_delay=120, source_name="http"):
+    """GET helper with polite rate-limit handling.
+
+    Behavior:
+      * 429: honor Retry-After header if present, otherwise exponential
+        backoff base_delay * 2^attempt (capped at max_delay).
+      * 5xx: exponential backoff.
+      * 4xx other than 429 (404/400/403/etc.): not retryable. 404 is
+        logged silently (these APIs return 404 for empty/unknown queries);
+        other 4xx are logged once.
+      * Network / timeout errors: retry with exponential backoff.
+    Returns parsed JSON (when as_json) or raw text on success, or None on
+    persistent failure.
+    """
+    last_err = None
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers={
+                "User-Agent": APP_USER_AGENT,
+                "Accept": "application/json" if as_json else "*/*",
+            })
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                raw = resp.read().decode("utf-8", errors="replace")
+                if as_json:
+                    return json.loads(raw)
+                return raw
+        except urllib.error.HTTPError as e:
+            code = e.code
+            last_err = f"HTTP {code} {e.reason}"
+            # Non-retryable 4xx (404/400/403/410/...). 404 is silent.
+            if 400 <= code < 500 and code != 429:
+                if code != 404:
+                    print(f"  [{source_name}] {code} {e.reason} (not retryable) url={url[:90]}")
+                return None
+            # 429 / 5xx: backoff
+            retry_after = _parse_retry_after(e.headers) if code == 429 else 0
+            if retry_after > 0:
+                wait = min(retry_after, max_delay)
+            else:
+                wait = min(base_delay * (2 ** attempt), max_delay)
+            print(f"  [{source_name}] {code} {e.reason}, backoff {wait}s (attempt {attempt + 1}/{retries})")
+            time.sleep(wait)
+        except (urllib.error.URLError, TimeoutError, ConnectionError, socket.timeout) as e:
+            last_err = f"{type(e).__name__}: {e}"
+            wait = min(base_delay * (2 ** attempt), max_delay)
+            print(f"  [{source_name}] network error {last_err}, backoff {wait}s (attempt {attempt + 1}/{retries})")
+            time.sleep(wait)
+        except Exception as e:
+            last_err = f"{type(e).__name__}: {e}"
+            print(f"  [{source_name}] unexpected error {last_err}")
+            return None
+    print(f"  [{source_name}] giving up after {retries} attempts: {last_err}")
+    return None
 
 def call_minimax(prompt, system_prompt, max_retries=5, max_tokens=500):
     global _MINIMAX_THROTTLE_UNTIL
@@ -899,268 +980,247 @@ def analyze_item_with_llm(title, content, is_news=False):
 
 def fetch_arxiv_papers(query, max_results=8):
     papers = []
-    for attempt in range(3):
-        try:
-            print(f"  Waiting {ARXIV_DELAY}s for arXiv...")
-            time.sleep(ARXIV_DELAY)
+    print(f"  Waiting {ARXIV_DELAY}s for arXiv...")
+    time.sleep(ARXIV_DELAY)
 
-            # arXiv API 把空格当作 OR 分隔符，所以多 token query 必须显式
-            # 用 AND 连接每个 all:token，否则只有第一个 token 受 all: 限定，
-            # 命中量爆炸且召回质量极差。
-            tokens = [t for t in query.split() if t]
-            search_query = " AND ".join(f"all:{t}" for t in tokens) if tokens else f"all:{query}"
+    # arXiv API 把空格当作 OR 分隔符，所以多 token query 必须显式
+    # 用 AND 连接每个 all:token，否则只有第一个 token 受 all: 限定，
+    # 命中量爆炸且召回质量极差。
+    tokens = [t for t in query.split() if t]
+    search_query = " AND ".join(f"all:{t}" for t in tokens) if tokens else f"all:{query}"
 
-            params = {
-                "search_query": search_query,
-                "start": 0,
-                "max_results": max_results,
-                "sortBy": "submittedDate",
-                "sortOrder": "descending",
-            }
-            url = f"{ARXIV_API}?{urllib.parse.urlencode(params)}"
-            
-            req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
-            with urllib.request.urlopen(req, timeout=30) as response:
-                data = response.read().decode("utf-8")
-            
-            root = ET.fromstring(data)
-            ns = {"atom": "http://www.w3.org/2005/Atom"}
-            
-            for entry in root.findall("atom:entry", ns):
-                title_elem = entry.find("atom:title", ns)
-                summary_elem = entry.find("atom:summary", ns)
-                id_elem = entry.find("atom:id", ns)
-                published_elem = entry.find("atom:published", ns)
-                
-                if (
-                    title_elem is None
-                    or summary_elem is None
-                    or id_elem is None
-                    or published_elem is None
-                ):
-                    continue
-                
-                title_text = title_elem.text or ""
-                summary_text = summary_elem.text or ""
-                id_text = id_elem.text or ""
-                published_text = published_elem.text or ""
+    params = {
+        "search_query": search_query,
+        "start": 0,
+        "max_results": max_results,
+        "sortBy": "submittedDate",
+        "sortOrder": "descending",
+    }
+    url = f"{ARXIV_API}?{urllib.parse.urlencode(params)}"
 
-                title = title_text.strip().replace("\n", " ")
-                summary = summary_text.strip().replace("\n", " ")
-                url_val = id_text
-                year = int(published_text[:4]) if len(published_text) >= 4 else 0
-                
-                if year >= MIN_YEAR and title and summary:
-                    papers.append({
-                        "title": title,
-                        "url": url_val,
-                        "abstract": summary,
-                        "source": "arXiv",
-                        "year": year
-                    })
-            break
-        except urllib.error.HTTPError as e:
-            if e.code == 429:
-                wait = 30 + attempt * 20
-                print(f"  arXiv rate limited, waiting {wait}s...")
-                time.sleep(wait)
-            else:
-                print(f"arXiv HTTP error: {e.code}")
-                break
-        except Exception as e:
-            print(f"arXiv fetch error: {e}")
-            if attempt < 2:
-                time.sleep(10)
-            else:
-                break
-    
+    data = _http_get(url, as_json=False, source_name="arXiv")
+    if not data:
+        return papers
+
+    try:
+        root = ET.fromstring(data)
+    except Exception as e:
+        print(f"  arXiv XML parse error: {e}")
+        return papers
+
+    ns = {"atom": "http://www.w3.org/2005/Atom"}
+
+    for entry in root.findall("atom:entry", ns):
+        title_elem = entry.find("atom:title", ns)
+        summary_elem = entry.find("atom:summary", ns)
+        id_elem = entry.find("atom:id", ns)
+        published_elem = entry.find("atom:published", ns)
+
+        if (
+            title_elem is None
+            or summary_elem is None
+            or id_elem is None
+            or published_elem is None
+        ):
+            continue
+
+        title_text = title_elem.text or ""
+        summary_text = summary_elem.text or ""
+        id_text = id_elem.text or ""
+        published_text = published_elem.text or ""
+
+        title = title_text.strip().replace("\n", " ")
+        summary = summary_text.strip().replace("\n", " ")
+        url_val = id_text
+        year = int(published_text[:4]) if len(published_text) >= 4 else 0
+
+        if year >= MIN_YEAR and title and summary:
+            papers.append({
+                "title": title,
+                "url": url_val,
+                "abstract": summary,
+                "source": "arXiv",
+                "year": year
+            })
+
     return papers
 
 def fetch_semantic_scholar_papers(query, max_results=8):
     papers = []
-    try:
-        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
-        
-        params = {
-            "query": query,
-            "limit": max_results,
-            "year": f"{MIN_YEAR}-",
-            "fields": "title,url,abstract,year",
-        }
-        url = f"{SEMANTIC_SCHOLAR_API}?{urllib.parse.urlencode(params)}"
-        
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode("utf-8"))
-        
-        for item in data.get("data", []):
-            title = item.get("title", "")
-            abstract = item.get("abstract", "") or ""
-            url_val = item.get("url", "")
-            year = item.get("year", 0)
-            
-            if title and url_val and year >= MIN_YEAR:
-                papers.append({
-                    "title": title,
-                    "url": url_val,
-                    "abstract": abstract,
-                    "source": "Semantic Scholar",
-                    "year": year
-                })
-    except Exception as e:
-        print(f"Semantic Scholar fetch error: {e}")
-    
+    random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
+
+    params = {
+        "query": query,
+        "limit": max_results,
+        "year": f"{MIN_YEAR}-",
+        "fields": "title,url,abstract,year",
+    }
+    url = f"{SEMANTIC_SCHOLAR_API}?{urllib.parse.urlencode(params)}"
+
+    data = _http_get(url, source_name="S2")
+    if not data:
+        return papers
+
+    for item in data.get("data", []):
+        title = item.get("title", "")
+        abstract = item.get("abstract", "") or ""
+        url_val = item.get("url", "")
+        year = item.get("year", 0)
+
+        if title and url_val and year >= MIN_YEAR:
+            papers.append({
+                "title": title,
+                "url": url_val,
+                "abstract": abstract,
+                "source": "Semantic Scholar",
+                "year": year
+            })
     return papers
 
 def fetch_openalex_papers(query, max_results=8):
     papers = []
-    try:
-        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
-        params = {
-            "search": query,
-            "filter": f"from_publication_date:{MIN_YEAR}-01-01,language:en",
-            "per-page": max_results,
-            "sort": "publication_date:desc",
-        }
-        url = f"{OPENALEX_API}?{urllib.parse.urlencode(params)}"
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode("utf-8"))
+    random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
 
-        for item in data.get("results", []):
-            title = item.get("title", "")
-            abstract_inverted = item.get("abstract_inverted_index") or {}
-            abstract = ""
-            if abstract_inverted:
-                pairs = []
-                for word, positions in abstract_inverted.items():
-                    for pos in positions:
-                        pairs.append((pos, word))
-                pairs.sort(key=lambda x: x[0])
-                abstract = " ".join([w for _, w in pairs])
-            year = item.get("publication_year", 0) or 0
-            url_val = item.get("primary_location", {}).get("landing_page_url") or item.get("id", "")
+    params = {
+        "search": query,
+        "filter": f"from_publication_date:{MIN_YEAR}-01-01,language:en",
+        "per-page": max_results,
+        "sort": "publication_date:desc",
+    }
+    url = f"{OPENALEX_API}?{urllib.parse.urlencode(params)}"
+    data = _http_get(url, source_name="OpenAlex")
+    if not data:
+        return papers
 
-            if title and url_val and year >= MIN_YEAR:
-                papers.append({
-                    "title": title,
-                    "url": url_val,
-                    "abstract": abstract,
-                    "source": "OpenAlex",
-                    "year": year,
-                })
-    except Exception as e:
-        print(f"OpenAlex fetch error: {e}")
+    for item in data.get("results", []):
+        title = item.get("title", "")
+        abstract_inverted = item.get("abstract_inverted_index") or {}
+        abstract = ""
+        if abstract_inverted:
+            pairs = []
+            for word, positions in abstract_inverted.items():
+                for pos in positions:
+                    pairs.append((pos, word))
+            pairs.sort(key=lambda x: x[0])
+            abstract = " ".join([w for _, w in pairs])
+        year = item.get("publication_year", 0) or 0
+        url_val = item.get("primary_location", {}).get("landing_page_url") or item.get("id", "")
+
+        if title and url_val and year >= MIN_YEAR:
+            papers.append({
+                "title": title,
+                "url": url_val,
+                "abstract": abstract,
+                "source": "OpenAlex",
+                "year": year,
+            })
     return papers
 
 def fetch_crossref_papers(query, max_results=8):
     papers = []
-    try:
-        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
-        params = {
-            "query": query,
-            "filter": f"from-pub-date:{MIN_YEAR}-01-01,type:journal-article",
-            "rows": max_results,
-            "sort": "published",
-            "order": "desc",
-        }
-        url = f"{CROSSREF_API}?{urllib.parse.urlencode(params)}"
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode("utf-8"))
+    random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
 
-        for item in data.get("message", {}).get("items", []):
-            titles = item.get("title", [])
-            title = titles[0] if titles else ""
-            abstract = re.sub(r"<[^>]+>", " ", item.get("abstract", "") or "")
-            year = 0
-            date_parts = item.get("published-print", {}).get("date-parts") or item.get("published-online", {}).get("date-parts") or []
-            if date_parts and date_parts[0]:
-                year = int(date_parts[0][0])
-            doi = item.get("DOI", "")
-            url_val = f"https://doi.org/{doi}" if doi else item.get("URL", "")
+    params = {
+        "query": query,
+        "filter": f"from-pub-date:{MIN_YEAR}-01-01,type:journal-article",
+        "rows": max_results,
+        "sort": "published",
+        "order": "desc",
+    }
+    url = f"{CROSSREF_API}?{urllib.parse.urlencode(params)}"
+    data = _http_get(url, source_name="Crossref")
+    if not data:
+        return papers
 
-            if title and url_val and year >= MIN_YEAR:
-                papers.append({
-                    "title": title,
-                    "url": url_val,
-                    "abstract": abstract,
-                    "source": "Crossref",
-                    "year": year,
-                })
-    except Exception as e:
-        print(f"Crossref fetch error: {e}")
+    for item in data.get("message", {}).get("items", []):
+        titles = item.get("title", [])
+        title = titles[0] if titles else ""
+        abstract = re.sub(r"<[^>]+>", " ", item.get("abstract", "") or "")
+        year = 0
+        date_parts = item.get("published-print", {}).get("date-parts") or item.get("published-online", {}).get("date-parts") or []
+        if date_parts and date_parts[0]:
+            year = int(date_parts[0][0])
+        doi = item.get("DOI", "")
+        url_val = f"https://doi.org/{doi}" if doi else item.get("URL", "")
+
+        if title and url_val and year >= MIN_YEAR:
+            papers.append({
+                "title": title,
+                "url": url_val,
+                "abstract": abstract,
+                "source": "Crossref",
+                "year": year,
+            })
     return papers
 
 def fetch_dblp_papers(query, max_results=8):
     papers = []
-    try:
-        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
-        params = {
-            "q": query,
-            "h": max_results,
-            "format": "json",
-        }
-        url = f"{DBLP_API}?{urllib.parse.urlencode(params)}"
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode("utf-8"))
+    random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
 
-        hits = data.get("result", {}).get("hits", {}).get("hit", [])
-        if isinstance(hits, dict):
-            hits = [hits]
+    params = {
+        "q": query,
+        "h": max_results,
+        "format": "json",
+    }
+    url = f"{DBLP_API}?{urllib.parse.urlencode(params)}"
+    data = _http_get(url, source_name="DBLP")
+    if not data:
+        return papers
 
-        for hit in hits:
-            info = hit.get("info", {})
-            title = info.get("title", "")
-            year = int(info.get("year", 0) or 0)
-            url_val = info.get("ee", "") or info.get("url", "")
-            venue = info.get("venue", "")
-            abstract = f"Venue: {venue}" if venue else ""
-            if title and url_val and year >= MIN_YEAR:
-                papers.append({
-                    "title": re.sub(r"<[^>]+>", " ", title),
-                    "url": url_val,
-                    "abstract": abstract,
-                    "source": "DBLP",
-                    "year": year,
-                })
-    except Exception as e:
-        print(f"DBLP fetch error: {e}")
+    hits = data.get("result", {}).get("hits", {}).get("hit", [])
+    if isinstance(hits, dict):
+        hits = [hits]
+
+    for hit in hits:
+        info = hit.get("info", {})
+        title = info.get("title", "")
+        year = int(info.get("year", 0) or 0)
+        url_val = info.get("ee", "") or info.get("url", "")
+        venue = info.get("venue", "")
+        abstract = f"Venue: {venue}" if venue else ""
+        if title and url_val and year >= MIN_YEAR:
+            papers.append({
+                "title": re.sub(r"<[^>]+>", " ", title),
+                "url": url_val,
+                "abstract": abstract,
+                "source": "DBLP",
+                "year": year,
+            })
     return papers
 
 def fetch_openreview_papers(query, max_results=8):
     papers = []
-    try:
-        random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
-        params = {
-            "query": query,
-            "limit": max_results,
-        }
-        url = f"{OPENREVIEW_API}?{urllib.parse.urlencode(params)}"
-        req = urllib.request.Request(url, headers={"User-Agent": "CatNews/2.0"})
-        with urllib.request.urlopen(req, timeout=30) as response:
-            data = json.loads(response.read().decode("utf-8"))
+    random_delay(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
 
-        notes = data.get("notes", [])
-        for note in notes:
-            content = note.get("content", {})
-            title = content.get("title", {}).get("value", "") if isinstance(content.get("title"), dict) else content.get("title", "")
-            abstract = content.get("abstract", {}).get("value", "") if isinstance(content.get("abstract"), dict) else content.get("abstract", "")
-            cdate = note.get("cdate", 0)
+    params = {
+        "query": query,
+        "limit": max_results,
+    }
+    url = f"{OPENREVIEW_API}?{urllib.parse.urlencode(params)}"
+    data = _http_get(url, source_name="OpenReview")
+    if not data:
+        return papers
+
+    notes = data.get("notes", [])
+    for note in notes:
+        content = note.get("content", {})
+        title = content.get("title", {}).get("value", "") if isinstance(content.get("title"), dict) else content.get("title", "")
+        abstract = content.get("abstract", {}).get("value", "") if isinstance(content.get("abstract"), dict) else content.get("abstract", "")
+        cdate = note.get("cdate", 0)
+        try:
             year = datetime.fromtimestamp(cdate / 1000, tz=timezone.utc).year if cdate else 0
-            forum = note.get("forum", "")
-            url_val = f"https://openreview.net/forum?id={forum}" if forum else ""
-            if title and url_val and year >= MIN_YEAR:
-                papers.append({
-                    "title": title,
-                    "url": url_val,
-                    "abstract": abstract,
-                    "source": "OpenReview",
-                    "year": year,
-                })
-    except Exception as e:
-        print(f"OpenReview fetch error: {e}")
+        except Exception:
+            year = 0
+        forum = note.get("forum", "")
+        url_val = f"https://openreview.net/forum?id={forum}" if forum else ""
+        if title and url_val and year >= MIN_YEAR:
+            papers.append({
+                "title": title,
+                "url": url_val,
+                "abstract": abstract,
+                "source": "OpenReview",
+                "year": year,
+            })
     return papers
 
 def innovation_score(title, abstract, tags):
