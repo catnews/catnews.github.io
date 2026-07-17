@@ -316,6 +316,49 @@
             color: var(--color-success);
         }
 
+        /* Inline date switcher (text-style tabs, not buttons) */
+        .patches-date-tabs {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-left: 6px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 400;
+            vertical-align: baseline;
+        }
+        .patches-date-tab {
+            background: transparent;
+            border: none;
+            padding: 0 0 1px;
+            margin: 0;
+            font: inherit;
+            color: var(--color-text-3);
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+            transition: color var(--transition), border-color var(--transition);
+            line-height: 1.4;
+        }
+        .patches-date-tab:hover {
+            color: var(--color-text);
+        }
+        .patches-date-tab.active {
+            color: var(--color-accent);
+            font-weight: 600;
+            border-bottom-color: var(--color-accent);
+        }
+        .patches-date-tab.empty {
+            color: var(--color-text-4);
+            cursor: default;
+            text-decoration: line-through;
+            text-decoration-color: var(--color-border-2);
+            border-bottom: none;
+        }
+        .patches-date-tab-sep {
+            color: var(--color-border-2);
+            user-select: none;
+        }
+
         .patches-note {
             font-size: 12px;
             color: var(--color-text-3);
@@ -1814,9 +1857,9 @@
         </div>
 
         <section id="patchView" class="page-view">
-            <section class="patches-section" id="patchesSection" aria-label="昨日 netdev 补丁">
+            <section class="patches-section" id="patchesSection" aria-label="近 3 日 netdev 补丁">
                 <div class="patches-header">
-                    <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>昨日 netdev 补丁 <span id="patchesDate" class="meta-pill" style="font-weight:500;font-size:12px;">-</span></h2>
+                    <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>近 3 日 netdev 补丁 <span class="patches-date-tabs" id="patchesDateTabs"></span><span class="meta-pill" id="patchesDate" style="font-weight:500;font-size:12px;display:none;">-</span></h2>
                     <div class="patches-summary" id="patchesSummary" aria-live="polite">
                         <span class="pill"><i class="fa-regular fa-eye" aria-hidden="true"></i> 审查中 <strong id="patchesInReview">-</strong></span>
                         <span class="pill rfc"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i> RFC <strong id="patchesRfc">-</strong></span>
@@ -1828,12 +1871,12 @@
                     <div class="patches-col" id="patchesInReviewCol">
                         <div class="patches-col-title"><i class="fa-regular fa-eye" aria-hidden="true"></i>审查中（含 RFC）</div>
                         <div class="list" id="patchesInReviewList"></div>
-                        <div class="empty-message" id="patchesInReviewEmpty" style="display:none;">昨日无新增审查 patch</div>
+                        <div class="empty-message" id="patchesInReviewEmpty" style="display:none;">当日无新增审查 patch</div>
                     </div>
                     <div class="patches-col merged" id="patchesMergedCol">
                         <div class="patches-col-title"><i class="fa-solid fa-code-merge" aria-hidden="true"></i>已合并到 maintainer 树</div>
                         <div class="list" id="patchesMergedList"></div>
-                        <div class="empty-message" id="patchesMergedEmpty" style="display:none;">昨日无 accepted 记录</div>
+                        <div class="empty-message" id="patchesMergedEmpty" style="display:none;">当日无 accepted 记录</div>
                     </div>
                 </div>
                 <div class="patches-more-row" id="patchesMoreRow" style="display:none;">
@@ -1960,6 +2003,9 @@
             selectedFilter: null,
             viewMode: 'compact',
             mainView: 'content',
+            patchesByDate: {},         // { 'YYYY-MM-DD': payload }
+            patchesAvailableDates: [], // ['YYYY-MM-DD', ...] sorted newest-first
+            patchesSelectedDate: null, // currently rendered date
         };
 
         const dayCache = new Map();
@@ -2748,46 +2794,56 @@
             el.textContent = `数据更新至 ${y}年${m}月${d}日`;
         }
 
-        // ---------------- Render: patches (yesterday netdev) ----------------
+        // ---------------- Render: patches (last 3 days netdev) ----------------
+        // Patches region shows one day at a time, picked from a compact
+        // inline date switcher. We pre-fetch the last 3 Beijing days in
+        // parallel, render text-style tabs for the days that actually have
+        // data, and default to the newest available day. Days without a
+        // .patches.json file render as a disabled greyed-out tab.
+        const PATCH_DAY_WINDOW = 3;
+
+        function bjYesterdayDate() {
+            // Beijing "yesterday" in the viewer's local clock: shift by +8h
+            // so the BJ day is captured regardless of viewer timezone.
+            const bjNow = new Date(Date.now() + 8 * 3600 * 1000);
+            const d = new Date(bjNow);
+            d.setUTCHours(0, 0, 0, 0);
+            d.setUTCDate(d.getUTCDate() - 1);
+            return d;
+        }
+
         async function loadPatches() {
-            // "Yesterday" in Beijing time, since fetch_lore_patches runs on BJ-now-1.
-            // We compute via the user's local offset for the wall-clock date, then
-            // shift by 16h so the Beijing day is captured regardless of viewer TZ.
-            const nowMs = Date.now();
-            const bjNow = new Date(nowMs + 8 * 3600 * 1000);
-            const yesterday = new Date(bjNow);
-            yesterday.setUTCHours(0, 0, 0, 0);
-            yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-            const yDateStr = formatDate(yesterday);
-
-            document.getElementById('patchesDate').textContent = `(${yDateStr})`;
-
-            let payload = null;
-            let foundDate = yDateStr;
-            try {
-                const res = await fetch(`docs/${yDateStr}.patches.json`, { cache: 'force-cache' });
-                if (res.ok) payload = await res.json();
-            } catch (e) { /* ignore */ }
-
-            // Fallback: try the day before that (e.g. workflow hadn't run yet today)
-            if (!payload) {
-                for (let i = 1; i <= 3; i++) {
-                    const d = new Date(yesterday);
-                    d.setUTCDate(d.getUTCDate() - i);
-                    const ds = formatDate(d);
-                    try {
-                        const r = await fetch(`docs/${ds}.patches.json`, { cache: 'force-cache' });
-                        if (r.ok) { payload = await r.json(); foundDate = ds; break; }
-                    } catch (e) { /* ignore */ }
-                }
+            const baseDate = bjYesterdayDate();
+            const dateStrs = [];
+            for (let i = 0; i < PATCH_DAY_WINDOW; i++) {
+                const d = new Date(baseDate);
+                d.setUTCDate(d.getUTCDate() - i);
+                dateStrs.push(formatDate(d));
             }
 
-            const section = document.getElementById('patchesSection');
-            if (!payload) {
-                // No data ever - show a single friendly placeholder instead of an empty 2-col grid
+            // Parallel prefetch; cache hits are free, misses return null.
+            const results = await Promise.all(dateStrs.map(async (ds) => {
+                if (state.patchesByDate[ds]) return { date: ds, payload: state.patchesByDate[ds] };
+                try {
+                    const res = await fetch(`docs/${ds}.patches.json`, { cache: 'force-cache' });
+                    if (res.ok) return { date: ds, payload: await res.json() };
+                } catch (e) { /* ignore */ }
+                return { date: ds, payload: null };
+            }));
+
+            results.forEach(({ date, payload }) => {
+                if (payload) state.patchesByDate[date] = payload;
+            });
+
+            state.patchesAvailableDates = dateStrs.filter(ds => state.patchesByDate[ds]);
+            renderPatchDateTabs(dateStrs);
+
+            if (state.patchesAvailableDates.length === 0) {
+                const section = document.getElementById('patchesSection');
+                const yDateStr = dateStrs[0];
                 section.innerHTML = `
                     <div class="patches-header">
-                        <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>昨日 netdev 补丁 <span class="meta-pill" style="font-weight:500;font-size:12px;">(${yDateStr})</span></h2>
+                        <h2><i class="fa-solid fa-code-branch" aria-hidden="true"></i>近 3 日 netdev 补丁 <span class="meta-pill" style="font-weight:500;font-size:12px;">(${yDateStr})</span></h2>
                     </div>
                     <div class="empty-message" style="padding:18px 4px;">
                         <i class="fa-regular fa-hourglass-half" aria-hidden="true"></i>
@@ -2798,11 +2854,72 @@
                 return;
             }
 
-            document.getElementById('patchesDate').textContent = `(${foundDate})`;
+            // Default: newest day that has data; honor ?patches_date= for deep links.
+            const fromUrl = new URLSearchParams(location.search).get('patches_date');
+            const initial = state.patchesAvailableDates.includes(fromUrl)
+                ? fromUrl
+                : state.patchesAvailableDates[0];
+            selectPatchDate(initial);
+        }
+
+        function renderPatchDateTabs(dateStrs) {
+            const tabsEl = document.getElementById('patchesDateTabs');
+            if (!tabsEl) return;
+            tabsEl.innerHTML = '';
+            dateStrs.forEach((ds, i) => {
+                if (i > 0) {
+                    const sep = document.createElement('span');
+                    sep.className = 'patches-date-tab-sep';
+                    sep.textContent = '·';
+                    tabsEl.appendChild(sep);
+                }
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'patches-date-tab';
+                btn.dataset.date = ds;
+                btn.textContent = ds.slice(5);  // MM-DD
+                if (!state.patchesByDate[ds]) {
+                    btn.classList.add('empty');
+                    btn.disabled = true;
+                    btn.title = '当日无补丁数据';
+                } else if (state.patchesSelectedDate === ds) {
+                    btn.classList.add('active');
+                }
+                btn.addEventListener('click', () => {
+                    if (state.patchesByDate[ds]) selectPatchDate(ds);
+                });
+                tabsEl.appendChild(btn);
+            });
+        }
+
+        function selectPatchDate(dateStr) {
+            const payload = state.patchesByDate[dateStr];
+            if (!payload) return;
+            state.patchesSelectedDate = dateStr;
+
+            // Update tab active states without re-rendering the whole switcher.
+            document.querySelectorAll('#patchesDateTabs .patches-date-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.date === dateStr);
+            });
+
+            // Reflect the selection in the URL for deep linking / refresh stability.
+            try {
+                const url = new URL(location.href);
+                url.searchParams.set('patches_date', dateStr);
+                history.replaceState(null, '', url);
+            } catch (e) { /* ignore */ }
+
+            renderPatchesForDate(dateStr);
+        }
+
+        function renderPatchesForDate(dateStr) {
+            const payload = state.patchesByDate[dateStr];
+            if (!payload) return;
             const ir = Array.isArray(payload.inReview) ? payload.inReview : [];
             const mg = Array.isArray(payload.merged) ? payload.merged : [];
             const rfc = ir.filter(p => p.isRfc).length;
             window.__patchesPayload = payload;
+
             document.getElementById('patchesInReview').textContent = String(ir.length);
             document.getElementById('patchesRfc').textContent = String(rfc);
             document.getElementById('patchesMerged').textContent = String(mg.length);
@@ -2814,7 +2931,7 @@
             renderPatchList(document.getElementById('patchesMergedList'),
                             document.getElementById('patchesMergedEmpty'), mg);
 
-            // "Show all" button: visible only if either column overflows.
+            // The "expand all" affordance follows the currently selected day.
             const moreBtn = document.getElementById('patchesMoreBtn');
             const moreRow = document.getElementById('patchesMoreRow');
             const overflow = (ir.length > PATCH_INITIAL_VISIBLE) || (mg.length > PATCH_INITIAL_VISIBLE);
