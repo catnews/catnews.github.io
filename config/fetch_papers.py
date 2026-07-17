@@ -49,20 +49,16 @@ SEARCH_KEYWORDS = [
     # 核心代码符号 / 子系统（精确）
     "Linux sk_buff kernel",
     "Linux net_device kernel",
-    "Linux netdev mailing list",
     "Linux qdisc traffic control",
     "Linux netlink kernel",
-    "Linux ethtool network",
     # XDP / eBPF / 数据面
     "Linux XDP data path",
     "Linux eBPF networking",
     "Linux AF_XDP zero copy",
-    "Linux BPF network program",
     "Linux sock_map sockhash",
-    # netfilter / conntrack
+    # netfilter / conntrack（iptables 已并入 netfilter nftables）
     "Linux netfilter nftables",
     "Linux conntrack netfilter",
-    "Linux iptables kernel",
     # TCP / 协议栈
     "Linux TCP IP stack kernel",
     "Linux TCP congestion kernel",
@@ -71,25 +67,19 @@ SEARCH_KEYWORDS = [
     "Linux virtio network",
     "Linux vhost_net vhost-net",
     "Linux kernel bypass networking",
-    # 容器网络（仅与内核相关）
+    # 容器网络（veth 已并入 network namespace；tc flower 召回差已删）
     "Linux network namespace kernel",
-    "Linux veth kernel",
     "Linux Cilium eBPF",
-    "Linux tc flower kernel",
     # 驱动 / 中断
     "Linux network driver kernel",
     "Linux NAPI softirq network",
     # 其他
     "Linux io_uring network",
-    "Linux kernel network",  # 兜底宽词，仍保留
     # SmartNIC offload / kernel bypass / 用户态高速网络栈
+    # （off-path / BlueField / hardware-offloaded 均已并入 SmartNIC 总称）
     "SmartNIC offload network stack",
-    "off-path SmartNIC TCP",
-    "BlueField network offload",
     "DPDK kernel bypass network",
     "RDMA Linux kernel network",
-    "hardware-offloaded network stack",
-    "userspace network stack Linux",
 ]
 
 HOT_TOPIC_KEYWORDS = [
