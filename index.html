@@ -2312,9 +2312,19 @@
             textEl.style.overflow = 'hidden';
             wrapper.appendChild(textEl);
 
-            requestAnimationFrame(() => {
+            // Overflow detection. The web font (IBM Plex Serif) and the
+            // async CSS (<link rel="preload" ... onload>) both load AFTER
+            // first paint, so a single rAF check runs before the layout
+            // has settled and under-reports overflow, dropping the
+            // expand button. We check three times: (1) on the next frame,
+            // (2) once web fonts are ready, and (3) on any subsequent
+            // resize of the text element (e.g. view-mode toggle, font
+            // swap). Idempotent: only ever creates the button once.
+            let btn = null;
+            const ensureButton = () => {
+                if (btn) return;
                 if (alwaysExpand || textEl.scrollHeight > textEl.clientHeight + 1) {
-                    const btn = document.createElement('button');
+                    btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'expand-btn';
                     btn.innerHTML = '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开';
@@ -2338,7 +2348,27 @@
                     });
                     wrapper.appendChild(btn);
                 }
-            });
+            };
+
+            requestAnimationFrame(ensureButton);
+            // Web fonts swap reflows the clamped text; re-check once they
+            // are ready so the button appears even if the first rAF missed.
+            try {
+                if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(() => requestAnimationFrame(ensureButton));
+                }
+            } catch (e) { /* ignore */ }
+            // Final safety net for late layout shifts (font fallback, CSS
+            // swap, container resize in view-mode toggles).
+            if (typeof ResizeObserver !== 'undefined') {
+                let ro;
+                try {
+                    ro = new ResizeObserver(() => ensureButton());
+                    ro.observe(textEl);
+                    // Stop watching after a short window to avoid leaks.
+                    setTimeout(() => { try { ro.disconnect(); } catch (e) {} }, 4000);
+                } catch (e) { /* ignore */ }
+            }
             return wrapper;
         }
 
