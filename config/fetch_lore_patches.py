@@ -422,7 +422,8 @@ def _process_single_patch(p, call_minimax_fn, gate_fn, excluded_fn):
     if not parsed:
         # LLM path exhausted (call failure / unparseable response). Keep a
         # heuristic summary so the patch still shows up in the feed, but
-        # mark relevance as low to signal it was not LLM-summarized.
+        # mark relevance as low and set `_llm_failed` so the caller can
+        # queue this patch for a serial LLM retry pass.
         fallback_text = (raw.get("content") or p.get("title", "")).strip()
         if not fallback_text:
             return None
@@ -432,6 +433,7 @@ def _process_single_patch(p, call_minimax_fn, gate_fn, excluded_fn):
             "tags": _infer_tags_from_text(gate_text),
             "readingTime": 3,
         }
+        p["_llm_failed"] = True
 
     if parsed.get("relevance") == "none":
         print(f"  [lore] skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
@@ -441,14 +443,16 @@ def _process_single_patch(p, call_minimax_fn, gate_fn, excluded_fn):
     p["tags"] = parsed["tags"]
     p["relevance"] = parsed["relevance"]
     p["readingTime"] = parsed["readingTime"]
-    # Drop raw to keep JSON small
-    p.pop("raw", None)
+    # NOTE: ``raw`` is intentionally NOT dropped here. It is kept so that
+    # the serial retry pass (see summarize_patches) can reuse the cached
+    # patch body + diff instead of re-fetching from patchwork. The
+    # caller drops ``raw`` after all retry rounds complete.
     return p
 
 
 def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
-                      limit=None, max_workers=4, llm_budget=None,
-                      delay_min=None, delay_max=None):
+                      limit=None, max_workers=2, llm_budget=None,
+                      delay_min=None, delay_max=None, retry_rounds=2):
     """Run domain gate + LLM summary on every patch, in parallel.
 
     Behavior:
@@ -461,8 +465,14 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
       * Calls are executed concurrently via ThreadPoolExecutor to amortize
         MiniMax latency; ``max_workers`` bounds concurrency to avoid
         tripping rate limits.
+      * After the concurrent pass, patches whose summary came from the
+        heuristic fallback (marked with ``_llm_failed``) enter a serial
+        retry queue. Each retry call invokes the LLM directly with a short
+        inter-call delay; this gives rate-limited / transiently failed
+        patches a second chance to get a real LLM summary. ``retry_rounds``
+        bounds how many serial passes we run.
       * If ``call_minimax_fn`` is None, every patch falls back to the
-        heuristic path.
+        heuristic path and no retry is attempted.
       * Output order follows input order (filtered to entries that
         survived the gate).
     """
@@ -475,6 +485,7 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
 
     workers = max(1, int(max_workers or 1))
     results_by_index = {}
+    failed_indices = []
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         future_to_index = {
@@ -496,8 +507,73 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                 result = None
             if result is not None:
                 results_by_index[idx] = result
+                if result.get("_llm_failed"):
+                    failed_indices.append(idx)
             if done % 10 == 0 or done == total:
-                print(f"  [lore] progress {done}/{total} (kept {len(results_by_index)})", flush=True)
+                print(f"  [lore] progress {done}/{total} (kept {len(results_by_index)}, llm_failed {len(failed_indices)})", flush=True)
+
+    # Serial retry pass for patches that fell back to the heuristic summary.
+    # The LLM is much less likely to be rate-limited when called serially
+    # with a small gap; the shared throttle (set by any 429) is honored
+    # inside call_minimax itself.
+    for round_idx in range(max(0, int(retry_rounds or 0))):
+        if not failed_indices:
+            break
+        print(f"  [lore] retry round {round_idx + 1}/{retry_rounds}: {len(failed_indices)} patches need LLM re-call", flush=True)
+        still_failed = []
+        for idx in failed_indices:
+            p = candidates[idx]
+            # Drop the fallback summary so a successful retry replaces it.
+            for k in ("summary", "tags", "relevance", "readingTime"):
+                p.pop(k, None)
+            p.pop("_llm_failed", None)
+            # Raw content was dropped after the first pass; reload so the
+            # prompt has the patch body + diff.
+            if not p.get("raw"):
+                try:
+                    _load_patch_detail(p)
+                except Exception as e:
+                    print(f"  [lore] retry detail fetch failed for {p.get('id')}: {e}", flush=True)
+            parsed = None
+            if call_minimax_fn:
+                resp = _call_minimax_summary(call_minimax_fn, _format_patch_for_prompt(p))
+                parsed = _parse_summary_response(resp)
+            if not parsed:
+                # Still no LLM; keep the fallback summary in place.
+                fallback_text = ((p.get("raw") or {}).get("content") or p.get("title", "")).strip()
+                if not fallback_text:
+                    results_by_index.pop(idx, None)
+                    continue
+                p["summary"] = _chinese_fallback(p.get("title", ""), fallback_text)
+                p["tags"] = _infer_tags_from_text(
+                    f"{p.get('title', '')}\n{(p.get('raw') or {}).get('content', '')[:600]}"
+                )
+                p["relevance"] = "low"
+                p["readingTime"] = 3
+                p["_llm_failed"] = True
+                results_by_index[idx] = p
+                still_failed.append(idx)
+                continue
+            if parsed.get("relevance") == "none":
+                # LLM now says unrelated; drop the patch.
+                print(f"  [lore] retry skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
+                results_by_index.pop(idx, None)
+                continue
+            p["summary"] = parsed["summary"]
+            p["tags"] = parsed["tags"]
+            p["relevance"] = parsed["relevance"]
+            p["readingTime"] = parsed["readingTime"]
+            p.pop("raw", None)
+            results_by_index[idx] = p
+            print(f"  [lore] retry ok {p.get('id')} {p.get('title', '')[:40]}", flush=True)
+            time.sleep(1.5)
+        failed_indices = still_failed
+
+    # Strip internal flags and the cached raw payload so they never land
+    # in the JSON file.
+    for p in results_by_index.values():
+        p.pop("_llm_failed", None)
+        p.pop("raw", None)
 
     return [results_by_index[i] for i in range(len(candidates)) if i in results_by_index]
 
@@ -527,7 +603,7 @@ def write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)
 def run(docs_dir, target_date_str, *,
         call_minimax_fn, gate_fn, excluded_fn,
         max_in_review=80, max_merged=DEFAULT_MAX_MERGED, llm_budget_per_side=None,
-        max_workers=4, delay_min=None, delay_max=None):
+        max_workers=2, delay_min=None, delay_max=None):
     print(f"[lore] fetching netdevbpf patches for {target_date_str}", flush=True)
 
     # Compute the Beijing-day window in UTC, used as the early-stop boundary.

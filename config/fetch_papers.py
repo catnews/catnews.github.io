@@ -12,6 +12,15 @@ import re
 import time
 import random
 import html as html_lib
+import threading
+
+# Process-wide MiniMax rate-limit throttle. Any worker that receives an
+# HTTP 429 sets `_MINIMAX_THROTTLE_UNTIL` to a future epoch timestamp;
+# every worker honors this before issuing a new request to avoid
+# compounding rate-limit failures when running concurrently (e.g. the
+# netdev patch summarization thread pool).
+_MINIMAX_LOCK = threading.Lock()
+_MINIMAX_THROTTLE_UNTIL = 0.0
 
 ARXIV_API = "http://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
@@ -426,13 +435,23 @@ def random_delay(min_sec, max_sec):
     print(f"  Waiting {delay:.1f}s...")
     time.sleep(delay)
 
-def call_minimax(prompt, system_prompt, max_retries=3, max_tokens=500):
+def call_minimax(prompt, system_prompt, max_retries=5, max_tokens=500):
+    global _MINIMAX_THROTTLE_UNTIL
     api_key = os.environ.get("MINIMAX_API_KEY", "")
     if not api_key:
         print("Warning: MINIMAX_API_KEY not set")
         return None
-    
+
     for attempt in range(max_retries):
+        # Honor the process-wide throttle set by any worker that hit 429.
+        with _MINIMAX_LOCK:
+            wait_for = _MINIMAX_THROTTLE_UNTIL - time.time()
+        if wait_for > 0:
+            cap = min(wait_for, 90.0)
+            print(f"  MiniMax shared throttle, waiting {cap:.1f}s (rate-limit backoff)")
+            time.sleep(cap)
+            continue
+
         try:
             payload = {
                 "model": MINIMAX_MODEL,
@@ -443,7 +462,7 @@ def call_minimax(prompt, system_prompt, max_retries=3, max_tokens=500):
                 "temperature": 0.7,
                 "max_tokens": max_tokens
             }
-            
+
             data = json.dumps(payload).encode("utf-8")
             req = urllib.request.Request(
                 MINIMAX_API,
@@ -453,24 +472,36 @@ def call_minimax(prompt, system_prompt, max_retries=3, max_tokens=500):
                     "Content-Type": "application/json"
                 }
             )
-            
-            with urllib.request.urlopen(req, timeout=60) as response:
+
+            with urllib.request.urlopen(req, timeout=90) as response:
                 result = json.loads(response.read().decode("utf-8"))
                 return result.get("choices", [{}])[0].get("message", {}).get("content", "")
-        
+
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                wait_time = 30 + attempt * 20
-                print(f"  Rate limited (429), waiting {wait_time}s...")
+                # Exponential backoff shared across all workers:
+                # 15s, 30s, 60s, 120s, 120s (capped).
+                wait_time = min(15 * (2 ** attempt), 120)
+                print(f"  Rate limited (429), shared throttle {wait_time}s (attempt {attempt + 1}/{max_retries})")
+                with _MINIMAX_LOCK:
+                    _MINIMAX_THROTTLE_UNTIL = max(
+                        _MINIMAX_THROTTLE_UNTIL,
+                        time.time() + wait_time,
+                    )
                 time.sleep(wait_time)
             else:
                 print(f"MiniMax API HTTP error: {e.code} {e.reason}")
-                return None
+                if attempt < max_retries - 1:
+                    time.sleep(5 + 3 * attempt)
+                else:
+                    return None
         except Exception as e:
             print(f"MiniMax API error: {e}")
             if attempt < max_retries - 1:
-                time.sleep(10)
-    
+                time.sleep(8 + 4 * attempt)
+            else:
+                return None
+
     return None
 
 QUICK_FILTER_PROMPT = """你是 Linux 内核网络论文初筛助手。快速判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
@@ -2023,6 +2054,7 @@ def main():
             excluded_fn=is_hard_excluded,
             delay_min=LLM_DELAY_MIN,
             delay_max=LLM_DELAY_MAX,
+            max_workers=2,
         )
     except Exception as e:
         print(f"[lore] skipped: {e}", flush=True)
