@@ -760,6 +760,92 @@
             margin-top: 0;
         }
 
+        .highlight-panel.past-week-panel {
+            border-left: 2px solid #7c3aed;
+            margin-top: 0;
+        }
+
+        .highlight-panel.past-week-panel .title-main i {
+            color: #7c3aed;
+        }
+
+        .past-week-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            background: var(--color-bg-2);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 12.5px;
+        }
+
+        .past-week-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-2);
+            border-radius: var(--radius-md);
+            color: var(--color-text-2);
+            cursor: pointer;
+            transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+            font-family: inherit;
+            font-size: inherit;
+            line-height: 1.4;
+        }
+
+        .past-week-nav-btn:hover:not(:disabled) {
+            background: var(--color-bg-2);
+            border-color: var(--color-border-3);
+            color: var(--color-text);
+        }
+
+        .past-week-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .past-week-nav-btn .past-week-nav-label {
+            font-weight: 600;
+            color: inherit;
+        }
+
+        .past-week-nav-btn .past-week-nav-range {
+            color: var(--color-text-3);
+            font-size: 11.5px;
+        }
+
+        .past-week-current {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+            color: var(--color-text);
+            flex: 1;
+            justify-content: center;
+        }
+
+        .past-week-period {
+            font-weight: 700;
+            color: #7c3aed;
+            font-size: 13px;
+        }
+
+        .past-week-range {
+            color: var(--color-text-3);
+            font-size: 12px;
+        }
+
+        .highlight-panel.past-week-panel .list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px 16px;
+        }
+
         .highlight-panel .list {
             display: grid;
             gap: 12px 16px;
@@ -1584,6 +1670,7 @@
         @media (max-width: 900px) {
             .highlight-panel.papers-panel .list,
             .highlight-panel.historical-panel .list,
+            .highlight-panel.past-week-panel .list,
             .highlight-panel.lwn-panel .list {
                 grid-template-columns: 1fr;
             }
@@ -1592,6 +1679,20 @@
         @media (max-width: 700px) {
             .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .insights-row { grid-template-columns: 1fr; }
+            .past-week-controls {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .past-week-nav-btn {
+                padding: 5px 10px;
+                font-size: 11.5px;
+            }
+            .past-week-current {
+                order: -1;
+                width: 100%;
+                justify-content: flex-start;
+                margin-bottom: 2px;
+            }
         }
 
         /* ============== View mode toggle ============== */
@@ -1956,6 +2057,28 @@
                     <div class="weekly-note">从更长时间窗口（≥7 天前）的论文中按相关度与热门标签评分去重，展示 Top 20，并采用双列排列避免长列表挤压页面。</div>
                     <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
                 </section>
+
+                <section class="category-section highlight-panel past-week-panel" id="pastWeekPicks" aria-label="历史周精选论文">
+                    <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-calendar-week" aria-hidden="true"></i>历史周精选</span><span class="item-count" id="pastWeekCount">加载中...</span></h2>
+                    <div class="weekly-note">逐周回看每周聚合的 Top 16 论文，算法与"本周精选"一致；点击前/后一周切换。保留 12 期，本周已在上方"本周精选"区展示。</div>
+                    <div class="past-week-controls" role="group" aria-label="历史周切换">
+                        <button id="pastWeekPrevBtn" type="button" class="past-week-nav-btn" aria-label="前一周">
+                            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                            <span class="past-week-nav-label">前一周</span>
+                            <span class="past-week-nav-range" id="pastWeekPrevRange">-</span>
+                        </button>
+                        <div class="past-week-current">
+                            <span class="past-week-period" id="pastWeekPeriod">-</span>
+                            <span class="past-week-range" id="pastWeekRange">-</span>
+                        </div>
+                        <button id="pastWeekNextBtn" type="button" class="past-week-nav-btn" aria-label="后一周">
+                            <span class="past-week-nav-range" id="pastWeekNextRange">-</span>
+                            <span class="past-week-nav-label">后一周</span>
+                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+                </section>
             </section>
 
             <section class="tag-cloud-section" aria-label="全量标签">
@@ -2271,6 +2394,7 @@
             writeTagToUrl(state.selectedFilter);
             renderTopHighlights();
             renderHistoricalHighlights();
+            renderPastWeekHighlights();
             renderTopTags();
         }
 
@@ -2470,6 +2594,10 @@
         const WEEKLY_TOP_N = 16;        // 本周精选展示数量，覆盖单日抓取上限
         const historicalHighlights = { papers: [] };
 
+        // Module-scope cache for past-week highlights (per-week Top 16, scrollable back 12 weeks).
+        const PAST_WEEK_MAX_BACK = 12;  // 最多回溯 12 周（不含本周）
+        const pastWeekHighlights = { papers: [], startDate: null, endDate: null, weekIndex: 1, loading: false };
+
         // ---------------- Render: top highlights ----------------
         async function loadTopHighlights() {
             const dateStrs = [];
@@ -2611,6 +2739,147 @@
                 empty.textContent = state.selectedFilter
                     ? `标签「${state.selectedFilter}」下无历史精选`
                     : '历史数据暂无精选论文';
+                panel.appendChild(empty);
+                return;
+            }
+
+            const list = document.createElement('div');
+            list.className = 'list';
+            papers.forEach(item => {
+                list.appendChild(renderCard(item, {
+                    variant: 'paper',
+                    showDate: true,
+                    dateStr: item._date,
+                }));
+            });
+            panel.appendChild(list);
+        }
+
+        // ---------------- Render: past-week highlights (按周回溯 Top 16) ----------------
+        // 复用"本周精选"算法（去重 + paperHotScore 排序 + Top 16），但窗口换成
+        // [today - 7*weekIndex - 6, today - 7*weekIndex]，让用户逐周回看曾经进入过
+        // "本周精选"区窗口的论文。这样可避免历史精选 Top 20 截断把本周论文过早挤掉。
+
+        function formatShortDate(dateStr) {
+            // YYYY-MM-DD -> MM.DD
+            if (!dateStr || dateStr.length < 10) return '';
+            return dateStr.slice(5).replace('-', '.');
+        }
+
+        async function loadPastWeekHighlights(weekIndex) {
+            if (weekIndex < 1 || weekIndex > PAST_WEEK_MAX_BACK) return;
+            pastWeekHighlights.weekIndex = weekIndex;
+            pastWeekHighlights.loading = true;
+            renderPastWeekHighlights();
+
+            // 滚动 7 天窗口：[today - 7*weekIndex - 6, today - 7*weekIndex]
+            const endDate = dateOffset(-(7 * weekIndex));
+            const startDate = dateOffset(-(7 * weekIndex + 6));
+
+            const dateStrs = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(startDate);
+                d.setDate(d.getDate() + i);
+                dateStrs.push(formatDate(d));
+            }
+
+            const dayDatas = await loadDaysParallel(dateStrs);
+            const papers = [];
+            for (let i = 0; i < dayDatas.length; i++) {
+                const dayData = dayDatas[i];
+                if (!dayData || !dayData.categories) continue;
+                const dayPapers = Array.isArray(dayData.categories.papers) ? dayData.categories.papers : [];
+                dayPapers.forEach(p => papers.push({ ...p, _date: dateStrs[i] }));
+            }
+
+            // 去重，按热度取 Top 16（与本周精选算法一致）
+            const paperDedup = new Map();
+            for (const p of papers) {
+                const key = (p.title || '').trim().toLowerCase();
+                if (!key) continue;
+                const existing = paperDedup.get(key);
+                if (!existing || paperHotScore(p) > paperHotScore(existing)) {
+                    paperDedup.set(key, p);
+                }
+            }
+            const top = Array.from(paperDedup.values())
+                .sort((a, b) => paperHotScore(b) - paperHotScore(a))
+                .slice(0, WEEKLY_TOP_N);
+
+            pastWeekHighlights.papers = top;
+            pastWeekHighlights.startDate = startDate;
+            pastWeekHighlights.endDate = endDate;
+            pastWeekHighlights.loading = false;
+            renderPastWeekHighlights();
+        }
+
+        function renderPastWeekHighlights() {
+            const panel = document.getElementById('pastWeekPicks');
+            if (!panel) return;
+            panel.querySelectorAll('.list, .empty-message, .loading').forEach(n => n.remove());
+
+            const weekIdx = pastWeekHighlights.weekIndex;
+            const startDate = pastWeekHighlights.startDate;
+            const endDate = pastWeekHighlights.endDate;
+
+            // 当前周信息
+            if (startDate && endDate) {
+                const startStr = formatDate(startDate);
+                const endStr = formatDate(endDate);
+                document.getElementById('pastWeekPeriod').textContent = `第 ${weekIdx} 期`;
+                document.getElementById('pastWeekRange').textContent = `${startStr} ~ ${endStr}`;
+            } else {
+                document.getElementById('pastWeekPeriod').textContent = `第 ${weekIdx} 期`;
+                document.getElementById('pastWeekRange').textContent = '加载中…';
+            }
+
+            // 按钮状态：前一周可达 maxBack，后一周可达 1（本周由"本周精选"区负责）
+            const prevBtn = document.getElementById('pastWeekPrevBtn');
+            const nextBtn = document.getElementById('pastWeekNextBtn');
+            const canPrev = weekIdx < PAST_WEEK_MAX_BACK;
+            const canNext = weekIdx > 1;
+            prevBtn.disabled = !canPrev || pastWeekHighlights.loading;
+            nextBtn.disabled = !canNext || pastWeekHighlights.loading;
+
+            // 按钮上的日期范围提示
+            if (canPrev) {
+                const prevEnd = dateOffset(-(7 * (weekIdx + 1)));
+                const prevStart = dateOffset(-(7 * (weekIdx + 1) + 6));
+                document.getElementById('pastWeekPrevRange').textContent =
+                    `${formatShortDate(formatDate(prevStart))} - ${formatShortDate(formatDate(prevEnd))}`;
+            } else {
+                document.getElementById('pastWeekPrevRange').textContent = '已达上限';
+            }
+            if (canNext) {
+                const nextEnd = dateOffset(-(7 * (weekIdx - 1)));
+                const nextStart = dateOffset(-(7 * (weekIdx - 1) + 6));
+                document.getElementById('pastWeekNextRange').textContent =
+                    `${formatShortDate(formatDate(nextStart))} - ${formatShortDate(formatDate(nextEnd))}`;
+            } else {
+                document.getElementById('pastWeekNextRange').textContent = '本周';
+            }
+
+            // 加载中状态：仅显示 loading 占位，不渲染列表
+            if (pastWeekHighlights.loading) {
+                const loading = document.createElement('div');
+                loading.className = 'loading';
+                loading.setAttribute('role', 'status');
+                loading.setAttribute('aria-live', 'polite');
+                loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> 加载中...';
+                panel.appendChild(loading);
+                return;
+            }
+
+            // 渲染论文列表（应用 tag 筛选）
+            const papers = applyFilter(pastWeekHighlights.papers);
+            document.getElementById('pastWeekCount').textContent = `共 ${papers.length} 篇`;
+
+            if (papers.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-message';
+                empty.textContent = state.selectedFilter
+                    ? `标签「${state.selectedFilter}」下无此周论文`
+                    : '该周无论文数据';
                 panel.appendChild(empty);
                 return;
             }
@@ -3102,6 +3371,16 @@
                 : '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表';
         });
         document.getElementById('clearFilterBtn').addEventListener('click', () => toggleFilter(null));
+        document.getElementById('pastWeekPrevBtn').addEventListener('click', () => {
+            if (pastWeekHighlights.weekIndex < PAST_WEEK_MAX_BACK && !pastWeekHighlights.loading) {
+                loadPastWeekHighlights(pastWeekHighlights.weekIndex + 1);
+            }
+        });
+        document.getElementById('pastWeekNextBtn').addEventListener('click', () => {
+            if (pastWeekHighlights.weekIndex > 1 && !pastWeekHighlights.loading) {
+                loadPastWeekHighlights(pastWeekHighlights.weekIndex - 1);
+            }
+        });
 
         // ---------------- Init ----------------
         async function initPage() {
@@ -3125,6 +3404,12 @@
             loadHistoricalHighlights().catch((e) => {
                 console.warn('historical highlights load failed', e);
                 renderHistoricalHighlights();
+            });
+
+            // 历史周精选同样不阻塞首屏：默认加载上周（第 1 期）。
+            loadPastWeekHighlights(1).catch((e) => {
+                console.warn('past week highlights load failed', e);
+                renderPastWeekHighlights();
             });
         }
 
