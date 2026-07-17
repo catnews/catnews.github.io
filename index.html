@@ -2052,15 +2052,9 @@
                     <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
                 </section>
 
-                <section class="category-section highlight-panel historical-panel" id="historicalPicks" aria-label="历史精选论文">
-                    <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>历史精选论文</span><span class="item-count" id="historicalCount">加载中...</span></h2>
-                    <div class="weekly-note">从更长时间窗口（≥7 天前）的论文中按相关度与热门标签评分去重，展示 Top 20，并采用双列排列避免长列表挤压页面。</div>
-                    <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
-                </section>
-
                 <section class="category-section highlight-panel past-week-panel" id="pastWeekPicks" aria-label="历史周精选论文">
                     <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-calendar-week" aria-hidden="true"></i>历史周精选</span><span class="item-count" id="pastWeekCount">加载中...</span></h2>
-                    <div class="weekly-note">逐周回看每周聚合的 Top 16 论文，算法与"本周精选"一致；点击前/后一周切换。保留 12 期，本周已在上方"本周精选"区展示。</div>
+                    <div class="weekly-note">逐周回看每周聚合的 Top 16 论文，算法与"本周精选"一致；点击前/后一周切换。第 1 期最早，共保留 12 期；本周已在上方"本周精选"区展示。</div>
                     <div class="past-week-controls" role="group" aria-label="历史周切换">
                         <button id="pastWeekPrevBtn" type="button" class="past-week-nav-btn" aria-label="前一周">
                             <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
@@ -2077,6 +2071,12 @@
                             <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
                         </button>
                     </div>
+                    <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
+                </section>
+
+                <section class="category-section highlight-panel historical-panel" id="historicalPicks" aria-label="历史精选论文">
+                    <h2 class="category-title"><span class="title-main"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>历史精选论文</span><span class="item-count" id="historicalCount">加载中...</span></h2>
+                    <div class="weekly-note">从更长时间窗口（≥7 天前）的论文中按相关度与热门标签评分去重，展示 Top 20，并采用双列排列避免长列表挤压页面。</div>
                     <div class="loading" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>加载中...</div>
                 </section>
             </section>
@@ -2821,15 +2821,17 @@
             const weekIdx = pastWeekHighlights.weekIndex;
             const startDate = pastWeekHighlights.startDate;
             const endDate = pastWeekHighlights.endDate;
+            // 期数反转：最旧的一周为第 1 期，最近的一周（上周）为第 PAST_WEEK_MAX_BACK 期
+            const periodNum = PAST_WEEK_MAX_BACK + 1 - weekIdx;
 
             // 当前周信息
             if (startDate && endDate) {
                 const startStr = formatDate(startDate);
                 const endStr = formatDate(endDate);
-                document.getElementById('pastWeekPeriod').textContent = `第 ${weekIdx} 期`;
+                document.getElementById('pastWeekPeriod').textContent = `第 ${periodNum} 期`;
                 document.getElementById('pastWeekRange').textContent = `${startStr} ~ ${endStr}`;
             } else {
-                document.getElementById('pastWeekPeriod').textContent = `第 ${weekIdx} 期`;
+                document.getElementById('pastWeekPeriod').textContent = `第 ${periodNum} 期`;
                 document.getElementById('pastWeekRange').textContent = '加载中…';
             }
 
