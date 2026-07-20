@@ -1,9 +1,9 @@
 {
   "date": "2026-07-19",
-  "fetchedAt": "2026-07-20T06:34:40+0800",
+  "fetchedAt": "2026-07-20T11:51:26+0800",
   "totals": {
-    "inReview": 10,
-    "merged": 14,
+    "inReview": 13,
+    "merged": 15,
     "rfc": 0
   },
   "inReview": [
@@ -22,14 +22,14 @@
       "state": "new",
       "submitter": "Chengfeng Ye",
       "date": "2026-07-19T15:22:07",
-      "summary": "在 net/ipv4/tcp_bpf.c 的 tcp_bpf_send_verdict() 中修复 sk_redir 的 use-after-free 问题。原代码在持有源 socket 锁时将 psock->sk_redir 拷贝到本地变量 sk_redir，但调用 tcp_bpf_sendmsg_redir() 前会释放该锁（release_sock），期间另一线程在同一个源 socket 上并发 sendmsg 可能将 apply_bytes 清零、把 psock->sk_redir 置 NULL 并对缓存引用执行 sock_put，导致 sk_redir 指向的 socket 被释放；原线程随后用本地裸指针调用 tcp_bpf_sendmsg_redir(sk_redir) 即触发 slab-use-after-free（KASAN 已确认）。修复方案是在拷贝 sk_redir 后立即执行 sock_hold(sk_redir) 为本地引用再增加一份引用计数，并在原有 sock_put 之后再增加一次 sock_put(sk_redir) 配对释放，保证在锁释放窗口内本地指针仍指向有效对象。",
+      "summary": "修复 tcp_bpf_send_verdict()（位于 net/ipv4/tcp_bpf.c）中 sk_redir 的 use-after-free 问题。在 __SK_REDIRECT 分支拷贝 psock->sk_redir 时未增加引用计数，随后 release_sock() 释放锁，期间并发 sendmsg 可能将 psock->apply_bytes 消耗至零并对 sk_redir 执行 sock_put，使该 socket 被释放，但本线程仍持有裸指针，最终在 tcp_bpf_sendmsg_redir() 中触发 KASAN slab-use-after-free。修复方案在读取 psock->sk_redir 后立即调用 sock_hold(sk_redir) 增加引用计数，并在 eval == __SK_REDIRECT 分支新增一次 sock_put(sk_redir) 以平衡新增的引用计数，确保跨锁释放期间的指针有效性。",
       "tags": [
         "eBPF",
-        "Socket",
-        "TCP/IP"
+        "TCP/IP",
+        "Socket"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 4
     },
     {
       "id": 14696004,
@@ -46,14 +46,14 @@
       "state": "new",
       "submitter": "Maciej Fijalkowski",
       "date": "2026-07-19T13:56:05",
-      "summary": "修改 AF_XDP 通用发送路径中多缓冲（multi-buffer）分组丢失逻辑。在 `include/net/xdp_sock.h` 的 `struct xdp_sock` 中新增 `bool drain_cont` 标志位，并在 `net/xdp/xsk.c` 中新增辅助函数 `xsk_cq_submit_addr_single_locked()`（在 `pool->cq_prod_lock` 自旋锁保护下，将单个 `xdp_desc` 的地址写入 CQ 并提交一个槽位）。当 `xsk_build_skb()` 因为描述符数量超过 `MAX_SKB_FRAGS` 或链中包含非法描述符而中止构造 skb 时，设置 `drain_cont`，使 `__xsk_generic_xmit()` 后续循环继续从 AF_XDP Tx ring 消费剩余的 continuation 描述符，并将它们的地址直接回填到完成队列（CQ），从而不再被静默丢弃。修复 commit cf24f5a5feea 引入的多缓冲 Tx 路径资源泄漏问题，避免用户态永远无法感知这些已发送描述符的状态。",
+      "summary": "修复 AF_XDP 通用 xmit 路径下多缓冲区分片的描述符泄漏问题。在 net/xdp/xsk.c 的 xsk_build_skb() 中，当分片数超过 MAX_SKB_FRAGS 或遇到非法描述符时，后续的 continuation 描述符此前被静默丢弃。在 include/net/xdp_sock.h 的 struct xdp_sock 中新增 bool drain_cont 标志位，在 net/xdp/xsk.c 中新增 xsk_cq_submit_addr_single_locked() 辅助函数，完成 CQ 地址提交逻辑的封装。改写 __xsk_generic_xmit() 流程：当 xsk_build_skb() 标记 drain_cont 后，循环消费 Tx ring 中剩余描述符并将其地址逐一提交到 CQ（xsk_tx_peek_release），避免描述符丢失导致 Tx ring 卡死。修复 commit cf24f5a5feea 引入的多缓冲 Tx 路径回归问题。",
       "tags": [
         "XDP",
-        "eBPF",
-        "包处理"
+        "包处理",
+        "驱动"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 5
     },
     {
       "id": 14696003,
@@ -70,7 +70,7 @@
       "state": "new",
       "submitter": "Maciej Fijalkowski",
       "date": "2026-07-19T13:56:04",
-      "summary": "修改 net/xdp/xsk.c 中的 xsk_drop_skb() 函数，解决 AF_XDP 多缓冲区 Tx 路径上的缓冲区泄漏问题。在 xsk_build_skb() 因 -EOVERFLOW 错误、__xsk_generic_xmit() 检测到非法描述符、以及 xsk_release() 关闭 socket 三种丢弃部分构建的多缓冲 skb 的场景中，原实现调用 xsk_consume_skb()，后者通过 xsk_cq_cancel_locked() 取消了已预留的 CQ 槽位，但 TX 描述符已从 TX ring 消费，导致用户态永久丢失对已用缓冲区的追踪。修复方案是改用 consume_skb() 触发已有的 xsk_destruct_skb 析构器，由它通过 xsk_cq_submit_addr_locked() 将缓冲区地址正确提交到 CQ；同时显式设置 xs->skb = NULL 以避免悬挂指针。补丁正文未提供具体测试数据或 benchmark 数值。",
+      "summary": "修复 AF_XDP 多缓冲区发送路径中 xsk_drop_skb() 导致的缓冲区泄漏。net/xdp/xsk.c 中的 xsk_drop_skb() 原本调用 xsk_consume_skb()，该函数通过 xsk_cq_cancel_locked() 取消 CQ 预留，使已处理 frags 的缓冲区地址永远不会出现在 CQ 中，导致用户态永久丢失这些缓冲区。改用 consume_skb() 触发已有的 xsk_destruct_skb 析构函数，通过 xsk_cq_submit_addr_locked() 将缓冲区地址正确提交到 CQ；同时新增 xs->skb = NULL 以清空部分构造的 skb 指针。在 xsk_build_skb_zerocopy() 中添加 xsk_addr->addrs[xsk_addr->num_descs] = desc->addr，确保最后一个 frag 的地址也被记录从而能被提交到 CQ。影响 xsk_build_skb() 的 -EOVERFLOW 路径、__xsk_generic_xmit() 的非法描述符路径以及 xsk_release() 的 socket 关闭路径，恢复多缓冲 Tx 在丢弃部分包时缓冲区归还的正确性。",
       "tags": [
         "XDP",
         "包处理",
@@ -94,14 +94,13 @@
       "state": "new",
       "submitter": "Danielle Ratson",
       "date": "2026-07-19T13:34:54",
-      "summary": "在 net/bridge/br_arp_nd_proxy.c 中，将 skb_linearize() 从 br_nd_send() 上移到 br_is_nd_neigh_msg() 中，紧接在 ndisc_check_ns_na() 验证 NS/NA 消息类型之后。这样所有被识别为合法 ND 邻居消息的 skb 在进入后续处理路径前都是线性的，从根源上消除因忘记线性化而直接解析 ns->opt[] 等 ND options 引发的那类 bug。br_nd_send() 因此删除了内部的 skb_linearize() 调用，并将 ns 的获取方式从基于 skb_network_header 加上 sizeof(struct ipv6hdr) 重新计算，改为直接复用 ndisc_check_ns_na() 已设置好的 skb_transport_header()。若 skb_linearize() 在内存压力下失败，br_is_nd_neigh_msg() 返回 NULL，使报文退回到普通转发路径而非被丢弃。",
+      "summary": "修改 net/bridge/br_arp_nd_proxy.c 中桥的 ND 代理路径，将 skb_linearize() 从 br_nd_send() 上移到 br_is_nd_neigh_msg() 中，紧跟在 ndisc_check_ns_na() 校验消息类型为 NS/NA 之后执行。由此保证被识别为 ND 邻居消息的 skb 进入处理路径时一定是线性的，消除后续 ND 选项解析忘记 linearize 的潜在 bug 类。br_nd_send() 中因此移除 skb_linearize() 调用。同时将 ns 指针的获取从 skb_network_header(request) + sizeof(struct ipv6hdr) 改为直接使用 ndisc_check_ns_na() 已设置的 skb_transport_header()。若 linearize 在内存压力下失败，br_is_nd_neigh_msg() 返回 NULL，该报文回退到普通转发而非被抑制。",
       "tags": [
         "网桥",
-        "包处理",
-        "IPv6"
+        "包处理"
       ],
       "relevance": "high",
-      "readingTime": 5
+      "readingTime": 2
     },
     {
       "id": 14695988,
@@ -118,14 +117,14 @@
       "state": "new",
       "submitter": "Danielle Ratson",
       "date": "2026-07-19T13:34:51",
-      "summary": "修改网桥 ND 邻居发现处理函数 `br_is_nd_neigh_msg()`，将内部对 `skb_header_pointer()` 的调用替换为直接指针转换 `(struct nd_msg *)(ipv6_hdr(skb) + 1)`，并从函数签名中移除已不再需要的 `msg` 参数。对应修改传播到所有调用方：`net/bridge/br_device.c` 的 `br_dev_xmit()` 和 `net/bridge/br_input.c` 中的调用点删除了局部 `struct nd_msg _msg` 栈缓冲区，`net/bridge/br_private.h` 更新函数声明。由于所有调用方在调用前已通过 `pskb_may_pull(skb, sizeof(struct ipv6hdr) + sizeof(struct nd_msg))` 保证数据位于线性区，省去 `skb_header_pointer()` 的间接访问与 fallback 拷贝路径，降低 IPv6 ND 代理/抑制路径的延迟与 CPU 开销，属于网桥转发路径上的轻量性能优化。",
+      "summary": "修改网桥子系统中处理 IPv6 ND 邻居发现消息的函数 `br_is_nd_neigh_msg()`：由于调用方已通过 `pskb_may_pull()` 确保线性区中存在 `sizeof(struct ipv6hdr) + sizeof(struct nd_msg)` 字节，`skb_header_pointer()` 的安全拷贝及回退缓冲区不再必要。改动将 `skb_header_pointer()` 调用替换为对 `ipv6_hdr(skb) + 1` 的直接强制类型转换，并从 `br_is_nd_neigh_msg()` 签名中移除冗余的 `struct nd_msg *msg` 参数，同时清理 `br_device.c` 和 `br_input.c` 中调用方传入的栈缓冲区 `_msg` 及局部变量。涉及文件 `net/bridge/br_arp_nd_proxy.c`、`net/bridge/br_device.c`、`net/bridge/br_input.c`、`net/bridge/br_private.h`。此改动避免了跨片段头部的数据拷贝开销，属于性能优化，对正确性无影响。",
       "tags": [
         "网桥",
         "包处理",
         "性能"
       ],
       "relevance": "high",
-      "readingTime": 2
+      "readingTime": 3
     },
     {
       "id": 14695937,
@@ -142,14 +141,13 @@
       "state": "new",
       "submitter": "Kumar Kartikeya Dwivedi",
       "date": "2026-07-19T11:35:50",
-      "summary": "修改内核 BPF 验证器 `kernel/bpf/verifier.c` 中 `is_tracing_prog_type()` 谓词的签名与判定逻辑：由接收 `enum bpf_prog_type` 改为接收 `struct bpf_prog *`，使其能同时检查 prog->type（BPF_PROG_TYPE_TRACING）和 prog->expected_attach_type，从而正确覆盖此前被遗漏的 BPF_TRACE_FENTRY/FEXIT/FMOD_RET 以及 BPF_TRACE_RAW_TP 等 attach 类型。在 `process_spin_lock()` 内靠近使用点处加入新分支：当 `is_tracing_prog_type(env->prog)` 为真且非 `bpf_res_spin_lock`（即 `is_res_lock` 为 false）时，返回 -EINVAL 并输出 \"tracing progs cannot use bpf_spin_lock yet\"，禁止 tracing 程序使用 `bpf_spin_lock`，引导用户改用 `bpf_res_spin_lock`。同步调整 selftests（prog_tests/linked_list.c、prog_tests/map_btf.c、progs/map_in_map_btf.c 等）的错误消息与新增约束用例，以适配验证器行为变化。",
+      "summary": "修改 kernel/bpf/verifier.c 中的 is_tracing_prog_type() 谓词函数，将其签名从接受 enum bpf_prog_type 改为接受 struct bpf_prog *prog，并收紧逻辑使其覆盖 BPF_PROG_TYPE_TRACING 下的 fentry、fexit、fmod_ret 以及 raw_tp 附加类型（此前因遗漏而跳过这些类型）。在 process_spin_lock() 中新增就近检查：当程序属于 tracing 类型且未使用 res_lock（is_res_lock 为 false）时，返回 -EINVAL 并提示 \"tracing progs cannot use bpf_spin_lock yet\"，从而禁止 tracing 程序使用 bpf_spin_lock，推荐改用 bpf_res_spin_lock。同时同步更新 linked_list、map_btf、map_in_map_btf、normal_map_btf、refcounted_kptr 等多个 selftest 程序以适配新的错误信息和新增的限制。",
       "tags": [
         "eBPF",
-        "XDP",
-        "性能"
+        "Linux内核网络"
       ],
       "relevance": "high",
-      "readingTime": 4
+      "readingTime": 5
     },
     {
       "id": 14695927,
@@ -166,13 +164,74 @@
       "state": "new",
       "submitter": "Nikola Z. Ivanov",
       "date": "2026-07-19T10:57:59",
-      "summary": "针对 IPv6 路由子系统的修正：在 `net/ipv6/route.c` 的 `__ip6_del_rt_siblings` 函数中，将两处内存分配标志由 `gfp_any()` 改为 `GFP_ATOMIC`。第一处是 `nlmsg_new(rt6_nlmsg_size(rt), GFP_ATOMIC)`，负责构造 RTM_DELROUTE 通知 skb；第二处是 `rtnl_notify(..., GFP_ATOMIC)`，负责 netlink 组播发送。原因是该函数已被转换到 rcu_read_lock 临界区内执行（Fixes 引用 bd11ff421d36），而先前 `gfp_any()` 在 may sleep 上下文中会解析为 `GFP_KERNEL`，经 `netlink_broadcast_filtered` 时可能触发调度/休眠，引发 syzbot 报告的违例。这两处改为不可睡眠的 `GFP_ATOMIC`，以满足 RCU 读侧不允许阻塞的要求，保证在原子上下文中分配内存并完成 netlink 广播，避免 sleeping in atomic context。",
+      "summary": "修改 net/ipv6/route.c 中 __ip6_del_rt_siblings 函数的两处内存分配标志。原代码在 nlmsg_new() 和 rtnl_notify() 调用中使用 gfp_any()，在普通上下文会解析为 GFP_KERNEL，可触发 netlink_broadcast_filtered 内部的睡眠/调度行为。但该函数自上游提交 bd11ff421d36 改为在 RCU 读锁临界区内被调用，不允许阻塞或让步。将这两处标志统一替换为 GFP_ATOMIC，确保在 RCU 读锁上下文中的分配不触发睡眠，避免 syzbot 报告的调度器告警与潜在死锁。改动属于缺陷修复，直接提升 RCU 读锁路径下的正确性，不涉及性能优化逻辑。",
       "tags": [
         "路由",
-        "IPv6",
         "Linux内核网络"
       ],
       "relevance": "high",
+      "readingTime": 2
+    },
+    {
+      "id": 14695874,
+      "title": "[ethtool-next,v3,3/3] qsfp: print all compliance codes",
+      "url": "https://lore.kernel.org/r/20260719090458.659332-3-olek2@wp.pl",
+      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260719090458.659332-3-olek2@wp.pl/",
+      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260719090458.659332-3-olek2@wp.pl/mbox/",
+      "hash": "a683076bad6e51b437dc7be12a73760d51bd99a4",
+      "commitRef": null,
+      "version": "",
+      "prefixes": [],
+      "isRfc": false,
+      "isSeries": false,
+      "state": "new",
+      "submitter": "Aleksander Jan Bajkowski",
+      "date": "2026-07-19T09:00:37",
+      "summary": "该补丁修改的是 ethtool 用户态工具的 qsfp.c（位于 ethtool-next 仓库），属于 SFF8636/QSFP 模块 EEPROM 解码与打印逻辑，将多个 compliance code 以数组方式全部输出，修复先前只显示最后一个 code 的 bug。改动不涉及 Linux 内核代码、内核网络协议栈、驱动或任何内核侧数据结构。",
+      "tags": [],
+      "relevance": "low",
+      "readingTime": 2
+    },
+    {
+      "id": 14695873,
+      "title": "[ethtool-next,v3,2/3] sfpid: print all compliance codes",
+      "url": "https://lore.kernel.org/r/20260719090458.659332-2-olek2@wp.pl",
+      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260719090458.659332-2-olek2@wp.pl/",
+      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260719090458.659332-2-olek2@wp.pl/mbox/",
+      "hash": "77033796830cdef1bd49464c958f25bebf50b877",
+      "commitRef": null,
+      "version": "",
+      "prefixes": [],
+      "isRfc": false,
+      "isSeries": false,
+      "state": "new",
+      "submitter": "Aleksander Jan Bajkowski",
+      "date": "2026-07-19T09:00:36",
+      "summary": "补丁正文未提供内核侧信息。该改动位于 ethtool 用户态工具的 sfpid.c，修复 SFP 模块 compliance codes 显示时仅输出最后一个编码的 bug：将累计拼接的 value[140] 缓冲区移除，改为对每个匹配的位调用 module_print_any_array_string_entry 逐条输出，并在 JSON 模式下用 open_json_array 把 transceiver_type 渲染为数组。这是 ethtool 用户态程序的输出逻辑变更，不涉及 Linux 内核网络子系统的数据结构、协议栈或驱动代码。",
+      "tags": [
+        "驱动"
+      ],
+      "relevance": "low",
+      "readingTime": 3
+    },
+    {
+      "id": 14695872,
+      "title": "[ethtool-next,v3,1/3] sfpid: print all implemented options",
+      "url": "https://lore.kernel.org/r/20260719090458.659332-1-olek2@wp.pl",
+      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260719090458.659332-1-olek2@wp.pl/",
+      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260719090458.659332-1-olek2@wp.pl/mbox/",
+      "hash": "89445b8ae89ba56399c2e654ae7050ed0f3ecdf9",
+      "commitRef": null,
+      "version": "",
+      "prefixes": [],
+      "isRfc": false,
+      "isSeries": false,
+      "state": "new",
+      "submitter": "Aleksander Jan Bajkowski",
+      "date": "2026-07-19T09:00:35",
+      "summary": "此补丁针对 ethtool 用户态工具（ethtool-next 仓库），而非 Linux 内核。改动位于 ethtool 的 module-common.c、module-common.h 和 sfpid.c 中，修复 SFF8079/SFP 模块标识信息输出时仅显示最后一个 Option 的 bug，新增 module_print_any_array_string_entry() 接口将所有已实现的 Option 以数组形式正确列出（文本模式逐行打印，JSON 模式输出为数组）。提交目标为用户态命令行工具的功能完善，不涉及内核网络子系统代码。",
+      "tags": [],
+      "relevance": "low",
       "readingTime": 2
     },
     {
@@ -190,7 +249,7 @@
       "state": "superseded",
       "submitter": "Cen Zhang (Microsoft)",
       "date": "2026-07-18T18:34:20",
-      "summary": "修复 net/rds/tcp.c 中 rds_tcp_exit_net() 的 per-netns 清理顺序引发的 use-after-free 漏洞。原实现在调用 rds_tcp_kill_sock() 释放 per-netns 的 listen socket 之后才通过 unregister_net_sysctl_table() 注销 sysctl 表，而 sysctl 写操作路径上的 rds_tcp_skbuf_handler() 通过 rtn->rds_tcp_listen_sock->sk 反查 netns，导致在 listen socket 已释放后仍被并发访问，KASAN 在 tcp.c:721 触发 slab-use-after-free。改动将 unregister_net_sysctl_table() 提前至 rds_tcp_kill_sock() 之前，使 unregister_net_sysctl_table() 阻塞新 handler 并等待 in-flight handler 退出后再释放 socket 与 ctl_table，彻底消除 UAF 窗口。",
+      "summary": "针对 net/rds/tcp.c 中 __net_exit 回调 rds_tcp_exit_net() 的清理顺序进行调整。原先先调用 rds_tcp_kill_sock() 释放 per-netns 的 RDS TCP listen socket（rtn->rds_tcp_listen_sock），随后才注销 sysctl 表。问题在于 rds_tcp_skbuf_handler() 通过 rtn->rds_tcp_listen_sock->sk 反推 netns，而 sysctl 写操作与 netns 销毁存在并发窗口，导致对已释放 socket 的 use-after-free，KASAN 在 net/rds/tcp.c:721 捕获到该 slab-use-after-free。修复方式是将 unregister_net_sysctl_table(rtn->rds_tcp_sysctl) 调用前移到 rds_tcp_kill_sock() 之前；unregister_net_sysctl_table() 既阻止新的 sysctl handler 启动，又等待正在执行的 handler 退出，从而保证 listen socket 在释放时不再有并发引用，修复由 commit 7f5611cbc487 引入的回归。",
       "tags": [
         "TCP/IP",
         "Socket",
@@ -214,13 +273,13 @@
       "state": "new",
       "submitter": "John Ericson",
       "date": "2026-07-18T18:29:02",
-      "summary": "在 tools/testing/selftests/net/af_unix/ 下新增 unix_listen 回归测试程序，针对 AF_UNIX 协议族 unix_listen() 中的状态检查逻辑。核心用例是验证对一个已 bind 且已 connect 的 socket 调用 listen() 必须返回 EINVAL（因为其状态已不是 TCP_CLOSE/TCP_LISTEN），防止此前 prepare_peercred() 在状态检查前执行并把 err 置 0 导致 listen() 错误地成功。同时覆盖相邻路径：处于 TCP_CLOSE 的 bound socket 应能 listen；已处于 TCP_LISTEN 的 socket 再调用 listen() 须允许；未 bind 的 socket 应返回 EINVAL。每种场景均对 SOCK_STREAM 与 SOCK_SEQPACKET 两种可监听类型以及 pathname 与 abstract 两种地址族进行组合测试。配套更新该目录的 .gitignore 与 Makefile 以纳入新测试。Fixes 指向 fd0a109a0f6b（net, pidfs 相关提交）。",
+      "summary": "在 tools/testing/selftests/net/af_unix/ 下新增 unix_listen.c 回归测试程序，并同步更新该目录的 .gitignore 与 Makefile（加入 TEST_GEN_PROGS 列表）。该测试针对 AF_UNIX 实现中 unix_listen() 的状态检查逻辑，覆盖四种场景：bound 处于 TCP_CLOSE 的 socket 应能正常 listen、bound 已连接的 socket 调用 listen() 必须返回 EINVAL、已处于 TCP_LISTEN 的 socket 再次 listen() 应被允许、unbound socket 调用 listen() 必须返回 EINVAL；每种场景对 SOCK_STREAM 与 SOCK_SEQPACKET 两类可监听 socket 以及 pathname / abstract 两种地址族分别执行。核心回归点对应 fd0a109a0f6b 引入的缺陷：prepare_peercred() 调用若在状态检查之前执行并把 err 留在 0，会让 connected socket 的 listen() 静默成功；本测试用 187 行 C 代码固化该约束，防止同类回归。",
       "tags": [
         "Socket",
-        "Linux内核网络"
+        "包处理"
       ],
-      "relevance": "medium",
-      "readingTime": 3
+      "relevance": "high",
+      "readingTime": 4
     },
     {
       "id": 14695465,
@@ -237,7 +296,7 @@
       "state": "new",
       "submitter": "John Ericson",
       "date": "2026-07-18T18:29:01",
-      "summary": "在 net/unix/af_unix.c 的 unix_listen() 函数中，在 unix_state_lock(sk) 加锁之后、socket 状态校验之前新增一行 err = -EINVAL。提交 fd0a109a0f6b 在原先的 err = -EINVAL 与 sk_state 检查之间插入了 prepare_peercred() 调用，该函数成功时会将 err 重置为 0，导致 sk->sk_state 不为 TCP_CLOSE 或 TCP_LISTEN（例如已连接的 socket）时，状态检查失败跳转至 out_unlock 时 err 为 0，listen() 静默返回成功而非 EINVAL。在加锁后显式重新赋值 err = -EINVAL 可保证状态检查失败路径正确返回错误码，恢复 listen() 对非法状态 socket 的拒绝语义。",
+      "summary": "修复 net/unix/af_unix.c 中 unix_listen() 函数的状态校验逻辑缺陷。此前 commit fd0a109a0f6b 在 err = -EINVAL 检查与 socket 状态判断之间插入了 prepare_peercred() 调用，而该函数成功返回时不会修改 err，导致对处于非 TCP_CLOSE/TCP_LISTEN 状态（如已连接）的 AF_UNIX 套接字调用 listen() 会静默返回 0 而非 -EINVAL。补丁在该函数 socket 状态校验分支前显式设置 err = -EINVAL，使后续 goto out_unlock 能正确返回错误码。改动仅新增 1 行，恢复 listen() 对非法状态套接字的拒绝语义，修正了 socket 状态机校验的正确性。",
       "tags": [
         "Socket",
         "Linux内核网络"
@@ -262,11 +321,11 @@
       "state": "accepted",
       "submitter": "Kumar Kartikeya Dwivedi",
       "date": "2026-07-17T19:13:56",
-      "summary": "该 PR 汇集 5 项 BPF 子系统修复：Matt Bobrowski 修复 socket clone early bailout 路径中的 UAF（use-after-free）缺陷，避免 bpf_sk_clone_redirect 等场景下 sk 引用异常释放；Michal Luczaj 在 sockmap 更新路径中拒绝未哈希（unhashed）的 UDP 套接字，防止 udp_sock 引用计数泄漏导致对象无法回收；Mattia Meleleo 修正 sockmap 中未附加 verdict 程序的 socket 在执行 FIONREAD ioctl 时忽略接收队列数据的错误，使返回字节数反映真实 sk_receive_queue 长度；Sun Jian 在 BPF verifier 中拒绝 buffer 指针携带负常量偏移，防止越界访问；Ihor Solodrai 修复 BPF kfunc tracing 在隐式参数（implicit args）场景下的参数传递错误，保证 bpf_trampoline/bpf_prog 与 kfunc 签名一致性。整体集中在 sockmap、verifier 和 trampoline/tracing 三条路径，影响正确性（UAF/引用计数泄漏）与安全性（verifier 边界检查）。",
+      "summary": "本批 BPF 修复包含五项改动：Matt Bobrowski 修复 socket clone early bailout 路径中的 use-after-free 问题，涉及 socket 克隆早期退出时引用计数与对象生命周期的正确处理；Michal Luczaj 在 sockmap 更新路径中拒绝未哈希的 UDP 套接字，防止 unhashed UDP socket 经 sockmap 插入后出现引用计数泄漏；Mattia Meleleo 修正 FIONREAD ioctl 在 sockmap 套接字（无 verdict 程序）下未将 receive queue 中的数据计入可用字节数的问题；Sun Jian 在 verifier 中拒绝针对 buffer pointer 的负常量偏移，避免越界访问；Ihor Solodrai 修复带 implicit arguments 的 kfunc tracing 链路，保证 BPF trampoline/probe 对隐式参数的正确解析与传递。整体覆盖 sockmap、verifier、tracing 三个子模块的正确性修复。补丁正文未提供具体 benchmark 数值或性能数据。",
       "tags": [
         "eBPF",
         "Socket",
-        "Linux内核网络"
+        "包处理"
       ],
       "relevance": "high",
       "readingTime": 4
@@ -306,14 +365,12 @@
       "state": "accepted",
       "submitter": "Marc Kleine-Budde",
       "date": "2026-07-16T15:47:43",
-      "summary": "修复 CAN isotp 协议在 NETDEV_UNREGISTER 与 isotp_release() 并发执行时的 use-after-free 竞态。在 struct isotp_sock 中新增 struct net_device *dev 与 netdevice_tracker dev_tracker 字段，bind() 阶段即持有受 tracker 跟踪的设备引用（与 raw.c 一致），不再依赖 dev_get_by_index() 在 release 时按 ifindex 重新查找。isotp_release()/isotp_bind() 在 rtnl_lock() 与 lock_sock() 共同保护下串行化，确保 so->dev 与 notifier 视角一致；同时在 isotp_bind() 中检测 so->[tx|rx].state 非 ISOTP_IDLE 时返回 -EAGAIN，杜绝残留定时器作用于新 bind 的 ifindex。isotp_sendmsg() 中对 so->bound 重新校验以防止 wakeup 路径上被解绑后继续发送。修改覆盖 net/can/isotp.c，主要对象为 isotp_sock、isotp_release、isotp_bind、isotp_sendmsg、isotp_notify，解决 CAN 过滤器指向已释放 socket 导致 UAF 的问题。",
+      "summary": "《fix use-after-free race with concurrent NETDEV_UNREGISTER》主要围绕“Oliver Hartkopp <socketcan@hartkopp.net> isotp_release() looked up the bound network...”进行调整，修正相关实现并降低维护成本。",
       "tags": [
-        "驱动",
-        "Socket",
-        "Linux内核网络"
+        "TCP/IP"
       ],
-      "relevance": "high",
-      "readingTime": 5
+      "relevance": "low",
+      "readingTime": 3
     },
     {
       "id": 14691664,
@@ -330,11 +387,11 @@
       "state": "accepted",
       "submitter": "Marc Kleine-Budde",
       "date": "2026-07-16T15:47:42",
-      "summary": "修改 net/can/isotp.c 中的 isotp_release() 函数，将原先依据 so->bound 条件判断才调用的 synchronize_rcu() 改为无条件执行。问题背景：isotp_notify() 在 NETDEV_UNREGISTER 通知链中通过 can_rx_unregister() 解绑 RCU 保护的 CAN 过滤器并清零 so->bound，但不等待宽限期；原实现中 isotp_release() 检查 so->bound 决定是否 synchronize_rcu() 再 hrtimer_cancel(&so->rxtimer)。当 NETDEV_UNREGISTER 先于 release 路径执行时，跳过 synchronize_rcu()，此时仍有在飞的 isotp_rcv() 调用，可能通过 isotp_send_fc() 重新启动 rxtimer，导致释放 socket 后 hrtimer 回调触发 use-after-free。新版无条件 synchronize_rcu() 保证在取消 txfrtimer/txtimer/rxtimer 前所有 RCU 读端临界区退出，不在 netdevice notifier 路径上额外增加 RCU 等待。",
+      "summary": "修复 net/can/isotp.c 中 isotp_release() 与 isotp_notify() 之间的 RCU 竞态。原代码根据 so->bound 是否为 0 决定是否在 hrtimer_cancel 之前调用 synchronize_rcu()，但 isotp_notify() 在 NETDEV_UNREGISTER 时通过 can_rx_unregister() 注销 CAN 过滤器后直接清除 so->bound 而不等待宽限期，导致 isotp_release() 跳过 synchronize_rcu()，在 hrtimer_cancel(&so->rxtimer) 时仍可能有 in-flight 的 isotp_rcv() 执行并通过 isotp_send_fc() 重新启动 rxtimer，引发释放后定时器回调的 use-after-free。修改将 synchronize_rcu() 移出条件分支，在三个 hrtimer_cancel（txfrtimer/txtimer/rxtimer）之前无条件执行，确保所有 RCU 读端临界区退出后再操作定时器，同时避免在 netdev notifier 路径上新增 synchronize_rcu() 等待。",
       "tags": [
         "驱动",
-        "包处理",
-        "Socket"
+        "Socket",
+        "Linux内核网络"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -354,11 +411,10 @@
       "state": "accepted",
       "submitter": "Marc Kleine-Budde",
       "date": "2026-07-16T15:47:40",
-      "summary": "修改位于 net/can/bcm.c 的 bcm_rx_handler() 函数。原先 op->rx_stamp 与 op->rx_ifindex 的赋值在 spin_lock_bh(&op->bcm_rx_update_lock) 之前执行，当 op 订阅所有接口（ifindex==0）时，同一个 op 会被不同 CPU 并发执行 bcm_rx_handler()，导致这两个字段出现并发写竞争，且 32 位平台上 64 位 rx_stamp 可能被撕裂存储（torn store）。补丁将这两行赋值移到 bcm_rx_update_lock 自旋锁临界区内部，使其与 CAN 帧内容比对处于同一不可中断的锁保护段落，保证 bcm_send_to_user() 上报的时间戳和 ifindex 与其投递的帧内容严格对应。RTR 请求帧路径不再更新 rx_stamp/rx_ifindex，因为该路径不经过 bcm_send_to_user()。",
+      "summary": "修改 net/can/bcm.c 中 bcm_rx_handler() 函数，将 op->rx_stamp（64 位 skb 时间戳）与 op->rx_ifindex 的赋值从自旋锁 bcm_rx_update_lock 外部移入临界区内部。在 ifindex==0 即通配订阅场景下，同一 op 在 per-netns 通配过滤链表只注册一次，不同 CPU 可并发执行 bcm_rx_handler()，原写法导致两个字段出现并发写竞争，且在 32 位平台上 rx_stamp 可能被撕裂存储。改动同时保证 bcm_send_to_user() 投递的帧内容与对应的时间戳/来源接口来自同一加锁区间，避免元数据与帧内容不匹配。附带效果：RTR 请求帧不再写入 rx_stamp/rx_ifindex，因为该路径不进入 bcm_send_to_user()，仅通知路径需要这两个字段。",
       "tags": [
-        "驱动",
-        "包处理",
-        "性能"
+        "Socket",
+        "包处理"
       ],
       "relevance": "high",
       "readingTime": 3
@@ -378,7 +434,7 @@
       "state": "accepted",
       "submitter": "Marc Kleine-Budde",
       "date": "2026-07-16T15:47:39",
-      "summary": "修复 net/can/bcm.c 中 CAN 广播管理协议在网络设备注销后残留的 rx/tx 操作问题。RX 侧：bcm_rx_setup() 在更新已有操作时无条件跳过 can_rx_register()，若并发 NETDEV_UNREGISTER 已经将 op->rx_reg_dev 置为 NULL（注销了之前的 can_rx 注册），则该更新后的过滤器会静默停止帧投递；改为 `do_rx_register = (ifindex && !op->rx_reg_dev) ? 1 : 0`，即仅在非 ifindex=0 且 rx_reg_dev 已失效时才重新调用 can_rx_register()，ifindex=0（匹配所有 CAN 设备）的 op 本就不携带 tracked rx_reg_dev，保持原状。TX 侧：bcm_notify() 在 NETDEV_UNREGISTER 时只清理 bo->rx_ops，未处理 tx_ops，导致其 hrtimer 周期性重新激活 bcm_tx_timeout_handler() 而形成 run-away timer，并可能在 ifindex 后续被复用时向新设备注入 CAN 帧；现取消该 hrtimer。由于 bcm_tx_setup() 拒绝 ifindex=0，必须保留 tx_ops 的 ifindex 不变，否则后续 TX_SETUP/TX_DELETE 将因精确匹配失效而无法再定位到该 op。影响：正确恢复设备热插拔后 BCM 的接收过滤投递，防止周期性发送在设备消失后泄漏到被复用的 ifindex。",
+      "summary": "修复 CAN 广播管理器 (bcm) 协议在网络设备注销后残留的 RX/TX 操作问题。RX 侧: bcm_rx_setup() 中更新既有 rx_op 时不再无条件跳过 can_rx_register(),改为当 ifindex 非零且 op->rx_reg_dev 已被 NETDEV_UNREGISTER 通知器注销(为 NULL)时才重新注册,避免该过滤器静默停止帧交付;ifindex=0(所有 CAN 设备)的 op 不持有 rx_reg_dev,维持原状。TX 侧: bcm_notify() 的 NETDEV_UNREGISTER 分支此前只处理 bo->rx_ops,导致 tx_ops 的循环发送 hrtimer 持续重新调度 bcm_tx_timeout_handler(),补丁取消该 hrtimer 防止 timer 失控以及向后续复用的 ifindex 注入帧。同时故意不清除 tx_ops 的 ifindex,因为 bcm_tx_setup() 拒绝 ifindex=0,清零将导致后续 TX_SETUP(bcm_find_op())与 TX_DELETE(bcm_delete_tx_op())因精确匹配无法再次定位该 op。",
       "tags": [
         "驱动",
         "包处理",
@@ -402,13 +458,14 @@
       "state": "accepted",
       "submitter": "Marc Kleine-Budde",
       "date": "2026-07-16T15:47:38",
-      "summary": "针对 net/can/bcm.c 中 CAN 广播管理协议在并发 NETDEV_UNREGISTER 时的竞态修复。在 struct bcm_op 中新增 netdevice_tracker rx_reg_dev_tracker 字段，在 bcm_rx_setup() 注册接收过滤器时通过 netdev_hold() 对 op->rx_reg_dev 持有 tracked 引用，在 bcm_rx_unreg() 中通过 netdev_put() 释放该引用。bcm_release()、bcm_delete_rx_op() 和 bcm_notifier() 不再依赖 dev_get_by_index(ifindex) 重新查找设备，而是直接使用已持有的引用执行 can_rx_unregister()，从而避免因并发设备注销导致设备已从 ifindex 表移除而查找失败、过滤器泄漏的问题。修复了自 ffd980f976e7 引入 bcm 协议以来存在的内存泄漏与悬垂引用隐患。",
+      "summary": "针对 CAN 广播管理协议（net/can/bcm.c）的并发注销竞态修复。在 bcm_op 结构体中新增 netdevice_tracker rx_reg_dev_tracker 字段，在 bcm_rx_setup() 注册 RX 过滤器时通过 netdev_hold() 获取对 op->rx_reg_dev 的追踪引用，在 bcm_rx_unreg() 中通过 netdev_put() 释放该引用。bcm_release() 和 bcm_delete_rx_op() 不再使用 dev_get_by_index(ifindex) 重新查找设备，而是直接使用已持有的引用调用 can_rx_unregister()，避免在 NETDEV_UNREGISTER 已将设备从 ifindex 表移除后查找失败导致过滤器泄漏及 bcm_op/socket 悬挂引用的问题。该机制与 raw.c 的修复（commit c275a176e4b6）一致。",
       "tags": [
-        "Linux内核网络",
-        "Socket"
+        "Socket",
+        "驱动",
+        "包处理"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 5
     },
     {
       "id": 14691665,
@@ -425,14 +482,13 @@
       "state": "accepted",
       "submitter": "Marc Kleine-Budde",
       "date": "2026-07-16T15:47:29",
-      "summary": "针对 CAN J1939 协议栈中传输层的无锁读取竞态进行修复。`j1939_priv.ents[].nusers` 本应受 `priv->lock` 保护，`j1939_can_recv()` 已在 `read_lock_bh()` 下读取，但 `j1939_session_skb_queue()` 与 `j1939_tp_send()` 在判定目标地址是否为本地 ECU 时直接裸读该字段，在用户空间并发绑定/释放 socket 与 TP 流量同时发生时，会与 `j1939_local_ecu_get()`/`j1939_local_ecu_put()` 产生竞态，导致 TP/ETP 会话被误判为本地或远端，走错传输路径。修复方式是在 `net/can/j1939/transport.c` 中新增辅助函数 `j1939_address_is_local(priv, addr)`，内部以 `read_lock_bh(&priv->lock)` 守护地读取 `priv->ents[addr].nusers`，并将该判断统一替换到上述两处调用点。",
+      "summary": "针对 net/can/j1939/transport.c 中 J1939 传输协议层对 priv->ents[].nusers 的无锁读取修复竞争问题。j1939_session_skb_queue() 与 j1939_tp_send() 在判断目标地址是否为本地 ECU 时，直接读取 priv->ents[da].nusers 而未持有 priv->lock，而 j1939_local_ecu_get()/put() 会在 userspace 并发 bind/release socket 时修改该字段，导致 J1939_ECU_LOCAL_DST 标志位误判，使 TP/ETP 会话走错传输路径。新增静态辅助函数 j1939_address_is_local(priv, addr)，在 read_lock_bh(&priv->lock) 保护下判断 unicast 地址对应的 nusers 是否非零，并将上述两处直接读取替换为调用该函数，统一锁定语义以消除竞争。",
       "tags": [
         "驱动",
-        "Socket",
-        "Linux内核网络"
+        "包处理"
       ],
-      "relevance": "medium",
-      "readingTime": 3
+      "relevance": "high",
+      "readingTime": 2
     },
     {
       "id": 14691657,
@@ -449,14 +505,13 @@
       "state": "accepted",
       "submitter": "Marc Kleine-Budde",
       "date": "2026-07-16T15:47:25",
-      "summary": "本 pull request 汇集 19 个针对 Linux 内核 CAN 子系统的修复补丁，涵盖以下对象与机制：(1) vxcan 驱动修复 Kconfig 描述错误；(2) esd_usb 驱动修正设备 tear-down 顺序，避免资源释放时序错误；(3) CAN_RAW 协议在 raw 标志访问处补充缺失的锁保护；(4) j1939 协议修复无锁的本地目的地址检查（local-destination check）路径中的并发问题；(5) CAN BCM（Broadcast Manager）协议由 11 个补丁组成，修复多处并发与加锁缺陷；(6) CAN ISOTP（ISO Transport Protocol）协议 3 个补丁修复 bot 工具发现的并发与锁问题。整体改动以正确性修复为主，主要解决 CAN 协议族中各模块的竞态条件与锁缺失，补丁正文未提供性能 benchmark 或具体数值。",
+      "summary": "CAN 子系统拉取请求，共 19 个补丁。Alexander Hölzl 修复 vxcan 驱动 Kconfig 描述；Fan Wu 修正 esd_usb 驱动拆卸顺序；Oliver Hartkopp 为 CAN_RAW 协议的 raw flags 补充缺失的锁保护；Shuhao Fu 修复 j1939 协议中无锁的本地目的检查；Lee Jones 与 Oliver Hartkopp 提供 11 个补丁修复 CAN 广播管理协议（bcm）中的并发与锁问题；最后 3 个补丁由 Oliver Hartkopp 修复 CAN ISO 传输协议（isotp）中的并发与锁问题。这些问题多由 syzkaller 等 fuzzer 发现。整体改动集中在 CAN 协议族（raw、bcm、isotp、j1939）及 CAN 网络驱动（vxcan、esd_usb）的锁机制完善与并发缺陷修复，涉及 sk 回调、proto_priv 区域、timer 回调、hrtimer 回调等关键路径的锁覆盖。补丁正文未提供具体 benchmark 或测试数据，仅说明问题由 fuzzing bot 发现。",
       "tags": [
         "驱动",
-        "包处理",
-        "性能"
+        "Linux内核网络"
       ],
       "relevance": "high",
-      "readingTime": 3
+      "readingTime": 15
     },
     {
       "id": 14690955,
@@ -473,11 +528,8 @@
       "state": "accepted",
       "submitter": "Tao Cui",
       "date": "2026-07-16T11:52:37",
-      "summary": "iproute2 的 rdma 子工具中 res_print_summary() 函数（rdma/res.c）新增对内核 netlink 属性 RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX 的解析，将 rdma resource show 输出从仅显示当前值改为 curr/max 格式（如 qp 123/131072），并在 utils.c 的 nldev_policy[] 表中注册该属性的 u64 类型。对于无上限的资源（如 cm_id、ctx）保持原有输出。JSON 输出新增对应的 <name>-max 字段，便于脚本计算资源使用率。当内核不含新属性时维持旧输出，向后兼容。改动仅限用户态工具，依赖内核侧对应 patch 提供 MAX 属性。",
-      "tags": [
-        "驱动",
-        "性能"
-      ],
+      "summary": "该补丁属于 iproute2 用户态工具的 rdma 子命令修改，改动对象是 rdma/res.c 中的 res_print_summary() 函数与 rdma/utils.c 中的 nldev_policy 策略表，新增对 RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX netlink 属性的解析，使 'rdma resource show' 命令以 curr/max 格式输出 QP/CQ/MR/PD 等 RDMA 资源上限，JSON 输出增加对应的 -max 字段。不涉及任何 Linux 内核网络子系统代码。",
+      "tags": [],
       "relevance": "low",
       "readingTime": 2
     },
@@ -496,7 +548,7 @@
       "state": "accepted",
       "submitter": "Tao Cui",
       "date": "2026-07-16T11:52:36",
-      "summary": "该改动针对 iproute2 工具链中的 rdma 子模块，将 rdma_netlink.h 用户态头文件同步至内核 commit 5911f6d6e7cc。在 enum rdma_nldev_attr 中新增枚举值 RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX（u64），用于标识 RDMA 资源摘要条目的最大值，与内核 RDMA/nldev 的资源汇总显示功能对齐。补丁正文未提供更多实现细节或性能数据。",
+      "summary": "该改动在 iproute2 工具链的 rdma/include/uapi/rdma/rdma_netlink.h 头文件中，于枚举 rdma_nldev_attr 末尾前新增一个成员 RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX（类型 u64），用于与内核 commit 5911f6d6e7cc 在 RDMA nldev 子系统中新增的\"资源摘要最大值\"属性保持 UAPI 一致。本次仅追加枚举值，未修改内核代码，未提供测试数据或 benchmark。该改动属于用户态 iproute2 工具对内核 RDMA netlink UAPI 头文件的同步动作，不影响内核网络子系统本身的行为或性能。",
       "tags": [
         "驱动",
         "Linux内核网络"
@@ -519,12 +571,13 @@
       "state": "accepted",
       "submitter": "Amery Hung",
       "date": "2026-07-15T17:21:26",
-      "summary": "修改 kernel/bpf/verifier.c 的 check_func_arg() 函数，针对 BPF_FUNC_map_peek_elem 在 BPF_MAP_TYPE_BLOOM_FILTER 类型 map 上的调用，新增一段判断逻辑将 meta->arg_raw_mem.regno 置为 0，从而禁用 raw 模式校验通路。bloom filter 的 map_peek_elem 把 value buffer 当作输入用于成员查询（而非像 queue/stack 那样填充输出），因此 verifier 不应允许传入未初始化的栈内存。修复了 CAP_BPF 网关下的栈信息泄露问题——此前程序可向 bloom filter 传入未初始化栈 buffer，verifier 错误地在返回后将其标记为已初始化，绕过 CAP_BPF 的能力边界读取残余内核栈内容。",
+      "summary": "修改 kernel/bpf/verifier.c 中 check_func_arg() 函数，针对 BPF_FUNC_map_peek_elem 在 BPF_MAP_TYPE_BLOOM_FILTER 上的 raw 模式做禁用处理。由于 bloom filter 的 peek 操作把 value 缓冲区当作输入（用于测试成员归属）而非填充输出，原先 ARG_PTR_TO_MAP_VALUE|MEM_UNINIT 标记会让验证器接受未初始化栈缓冲区并在返回后错误地将其标记为已初始化，程序可借此读取残留内核栈数据，形成绕过 CAP_BPF 边界（任意内核读取本应由 CAP_PERFMON 守护）的栈信息泄露。新增条件判断在识别到 map_peek_elem + bloom filter 组合时将 meta->arg_raw_mem.regno 清零，从而关闭 raw 内存模式，避免未初始化内存被传入。",
       "tags": [
-        "eBPF"
+        "eBPF",
+        "Linux内核网络"
       ],
       "relevance": "high",
-      "readingTime": 5
+      "readingTime": 4
     },
     {
       "id": 14688530,
@@ -541,14 +594,14 @@
       "state": "accepted",
       "submitter": "Avinash Duduskar",
       "date": "2026-07-15T10:03:49",
-      "summary": "修改 tools/testing/selftests/bpf/prog_tests/fib_lookup.c 中的 setup_netns() 与 test_fib_lookup_vlan_netns()。在 setup_netns() 中通过 write_sysctl 将 /proc/sys/net/ipv4/conf/all/forwarding 与 /proc/sys/net/ipv4/conf/default/forwarding 显式写为 0，再创建 veth 设备，以阻止新建 netns 从 init_net 继承 IPv4 forwarding=1；测试用例后续仍按需对单个设备开启 forwarding。该修复保证依赖 BPF_FIB_LKUP_RET_FWD_DISABLED（返回值 5）的 VLAN 测试分支不会因转发已开而错误返回 SUCCESS（0）。在 test_fib_lookup_vlan_netns() 中为目标 netns 补充一条路由，使解析成功的跨 netns 设备返回 SUCCESS 而非 NOT_FWDED，从而使 bpf_fib_vlan_input_dev() 中跨 netns 解析检查的断言从恒真变为有效区分。影响范围仅限 BPF fib_lookup selftest 正确性，不涉及内核运行时逻辑改动。",
+      "summary": "修改 tools/testing/selftests/bpf/prog_tests/fib_lookup.c 中的 setup_netns() 函数，在创建 veth 设备之前通过 write_sysctl 将 /proc/sys/net/ipv4/conf/all/forwarding 和 conf/default/forwarding 显式写为 \"0\"，防止新建 netns 从 init_net 继承 IPv4 forwarding=1 导致依赖 BPF_FIB_LKUP_RET_FWD_DISABLED（返回值 5）的测试用例因 FIB 查找返回 SUCCESS 而失败。同时修改 test_fib_lookup_vlan_netns() 函数，在 netns 测试臂中为 VLAN 设备添加路由，使解析后的设备能返回 SUCCESS，避免在 forwarding 开启的主机上该用例因转发门控被绕过而变成恒真断言，从而无法区分 NOT_FWDED 与真正未解析两种情况。改动机制为新增 sysctl 写入与路由添加，未触及内核代码。",
       "tags": [
         "eBPF",
         "路由",
         "包处理"
       ],
       "relevance": "high",
-      "readingTime": 4
+      "readingTime": 3
     },
     {
       "id": 14684697,
@@ -565,14 +618,32 @@
       "state": "accepted",
       "submitter": "Ihor Solodrai",
       "date": "2026-07-13T23:52:22",
-      "summary": "BPF 子系统中，带 KF_IMPLICIT_ARGS 标志的 kfunc 在 load 时会被校验器注入隐式参数（如 bpf_prog_aux），resolve_btfids 会剥离这些参数并保留真实 ABI 的 _impl 原型。fentry/fexit/fmod_ret/fsession 等 BPF 程序附加到这类 kfunc 时，bpf_check_attach_target() 与 bpf_check_attach_btf_id_multi() 从错误的 BTF 原型（即被剥离后的版本）提取 btf_func_model，导致 trampoline 构造时把隐式参数覆盖、kfunc 解引用到垃圾值。补丁新增 btf_attach_func_proto()，按调用点方式查找 _impl 原型以解析真实 ABI，并在两个 attach-target 模型构造处使用；为支持复用，将 find_kfunc_impl_proto() 的入参从 bpf_verifier_env 改为 bpf_verifier_log；新增 btf_kfunc_check_flag() 跨 kfunc 所有 hook set 检验单一 KF_* 标志，对模块 BTF 的不稳定 kfunc_set_tab 需在模块加载稳定后才读取，KF_IMPLICIT_ARGS 跨 set 必须一致否则返回 -EINVAL。改动涉及 btf.c 与 include/linux/btf.h 中 btf_func_model 解析路径与 BPF trampoline 构造正确性。",
+      "summary": "针对带 KF_IMPLICIT_ARGS 标志的 kfunc（如 bpf_prog_aux 等隐式参数），BPF 在 attach 阶段（fentry/fexit/fmod_ret/fsession）原本错误地从 BTF 可见原型构造 btf_func_model，导致 trampoline 把验证器注入的隐式参数覆盖，新引入 btf_attach_func_proto()，按照调用点的方式查找对应的 _impl 原型，使 trampoline 与实际 ABI 一致；在 bpf_check_attach_target() 和 bpf_check_attach_btf_id_multi() 两处替换模型构造路径。为支持复用，将 find_kfunc_impl_proto() 的参数由 bpf_verifier_env 改为 bpf_verifier_log；新增 btf_kfunc_check_flag() 跨所有 hook set 检查 KF_* 标志，set 不一致时返回 -EINVAL，从 kfunc_set_tab 读取 flag。对于 module BTF 仅在解析稳定后才可读取。修复后避免了 trampoline 销毁隐式参数导致 kfunc 解引用垃圾值的问题。",
       "tags": [
-        "eBPF",
-        "Linux内核网络",
-        "性能"
+        "eBPF"
       ],
       "relevance": "high",
       "readingTime": 6
+    },
+    {
+      "id": 14682835,
+      "title": "[iproute2-next] ip: display DPLL pin information in link details",
+      "url": "https://lore.kernel.org/r/20260713092119.1536385-1-ivecera@redhat.com",
+      "patchworkUrl": "https://patchwork.kernel.org/project/netdevbpf/patch/20260713092119.1536385-1-ivecera@redhat.com/",
+      "mbox": "https://patchwork.kernel.org/project/netdevbpf/patch/20260713092119.1536385-1-ivecera@redhat.com/mbox/",
+      "hash": "e7ab76c70c91ba3a563514dceba1056b8282d1b8",
+      "commitRef": "20e860c632e314a9e985f8a549ff962c1cfcaf98",
+      "version": "",
+      "prefixes": [],
+      "isRfc": false,
+      "isSeries": false,
+      "state": "accepted",
+      "submitter": "Ivan Vecera",
+      "date": "2026-07-13T09:21:19",
+      "summary": "此补丁修改的是 iproute2 用户态工具（ip/ipaddress.c），而非 Linux 内核本身。补丁在 print_linkinfo() 中新增对 IFLA_DPLL_PIN 嵌套属性的解析，从内核 DPLL 子系统读取 DPLL_A_PIN_ID 并在 `ip -d link show` 输出中追加 'dpll-pin <id>' 字段。iproute2 属于 netlink 用户态工具链，不属于内核网络子系统，本补丁内核网络对象/函数层面没有任何改动。",
+      "tags": [],
+      "relevance": "low",
+      "readingTime": 1
     }
   ]
 }

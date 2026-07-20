@@ -1,8 +1,86 @@
 {
   "date": "2026-07-20",
   "categories": {
-    "papers": [],
+    "papers": [
+      {
+        "title": "An RDMA-First Object Storage System with SmartNIC Offload",
+        "url": "https://www.semanticscholar.org/paper/215ed4b4469294836cc3d95f58e1a2947cfcd662",
+        "summary": "AI 训练与推理对存储 I/O 提出细粒度、高吞吐的持续需求，传统主机中介的 TCP 存储路径成为瓶颈。论文提出 ROS2 系统，将 DAOS 对象存储客户端整体卸载到 NVIDIA BlueField-3 SmartNIC 上运行，存储服务端保持 DAOS I/O engine 不变。系统将控制面（基于 gRPC 的 namespace 与 capability 协商）与数据面（基于 UCX/libfabric 的 RDMA 或 TCP 传输）分离，并在数据路径上去除主机中介，实现 NIC-resident 的多租户隔离与内联加解密等 DPU 服务。评估使用 FIO/DFS 在本地与远程配置下展开，对比 RDMA 与 TCP 在大块顺序 I/O 及小块随机 I/O 上的差异，并比较 host-resident 与 SmartNIC-offload 两种部署形态。结果显示，在服务器级 CPU 上 RDMA 一致优于 TCP；将 RDMA 驱动的 DAOS 客户端卸载至 BlueField-3 后，端到端性能与主机侧持平，证明 SmartNIC 卸载在保留 RDMA 效率的同时可承载 DPU-resident 功能；与之相对，TCP 在 SmartNIC 上的表现显著落后于主机，凸显 RDMA 对卸载部署的关键性。该工作面向 LLM 训练数据供给场景，GPU-direct placement 集成留作未来工作；对内核网络维护者的参考点在于：基于 UCX/libfabric 的旁路数据面如何在 BlueField-3 Arm 子系统上与 DAOS 控制面协作，以及 RDMA RC/UC 语义对对象存储语义一致性的影响。",
+        "summary_en": "AI training and inference impose sustained, fine-grain I/O that stresses host-mediated, TCP-based storage paths. Motivated by kernel-bypass networking and user-space storage stacks, we revisit POSIX-compatible object storage for GPU-centric pipelines. We present ROS2, an RDMA-first object storage system design that offloads the DAOS client to an NVIDIA BlueField-3 Smart-NIC while leaving the DAOS I/O engine unchanged on the storage server. ROS2 separates a lightweight control plane (gRPC for names-pace and capability exchange) from a high-throughput data plane (UCX/libfabric over RDMA or TCP) ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "RDMA",
+          "BlueField-3",
+          "DAOS"
+        ],
+        "readingTime": 7,
+        "relevance": "medium",
+        "innovationScore": 4
+      },
+      {
+        "title": "hKVS: a framework for designing a high throughput heterogeneous key-value store with SmartNIC and RDMA",
+        "url": "https://www.semanticscholar.org/paper/5312ca08a5c6ad4658002ec236b8b8e78ca251da",
+        "summary": "针对数据中心内存键值存储（in-memory KVS）受限于传统内核网络栈吞吐与延迟的瓶颈，提出hKVS框架，将NVIDIA BlueField DPU SmartNIC与RDMA结合到主机，形成异构KVS架构。核心设计包括：把热门键值对象从主机DRAM复制到SmartNIC的片上/板载内存，构建由SmartNIC上的RDMA KVS与主机端KVS协同提供读路径的双层数据面；利用SmartNIC的ARM计算资源分担部分CPU负载，并直接通过RDMA verbs绕过内核TCP/IP协议栈完成请求处理。实验在100%读与95%读混合工作负载下，对比未加速基线与多机KVS方案，hKVS分别取得最高1.86倍与1.48倍吞吐提升；单台主机+SmartNIC在成本与扩展性上优于堆叠多台高性能服务器，且可通过增加多块SmartNIC线性扩展吞吐。该工作明确以RDMA verbs与SmartNIC片上资源为数据面，Linux内核网络栈（sk_buff、TCP/IP、netfilter、qdisc等）被完全旁路；对关注内核旁路/卸载路线的读者价值在于：BlueField DPU上运行用户态DPDK/RDMA KVS与主机侧应用协同的可行模式，以及在ARM核+DPDK+RoCE环境下的吞吐边界与扩展性取舍。论文未涉及对内核网络代码路径的修改，也未讨论与传统AF_XDP/XDP方案的对比。",
+        "summary_en": "In-memory key-value store (KVS) is a crucial component of data center applications. Since DRAM provides high bandwidth and low latency, the major performance bottleneck of common in-memory KVS lies in the network stack. Prior works have attempted to replace the traditional network stack with remote direct memory access (RDMA), which achieve orders of magnitude higher throughput and reduce the response latency. To further increase the throughput of an in-memory KVS, we propose a framework called hKVS, which enables the developers to design high-throughput heterogeneous KVS systems by adding the...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "RDMA",
+          "BlueField DPU",
+          "kernel-bypass KVS"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 3
+      },
+      {
+        "title": "PASS: A Flexible Programmable Framework for Building Integrated Security Stack in Public Cloud",
+        "url": "https://www.semanticscholar.org/paper/106d270628a6fe16c284771326b9bd8d1d6ceb40",
+        "summary": "研究面向公有云多租户场景下集成安全栈（firewall/IDS/IPS 等安全功能链）的快速构建问题，指出纯软件栈性能不足而纯硬件定制栈灵活性差，提出基于 SmartNIC 加速的 PASS 可编程框架。数据面层面，PASS 通过模块化抽象抽取安全功能的共享逻辑，并基于自定义 metadata 复用中间结果以消除冗余操作；控制面层面，将繁琐的安全策略转换卸载到专门的 security auxiliary plane 完成，开发者只需关注核心业务逻辑而无需重复实现共享机制。框架通过 well-defined API 解耦业务与基础设施细节，原型基于 CPU-FPGA 平台实现并开发了三类典型安全组件。实验评估显示，相较于从零开发，PASS 平均减少 65% 代码量；相比纯软件实现，安全处理性能提升 76%；相比未卸载策略转换的架构，策略翻译与分发时延降低 90%。该工作与 Linux 内核网络的关系体现在：SmartNIC 卸载路径与 Linux 内核网络栈并行，属于旁路硬件卸载网络研究范畴，但原摘要未提供是否集成 DPDK/XDP/AF_XDP 等具体数据面接口、是否在 BlueField 等商用 SmartNIC 上验证、或与 Linux tc/iptables/nftables 等安全子系统的兼容性等细节。读者应关注其 CPU-SmartNIC 协同设计模式与 metadata 复用策略在 Linux 主机侧安全卸载落地时的适配性，以及 FPGA 平台对云租户的可用性约束。",
+        "summary_en": "Integrated security stacks, which offer diverse security function chains in a single device, hold substantial potential to satisfy the security requirements of multiple tenants on a public cloud. However, it is difficult for the software-only or hardware-customized security stack to establish a good tradeoff between performance and flexibility. SmartNIC overcomes these limitations by providing a programmable platform for implementing these functions with hardware acceleration. Significantly, without a professional CPU/SmartNIC co-design, developing security function chains from scratch with lo...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "Security Stack",
+          "FPGA",
+          "Cloud Networking"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 3
+      },
+      {
+        "title": "Plug & Offload: Transparently Offloading TCP Stack onto Off-path SmartNIC with PnO-TCP",
+        "url": "https://www.semanticscholar.org/paper/eac5281f455cf33a9bcc6d790932dfb4e6cf5c75",
+        "summary": "针对数据中心主机CPU被TCP协议栈处理大量消耗、限制横向扩展的问题，提出PnO(Plug&Offload)方案，将完整TCP处理透明卸载到off-path SmartNIC（NVIDIA BlueField DPU）上执行。核心设计是PnO-TCP协议栈：基于DPDK在DPU通用核上实现轻量用户态TCP栈，跨越host与SmartNIC两端协同完成offload，覆盖连接管理、拥塞控制、数据收发等完整功能，而非仅卸载部分子模块。评估选取Redis、Lighttpd、HAProxy三类典型真实应用进行实测，在小包（<2KB）单线程场景下RPS提升34%-127%，并显著降低host CPU占用。该工作属于旁路式硬件卸载路线，不修改Linux内核网络代码路径，对内核维护者关注点在于：off-path DPU通用核算力有限时用户态DPDK栈如何平衡吞吐与单流延迟，以及与内核TCP在拥塞控制、零拷贝语义上的兼容边界。落地点适合TCP密集型、连接数高的云原生服务卸载场景。",
+        "summary_en": "Host CPU resources are heavily consumed by TCP stack processing, limiting scalability in data centers. Existing offload methods typically address only partial functionality or lack flexibility. This paper introduces PnO (Plug&Offload), an approach to fully offload TCP processing transparently onto off-path SmartNICs (NVIDIA BlueField DPUs). Key to our solution is PnO-TCP, a novel TCP stack specifically designed for efficient execution on the DPU's general-purpose cores, panning both the host and the SmartNIC to facilitate the offload. PnO-TCP leverages a lightweight, user-space stack based on ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "旁路",
+          "SmartNIC offload",
+          "BlueField DPU",
+          "TCP协议栈"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 5
+      }
+    ],
     "news": []
   },
-  "tagStats": {}
+  "tagStats": {
+    "SmartNIC": 3,
+    "RDMA": 2,
+    "BlueField-3": 1,
+    "DAOS": 1,
+    "BlueField DPU": 2,
+    "kernel-bypass KVS": 1,
+    "Security Stack": 1,
+    "FPGA": 1,
+    "Cloud Networking": 1,
+    "旁路": 1,
+    "SmartNIC offload": 1,
+    "TCP协议栈": 1
+  }
 }
