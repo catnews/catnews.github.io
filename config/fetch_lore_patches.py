@@ -36,7 +36,6 @@ PAGE_SIZE = 30
 # (typically around page 9 for a busy day).
 MAX_INREVIEW_PAGES = 20
 MAX_MERGED_PAGES = 10
-DEFAULT_MAX_INREVIEW = 24  # cap LLM calls for in-review
 DEFAULT_MAX_MERGED = None  # Keep merged feed complete; page fetch already bounds scope.
 STATE_MERGED = "accepted"
 STATE_IN_REVIEW_STATES = {"new", "changes-requested", "superseded", "rfc"}
@@ -436,8 +435,10 @@ def _process_single_patch(p, call_minimax_fn, gate_fn, excluded_fn):
         p["_llm_failed"] = True
 
     if parsed.get("relevance") == "none":
-        print(f"  [lore] skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
-        return None
+        # netdevbpf 邮件列表的 patch 默认属于 Linux 内核网络，LLM 判为 none 也不丢弃，
+        # 只把 relevance 强制提升为 low，让 patch 仍能展示在审查中列表里。
+        parsed["relevance"] = "low"
+        print(f"  [lore] keep (llm=none->low) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
 
     p["summary"] = parsed["summary"]
     p["tags"] = parsed["tags"]
@@ -555,10 +556,9 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                 still_failed.append(idx)
                 continue
             if parsed.get("relevance") == "none":
-                # LLM now says unrelated; drop the patch.
-                print(f"  [lore] retry skip (none) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
-                results_by_index.pop(idx, None)
-                continue
+                # 与首轮一致：netdevbpf patch 默认属于内核网络，不丢弃，强制提升为 low。
+                parsed["relevance"] = "low"
+                print(f"  [lore] retry keep (llm=none->low) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
             p["summary"] = parsed["summary"]
             p["tags"] = parsed["tags"]
             p["relevance"] = parsed["relevance"]
@@ -602,7 +602,7 @@ def write_patches_file(docs_dir, target_date_str, in_review, merged, fetched_at)
 # ---------------- Top-level ----------------
 def run(docs_dir, target_date_str, *,
         call_minimax_fn, gate_fn, excluded_fn,
-        max_in_review=80, max_merged=DEFAULT_MAX_MERGED, llm_budget_per_side=None,
+        max_in_review=None, max_merged=DEFAULT_MAX_MERGED, llm_budget_per_side=None,
         max_workers=2, delay_min=None, delay_max=None):
     print(f"[lore] fetching netdevbpf patches for {target_date_str}", flush=True)
 
