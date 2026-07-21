@@ -3,137 +3,47 @@
   "categories": {
     "papers": [
       {
-        "title": "Comparing User Space and In-Kernel Packet Processing for Edge Data Centers",
-        "url": "https://www.semanticscholar.org/paper/593f679bb6541bffe28401d47c1a7c6ee411d9f1",
-        "summary": "原摘要要点：Telecommunication operators are massively moving their network functions in small data centers at the edge of the network, which are becoming increasingly common. However, the high performance provided by commonly used technologies for data plane processing such as DPDK, based on kernel-bypass primitives, comes at the cost of rigid resource partitioning. This is unsuitable for edge data centers, in which efficiency demands both general-purpose applications and data-plane telc...",
-        "summary_en": "Telecommunication operators are massively moving their network functions in small data centers at the edge of the network, which are becoming increasingly common. However, the high performance provided by commonly used technologies for data plane processing such as DPDK, based on kernel-bypass primitives, comes at the cost of rigid resource partitioning. This is unsuitable for edge data centers, in which efficiency demands both general-purpose applications and data-plane telco workloads to be executed on the same (shared) physical machines. In this respect, eBPF/XDP looks a more appealing solu...",
+        "title": "An Efficient Caching Mechanism for End-host Network Functions",
+        "url": "https://www.semanticscholar.org/paper/57120a5a5f668f0f5cea004cfe4c55a3b1a1f7da",
+        "summary": "研究针对端主机上网络功能（NAT、防火墙、负载均衡器）受限于 Linux 网络栈、在高速网卡下吞吐不足的问题，提出 PFC（Pre-Function table Caching）机制。PFC 利用 XDP 作为前置包头处理器，在 Linux 内核网络栈入口之前完成 NF 表项缓存查找，包含两个处理面：端主机内的流量管理，以及面向分布式应用的请求处理。系统通过 XDP hook 实现数据包早期分类与缓存命中检查，从而减少进入完整协议栈的包数。实验在端主机高吞吐场景下对比 DPDK，结果显示 PFC 吞吐与 DPDK 相当但 CPU 占用更低，并且无需修改上层应用即可与现有系统集成。该工作落地点在于内核 XDP 与 NF 子系统的协同；对内核网络维护者的参考在于 NF 表项缓存在 XDP 早处理阶段的可行性，以及与 DPDK 用户态栈的取舍边界。读者需关注的限制：原摘要未提供具体吞吐数值、对比基线配置、延迟与丢包率指标及 NF 类型覆盖范围。",
+        "summary_en": "The end host serves as a natural enforcement point for various network functions (NFs), such as network address translators (NATs), firewalls, and load balancers. However, due to the limitations of the Linux networking stack, NFs struggle to achieve high performance when utilizing high-speed network interfaces. The eXpress Data Path (XDP) is a high-performance framework for packet processing within the Linux kernel. It operates as an optimized execution point before the networking stack. In contrast to kernel-bypass solutions like DPDK, XDP offers an appealing alternative by providing comparab...",
         "source": "Semantic Scholar",
         "tags": [
-          "eBPF",
           "XDP",
-          "驱动",
-          "包处理"
-        ],
-        "readingTime": 5,
-        "relevance": "high",
-        "innovationScore": 6
-      },
-      {
-        "title": "Enabling Kernel Bypass Networking on gem5",
-        "url": "https://www.semanticscholar.org/paper/dd503b9eb3e8e2afee850f8f871d1bfaa8238467",
-        "summary": "研究针对全系统架构模拟器 gem5 仍使用内核网络栈、无法刻画 kernel bypass 与数据面网络真实行为的问题，在 gem5 上端到端启用 DPDK 旁路网络栈。具体做法包括：扩展 gem5 的 NIC 硬件模型与设备驱动，使其能挂载用户态驱动并运行 DPDK 框架；新增一个网络负载生成器硬件模型，可按多种流量模式产生报文，并在不引入丢包的前提下完成逐包时间戳与端到端时延测量。实验评估显示，DPDK 模拟网络带宽随核数与 NIC 端口数线性扩展。作为两个用例，论文分析了 (1) 微架构参数（流水线深度、频率等）对 DPDK 网络吞吐与时延的敏感度；(2) Direct Cache Access (DCA) 预取技术在 DPDK burst size 变化时对 cache miss 与延迟的影响。\n\n与 Linux 内核网络的关系：该工作不修改内核网络代码路径，而是把 DPDK 这类用户态高速网络栈引入 gem5，使其能替代传统内核网络栈进行大规模节点仿真；对 Linux 内核网络维护者的参考价值在于，可在 gem5 上对比旁路栈与内核栈（如 socket/NAPI 路径）的微架构敏感度差异。读者应关注的限制是：原型依赖 gem5 模拟速度，NIC 模型保真度与真实 SmartNIC（如 Mellanox ConnectX、BlueField）行为存在差距，DCA 等结论需结合真实硬件再验证；burst size、DPDK ring 规模等参数对性能影响的具体数值在原摘要中未提供，需查阅正文。",
-        "summary_en": "Full-system simulation of computer systems is critical to capture the complex interplay between various hardware and software components in future systems. Modeling the network subsystem is indispensable to the fidelity of the full-system simulation due to the increasing importance of scale-out systems. The network software stack has undergone major changes over the last decade, and kernel-bypass networking stacks and data-plane networks are rapidly replacing the conventional kernel network stack. Nevertheless, the current state-of-the-art architectural simulators still use kernel networking w...",
-        "source": "Semantic Scholar",
-        "tags": [
+          "网络功能",
           "旁路",
-          "kernel-bypass",
-          "gem5",
-          "full-system-simulation"
-        ],
-        "readingTime": 8,
-        "relevance": "medium",
-        "innovationScore": 4
-      },
-      {
-        "title": "ARCHITECTURE OF DATA PLANE DEVELOPMENT KIT (DPDK) FOR ACCELERATING PACKET PROCESSING AND TRAFFIC PROTECTION AT 100 GBPS AND BEYOND",
-        "url": "https://www.semanticscholar.org/paper/8b88bfe177226b34aefc87eeb610406d9c12d488",
-        "summary": "研究对 Data Plane Development Kit (DPDK) 在 100 Gbps 及以上速率下实现高速报文处理的整体架构进行系统性剖析。核心方法围绕 DPDK 四大支柱组件展开：Environment Abstraction Layer (EAL) 负责硬件与操作系统抽象、Poll Mode Drivers (PMD) 提供用户态网卡轮询驱动、内存子系统使用 rte_mbuf / rte_mempool / rte_ring 实现零拷贝报文描述符与无锁环形队列，以及四种报文处理模型——run-to-completion、pipeline、event-driven 与 graph framework——在不同多核拓扑下的适用场景。论文重点讨论 kernel-bypass、zero-copy data path 与 cache-optimized processing 三类机制如何在多核处理器上逼近线速处理能力。安全方面，分析 rte_security 与 cryptodev 子系统对 IPsec、MACsec 的集成路径，对比 inline hardware offload 与 look-aside crypto 处理模式在吞吐与时延上的取舍，并展望 FPGA-based 网络加速器在 DPDK 生态下融合高速交换与硬件级流量加密的演进方向。整体为面向电信与数据中心基础设施的架构综述与技术参考，未提供具体基准测试数据（数据集、对比基线、吞吐 / 时延 / CPU 占用 / 丢包率等量化指标在原摘要中未呈现）。对 Linux 内核网络维护者而言，该工作界定了用户态 DPDK 与内核态网络栈的能力边界与共存模式，是评估内核旁路方案在 100 Gbps+ 场景定位的重要参照。",
-        "summary_en": "This article presents a comprehensive analysis of the Data Plane Development Kit (DPDK) architecture as a framework for achieving high-performance packet processing at rates of 100 Gbps and above. The work examines the key architectural components of DPDK, including the Environment Abstraction Layer (EAL), Poll Mode Drivers (PMD), memory management subsystem (rte_mbuf, rte_mempool, rte_ring), and packet processing models (run-to-completion, pipeline, event-driven, and graph framework). Special attention is given to the mechanisms enabling kernel-bypass, zero-copy data paths, and cache-optimize...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "旁路",
-          "kernel-bypass",
-          "高速报文处理",
-          "IPsec/MACsec"
-        ],
-        "readingTime": 8,
-        "relevance": "medium",
-        "innovationScore": 3
-      },
-      {
-        "title": "This Is INSANE! Kernel-Bypass Networking Finally Made Easy",
-        "url": "https://www.semanticscholar.org/paper/fb851c3070c75dd3d2519df1db5acbb14ffcfd89",
-        "summary": "研究针对现有中间件仍依赖传统内核网络栈、难以利用 SmartNIC 与 DPDK 等旁路加速技术的现状，提出 INSANE 中间件。该中间件采用数据驱动的 sidecar 架构，将高层用户 QoS 策略映射到当前可用的最优网络栈（标准内核栈或 DPDK 旁路栈），目标是以最小编程代价实现可移植的高性能通信系统。作为 EuroSys 教程，内容包括三部分：网络加速技术概览、INSANE 中间件架构讲解、以及动手编码环节。参会者通过该教程可获得构建可移植高速通信系统的概念认知与实操经验。原摘要未提供具体吞吐量、时延、CPU 占用等量化评测指标，也未说明所支持的 SmartNIC 型号、DPDK 版本或与 AF_XDP 等内核接口的对比基线；对关注 Linux 内核旁路高速网络落地的读者，需结合具体实现细节评估其在生产环境中替代或补充标准 socket 接口的可行性，并核对 sidecar 模式与 NAPI、kernel-bypass 边界处的资源争用与故障域隔离策略。",
-        "summary_en": "This tutorial presents INSANE, a middleware designed to make kernel bypass networking accessible and portable. As modern hardware and software stacks, such as SmartNICs and DPDK, push cloud communication performance to new boundaries, most existing middleware still rely only on traditional kernel-based networking. The INSANE middleware bridges this gap through a data-centric, sidecar-based architecture that maps high-level user QoS policies to the best available network stack. This tutorial on INSANE combines a concise overview of network acceleration techniques, an introduction to the INSANE ...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "kernel-bypass",
-          "旁路",
-          "SmartNIC",
-          "middleware"
-        ],
-        "readingTime": 4,
-        "relevance": "medium",
-        "innovationScore": 2
-      },
-      {
-        "title": "MiddleNet: A Unified, High-Performance NFV and Middlebox Framework With eBPF and DPDK",
-        "url": "https://www.semanticscholar.org/paper/af74aefe4af90e158e2eec7d57c70fd1adb18260",
-        "summary": "原摘要要点：Traditional network resident functions (e.g., firewalls, network address translation) and middleboxes (caches, load balancers) have moved from purpose-built appliances to software-based components. However, L2/L3 network functions (NFs) are being implemented on Network Function Virtualization (NFV) platforms that extensively exploit kernel-bypass technology. They often use DPDK for zero-copy delivery and high performance. On the other hand, L4/L7 middleboxes, which have a gre...",
-        "summary_en": "Traditional network resident functions (e.g., firewalls, network address translation) and middleboxes (caches, load balancers) have moved from purpose-built appliances to software-based components. However, L2/L3 network functions (NFs) are being implemented on Network Function Virtualization (NFV) platforms that extensively exploit kernel-bypass technology. They often use DPDK for zero-copy delivery and high performance. On the other hand, L4/L7 middleboxes, which have a greater emphasis on functionality, take advantage of a full-fledged kernel-based system. L2/L3 NFs and L4/L7 middleboxes co...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "eBPF",
-          "驱动",
-          "包处理",
-          "旁路"
-        ],
-        "readingTime": 5,
-        "relevance": "high",
-        "innovationScore": 3
-      },
-      {
-        "title": "A Transparent and Efficient Performance Analysis Approach to Enhance DPDK Observability",
-        "url": "https://www.semanticscholar.org/paper/6d2629d53c05729a790a017659d085081975c8c4",
-        "summary": "针对Linux内核网络栈固有的性能瓶颈，用户态网络框架DPDK通过绕过内核实现高速报文处理，但传统监控工具难以观测其内部状态，故障定位与性能调优困难。该工作面向DPDK应用提出性能分析框架：利用DPDK原生tracer采集trace数据，派生针对性性能指标，并在Trace Compass中通过交互式、领域专属的可视化分析呈现。该方案以低运行时开销为前提，在底层trace与可操作的性能洞察之间建立桥梁。评估方面，研究者对19位行业从业者开展调研以验证设计选择并捕捉DPDK应用调试挑战的实证证据；进一步在一款广泛使用的软件路由器上演示所提分析如何揭示并解释性能瓶颈。对关注Linux内核旁路高速网络的读者，该工作的落地点在于：原生tracer钩子的覆盖范围决定了可观测性能事件的上界，DPDK轮询模式驱动（如igb_uio/vfio）与用户态报文mbuf生命周期是trace数据的主要来源。限制方面，框架对非DPDK原生组件的覆盖能力未在原摘要中给出，且19人调研样本规模有限，结论的泛化性需结合具体生产环境验证。",
-        "summary_en": "In recent years, the rapid growth of network traffic and the performance bottlenecks inherent in kernel networking stacks have driven the widespread adoption of userspace networking frameworks. While kernel-bypass solutions such as the Data Plane Development Kit (DPDK) effectively eliminate kernel overhead, they also limit observability for traditional monitoring tools, complicating fault diagnosis and performance tuning. This observability gap, coupled with the complexity of modern packet-processing software, makes diagnosing performance issues increasingly difficult. This paper presents a pe...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "旁路",
-          "可观测性",
-          "tracing",
-          "内核旁路"
+          "端主机加速"
         ],
         "readingTime": 6,
-        "relevance": "medium",
-        "innovationScore": 1
+        "relevance": "high",
+        "innovationScore": 7
       },
       {
-        "title": "Kernel-Bypass Based Fast Detection Method for IPv6 Extension Header Threats",
-        "url": "https://www.semanticscholar.org/paper/654b86bbe4f64edbdb172b333ce9b116dd8e1173",
-        "summary": "针对IPv6扩展头威胁检测在高流量场景下丢包率高、处理速度慢、威胁类型覆盖不全的问题，提出基于内核旁路的快速检测方法KB-FD6。核心方案是借助DPDK从网卡直接抓取并处理IPv6报文，绕过Linux内核协议栈（sk_buff处理路径、netfilter hook等），从而提升包处理吞吐；在此基础上对常见IPv6扩展头威胁构造特征，通过对捕获报文做特征匹配实现8类常见扩展头威胁识别，命中后触发告警并记录日志。实验在IPv6网络环境中与开源IDS Suricata进行对比，结果显示KB-FD6在扩展头威胁类型覆盖率上与Suricata持平（均覆盖全部8类），同时在高规模流量下报文捕获率提升73.4%，平均包处理速度提升72.87%。该工作并不修改Linux内核网络源码，也未走netfilter/XDP/BPF等内核钩子，而是用DPDK构建用户态检测管线；其落地点在于运营商或企业IPv6边界网关的高吞吐威胁检测场景，对内核网络维护者的参考价值在于IPv6扩展头解析规范及旁路栈与内核协议栈在报文可见性/元数据一致性上的差异。",
-        "summary_en": "Existing threat detection techniques for IPv6 extension headers suffer from issues such as high packet loss rates, low processing speeds as network traffic scales up, and incomplete detection of threat types. To address these shortcomings, a Kernel-Bypass based Fast Detection Method for IPv6 Extension Header Threats (KB-FD6) is proposed. Firstly, leveraging DPDK to swiftly capture and process IPv6 packets directly from the network interface card bypasses the Linux kernel protocol stack, thereby enhancing packet processing speeds. Subsequently, features are constructed for common IPv6 extension...",
+        "title": "Getting back what was lost in the era of high-speed software packet processing",
+        "url": "https://www.semanticscholar.org/paper/a5e34405f869e4781f2df57f2bd1bf947fee7d63",
+        "summary": "针对高速软件包处理中长期存在的“绕过Linux网络栈”路线（如DPDK等用户态栈）所付出的功能与可管理性代价，论文主张重构Linux内核网络栈本身而非另起替代管线。核心思路是将包处理分解为fast path与slow path两类，并通过运行时内省当前网络配置（路由、netfilter规则、tc qdisc、连接跟踪状态等），透明且动态地生成只包含当前所需处理步骤的最小化fast-path模块。该机制基于Linux内核已有的eXpress Data Path（XDP）子系统，将这些小型eBPF fast-path程序挂载到驱动侧，在驱动进入NAPI轮询入口即完成sk_buff分配、协议解析、转发决策等高频操作；未被匹配到的流量回退至内核网络栈作为slow path，从而保留Linux原有的连接跟踪、netfilter、安全策略、tc控制面与管理生态。系统原型命名为Transparent Network Acceleration（TNA），强调“自动化生成”与“透明性”，用户无需修改应用或控制面配置即可获得接近用户态高速栈的吞吐。论文以TNA为代表，论证了在保留Linux丰富网络功能的同时，通过XDP/eBPF数据面下沉与按需裁剪可显著削减Linux网络栈固定开销（内存分配、锁、协议栈遍历）。摘要中未提供具体实验数据集、对比基线（如DPDK、VPP、原生内核栈）的吞吐/时延/CPU占用数值，也未说明在内核版本、驱动适配范围、eBPF verifier限制对fast-path表达力的影响等细节，阅读时应关注其评估章节是否覆盖了多规则集规模、含conntrack/nat的真实负载，以及fast-path生成对控制面变更的响应延迟。",
+        "summary_en": "The need for high performance and custom software-based packet processing has resulted in decades of research. Most proposals bypass or replace the Linux networking stack with the unfortunate consequence of sacrificing the rich and robust functionality available within Linux and the ecosystem of management programs and control-plane software built on top of it. In this paper, we propose to rethink the design of the Linux network stack to address its shortcomings rather than creating alternative pipelines. This re-design involves (1) decomposing packet processing into a fast path and a slow pat...",
         "source": "Semantic Scholar",
         "tags": [
-          "旁路",
-          "内核旁路",
-          "IPv6扩展头威胁检测",
-          "Suricata对比"
+          "XDP",
+          "eBPF",
+          "Linux网络栈重构",
+          "TNA"
         ],
-        "readingTime": 5,
-        "relevance": "medium",
-        "innovationScore": 4
+        "readingTime": 12,
+        "relevance": "high",
+        "innovationScore": 5
       }
     ],
     "news": []
   },
   "tagStats": {
-    "eBPF": 2,
-    "XDP": 1,
-    "驱动": 2,
-    "包处理": 2,
-    "旁路": 6,
-    "kernel-bypass": 3,
-    "gem5": 1,
-    "full-system-simulation": 1,
-    "高速报文处理": 1,
-    "IPsec/MACsec": 1,
-    "SmartNIC": 1,
-    "middleware": 1,
-    "可观测性": 1,
-    "tracing": 1,
-    "内核旁路": 2,
-    "IPv6扩展头威胁检测": 1,
-    "Suricata对比": 1
+    "XDP": 2,
+    "网络功能": 1,
+    "旁路": 1,
+    "端主机加速": 1,
+    "eBPF": 1,
+    "Linux网络栈重构": 1,
+    "TNA": 1
   }
 }
