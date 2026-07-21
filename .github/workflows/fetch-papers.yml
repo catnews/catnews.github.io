@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 21 * * *'
   workflow_dispatch:
+    inputs:
+      disable_gate:
+        description: '放开 domain gate (实测用，所有 patch 都走 LLM，不丢弃)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -15,7 +20,7 @@ env:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 90
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,6 +34,7 @@ jobs:
         run: python config/fetch_papers.py
         env:
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          LORE_DISABLE_GATE: ${{ inputs.disable_gate == true && '1' || '0' }}
         
       - name: Check for changes
         id: check_changes

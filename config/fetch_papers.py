@@ -680,6 +680,17 @@ def is_hard_excluded(text):
     text_lower = (text or "").lower()
     return any(keyword in text_lower for keyword in HARD_EXCLUDE_KEYWORDS)
 
+def is_hard_excluded_reasoned(text):
+    """与 is_hard_excluded 等价，但额外返回命中关键词用于诊断日志。
+
+    返回 (bool, reason)。reason 形如 'hard-excluded:neural network'，未命中时为 ''。
+    """
+    text_lower = (text or "").lower()
+    for keyword in HARD_EXCLUDE_KEYWORDS:
+        if keyword in text_lower:
+            return True, f"hard-excluded:{keyword}"
+    return False, ""
+
 def passes_domain_gate(title, abstract, source=""):
     merged = f"{title} {abstract}".lower()
     if is_hard_excluded(merged):
@@ -708,6 +719,38 @@ def passes_domain_gate(title, abstract, source=""):
 
     # 论文类：无内核专属词一律挡下，由 LLM 再筛
     return False
+
+def passes_domain_gate_reasoned(title, abstract, source=""):
+    """与 passes_domain_gate 等价，但返回 (bool, reason)。
+
+    reason 取值（仅在 False 时有意义）：
+      - 'hard-excluded:<kw>'        命中 HARD_EXCLUDE 关键词
+      - 'non-kernel-context'        命中 NON_KERNEL_CONTEXT 且无 linux/kernel 上下文
+      - 'no-network-anchor'        缺 NETWORK_ANCHOR_KEYWORDS
+      - 'no-kernel-anchor'         有 network 锚点但缺 KERNEL_SPECIFIC_TERMS
+                                    （source 非 LWN.net 时挡下）
+      - ''                          通过
+    """
+    merged = f"{title} {abstract}".lower()
+    hard_hit, hard_reason = is_hard_excluded_reasoned(merged)
+    if hard_hit:
+        return False, hard_reason
+
+    if any(keyword in merged for keyword in NON_KERNEL_CONTEXT_KEYWORDS):
+        if "linux" not in merged and "kernel" not in merged:
+            return False, "non-kernel-context"
+
+    network_hit = any(keyword in merged for keyword in NETWORK_ANCHOR_KEYWORDS)
+    if not network_hit:
+        return False, "no-network-anchor"
+
+    if any(term in merged for term in KERNEL_SPECIFIC_TERMS):
+        return True, ""
+
+    if source == "LWN.net":
+        return True, "lwn-exception"
+
+    return False, "no-kernel-anchor"
 
 def passes_tech_news_gate(title, abstract, source=""):
     merged = f"{title} {abstract}".lower()
@@ -2100,11 +2143,11 @@ def main():
             docs_dir,
             yesterday_str,
             call_minimax_fn=call_minimax,
-            gate_fn=passes_domain_gate,
-            excluded_fn=is_hard_excluded,
+            gate_fn=passes_domain_gate_reasoned,
+            excluded_fn=is_hard_excluded_reasoned,
             delay_min=LLM_DELAY_MIN,
             delay_max=LLM_DELAY_MAX,
-            max_workers=2,
+            max_workers=4,
         )
     except Exception as e:
         print(f"[lore] skipped: {e}", flush=True)

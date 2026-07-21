@@ -206,12 +206,33 @@ def _load_patch_detail(patch):
 
 # ---------------- Domain gate ----------------
 def passes_domain(patch, gate_fn, excluded_fn):
+    """Run the domain gate; returns (passed, reason).
+
+    `gate_fn` / `excluded_fn` are expected to be the *_reasoned variants that
+    return (bool, str). Falls back to plain bool returns for backward
+    compatibility (reason becomes '' in that case).
+    """
     text = f"{patch.get('title', '')} {patch.get('summary', '')}".strip()
     if not text:
-        return False
-    if excluded_fn(text):
-        return False
-    return bool(gate_fn(patch.get("title", ""), text, source="lore.kernel.org"))
+        return False, "empty-text"
+
+    # excluded_fn: (bool, reason)
+    try:
+        excluded, ex_reason = excluded_fn(text)
+    except TypeError:
+        # legacy bool-only signature
+        excluded, ex_reason = bool(excluded_fn(text)), ""
+    if excluded:
+        return False, ex_reason or "hard-excluded"
+
+    # gate_fn: (bool, reason)
+    try:
+        passed, gate_reason = gate_fn(patch.get("title", ""), text, source="lore.kernel.org")
+    except TypeError:
+        passed, gate_reason = bool(gate_fn(patch.get("title", ""), text, source="lore.kernel.org")), ""
+    if not passed:
+        return False, gate_reason or "gate-failed"
+    return True, ""
 
 
 # ---------------- LLM summarization ----------------
@@ -407,10 +428,15 @@ def _process_single_patch(p, call_minimax_fn, gate_fn, excluded_fn):
 
     raw = p.get("raw") or {}
     gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
-    if not passes_domain({"title": p.get("title", ""), "summary": gate_text},
-                         gate_fn, excluded_fn):
-        print(f"  [lore] skip (gate) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
-        return None
+    disable_gate = os.environ.get("LORE_DISABLE_GATE", "").lower() in ("1", "true", "yes")
+    if disable_gate:
+        print(f"  [lore] gate disabled by env, keep patch {p.get('id')} {p.get('title', '')[:40]}", flush=True)
+    else:
+        passed, reason = passes_domain({"title": p.get("title", ""), "summary": gate_text},
+                                       gate_fn, excluded_fn)
+        if not passed:
+            print(f"  [lore] skip (gate) {p.get('id')} reason={reason or '?'} {p.get('title', '')[:40]}", flush=True)
+            return None
 
     parsed = None
     if call_minimax_fn:
