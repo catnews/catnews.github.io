@@ -40,6 +40,12 @@ DEFAULT_MAX_MERGED = None  # Keep merged feed complete; page fetch already bound
 STATE_MERGED = "accepted"
 STATE_IN_REVIEW_STATES = {"new", "changes-requested", "superseded", "rfc"}
 
+# Batch size for LLM summarization. MiniMax M3 supports 1M context, so we can
+# pack many patches into one prompt to amortize HTTP/LLM latency.
+# Override with env var LORE_BATCH_SIZE; set to 1 to disable batching.
+BATCH_SIZE = 15
+BATCH_MAX_TOKENS = 6000
+
 # Beijing timezone
 BEIJING_TZ = timezone(timedelta(hours=8))
 
@@ -291,18 +297,113 @@ def _call_minimax_summary(call_minimax_fn, prompt):
         return None
 
 
+# ---------------- Batch summarization ----------------
+PATCH_BATCH_SUMMARY_PROMPT = """你是 Linux 内核网络补丁分析助手。下面给你 N 个 patch，请为每个 patch 单独生成摘要。
+
+对每个 patch，判断是否属于 Linux 内核网络子系统（TCP/IP 协议栈 / eBPF / XDP / Netfilter / 网络驱动 / 路由网桥 / virtio-net / 网络性能优化等）。
+
+强约束：
+1. 每条 patch 的 summary 必须具体到内核对象 / 函数 / 数据结构（如 sk_buff、napi、qdisc、conntrack、tcp_sock、virtio_net、bpf_prog、xdp_buff 等）、改动机制（新增 / 替换 / 移除 / 优化）、要解决的问题、对性能或正确性的影响。如果补丁正文给出测试数据、benchmark 或具体数值，必须引用。
+2. summary 严禁复述、引用或翻译 patch 标题；不要以《标题》、"本补丁"、"该补丁"等开头提及标题；摘要直接陈述改动的对象与机制。
+3. summary 严禁空泛套话，例如"主要围绕...进行调整"、"实现与优化"、"建议重点关注"等。
+4. 如果补丁正文信息不足，必须直说"补丁正文未提供 X 信息"，禁止用模板凑字数。
+5. 每条 summary 80-200 字中文。
+6. 如果 patch 不属于 Linux 内核网络，relevance 设为 'none'（输出数组仍需包含该条）。
+7. tags 从下列标签中选 2-3 个：eBPF, XDP, TCP/IP, Socket, Netfilter, 路由, 网桥, 驱动, 包处理, 虚拟化, 性能, 容器网络, Linux内核网络。
+
+返回严格 JSON 数组（数组长度必须等于输入 patch 数量），每条形如：
+[
+  {"index": 1, "relevance": "high/medium/low/none", "summary": "中文总结", "tags": ["...","..."], "readingTime": 3},
+  {"index": 2, "relevance": "...", "summary": "...", "tags": ["..."], "readingTime": 3},
+  ...
+]
+
+index 必须对应输入的 Patch #N 编号（1-based）。"""
+
+
+def _format_batch_prompt(batch):
+    """Format a batch of patches into a single prompt.
+
+    `batch` is a list of (index, patch) tuples; index is the original index
+    in the candidates list (used to map results back). The LLM sees them as
+    Patch #1, Patch #2, ... (1-based).
+    """
+    parts = [f"共 {len(batch)} 个补丁："]
+    for k, (_, p) in enumerate(batch, 1):
+        single = _format_patch_for_prompt(p)
+        parts.append(f"--- Patch #{k} ---\n{single}")
+    return "\n\n".join(parts)
+
+
+def _call_minimax_batch(call_minimax_fn, prompt, batch_size):
+    try:
+        # Output budget: ~400 tokens per patch (200 for summary + overhead).
+        max_tokens = min(BATCH_MAX_TOKENS, 400 * batch_size + 500)
+        return call_minimax_fn(prompt, PATCH_BATCH_SUMMARY_PROMPT, max_tokens=max_tokens)
+    except Exception as e:
+        print(f"  [lore] batch LLM call failed: {e}", flush=True)
+        return None
+
+
+_JSON_ARRAY_RE = re.compile(r"\[[\s\S]*\]")
+
+
+def _parse_batch_response(resp, batch):
+    """Parse the batch LLM response and map results back to patch indices.
+
+    `batch` is a list of (orig_index, patch) tuples.
+    Returns {orig_index: parsed_dict}.
+    """
+    if not resp:
+        return {}
+    m = _JSON_ARRAY_RE.search(resp)
+    if not m:
+        return {}
+    try:
+        arr = json.loads(m.group(0))
+    except Exception:
+        return {}
+    if not isinstance(arr, list):
+        return {}
+
+    # Build a 1-based index -> parsed dict, falling back to sequential order.
+    by_index = {}
+    sequential = []
+    for item in arr:
+        if not isinstance(item, dict):
+            continue
+        idx_hint = item.get("index") or item.get("idx")
+        if idx_hint is not None:
+            try:
+                by_index[int(idx_hint)] = item
+            except Exception:
+                pass
+        sequential.append(item)
+
+    out = {}
+    for k, (orig_idx, _) in enumerate(batch, 1):
+        if k in by_index:
+            item = by_index[k]
+        elif k <= len(sequential):
+            item = sequential[k - 1]
+        else:
+            continue
+        parsed = _parse_summary_obj(item)
+        if not parsed:
+            continue
+        if parsed.get("relevance") == "none":
+            # netdevbpf patch 默认属于内核网络，强制 low 保留。
+            parsed["relevance"] = "low"
+        out[orig_idx] = parsed
+    return out
+
+
 _JSON_RE = re.compile(r"\{[\s\S]*\}")
 
 
-def _parse_summary_response(resp):
-    if not resp:
-        return None
-    m = _JSON_RE.search(resp)
-    if not m:
-        return None
-    try:
-        obj = json.loads(m.group(0))
-    except Exception:
+def _parse_summary_obj(obj):
+    """Parse a single summary dict (already JSON-decoded)."""
+    if not isinstance(obj, dict):
         return None
     rel = obj.get("relevance", "low")
     if rel not in ("high", "medium", "low", "none"):
@@ -324,6 +425,19 @@ def _parse_summary_response(resp):
         "tags": tags,
         "readingTime": max(1, min(reading_time, 30)),
     }
+
+
+def _parse_summary_response(resp):
+    if not resp:
+        return None
+    m = _JSON_RE.search(resp)
+    if not m:
+        return None
+    try:
+        obj = json.loads(m.group(0))
+    except Exception:
+        return None
+    return _parse_summary_obj(obj)
 
 
 def _compact_patch_subject(title):
@@ -477,29 +591,84 @@ def _process_single_patch(p, call_minimax_fn, gate_fn, excluded_fn):
     return p
 
 
+def _process_batch(batch, call_minimax_fn):
+    """Process one batch of patches via a single LLM call.
+
+    `batch` is a list of (orig_index, patch) tuples. Patches are assumed to
+    have already passed the gate (and had raw detail loaded).
+
+    Returns ({orig_index: patched_patch}, [orig_indices_that_failed]).
+    Failed patches are marked with `_llm_failed` and given a heuristic
+    fallback so they still appear in the feed.
+    """
+    if not call_minimax_fn or not batch:
+        # No LLM available: each patch falls back to heuristic summary.
+        out, failed = {}, []
+        for orig_idx, p in batch:
+            raw = p.get("raw") or {}
+            fallback_text = (raw.get("content") or p.get("title", "")).strip()
+            if not fallback_text:
+                continue
+            gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
+            p["summary"] = _chinese_fallback(p.get("title", ""), fallback_text)
+            p["tags"] = _infer_tags_from_text(gate_text)
+            p["relevance"] = "low"
+            p["readingTime"] = 3
+            p["_llm_failed"] = True
+            out[orig_idx] = p
+            failed.append(orig_idx)
+        return out, failed
+
+    prompt = _format_batch_prompt(batch)
+    resp = _call_minimax_batch(call_minimax_fn, prompt, len(batch))
+    parsed_map = _parse_batch_response(resp, batch)
+
+    out, failed = {}, []
+    for orig_idx, p in batch:
+        parsed = parsed_map.get(orig_idx)
+        if not parsed:
+            # Batch call succeeded but this patch was missing from LLM output;
+            # fall back to heuristic + mark for serial retry.
+            raw = p.get("raw") or {}
+            fallback_text = (raw.get("content") or p.get("title", "")).strip()
+            if not fallback_text:
+                continue
+            gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
+            p["summary"] = _chinese_fallback(p.get("title", ""), fallback_text)
+            p["tags"] = _infer_tags_from_text(gate_text)
+            p["relevance"] = "low"
+            p["readingTime"] = 3
+            p["_llm_failed"] = True
+            out[orig_idx] = p
+            failed.append(orig_idx)
+            continue
+        p["summary"] = parsed["summary"]
+        p["tags"] = parsed["tags"]
+        p["relevance"] = parsed["relevance"]
+        p["readingTime"] = parsed["readingTime"]
+        out[orig_idx] = p
+    return out, failed
+
+
 def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                       limit=None, max_workers=2, llm_budget=None,
-                      delay_min=None, delay_max=None, retry_rounds=2):
-    """Run domain gate + LLM summary on every patch, in parallel.
+                      delay_min=None, delay_max=None, retry_rounds=2,
+                      batch_size=None):
+    """Run domain gate + LLM summary on every patch, in parallel batches.
 
     Behavior:
-      * Domain gate is applied to every patch; non-networking patches are
-        dropped entirely.
-      * EVERY network patch now goes through the LLM (the previous
-        ``llm_budget`` cap that limited LLM calls to the first N net
-        patches has been removed). The historical ``llm_budget`` parameter
-        is kept in the signature for backward compatibility but ignored.
-      * Calls are executed concurrently via ThreadPoolExecutor to amortize
-        MiniMax latency; ``max_workers`` bounds concurrency to avoid
-        tripping rate limits.
-      * After the concurrent pass, patches whose summary came from the
-        heuristic fallback (marked with ``_llm_failed``) enter a serial
-        retry queue. Each retry call invokes the LLM directly with a short
-        inter-call delay; this gives rate-limited / transiently failed
-        patches a second chance to get a real LLM summary. ``retry_rounds``
-        bounds how many serial passes we run.
-      * If ``call_minimax_fn`` is None, every patch falls back to the
-        heuristic path and no retry is attempted.
+      * Domain gate is applied to every patch (synchronously, cheap);
+        non-networking patches are dropped entirely.
+      * Surviving patches are packed into batches of `batch_size` (default
+        BATCH_SIZE; override via env LORE_BATCH_SIZE, set to 1 to disable
+        batching) and each batch is summarized via a single LLM call. This
+        amortizes HTTP/LLM latency and roughly cuts call count by N.
+      * Batch calls run concurrently via ThreadPoolExecutor bounded by
+        ``max_workers``.
+      * Patches missing from a batch's LLM output, or whose batch call
+        failed, get a heuristic fallback summary and enter the serial retry
+        queue (marked with ``_llm_failed``). ``retry_rounds`` bounds how
+        many serial re-call passes we run.
       * Output order follows input order (filtered to entries that
         survived the gate).
     """
@@ -510,52 +679,106 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
     if not candidates:
         return []
 
+    # ---- Pass 1: synchronous gate + detail load ----
+    disable_gate_env = os.environ.get("LORE_DISABLE_GATE", "").lower() in ("1", "true", "yes")
+    gated = []
+    for i, p in enumerate(candidates):
+        try:
+            _load_patch_detail(p)
+        except Exception as e:
+            print(f"  [lore] detail fetch failed for {p.get('id')}: {e}", flush=True)
+            continue
+        raw = p.get("raw") or {}
+        gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
+        if disable_gate_env:
+            gated.append((i, p))
+            continue
+        passed, reason = passes_domain(
+            {"title": p.get("title", ""), "summary": gate_text},
+            gate_fn, excluded_fn,
+        )
+        if not passed:
+            print(f"  [lore] skip (gate) {p.get('id')} reason={reason or '?'} {p.get('title', '')[:40]}", flush=True)
+            continue
+        gated.append((i, p))
+    print(f"[lore] gate kept {len(gated)}/{len(candidates)}", flush=True)
+
+    if not gated:
+        return []
+
+    # ---- Pass 2: batched LLM summarization ----
+    if batch_size is None:
+        try:
+            batch_size = int(os.environ.get("LORE_BATCH_SIZE", BATCH_SIZE))
+        except Exception:
+            batch_size = BATCH_SIZE
+    batch_size = max(1, batch_size)
+
+    batches = [gated[i:i + batch_size] for i in range(0, len(gated), batch_size)]
     workers = max(1, int(max_workers or 1))
+
     results_by_index = {}
     failed_indices = []
 
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        future_to_index = {
-            executor.submit(
-                _process_single_patch,
-                p, call_minimax_fn, gate_fn, excluded_fn,
-            ): i
-            for i, p in enumerate(candidates)
-        }
-        done = 0
-        total = len(future_to_index)
-        for future in as_completed(future_to_index):
-            idx = future_to_index[future]
-            done += 1
-            try:
-                result = future.result()
-            except Exception as e:
-                print(f"  [lore] worker error on patch #{idx}: {e}", flush=True)
-                result = None
-            if result is not None:
-                results_by_index[idx] = result
-                if result.get("_llm_failed"):
-                    failed_indices.append(idx)
-            if done % 10 == 0 or done == total:
-                print(f"  [lore] progress {done}/{total} (kept {len(results_by_index)}, llm_failed {len(failed_indices)})", flush=True)
+    if batch_size == 1 or not call_minimax_fn:
+        # No batching: each patch handled individually (existing path).
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            future_to_idx = {
+                executor.submit(_process_single_patch, p, call_minimax_fn, gate_fn, excluded_fn): i
+                for i, p in gated
+            }
+            done = 0
+            total = len(future_to_idx)
+            for future in as_completed(future_to_idx):
+                idx = future_to_idx[future]
+                done += 1
+                try:
+                    result = future.result()
+                except Exception as e:
+                    print(f"  [lore] worker error on patch #{idx}: {e}", flush=True)
+                    result = None
+                if result is not None:
+                    results_by_index[idx] = result
+                    if result.get("_llm_failed"):
+                        failed_indices.append(idx)
+                if done % 10 == 0 or done == total:
+                    print(f"  [lore] progress {done}/{total} (kept {len(results_by_index)}, llm_failed {len(failed_indices)})", flush=True)
+    else:
+        print(f"[lore] batch mode: {len(gated)} patches / {batch_size} per batch = {len(batches)} batches, workers={workers}", flush=True)
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            future_to_batch = {
+                executor.submit(_process_batch, batch, call_minimax_fn): batch
+                for batch in batches
+            }
+            done = 0
+            total = len(future_to_batch)
+            for future in as_completed(future_to_batch):
+                batch = future_to_batch[future]
+                done += 1
+                try:
+                    batch_results, batch_failed = future.result()
+                except Exception as e:
+                    print(f"  [lore] batch worker error: {e}", flush=True)
+                    batch_results, batch_failed = {}, [orig_idx for orig_idx, _ in batch]
+                for orig_idx, p in batch:
+                    if orig_idx in batch_results:
+                        results_by_index[orig_idx] = batch_results[orig_idx]
+                    if orig_idx in batch_failed:
+                        failed_indices.append(orig_idx)
+                kept_now = sum(1 for orig_idx, _ in batch if orig_idx in batch_results)
+                print(f"  [lore] batch {done}/{total} done (kept {kept_now}/{len(batch)}, total kept {len(results_by_index)}, failed {len(failed_indices)})", flush=True)
 
-    # Serial retry pass for patches that fell back to the heuristic summary.
-    # The LLM is much less likely to be rate-limited when called serially
-    # with a small gap; the shared throttle (set by any 429) is honored
-    # inside call_minimax itself.
+    # ---- Pass 3: serial retry rounds for LLM-failed patches ----
     for round_idx in range(max(0, int(retry_rounds or 0))):
         if not failed_indices:
             break
-        print(f"  [lore] retry round {round_idx + 1}/{retry_rounds}: {len(failed_indices)} patches need LLM re-call", flush=True)
+        print(f"[lore] retry round {round_idx + 1}/{retry_rounds}: {len(failed_indices)} patches need LLM re-call", flush=True)
         still_failed = []
         for idx in failed_indices:
             p = candidates[idx]
-            # Drop the fallback summary so a successful retry replaces it.
             for k in ("summary", "tags", "relevance", "readingTime"):
                 p.pop(k, None)
             p.pop("_llm_failed", None)
-            # Raw content was dropped after the first pass; reload so the
-            # prompt has the patch body + diff.
             if not p.get("raw"):
                 try:
                     _load_patch_detail(p)
@@ -566,7 +789,6 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                 resp = _call_minimax_summary(call_minimax_fn, _format_patch_for_prompt(p))
                 parsed = _parse_summary_response(resp)
             if not parsed:
-                # Still no LLM; keep the fallback summary in place.
                 fallback_text = ((p.get("raw") or {}).get("content") or p.get("title", "")).strip()
                 if not fallback_text:
                     results_by_index.pop(idx, None)
@@ -582,7 +804,6 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                 still_failed.append(idx)
                 continue
             if parsed.get("relevance") == "none":
-                # 与首轮一致：netdevbpf patch 默认属于内核网络，不丢弃，强制提升为 low。
                 parsed["relevance"] = "low"
                 print(f"  [lore] retry keep (llm=none->low) {p.get('id')} {p.get('title', '')[:40]}", flush=True)
             p["summary"] = parsed["summary"]
