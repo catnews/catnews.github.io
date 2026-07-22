@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       disable_gate:
-        description: '放开 domain gate (实测用，所有 patch 都走 LLM，不丢弃)'
+        description: '放开 domain gate (cron 默认已放开；手动触发时勾选才放开，不勾则过滤)'
         type: boolean
         default: false
 
@@ -34,7 +34,7 @@ jobs:
         run: python config/fetch_papers.py
         env:
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
-          LORE_DISABLE_GATE: ${{ inputs.disable_gate == true && '1' || '0' }}
+          LORE_DISABLE_GATE: ${{ github.event_name == 'schedule' && '1' || (inputs.disable_gate == true && '1' || '0') }}
         
       - name: Check for changes
         id: check_changes
