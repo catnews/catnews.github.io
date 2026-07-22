@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
         
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -52,4 +54,24 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git commit -m "Update papers $(date '+%Y-%m-%d')"
-          git push
+          # Retry push up to 3 times. If a concurrent push (manual run,
+          # editor save, or another cron) lands first, rebase our local
+          # commit on top of origin/main and try again. The data files
+          # under docs/ rarely conflict with concurrent pushes touching
+          # other paths (config/, workflow yml, index.html).
+          for attempt in 1 2 3; do
+            if git push; then
+              echo "push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "push attempt $attempt rejected (remote moved); fetching + rebasing..."
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "rebase failed; aborting to leave repo in clean state"
+              git rebase --abort
+              exit 1
+            fi
+            sleep 5
+          done
+          echo "push failed after 3 attempts"
+          exit 1
