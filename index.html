@@ -2436,18 +2436,27 @@
             textEl.style.overflow = 'hidden';
             wrapper.appendChild(textEl);
 
+            // 文本长度兜底：webkit line-clamp 在某些字体/布局组合下会让
+            // scrollHeight 与 clientHeight 相等，导致 overflow 检测失效。
+            // 中文每行约 45-55 字，估算 lines * 50 字以上就基本一定会被
+            // clamp 截断，预判创建按钮。
+            const approxCharsPerLine = 50;
+            const likelyOverflowsByText = typeof text === 'string'
+                && text.length > lines * approxCharsPerLine;
+
             // Overflow detection. The web font (IBM Plex Serif) and the
             // async CSS (<link rel="preload" ... onload>) both load AFTER
             // first paint, so a single rAF check runs before the layout
             // has settled and under-reports overflow, dropping the
-            // expand button. We check three times: (1) on the next frame,
-            // (2) once web fonts are ready, and (3) on any subsequent
+            // expand button. We check four times: (1) on the next frame,
+            // (2) once web fonts are ready, (3) on any subsequent
             // resize of the text element (e.g. view-mode toggle, font
-            // swap). Idempotent: only ever creates the button once.
+            // swap), and (4) a setTimeout safety net in case all the
+            // above miss. Idempotent: only ever creates the button once.
             let btn = null;
             const ensureButton = () => {
                 if (btn) return;
-                if (alwaysExpand || textEl.scrollHeight > textEl.clientHeight + 1) {
+                if (alwaysExpand || likelyOverflowsByText || textEl.scrollHeight > textEl.clientHeight + 1) {
                     btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'expand-btn';
@@ -2493,6 +2502,12 @@
                     setTimeout(() => { try { ro.disconnect(); } catch (e) {} }, 4000);
                 } catch (e) { /* ignore */ }
             }
+            // Last-resort setTimeout safety net. If fonts.ready never
+            // resolves (rare CDN failure) and ResizeObserver's 4s window
+            // elapses before layout settles, we still get one more
+            // ensureButton call at 1500ms — enough for almost any layout
+            // to have stabilized on GitHub Pages.
+            setTimeout(() => requestAnimationFrame(ensureButton), 1500);
             return wrapper;
         }
 
