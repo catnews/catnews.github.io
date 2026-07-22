@@ -1,0 +1,49 @@
+{
+  "date": "2026-07-23",
+  "categories": {
+    "papers": [
+      {
+        "title": "From Packets to Defense: Architectural Patterns in eBPF-Based Intrusion Detection",
+        "url": "https://www.semanticscholar.org/paper/73cf1c17fceac6988d4fb6d6f7fee0b6a259e889",
+        "summary": "原摘要要点：The extended Berkeley Packet Filter (eBPF) has emerged as a transformative in-kernel programmable framework enabling secure, low-latency packet processing in modern Linux systems. By supporting verified bytecode execution, eBPF provides fine-grained kernel observability and enforcement previously inaccessible to userspace tools, driving widespread adoption in network intrusion detection and prevention.This paper presents the first structured taxonomy of eBPF-based intrusion d...",
+        "summary_en": "The extended Berkeley Packet Filter (eBPF) has emerged as a transformative in-kernel programmable framework enabling secure, low-latency packet processing in modern Linux systems. By supporting verified bytecode execution, eBPF provides fine-grained kernel observability and enforcement previously inaccessible to userspace tools, driving widespread adoption in network intrusion detection and prevention.This paper presents the first structured taxonomy of eBPF-based intrusion detection systems, systematically categorizing academic research and production frameworks. We organize systems into thre...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "intrusion_detection",
+          "XDP",
+          "SmartNIC_offload"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 8
+      },
+      {
+        "title": "Performance Comparison of Modern CNI Technologies for Microservice Architectures",
+        "url": "https://www.semanticscholar.org/paper/fcd7e259d2f80413450f405ac4d813a99d3b6e60",
+        "summary": "原摘要要点：The underlying networking technologies used for interconnection in container-based microservice architectures are critical components as they directly impact the application performance. This paper presents a comprehensive performance evaluation of three popular Container Network Interface (CNI) relying on different networking solutions —Flannel (standard Linux networking stack and tools), Antrea (Open vSwitch), and Cilium (eBPF)— across varying microservice topologies. We de...",
+        "summary_en": "The underlying networking technologies used for interconnection in container-based microservice architectures are critical components as they directly impact the application performance. This paper presents a comprehensive performance evaluation of three popular Container Network Interface (CNI) relying on different networking solutions —Flannel (standard Linux networking stack and tools), Antrea (Open vSwitch), and Cilium (eBPF)— across varying microservice topologies. We developed a microservice topology generator to create both simple chains and diverse Direct Acyclic Graphs topologies, inc...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "网络优化",
+          "容器网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 6
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 2,
+    "intrusion_detection": 1,
+    "XDP": 1,
+    "SmartNIC_offload": 1,
+    "网络优化": 1,
+    "容器网络": 1,
+    "性能": 1
+  }
+}
