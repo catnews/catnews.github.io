@@ -3430,7 +3430,7 @@
             patchCounts.merged = mg.length;
 
             // New: render highlights + by-tag groups above the full list.
-            renderPatchesHighlights(ir, mg);
+            renderPatchesHighlights(ir, mg, dateStr);
             renderPatchesByTag(ir, mg);
             // Update the "full list" summary count.
             const flCount = document.getElementById('patchesFullListCount');
@@ -3456,7 +3456,7 @@
         // ---------------- Patches: today's highlights ----------------
         // Score each patch by reviewer-interest signals so the top 6-8
         // surface above the long inReview/merged lists.
-        function patchPriorityScore(p) {
+        function patchPriorityScore(p, dateStr) {
             let score = 0;
             const rel = String(p.relevance || '').toLowerCase();
             if (rel === 'high') score += 3;
@@ -3469,7 +3469,7 @@
             const tags = Array.isArray(p.tags) ? p.tags : [];
             if (tags.includes('eBPF') || tags.includes('XDP')) score += 1;
             // Recency: patch dated today (Beijing) gets a small bump.
-            if (p.date) {
+            if (p.date && dateStr) {
                 const d = String(p.date).slice(0, 10);
                 if (d === dateStr) score += 1;
             }
@@ -3478,7 +3478,7 @@
 
         const PATCH_HIGHLIGHTS_LIMIT = 6;
 
-        function renderPatchesHighlights(ir, mg) {
+        function renderPatchesHighlights(ir, mg, dateStr) {
             const section = document.getElementById('patchesHighlights');
             const listEl = document.getElementById('patchesHighlightsList');
             const emptyEl = document.getElementById('patchesHighlightsEmpty');
@@ -3491,7 +3491,7 @@
                 return;
             }
             const picks = all
-                .map(p => ({ p, score: patchPriorityScore(p) }))
+                .map(p => ({ p, score: patchPriorityScore(p, dateStr) }))
                 .sort((a, b) => b.score - a.score || String(b.p.date || '').localeCompare(String(a.p.date || '')))
                 .slice(0, PATCH_HIGHLIGHTS_LIMIT)
                 .map(x => x.p);
