@@ -1101,6 +1101,110 @@
             font-size: 10px;
         }
 
+        /* ============== Patches: highlights + by-tag sections ============== */
+        .patches-subhead {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 18px 0 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--color-border-2);
+        }
+        .patches-subhead h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .patches-subhead h3 i {
+            color: var(--color-accent);
+            font-size: 13px;
+        }
+
+        .patches-highlights-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 720px) {
+            .patches-highlights-list { grid-template-columns: 1fr; }
+        }
+        .patches-highlights-list .patch-card {
+            border-left: 3px solid var(--color-accent);
+            padding-left: 12px;
+            background: var(--color-surface);
+            box-shadow: 0 1px 0 var(--color-border-2);
+        }
+        .patches-highlights-list .patch-card .patch-title {
+            font-size: 14.5px;
+            font-weight: 600;
+        }
+
+        .patches-by-tag-group {
+            margin-bottom: 14px;
+            border: 1px solid var(--color-border-2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .patches-by-tag-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--color-bg-2, var(--color-surface));
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .patches-by-tag-head i {
+            color: var(--color-accent);
+            transition: transform 0.15s ease;
+        }
+        .patches-by-tag-group.collapsed .patches-by-tag-head i {
+            transform: rotate(-90deg);
+        }
+        .patches-by-tag-head .patches-by-tag-count {
+            margin-left: auto;
+            color: var(--color-text-3);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .patches-by-tag-body {
+            padding: 4px 12px 12px;
+        }
+        .patches-by-tag-group.collapsed .patches-by-tag-body {
+            display: none;
+        }
+
+        .patches-full-list {
+            margin-top: 16px;
+            border-top: 1px dashed var(--color-border-2);
+            padding-top: 8px;
+        }
+        .patches-full-list-summary {
+            cursor: pointer;
+            user-select: none;
+            font-size: 13px;
+            color: var(--color-text-2);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 0;
+        }
+        .patches-full-list-summary::-webkit-details-marker { display: none; }
+        .patches-full-list-summary i {
+            color: var(--color-text-3);
+            transition: transform 0.15s ease;
+        }
+        .patches-full-list[open] .patches-full-list-summary i {
+            transform: rotate(90deg);
+        }
+
         .source-tag {
             background-color: transparent;
             color: var(--color-text-3);
@@ -1992,24 +2096,51 @@
                     </div>
                 </div>
                 <div class="patches-note">来源：patchwork.kernel.org/project/netdevbpf/（Netdev + BPF 邮件列表）。审查中包含带 [RFC] 标签的设计提案；已合并为 maintainer 树接受的 commit。AI 总结每个 patch 的核心改动。</div>
-                <div class="patches-cols">
-                    <div class="patches-col" id="patchesInReviewCol">
-                        <div class="patches-col-title"><i class="fa-regular fa-eye" aria-hidden="true"></i>审查中（含 RFC）</div>
-                        <div class="list" id="patchesInReviewList"></div>
-                        <div class="empty-message" id="patchesInReviewEmpty" style="display:none;">当日无新增审查 patch</div>
+
+                <!-- 今日重点：从所有 patch 中按优先级算法选出 5-8 条最值得关注的 -->
+                <div class="patches-highlights" id="patchesHighlights" style="display:none;">
+                    <div class="patches-subhead">
+                        <h3><i class="fa-solid fa-star" aria-hidden="true"></i> 今日重点</h3>
+                        <span class="meta-pill" id="patchesHighlightsCount">-</span>
                     </div>
-                    <div class="patches-col merged" id="patchesMergedCol">
-                        <div class="patches-col-title"><i class="fa-solid fa-code-merge" aria-hidden="true"></i>已合并到 maintainer 树</div>
-                        <div class="list" id="patchesMergedList"></div>
-                        <div class="empty-message" id="patchesMergedEmpty" style="display:none;">当日无 accepted 记录</div>
-                    </div>
+                    <div class="patches-highlights-list" id="patchesHighlightsList"></div>
+                    <div class="empty-message" id="patchesHighlightsEmpty" style="display:none;">当日无重点 patch</div>
                 </div>
+
+                <!-- 按子系统分组：让读者按 tag 快速跳到自己关心的子系统 -->
+                <div class="patches-by-tag" id="patchesByTag" style="display:none;">
+                    <div class="patches-subhead">
+                        <h3><i class="fa-solid fa-layer-group" aria-hidden="true"></i> 按子系统分组</h3>
+                    </div>
+                    <div id="patchesByTagList"></div>
+                </div>
+
+                <!-- 完整补丁列表：保留原 inReview / merged 两列，默认折叠 -->
+                <details class="patches-full-list" id="patchesFullList">
+                    <summary class="patches-full-list-summary">
+                        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                        完整补丁列表（审查中 + 已合并，<span id="patchesFullListCount">-</span> 条）
+                    </summary>
+                    <div class="patches-cols">
+                        <div class="patches-col" id="patchesInReviewCol">
+                            <div class="patches-col-title"><i class="fa-regular fa-eye" aria-hidden="true"></i>审查中（含 RFC）</div>
+                            <div class="list" id="patchesInReviewList"></div>
+                            <div class="empty-message" id="patchesInReviewEmpty" style="display:none;">当日无新增审查 patch</div>
+                        </div>
+                        <div class="patches-col merged" id="patchesMergedCol">
+                            <div class="patches-col-title"><i class="fa-solid fa-code-merge" aria-hidden="true"></i>已合并到 maintainer 树</div>
+                            <div class="list" id="patchesMergedList"></div>
+                            <div class="empty-message" id="patchesMergedEmpty" style="display:none;">当日无 accepted 记录</div>
+                        </div>
+                    </div>
+                </details>
                 <div class="patches-more-row" id="patchesMoreRow" style="display:none;">
                     <button id="patchesMoreBtn" class="clear-filter" type="button">
                         <i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表
                     </button>
                 </div>
             </section>
+        </section>
         </div>
 
         <section id="contentView" class="page-view" hidden>
@@ -3298,6 +3429,13 @@
             patchCounts.inReview = ir.length;
             patchCounts.merged = mg.length;
 
+            // New: render highlights + by-tag groups above the full list.
+            renderPatchesHighlights(ir, mg);
+            renderPatchesByTag(ir, mg);
+            // Update the "full list" summary count.
+            const flCount = document.getElementById('patchesFullListCount');
+            if (flCount) flCount.textContent = String(ir.length + mg.length);
+
             renderPatchList(document.getElementById('patchesInReviewList'),
                             document.getElementById('patchesInReviewEmpty'), ir);
             renderPatchList(document.getElementById('patchesMergedList'),
@@ -3313,6 +3451,237 @@
                 moreBtn.innerHTML = `<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 展开全部补丁列表（还有 ${hidden} 条）`;
                 moreBtn.dataset.expanded = 'false';
             }
+        }
+
+        // ---------------- Patches: today's highlights ----------------
+        // Score each patch by reviewer-interest signals so the top 6-8
+        // surface above the long inReview/merged lists.
+        function patchPriorityScore(p) {
+            let score = 0;
+            const rel = String(p.relevance || '').toLowerCase();
+            if (rel === 'high') score += 3;
+            else if (rel === 'medium') score += 1;
+            if (p.isRfc) score += 2;
+            if (p.state === 'accepted' && p.commitRef) score += 3;
+            const title = String(p.title || '');
+            if (/\[GIT[\s_,]?PULL\]/i.test(title)) score += 3;
+            if (/\[PATCH[^\]]*v([2-9]|\d{2,})/i.test(title)) score += 1;
+            const tags = Array.isArray(p.tags) ? p.tags : [];
+            if (tags.includes('eBPF') || tags.includes('XDP')) score += 1;
+            // Recency: patch dated today (Beijing) gets a small bump.
+            if (p.date) {
+                const d = String(p.date).slice(0, 10);
+                if (d === dateStr) score += 1;
+            }
+            return score;
+        }
+
+        const PATCH_HIGHLIGHTS_LIMIT = 6;
+
+        function renderPatchesHighlights(ir, mg) {
+            const section = document.getElementById('patchesHighlights');
+            const listEl = document.getElementById('patchesHighlightsList');
+            const emptyEl = document.getElementById('patchesHighlightsEmpty');
+            const countEl = document.getElementById('patchesHighlightsCount');
+            if (!section || !listEl) return;
+
+            const all = [...ir, ...mg];
+            if (all.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            const picks = all
+                .map(p => ({ p, score: patchPriorityScore(p) }))
+                .sort((a, b) => b.score - a.score || String(b.p.date || '').localeCompare(String(a.p.date || '')))
+                .slice(0, PATCH_HIGHLIGHTS_LIMIT)
+                .map(x => x.p);
+
+            section.style.display = 'block';
+            countEl.textContent = `Top ${picks.length}`;
+            listEl.innerHTML = '';
+            if (picks.length === 0) {
+                emptyEl.style.display = 'block';
+                return;
+            }
+            emptyEl.style.display = 'none';
+            picks.forEach(p => {
+                const card = buildPatchCard(p, { highlight: true });
+                if (card) listEl.appendChild(card);
+            });
+        }
+
+        // ---------------- Patches: by-tag groups ----------------
+        // Group all patches (inReview + merged) by their `tags` field so
+        // readers can jump straight to the subsystem they care about.
+        const PATCH_TAG_ORDER = [
+            'eBPF', 'XDP', 'TCP/IP', 'Socket', 'Netfilter',
+            '路由', '网桥', '驱动', '包处理', '虚拟化',
+            '性能', '容器网络', 'Linux内核网络',
+        ];
+        const PATCH_PER_TAG_VISIBLE = 6;
+        const PATCH_TAG_GROUPS_OPEN_BY_DEFAULT = 2;
+
+        function renderPatchesByTag(ir, mg) {
+            const section = document.getElementById('patchesByTag');
+            const listEl = document.getElementById('patchesByTagList');
+            if (!section || !listEl) return;
+            const all = [...ir, ...mg];
+            if (all.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = 'block';
+            listEl.innerHTML = '';
+
+            // Bucket: tag -> [patches]
+            const buckets = new Map();
+            const others = [];
+            for (const p of all) {
+                const tags = Array.isArray(p.tags) ? p.tags : [];
+                if (tags.length === 0) {
+                    others.push(p);
+                    continue;
+                }
+                let matched = false;
+                for (const t of tags) {
+                    if (PATCH_TAG_ORDER.includes(t)) {
+                        if (!buckets.has(t)) buckets.set(t, []);
+                        buckets.get(t).push(p);
+                        matched = true;
+                    }
+                }
+                if (!matched) others.push(p);
+            }
+            // Order buckets by PATCH_TAG_ORDER, only those with entries.
+            const orderedTags = PATCH_TAG_ORDER.filter(t => buckets.has(t) && buckets.get(t).length > 0);
+            if (others.length > 0) orderedTags.push('其他');
+
+            // Pick top-N groups to expand by default (by patch count).
+            const countsDesc = orderedTags
+                .map(t => ({ t, n: t === '其他' ? others.length : buckets.get(t).length }))
+                .sort((a, b) => b.n - a.n);
+            const openTags = new Set(countsDesc.slice(0, PATCH_TAG_GROUPS_OPEN_BY_DEFAULT).map(x => x.t));
+
+            orderedTags.forEach(tag => {
+                const items = tag === '其他' ? others : buckets.get(tag);
+                if (!items || items.length === 0) return;
+                const group = document.createElement('div');
+                group.className = `patches-by-tag-group ${openTags.has(tag) ? '' : 'collapsed'}`;
+                const head = document.createElement('div');
+                head.className = 'patches-by-tag-head';
+                head.innerHTML = `<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> <span>${escapeHtml(tag)}</span> <span class="patches-by-tag-count">${items.length} 条</span>`;
+                head.addEventListener('click', () => group.classList.toggle('collapsed'));
+                const body = document.createElement('div');
+                body.className = 'patches-by-tag-body';
+                items.slice(0, PATCH_PER_TAG_VISIBLE).forEach(p => {
+                    const card = buildPatchCard(p, { highlight: false });
+                    if (card) body.appendChild(card);
+                });
+                const hidden = items.length - PATCH_PER_TAG_VISIBLE;
+                if (hidden > 0) {
+                    const more = document.createElement('button');
+                    more.type = 'button';
+                    more.className = 'clear-filter';
+                    more.style.marginTop = '8px';
+                    more.innerHTML = `<i class="fa-solid fa-chevron-down" aria-hidden="true"></i> 还有 ${hidden} 条`;
+                    let expandedTag = false;
+                    more.addEventListener('click', () => {
+                        if (expandedTag) return;
+                        expandedTag = true;
+                        items.slice(PATCH_PER_TAG_VISIBLE).forEach(p => {
+                            const card = buildPatchCard(p, { highlight: false });
+                            if (card) body.insertBefore(card, more);
+                        });
+                        more.remove();
+                    });
+                    body.appendChild(more);
+                }
+                group.appendChild(head);
+                group.appendChild(body);
+                listEl.appendChild(group);
+            });
+        }
+
+        // Build a single patch card. Extracted from renderPatchList so the
+        // highlights and by-tag sections can reuse the same layout.
+        function buildPatchCard(p, opts = {}) {
+            const { highlight = false, collapsed = false } = opts;
+            const card = document.createElement('article');
+            card.className = `patch-card ${p.isRfc ? 'rfc' : ''} ${p.state === 'accepted' ? 'merged' : ''}`;
+            if (collapsed) card.classList.add('collapsed');
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'patch-title';
+            const a = document.createElement('a');
+            a.href = p.url || p.patchworkUrl || '#';
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = p.title || '(无标题)';
+            titleDiv.appendChild(a);
+            card.appendChild(titleDiv);
+
+            if (p.summary) {
+                const sumWrap = buildExpandableText(p.summary, { lines: 4, className: 'patch-summary', alwaysExpand: true });
+                sumWrap.className = 'patch-summary-shell';
+                const label = document.createElement('div');
+                label.className = 'patch-summary-label';
+                label.innerHTML = '<i class="fa-solid fa-bolt" aria-hidden="true"></i> 重点摘要';
+                sumWrap.prepend(label);
+                card.appendChild(sumWrap);
+            }
+
+            const meta = document.createElement('div');
+            meta.className = 'patch-meta';
+
+            if (p.isRfc) {
+                const t = document.createElement('span');
+                t.className = 'patch-tag rfc';
+                t.textContent = 'RFC';
+                meta.appendChild(t);
+            }
+            if (p.state === 'accepted') {
+                const t = document.createElement('span');
+                t.className = 'patch-tag merged';
+                t.textContent = '已合并';
+                meta.appendChild(t);
+            }
+            if (p.version) {
+                const t = document.createElement('span');
+                t.className = 'patch-tag';
+                t.textContent = p.version;
+                meta.appendChild(t);
+            }
+            if (Array.isArray(p.tags)) {
+                for (const tag of p.tags.slice(0, 3)) {
+                    const t = document.createElement('span');
+                    t.className = 'patch-tag';
+                    t.textContent = tag;
+                    meta.appendChild(t);
+                }
+            }
+            if (p.submitter) {
+                const sub = document.createElement('span');
+                sub.className = 'meta-pill';
+                sub.innerHTML = `<i class="fa-regular fa-user" aria-hidden="true"></i> ${escapeHtml(p.submitter)}`;
+                meta.appendChild(sub);
+            }
+            if (p.date) {
+                const dt = document.createElement('span');
+                dt.className = 'meta-pill';
+                const dd = String(p.date).slice(5, 16).replace('T', ' ');
+                dt.innerHTML = `<i class="fa-regular fa-clock" aria-hidden="true"></i> ${dd}`;
+                meta.appendChild(dt);
+            }
+            if (p.commitRef) {
+                const cm = document.createElement('span');
+                cm.className = 'meta-pill';
+                cm.title = p.commitRef;
+                cm.innerHTML = `<i class="fa-solid fa-hashtag" aria-hidden="true"></i> ${escapeHtml(String(p.commitRef).slice(0, 8))}`;
+                meta.appendChild(cm);
+            }
+
+            card.appendChild(meta);
+            return card;
         }
 
         // Default number of patches shown expanded in each column; rest are
@@ -3344,7 +3713,7 @@
                 card.appendChild(titleDiv);
 
                 if (p.summary) {
-                    const sumWrap = buildExpandableText(p.summary, { lines: 4, className: 'patch-summary' });
+                    const sumWrap = buildExpandableText(p.summary, { lines: 4, className: 'patch-summary', alwaysExpand: true });
                     sumWrap.className = 'patch-summary-shell';
                     const label = document.createElement('div');
                     label.className = 'patch-summary-label';
