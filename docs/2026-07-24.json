@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-24",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for July 16, 2026",
+        "url": "https://lwn.net/Articles/1081915/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for July 16, 2026 This edition contains the following feature content: An update on the scraper situation : the battle between bots and publishers continues. Lockless MPSC FIFO queues for io_uring : a look at performance gains coming to io_uring in 7.2. Continued coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : Topics in filesystem testing : a discussion on testing filesystems, especially on patches aimed at the stable kernels. Shielding running kernels against exploits with BPF : John Fastabend discusses a strategy for quickly immunizing vulnerable kernels against new exploits. Sending packets directly from BPF : a facility to allow BPF to make outgoing network requests. Kitty chases the mouse : a look at the Kitty GPU-based terminal emulator. QBE 1.3: metaprogramming, performance, and cross-platform support : a lightweight alternative to compiler backends such as LLVM and GCC. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, ",
+        "summary": "本期LWN头条'Lockless MPSC FIFO queues for io_uring'讨论io_uring 7.2的无锁多生产者单消费者FIFO队列优化，可显著提升高并发I/O场景的吞吐，对网络I/O路径亦有间接影响。'Sending packets directly from BPF'介绍了允许BPF程序主动发起出向网络请求（sending packets from BPF）的新机制，扩展了BPF在网络数据面的能力，使BPF程序能够构造并发送数据包，而不仅限于传统的被动包处理（XDP/TC）。'Shielding running kernels against exploits with BPF'则由John Fastabend介绍利用BPF快速为运行中的内核打补丁以免疫新漏洞的策略，反映BPF在内核安全与网络可编程性交叉领域的持续演进。这些更新对eBPF网络数据面、内核旁路路径以及容器网络（如Cilium）均有直接参考价值。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "eBPF",
+          "BPF数据面",
+          "io_uring",
+          "内核网络性能"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "BPF数据面": 1,
+    "io_uring": 1,
+    "内核网络性能": 1
+  }
+}
