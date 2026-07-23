@@ -1077,6 +1077,30 @@
             border-radius: 2px;
         }
 
+        /* "今日新增" badge: highlights papers first seen today (not in
+           the previous 6 days of the rolling window). */
+        .card-new-today {
+            position: relative;
+            border-left: 3px solid var(--color-accent);
+            padding-left: 13px;
+        }
+        .new-today-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--color-accent);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 11px;
+            margin: 4px 0 6px;
+            white-space: nowrap;
+        }
+        .new-today-badge i {
+            font-size: 10px;
+        }
+
         .source-tag {
             background-color: transparent;
             color: var(--color-text-3);
@@ -2542,9 +2566,17 @@
             } = opts;
 
             const wrapper = document.createElement('article');
-            wrapper.className = `card ${variant === 'lwn' ? 'accent-warning' : ''}`;
+            wrapper.className = `card ${variant === 'lwn' ? 'accent-warning' : ''} ${item.isTodayNew ? 'card-new-today' : ''}`;
 
             wrapper.appendChild(buildTitleElement(item.title, item.url));
+
+            if (item.isTodayNew) {
+                const badge = document.createElement('span');
+                badge.className = 'new-today-badge';
+                badge.title = '今日首次抓取到，前 6 天未见';
+                badge.innerHTML = '<i class="fa-solid fa-bolt" aria-hidden="true"></i> 今日新增';
+                wrapper.appendChild(badge);
+            }
 
             if (variant === 'lwn') {
                 const points = buildLwnSummaryPoints(item);
@@ -2631,6 +2663,24 @@
                 dayNews.filter(isTechNewsItem).forEach(item => techNews.push({ ...item, _date: dateStr }));
             }
 
+            // Compute "today new" set: titles present in today's JSON but
+            // absent from every earlier day in the 7-day window. These get
+            // a prominent badge on the card so readers can spot fresh
+            // entries at a glance when scrolling through the weekly picks.
+            const todayStr = formatDate(new Date());
+            const todayTitles = new Set();
+            const earlierTitles = new Set();
+            for (const p of papers) {
+                const key = (p.title || '').trim().toLowerCase();
+                if (!key) continue;
+                if (p._date === todayStr) todayTitles.add(key);
+                else if (p._date && p._date < todayStr) earlierTitles.add(key);
+            }
+            const newTodayTitles = new Set();
+            for (const t of todayTitles) {
+                if (!earlierTitles.has(t)) newTodayTitles.add(t);
+            }
+
             const paperDedup = new Map();
             for (const p of papers) {
                 const key = (p.title || '').trim().toLowerCase();
@@ -2639,6 +2689,12 @@
                 if (!existing || paperHotScore(p) > paperHotScore(existing)) {
                     paperDedup.set(key, p);
                 }
+            }
+            // Mark today-new papers on the deduped entries so renderCard
+            // can pick it up. (We use the surviving paperDedup entry as
+            // the canonical item; the badge depends only on the title.)
+            for (const [key, p] of paperDedup) {
+                p.isTodayNew = newTodayTitles.has(key);
             }
             const weeklyTop = Array.from(paperDedup.values())
                 .sort((a, b) => paperHotScore(b) - paperHotScore(a))
@@ -3288,7 +3344,7 @@
                 card.appendChild(titleDiv);
 
                 if (p.summary) {
-                    const sumWrap = buildExpandableText(p.summary, { lines: 4, className: 'patch-summary', alwaysExpand: true });
+                    const sumWrap = buildExpandableText(p.summary, { lines: 4, className: 'patch-summary' });
                     sumWrap.className = 'patch-summary-shell';
                     const label = document.createElement('div');
                     label.className = 'patch-summary-label';
