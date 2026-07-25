@@ -44,11 +44,13 @@ STATE_IN_REVIEW_STATES = {"new", "changes-requested", "superseded", "rfc"}
 # pack many patches into one prompt to amortize HTTP/LLM latency.
 # Override with env var LORE_BATCH_SIZE; set to 1 to disable batching.
 BATCH_SIZE = 15
-# Output budget for batch calls. 15 patches * ~400 tokens/patch (200 for the
-# Chinese summary + JSON overhead) lands around 6000 tokens, but LLMs
-# occasionally pad or repeat themselves, truncating the JSON array mid-item
-# and dropping trailing patches from the parsed output. 8000 leaves headroom.
-BATCH_MAX_TOKENS = 8000
+# Output budget for batch calls. MiniMax-M3 single-call output ceiling is
+# 512K tokens (recommended 128K), so we have plenty of headroom. Earlier
+# 6000 was too tight: LLM occasionally padded the JSON array mid-item and
+# truncated trailing patches, dropping them to the heuristic fallback.
+# 10000 gives ~600 tokens per patch for a 15-batch (200 summary + JSON
+# overhead + occasional repetition), well within the 512K API ceiling.
+BATCH_MAX_TOKENS = 10000
 
 # Beijing timezone
 BEIJING_TZ = timezone(timedelta(hours=8))
@@ -341,9 +343,11 @@ def _format_batch_prompt(batch):
 
 def _call_minimax_batch(call_minimax_fn, prompt, batch_size):
     try:
-        # Output budget: ~400 tokens per patch (200 for summary + overhead).
-        max_tokens = min(BATCH_MAX_TOKENS, 400 * batch_size + 500)
-        return call_minimax_fn(prompt, PATCH_BATCH_SUMMARY_PROMPT, max_tokens=max_tokens)
+        # Use BATCH_MAX_TOKENS directly so the per-patch budget scales
+        # with the configured ceiling rather than being capped by a
+        # heuristic formula. MiniMax-M3 single-call output limit is 512K,
+        # far above our 10000 default.
+        return call_minimax_fn(prompt, PATCH_BATCH_SUMMARY_PROMPT, max_tokens=BATCH_MAX_TOKENS)
     except Exception as e:
         print(f"  [lore] batch LLM call failed: {e}", flush=True)
         return None
