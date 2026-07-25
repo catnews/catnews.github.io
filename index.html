@@ -3692,7 +3692,10 @@
             '性能', '容器网络', 'Linux内核网络',
         ];
         const PATCH_PER_TAG_VISIBLE = 6;
-        const PATCH_TAG_GROUPS_OPEN_BY_DEFAULT = 2;
+        // 0 = all groups collapsed by default; user opens the ones they
+        // care about. Auto-expanding the top-N groups surprised readers
+        // who expected collapsed state on first paint.
+        const PATCH_TAG_GROUPS_OPEN_BY_DEFAULT = 0;
 
         function renderPatchesByTag(ir, mg) {
             const section = document.getElementById('patchesByTag');
