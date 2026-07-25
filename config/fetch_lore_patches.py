@@ -44,7 +44,11 @@ STATE_IN_REVIEW_STATES = {"new", "changes-requested", "superseded", "rfc"}
 # pack many patches into one prompt to amortize HTTP/LLM latency.
 # Override with env var LORE_BATCH_SIZE; set to 1 to disable batching.
 BATCH_SIZE = 15
-BATCH_MAX_TOKENS = 6000
+# Output budget for batch calls. 15 patches * ~400 tokens/patch (200 for the
+# Chinese summary + JSON overhead) lands around 6000 tokens, but LLMs
+# occasionally pad or repeat themselves, truncating the JSON array mid-item
+# and dropping trailing patches from the parsed output. 8000 leaves headroom.
+BATCH_MAX_TOKENS = 8000
 
 # Beijing timezone
 BEIJING_TZ = timezone(timedelta(hours=8))
@@ -626,9 +630,17 @@ def _process_batch(batch, call_minimax_fn):
     out, failed = {}, []
     for orig_idx, p in batch:
         parsed = parsed_map.get(orig_idx)
+        if not parsed and call_minimax_fn:
+            # Patch missing from batch output. Try a single-call LLM
+            # immediately so we don't depend on the serial retry rounds
+            # (which run after the whole batch pass and may still fail).
+            # This catches the common case where the batch JSON got
+            # truncated mid-array or the LLM skipped an entry.
+            print(f"  [lore] batch missing patch {p.get('id')}, retrying as single call", flush=True)
+            single_resp = _call_minimax_summary(call_minimax_fn, _format_patch_for_prompt(p))
+            parsed = _parse_summary_response(single_resp)
         if not parsed:
-            # Batch call succeeded but this patch was missing from LLM output;
-            # fall back to heuristic + mark for serial retry.
+            # Both batch and single-call failed; fall back to heuristic.
             raw = p.get("raw") or {}
             fallback_text = (raw.get("content") or p.get("title", "")).strip()
             if not fallback_text:
