@@ -1,0 +1,49 @@
+{
+  "date": "2026-07-31",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for July 23, 2026",
+        "url": "https://lwn.net/Articles/1083123/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for July 23, 2026 This edition contains the following feature content: Debating the role of large language models in the kernel community : the kernel LLM discussion has been more nuanced than many think. Save and restore may be coming to GNOME : the pieces are coming together to bring a much-missed X11 feature to GNOME on Wayland. Fedora grapples with change : a look at Fedora's ongoing discussions about managing distribution and project changes. More coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : Attaching programs to multiple tracepoints : Jiri Olsa discusses the changes necessary to make tracepoint attachment more efficient. Securing BPF LSMs against tampering : Christian Brauner leads a discussion of the problems systemd has had in deploying BPF LSMs. Merging famfs? : famfs is aimed at shared access to huge memory appliances, but it has not found its way into the kernel, so the discussion centered on how to change that. Sched-ext: enqueue() for sub-schedulers and proxy-execution support : progress continues in the sched_ext subsystem. This week's edition also includes these inner pages: Brief items : ",
+        "summary": "这篇文章详细报道了Linux内核社区围绕大语言模型（LLM）使用所展开的讨论。背景方面，2025年底内核7.0版本引入了Assisted-by标签机制，要求由LLM生成或协助的补丁需要标注具体工具和模型版本，目的是在模型出现特定bug或版权纠纷时方便溯源审查。截至7.2-rc4版本，超过1200个提交带有该标签，但仍有大量机器生成补丁未按规则标注。在核心争议上，网络维护者Jakub Kicinski等人公开表示会主动移除Assisted-by标签；Christian Brauner主张完全取消披露要求或至少去掉具体模型名称；Jeff Layton则提交了直接废除该要求的补丁。然而Greg Kroah-Hartman和Lorenzo Stoakes认为该标签仍是审查LLM生成代码的重要信号，能赋予维护者拒绝的权利。最终社区共识倾向于保留标签但去掉具体工具披露要求，正式决定可能要等到10月的维护者峰会。另一个重要议题是依赖性与可持续性：以Sashiko为代表的LLM代码审查工具在多个子系统广泛采用，但开发高度依赖单一公司的资助，Roman Gushchin等人警示这会重蹈BitKeeper被撤带来的覆辙。Sasha Levin、Dave Chinner等开发者坦言已深度依赖LLM辅助，但Ted Ts'o强调Sashiko不能替代人类审查，且若工具消失，审查技能将出现退化。Mauro Carvalho Chehab等开发者正在探索基于开源权重模型的本地运行方案以降低风险。",
+        "keyPoints": [
+          "内核社区早在2025年底7.0版本发布时就在coding-assistants.rst中加入Assisted-by标签规范，格式为Assisted-by: AGENT_NAME:MODEL_VERSION [TOOL1] [TOOL2]，目的是记录LLM使用情况并在出现bug或版权纠纷时便于回溯审查",
+          "截至7.2-rc4已有超过1200个提交携带Assisted-by标签，但社区明显存在大量未按规定标注的机器生成补丁，部分开发者出于忽视规则，部分则是有意模糊代码来源",
+          "网络维护者Jakub Kicinski公开表示自己在应用补丁时会直接删除Assisted-by标签，事实上削弱了TAB和社区此前做出的决定",
+          "Christian Brauner主张完全废除披露要求，认为强制标注既无用又会带来未定义的法律风险，理由是大量贡献者根本不会遵守披露规则",
+          "Jeff Layton随后单独提交了彻底移除Attribution要求的补丁，与Brauner的激进立场相呼应",
+          "Greg Kroah-Hartman认为Assisted-by标签是有LLM参与的关键信号，提醒维护者需要更仔细地审查此类补丁",
+          "Lorenzo Stoakes将现有政策定性为'赋予维护者拒绝权'的工具，属于希望保留标签阵营的代表观点",
+          "最终形成的折中共识是保留Assisted-by标签但去除具体模型名称披露要求，相关新版本修订尚未提交，正式决定可能要推迟到10月维护者峰会",
+          "LLM在内核社区的实际使用中更多集中在代码审查环节而非编写环节，其中Sashiko工具被多个子系统广泛采用，维护者越来越期望开发者响应其审查意见",
+          "Sashiko核心开发者Roman Gushchin在维护者峰会提案中明确指出依赖单一公司提供的基础设施存在风险，缺乏正式保障机制",
+          "文章将当前的LLM工具依赖与二十年前社区依赖BitKeeper的历史教训相类比，但指出这一次Torvalds不太可能用一个长周末再造替代品",
+          "Sasha Levin承认过去一年借助AI重写脚本、自动化流程并搭建CVE基础设施，但他表示AI若消失自己仍可回归手工作业",
+          "资深内核开发者Dave Chinner透露自己已将LLM作为代码编辑器使用，实现了高级DWIM预测文本输入功能，事实上已深度依赖",
+          "Ted Ts'o承认Sashiko能发现人类审查者容易忽略的问题，但他强调它不能替代人类审查，并担心审查者若停止主动寻找问题将面临困境",
+          "文章警告若LLM审查工具长期存在，维护者的低级代码审查技能将逐渐萎缩，可能变得不再被需要；一旦工具随资金收缩而消失，社区将后悔技能流失",
+          "Ted Ts'o进一步指出编译器不会从社区手中被夺走，但依赖数据中心的LLM完全可以消失，且即便不消失也可能让无力付费的开发者无法使用",
+          "Mauro Carvalho Chehab和Takashi Iwai等开发者正在探索在本地使用开源权重模型运行类似Sashiko的工具，以降低对专有服务的依赖"
+        ],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "大语言模型",
+          "内核开发流程",
+          "代码审查"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "Linux内核网络": 1,
+    "大语言模型": 1,
+    "内核开发流程": 1,
+    "代码审查": 1
+  }
+}
