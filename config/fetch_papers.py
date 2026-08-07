@@ -300,6 +300,24 @@ KERNEL_SPECIFIC_TERMS = [
     "linux kernel network",
     "kernel tcp/ip",
     "kernel tcp stack",
+    # 论文摘要中常见的高层概念词（非源码符号）；与上面源码符号互补，
+    # 避免 KERNEL_SPECIFIC_TERMS 全部是 sk_buff/net_device 这类论文
+    # 摘要几乎不会出现的源码符号，导致硬锚点过严、召回几乎全空
+    "linux kernel",
+    "kernel networking",
+    "linux networking",
+    "kernel socket",
+    "kernel tcp",
+    "kernel udp",
+    "kernel ip",
+    "kernel packet",
+    "ebpf",
+    "bpf",
+    "xdp",
+    "netfilter",
+    "virtio",
+    "vhost",
+    "sriov",
     # SmartNIC offload / kernel bypass / 用户态高速网络栈
     # （AGENTS.md 高级特性 "Kernel Bypass (DPDK, user-space networking)" 范畴）
     "smartnic",
