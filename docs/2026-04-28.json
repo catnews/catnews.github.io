@@ -34,7 +34,7 @@
       {
         "title": "ACCeSS: Adaptive QoS-aware Congestion Control for Multipath TCP",
         "url": "https://www.semanticscholar.org/paper/0de0a871c5c9a7db667f8930350fd5790bfbe538",
-        "summary": "Multipath TCP (MPTCP) enables multi-home devices to establish multiple paths for simultaneous data transmission. However, due to diverse Quality of Service (QoS) requirements in real network, existing multipath congestio...",
+        "summary": "多路径 TCP（MPTCP）使多宿主设备可建立多条路径并发传输，但真实网络中 QoS 需求多样，现有 MPTCP 拥塞控制（如 coupled/OLIA/BALIA）难以兼顾。研究提出 ACCeSS，一种自适应 QoS 感知的拥塞控制机制，面向 Linux 内核网络栈 MPTCP 子系统。原摘要截断后未提供具体算法（如何按 QoS 类分配子流速率、是否扩展 MPTCP 拥塞控制内核模块）、评测拓扑、对比基线与吞吐/时延/公平性量化结果。读者关注点在于 ACCeSS 与 Linux 主线 MPTCP 拥塞控制（path manager、scheduler）的集成路径及对内核 patch 的依赖程度。",
         "summary_en": "Multipath TCP (MPTCP) enables multi-home devices to establish multiple paths for simultaneous data transmission. However, due to diverse Quality of Se...",
         "source": "Semantic Scholar",
         "tags": [
@@ -49,7 +49,7 @@
       {
         "title": "Research on TCP transmission performance optimization based on satellite communication conditions",
         "url": "https://www.semanticscholar.org/paper/22b284ceaa9c87566baa641b146b53c5e57a8abb",
-        "summary": "This article proposes directions for improving TCP transmission performance by analyzing the impact of satellite communication link characteristics on TCP. We conducted in-depth research on the application of various TCP...",
+        "summary": "卫星通信链路高时延、高误码与带宽非对称特性严重影响 TCP 传输性能。研究通过分析卫星链路特性对 TCP 的影响，提出改进 TCP 传输性能的方向，涉及 TCP/IP、驱动、网络优化与性能。原摘要截断后未提供具体优化手段（如是否调参初始拥塞窗口、是否启用 TCP Hybla/PEP）、评测场景（GEO/LEO）、链路参数（如 RTT 600ms、误码率）及量化对比结果。读者关注点在于方案是否可在 Linux 内核 TCP 子层落地（sysctl/拥塞控制模块选择）而非仅依赖 PEP 代理。",
         "summary_en": "This article proposes directions for improving TCP transmission performance by analyzing the impact of satellite communication link characteristics on...",
         "source": "Semantic Scholar",
         "tags": [
@@ -94,7 +94,7 @@
       {
         "title": "On the Informativeness of Security Commit Messages: A Large-scale Replication Study",
         "url": "http://arxiv.org/abs/2604.20461v1",
-        "summary": "The informativeness of security-related commit messages is crucial for patch triage: when high, it enables the rapid distribution and deployment of security fixes. Prior research (Reis et al., 2023) reported, however, th...",
+        "summary": "安全相关 commit message 的信息量对补丁分流至关重要：信息量高时可加速安全修复的分发与部署。先前研究（Reis 等，2023）报告称其信息量偏低。研究开展大规模复现研究以重新评估安全 commit message 的信息量，涉及 TCP/IP 与 Linux 内核网络（标签标注）。原摘要截断后未提供具体评估方法（如是否用 LLM/规则分类）、样本规模、与原研究结论的一致性及统计指标。读者关注点在于结论对内核网络维护者做漏洞补丁溯源与下游 backport 的实际指导意义。",
         "summary_en": "The informativeness of security-related commit messages is crucial for patch triage: when high, it enables the rapid distribution and deployment of se...",
         "source": "arXiv",
         "tags": [

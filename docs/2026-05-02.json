@@ -5,7 +5,7 @@
       {
         "title": "DeLiBA-K: Speeding-up Hardware-Accelerated Distributed Storage Access by Tighter Linux Kernel Integration and Use of a Modern API",
         "url": "https://www.semanticscholar.org/paper/62bf29fb5b0168c8f6053cc8fc203c97208d0254",
-        "summary": "We present DeLiBA-K, an improved version of the Development of Linux Block I/O Accelerators (DeLiBA) framework. DeLiBA-K operates at the Linux kernel level, bypassing the user-space interactions of DeLiBA-1 and -2 to int...",
+        "summary": "研究提出 DeLiBA-K，Linux Block I/O 加速器框架（DeLiBA）的改进版。DeLiBA-K 在 Linux 内核层运行，绕过 DeLiBA-1/-2 的用户态交互，借助更紧密的内核集成与现代 API（如 io_uring）加速硬件加速分布式存储访问，涉及 Linux 内核网络、网络优化与性能。原摘要截断后未提供具体集成点（如是否 hook block 层 blk-mq、是否对接 RDMA/NVMe-oF）、对比基线（DeLiBA-1/-2）、IOPS/时延量化提升。读者关注点在于 DeLiBA-K 与 io_uring 的协同及对存储而非网络路径的影响边界。",
         "summary_en": "We present DeLiBA-K, an improved version of the Development of Linux Block I/O Accelerators (DeLiBA) framework. DeLiBA-K operates at the Linux kernel ...",
         "source": "Semantic Scholar",
         "tags": [
@@ -19,7 +19,7 @@
       {
         "title": "High-Performance DBMSs with io_uring: When and How to use it",
         "url": "https://www.semanticscholar.org/paper/a794826fc5d89630ea41227b9e88c8378c9e2e7d",
-        "summary": "We study how modern database systems can leverage the Linux io_uring interface for efficient, low-overhead I/O. io_uring is an asynchronous system call batching interface that unifies storage and network operations, addr...",
+        "summary": "现代数据库系统可借助 Linux io_uring 接口实现高效低开销 I/O。io_uring 是异步系统调用批处理接口，统一存储与网络操作。研究探讨何时及如何使用 io_uring 构建高性能 DBMS，涉及网络优化与性能。原摘要截断后未提供具体使用模式（如 fixed buffer、registered buffer、SQpoll）、对网络路径（io_uring send/recv）的覆盖、对比基线（epoll/AIO）及 TPS/时延量化。读者关注点在于 io_uring 在存储密集 vs 网络密集负载下的收益差异及对内核版本的要求。",
         "summary_en": "We study how modern database systems can leverage the Linux io_uring interface for efficient, low-overhead I/O. io_uring is an asynchronous system cal...",
         "source": "Semantic Scholar",
         "tags": [
@@ -32,7 +32,7 @@
       {
         "title": "HERMES++: Toward a Unified Driving World Model for 3D Scene Understanding and Generation",
         "url": "http://arxiv.org/abs/2604.28196v1",
-        "summary": "Driving world models serve as a pivotal technology for autonomous driving by simulating environmental dynamics. However, existing approaches predominantly focus on future scene generation, often overlooking comprehensive...",
+        "summary": "驾驶世界模型通过模拟环境动力学成为自动驾驶关键技术，但现有方法偏重未来场景生成，忽视全面理解。研究提出 HERMES++，面向 3D 场景理解与生成的统一驾驶世界模型，涉及 TCP/IP、网桥与性能（标签标注）。原摘要截断后未提供具体模型架构（如是否基于扩散/自回归）、数据集（nuScenes/Waymo）、评测指标（感知精度 vs 生成质量）及量化结果。该工作与 Linux 内核网络子系统关联较弱，tags 标注疑似误分类，读者需核对实际网络相关性。",
         "summary_en": "Driving world models serve as a pivotal technology for autonomous driving by simulating environmental dynamics. However, existing approaches predomina...",
         "source": "arXiv",
         "tags": [
@@ -46,7 +46,7 @@
       {
         "title": "Time Sensitive Networking Protocol Implementation for Linux End Equipment",
         "url": "https://www.semanticscholar.org/paper/a2f77d282c2088c4ae4e67f24dd36fcb986ebd91",
-        "summary": "By bringing industrial-grade robustness and reliability to Ethernet, Time Sensitive Networking (TSN) offers an IEEE standard communication technology that enables interoperability between standard-conformant industrial d...",
+        "summary": "时间敏感网络（TSN）为以太网带来工业级鲁棒性与可靠性，是支持符合标准的工业设备互操作的 IEEE 标准通信技术。研究面向 Linux 端设备实现 TSN 协议，涉及 TCP/IP、驱动与网络优化。原摘要截断后未提供具体实现协议（如 802.1AS 时间同步、802.1Qbv 调度、802.1CB 冗余）、与内核 TSN 子系统（tc ETF/TAPRIO/MQPRIO）的集成方式、时延确定性量化评测。读者关注点在于该实现是否依赖 PREEMPT_RT 及对网卡驱动的硬件时间戳要求。",
         "summary_en": "By bringing industrial-grade robustness and reliability to Ethernet, Time Sensitive Networking (TSN) offers an IEEE standard communication technology ...",
         "source": "Semantic Scholar",
         "tags": [
@@ -60,7 +60,7 @@
       {
         "title": "Open Networking for Modern Data Centers Infrastructures: VXLAN Proof-of-Concept Emulation using LNV and EVPN under Cumulus Linux",
         "url": "https://www.semanticscholar.org/paper/a850e15f92375a55e4d2bdee8d612fcc5aff02f3",
-        "summary": "Modern telecom service providers need modern Data Centers infrastructures. One Overlay encapsulation protocol brings the ease, flexibility, and good-response behavior to support technological changes oriented to support ...",
+        "summary": "现代电信服务提供商需要现代化的数据中心基础设施。VXLAN 封装协议带来易用性、灵活性与良好的响应行为以支持技术演进。研究在 Cumulus Linux 下使用 LNV 与 EVPN 进行 VXLAN 概念验证仿真，面向现代数据中心网络基础设施，涉及网络优化与性能。原摘要截断后未提供具体拓扑（leaf-spine 规模）、控制平面（EVPN 类型 2/5 路由）、与 Cumulus Linux（FRR/PTM）的集成、对比基线及量化指标。读者关注点在于该 PoC 在真实流量下的可复现性及与基于 eBPF 的 overlay 方案差异。",
         "summary_en": "Modern telecom service providers need modern Data Centers infrastructures. One Overlay encapsulation protocol brings the ease, flexibility, and good-r...",
         "source": "Semantic Scholar",
         "tags": [

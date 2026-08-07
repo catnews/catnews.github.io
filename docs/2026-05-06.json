@@ -5,7 +5,7 @@
       {
         "title": "Traffic Control Optimization for SOME/IP: Evaluating Queuing Disciplines in Vehicular Networks",
         "url": "https://www.semanticscholar.org/paper/5173a237ef583864b9169c91c4f807e2a8a9d12f",
-        "summary": "As automotive systems become more complex, the flexibility and scalability of vehicle software components are required. Scalable service-oriented middleware over IP (SOME/IP) has emerged as a middleware solution for scal...",
+        "summary": "汽车系统日益复杂，要求车辆软件组件具备灵活性与可扩展性。SOME/IP（Scalable service-oriented middleware over IP）作为可扩展中间件方案出现。研究评估车载网络中 SOME/IP 的流量控制优化，对比排队规则（qdisc），涉及 TCP/IP、Netfilter、驱动与网络优化。原摘要截断后未提供具体 qdisc 对比（如 FIFO/HTB/TBF/ETF）、评测平台（嵌入式 Linux）、时延与抖动量化数据。读者关注点在于 tc qdisc 对 SOME/IP 车载以太网 QoS 的适配性及与 TSN 调度的关系。",
         "summary_en": "As automotive systems become more complex, the flexibility and scalability of vehicle software components are required. Scalable service-oriented midd...",
         "source": "Semantic Scholar",
         "tags": [
@@ -109,7 +109,7 @@
       {
         "title": "Unfair by design: eBPF-based scheduling of mixed database workloads",
         "url": "http://arxiv.org/abs/2605.02377v1",
-        "summary": "Modern database systems increasingly co-schedule time-sensitive and background tasks. In such mixed workloads, background tasks should ideally utilize only spare CPU capacity without interfering with latency-critical req...",
+        "summary": "现代数据库系统越来越多地协同调度时敏任务与后台任务。混合负载下，后台任务理想上应只用空闲 CPU 而不干扰时敏请求。研究提出基于 eBPF 的混合数据库负载调度，by design 地做非公平调度，涉及 eBPF、Linux 内核网络与性能。原摘要截断后未提供具体调度机制（如是否用 BPF 做 CPU 占用控制、是否 hook completion path）、对比基线（CFS/nice/cgroup）、时敏任务尾时延与后台吞吐量化。读者关注点在于 eBPF 调度对内核调度器的侵入性及对其他负载的隔离影响。",
         "summary_en": "Modern database systems increasingly co-schedule time-sensitive and background tasks. In such mixed workloads, background tasks should ideally utilize...",
         "source": "arXiv",
         "tags": [
@@ -123,7 +123,7 @@
       {
         "title": "Decentralized Edge Caching under Budget and Storage Constraints: A Game-Theoretic Approach",
         "url": "http://arxiv.org/abs/2605.04023v1",
-        "summary": "The rapid growth of mobile social networks (MSNs) has significantly increased the demand for low-latency and reliable content delivery, motivating the deployment of edge caching systems. In practice, multiple content pro...",
+        "summary": "移动社交网络（MSN）快速增长显著提升了对低时延可靠内容分发的需求，推动边缘缓存部署。实践中多个内容提供商在预算与存储约束下竞争。研究以博弈论方法研究预算与存储约束下的去中心化边缘缓存，涉及 TCP/IP、网络优化与性能。原摘要截断后未提供具体博弈模型（纳什均衡/斯塔克尔伯格）、缓存替换策略、对比基线及命中率/时延量化。该工作偏理论网络经济学，与 Linux 内核网络子系统直接关联有限，读者需核对落地路径。",
         "summary_en": "The rapid growth of mobile social networks (MSNs) has significantly increased the demand for low-latency and reliable content delivery, motivating the...",
         "source": "arXiv",
         "tags": [

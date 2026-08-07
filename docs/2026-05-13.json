@@ -5,7 +5,7 @@
       {
         "title": "Enabling AI-Native Mobility in 6G: A Real-World Dataset for Handover, Beam Management, and Timing Advance",
         "url": "http://arxiv.org/abs/2605.12453v1",
-        "summary": "To address the issues of high interruption time and measurement report overhead under user equipment (UE) mobility especially in high speed 5G use cases the use of AI/ML techniques (AI/ML beam management and mobility pro...",
+        "summary": "高速 5G 用例下用户设备（UE）移动带来高中断时间与测量报告开销问题。研究使用 AI/ML 技术（AI/ML 波束管理与移动性流程）并面向 6G 启用 AI 原生移动性，提供切换、波束管理与时间提前量的真实世界数据集，涉及 TCP/IP、网络优化与性能。原摘要截断后未提供具体数据集采集场景（频段、UE 速度）、AI/ML 模型架构、对比基线及量化指标（中断时间降低幅度）。该工作偏无线移动性/数据集，与 Linux 内核网络子系统直接关联有限，tags 标注疑似不当。",
         "summary_en": "To address the issues of high interruption time and measurement report overhead under user equipment (UE) mobility especially in high speed 5G use cas...",
         "source": "arXiv",
         "tags": [

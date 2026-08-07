@@ -5,7 +5,7 @@
       {
         "title": "IteRate: Autonomous AI Synthesis of In-Kernel eBPF Wi-Fi Rate Control Algorithms",
         "url": "http://arxiv.org/abs/2605.02542v1",
-        "summary": "Wi-Fi rate adaptation remains a persistent challenge in wireless networking. Deployed algorithms like Minstrel-HT have remained largely stagnant for over a decade, relying on hand-tuned heuristics that fail to generalize...",
+        "summary": "Wi-Fi 速率适配是无线网络持续难题。已部署算法如 Minstrel-HT 十余年基本停滞，依赖手工调参启发式难以泛化。研究提出 IteRate，自主合成内核态 eBPF Wi-Fi 速率控制算法，直接在 Linux 内核网络栈的 mac80211 子系统运行 eBPF 程序做速率决策，涉及 eBPF、TCP/IP、Linux 内核网络与网络优化。原摘要截断后未提供具体合成机制（如是否用遗传/强化学习搜索 BPF 策略空间）、对比基线（Minstrel-HT/Minstrel-Blues）、吞吐与重传率量化。读者关注点在于 eBPF 速率控制相对 mac80211 内置算法的实测增益及驱动 hook 可用性。",
         "summary_en": "Wi-Fi rate adaptation remains a persistent challenge in wireless networking. Deployed algorithms like Minstrel-HT have remained largely stagnant for o...",
         "source": "arXiv",
         "tags": [
@@ -20,7 +20,7 @@
       {
         "title": "Tool Use as Action: Towards Agentic Control in Mobile Core Networks",
         "url": "http://arxiv.org/abs/2605.02811v1",
-        "summary": "Artificial Intelligence (AI) will play an essential role in 6G. It will fundamentally reshape the network architecture itself and drive major changes in the design of network entities, interfaces, and procedures. The ado...",
+        "summary": "人工智能将在 6G 中扮演关键角色，重塑网络架构本身并推动网络实体、接口与流程设计的重大变化。研究探讨将工具使用作为动作（tool use as action），面向移动核心网络的代理式（agentic）控制，涉及包处理、网络优化与性能。原摘要截断后未提供具体代理架构（如是否对接 O-RAN/non-3GPP 接口）、工具集定义、与现有核心网（AMF/SMF）的集成方式及评测量化。该工作偏 6G 架构愿景，与 Linux 内核网络子系统直接关联有限，读者需核对落地路径。",
         "summary_en": "Artificial Intelligence (AI) will play an essential role in 6G. It will fundamentally reshape the network architecture itself and drive major changes ...",
         "source": "arXiv",
         "tags": [
@@ -34,7 +34,7 @@
       {
         "title": "The Activist's Guide to the Decentralized Social Universe: A Framework for Exploring How Decentralized Social Networks Can Support Collective Action",
         "url": "http://arxiv.org/abs/2605.02800v1",
-        "summary": "The overreaches of mainstream social media platforms have been extensively reported and studied. For activist communities, these platforms pose risks of surveillance, censorship, or erasure. Decentralized social networks...",
+        "summary": "主流社交媒体平台的越权行为已被广泛报道与研究。对行动主义社群，这些平台带来监控、审查或抹除风险。研究提出探索去中心化社交网络如何支持集体行动的框架，涉及 TCP/IP、驱动与网络优化（标签标注，疑似误分类）。原摘要截断后未提供具体框架内容、去中心化协议（ActivityPub/AT Protocol）及案例分析。该工作属社会科学/平台研究，与 Linux 内核网络子系统无直接关联，tags 标注明显不当，读者需注意归类偏差。",
         "summary_en": "The overreaches of mainstream social media platforms have been extensively reported and studied. For activist communities, these platforms pose risks ...",
         "source": "arXiv",
         "tags": [

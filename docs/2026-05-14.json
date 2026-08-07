@@ -5,7 +5,7 @@
       {
         "title": "Zero-consistency root emulation for unprivileged container image build",
         "url": "https://www.semanticscholar.org/paper/5de988f5c960db4b2a8d6f5476f1474d6ffdbfbc",
-        "summary": "Do Linux distribution package managers need the privileged operations they request to actually happen? Apparently not, at least when building container images for HPC applications. We use this observation to implement a ...",
+        "summary": "Linux 发行版包管理器是否真的需要其请求的特权操作发生？至少在为 HPC 应用构建容器镜像时并非如此。研究利用该观察实现零一致性 root 仿真，用于非特权容器镜像构建，涉及容器网络。原摘要截断后未提供具体仿真机制（如是否拦截/伪造 chroot/mount/setuid syscall、是否用 user namespace）、包管理器覆盖（apt/yum/dnf）、对比基线（buildah/kaniko）及构建时延量化。读者关注点在于该方案对内核特权的最小依赖及在无 root 环境的兼容性。",
         "summary_en": "Do Linux distribution package managers need the privileged operations they request to actually happen? Apparently not, at least when building containe...",
         "source": "Semantic Scholar",
         "tags": [

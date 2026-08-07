@@ -48,7 +48,7 @@
       {
         "title": "iDynamics: A Configurable Emulation Framework for Evaluating Microservice Scheduling Policies under Controllable Cloud-Edge Dynamics",
         "url": "https://www.semanticscholar.org/paper/2dc1c2ef72c71e176365a682584e650661641b8c",
-        "summary": "This paper presents iDynamics, a configurable emulation framework that exposes these dynamics as controllable experimental factors while running real microservice code on a Kubernetes-based cloud-edge cluster. iDynamics ...",
+        "summary": "研究提出 iDynamics，一个可配置的仿真框架，将云-边动态作为可控实验因子暴露，同时在基于 Kubernetes 的云-边集群上运行真实微服务代码。iDynamics 评估可控云-边动态下的微服务调度策略，涉及网络优化、容器网络与性能。原摘要截断后未提供具体调度策略（K8s scheduler 扩展）、可控因子（CPU/网络抖动注入机制，是否用 tc netem）、对比基线及量化指标（尾时延/SLA 违约率）。读者关注点在于 iDynamics 对云-边网络动态的建模保真度及对调度策略评估的可复现性。",
         "summary_en": "This paper presents iDynamics, a configurable emulation framework that exposes these dynamics as controllable experimental factors while running real ...",
         "source": "Semantic Scholar",
         "tags": [

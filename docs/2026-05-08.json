@@ -5,7 +5,7 @@
       {
         "title": "Indoor 60 GHz Radio Channel Dataset Enabling Digital Twin Construction",
         "url": "http://arxiv.org/abs/2605.05824v1",
-        "summary": "The ambitious performance targets of modern wireless networks, including 6G and Industrial IoT (IIoT) systems, necessitate advanced hardware platforms utilizing millimeter-wave (mmWave) technology. High-frequency signals...",
+        "summary": "现代无线网络（含 6G 与工业物联网 IIoT）的高性能目标需要利用毫米波（mmWave）技术的高级硬件平台。高频信号特性推动数字孪生构建。研究提供室内 60GHz 无线电信道数据集以支持数字孪生构建，涉及驱动、网络优化与性能。原摘要截断后未提供具体采集平台（SDR/信道探测仪）、场景覆盖、信道参数（路径损耗、时延扩展）及数据集规模。该工作偏无线信道测量，与 Linux 内核网络子系统直接关联有限，读者需核对与驱动/网络栈的关联点。",
         "summary_en": "The ambitious performance targets of modern wireless networks, including 6G and Industrial IoT (IIoT) systems, necessitate advanced hardware platforms...",
         "source": "arXiv",
         "tags": [
@@ -33,7 +33,7 @@
       {
         "title": "LiVeAction: a Lightweight, Versatile, and Asymmetric Neural Codec Design for Real-time Operation",
         "url": "http://arxiv.org/abs/2605.06628v1",
-        "summary": "Modern sensors generate rich, high-fidelity data, yet applications operating on wearable or remote sensing devices remain constrained by bandwidth and power budgets. Standardized codecs such as JPEG and MPEG achieve effi...",
+        "summary": "现代传感器产生丰富高保真数据，但可穿戴或遥感设备上的应用仍受带宽与功耗预算约束。JPEG、MPEG 等标准编解码器效率高但针对特定模态。研究提出 LiVeAction，一种轻量、通用且非对称的神经编解码器设计面向实时操作，涉及网络优化与性能。原摘要截断后未提供具体架构（编码器-解码器非对称）、目标模态（IMU/音频/视频）、对比基线（标准编解码器）及压缩率/时延/功耗量化。该工作偏端侧 AI 编解码，与 Linux 内核网络子系统直接关联有限。",
         "summary_en": "Modern sensors generate rich, high-fidelity data, yet applications operating on wearable or remote sensing devices remain constrained by bandwidth and...",
         "source": "arXiv",
         "tags": [

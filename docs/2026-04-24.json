@@ -5,7 +5,7 @@
       {
         "title": "Understanding Network Startup for Secure Containers in Multi-Tenant Clouds: Performance, Bottleneck and Optimization",
         "url": "https://www.semanticscholar.org/paper/d2163f12daf165af513c9286e44dc4030e7d1360",
-        "summary": "In this paper, we use empirical measurements to show that container network startup is a key factor that contributes to the slow startup of secure containers in multi-tenant clouds, especially in the scenario of serverle...",
+        "summary": "多租户云中安全容器（secure container）启动缓慢，尤其在 serverless 场景影响弹性。研究通过实证测量指出容器网络启动是关键瓶颈之一，并分析其性能、瓶颈与优化方向，涉及 TCP/IP、路由、Linux 内核网络栈与网络优化。原摘要截断后未提供具体测量数据（如启动时延分解、网络配置耗时占比）、优化手段（是否优化 netns/veth/iptables 初始化）及对比基线。读者关注点在于网络启动耗时在整体容器启动中的占比，以及是否可在 kata/containerd 层做内核网络路径裁剪。",
         "summary_en": "In this paper, we use empirical measurements to show that container network startup is a key factor that contributes to the slow startup of secure con...",
         "source": "Semantic Scholar",
         "tags": [
@@ -153,7 +153,7 @@
       {
         "title": "A Bidirectional data packet tampering method for Linux system",
         "url": "https://www.semanticscholar.org/paper/f12efd26c7825d234546e442789d651c9ec61bdb",
-        "summary": "Network data security is very important for each user and service provider, and every process of network data transmission is at risk of being tampered with. In this paper, we proposed a bidirectional tampering method of...",
+        "summary": "网络数据传输各环节均存在被篡改风险。针对 Linux 系统，研究提出一种双向数据包篡改方法，基于 Netfilter 框架与 TCP/IP 协议栈在内核态对数据包进行双向修改，属于内核级包处理与网络安全研究范畴。原摘要截断后未提供具体 hook 点选型、对校验和重计算的处理、可检测性分析与防御对策。读者应将其作为安全威胁建模与内核网络栈脆弱性分析的参考，关注对应检测/防御策略。",
         "summary_en": "Network data security is very important for each user and service provider, and every process of network data transmission is at risk of being tampere...",
         "source": "Semantic Scholar",
         "tags": [
@@ -198,7 +198,7 @@
       {
         "title": "Poster: Towards Open Wireless Time-sensitive Networking in Linux",
         "url": "https://www.semanticscholar.org/paper/8d8756f70047fd25e7963917a6258d3e323f3de4",
-        "summary": "The integration of IEEE 802.1 Time-sensitive Networking (TSN) with wireless technologies promises to support realtime applications over hybrid networks. Although TSN over Ethernet is well established, extending its capab...",
+        "summary": "IEEE 802.1 时间敏感网络（TSN）与无线技术融合以支持混合网络上的实时应用。Ethernet 上 TSN 已成熟，但将其能力扩展到无线侧仍是开放问题。研究面向 Linux 内核中开放式无线 TSN 的实现，涉及网络驱动与内核网络栈优化。原摘要截断后未提供具体实现路径（如是否修改 mac80211 子系统、是否复用 tc 的 ETF/TAPRIO qdisc）、对时延确定性指标（如最坏情况时延）的量化评测，以及与 Linux TSN 子系统（如 ST、EST）的集成方式。作为 poster，深度有限，读者应关注其对无线侧 TSN 调度的可行性论证。",
         "summary_en": "The integration of IEEE 802.1 Time-sensitive Networking (TSN) with wireless technologies promises to support realtime applications over hybrid network...",
         "source": "Semantic Scholar",
         "tags": [

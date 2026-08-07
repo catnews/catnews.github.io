@@ -34,7 +34,7 @@
       {
         "title": "FG-RCA: Kernel-Anchored Post-Exploitation Containment for IoT with Policy Synthesis and Mitigation of Zero-Day Attacks",
         "url": "https://www.semanticscholar.org/paper/32ee09c3c6442f174c2d3b2e6cc425cd3aef4f74",
-        "summary": "Zero-day intrusions on IoT endpoints demand defenses that curtail attacker impact and persistence after breach. This article presents Fine-Grained Runtime Containment Agent (FG-RCA), a lightweight post-exploitation conta...",
+        "summary": "IoT 端点上的零日入侵要求在突破后能限制攻击者影响与持久化。研究提出细粒度运行时遏制代理（FG-RCA），一种轻量级后渗透遏制机制，结合策略合成与零日攻击缓解，并以内核为锚点（kernel-anchored）部署，借助 eBPF、Socket 等机制实现。原摘要截断后未提供具体遏制原语（如对 socket/文件/进程的拦截点）、策略合成算法、对零日攻击的覆盖范围及评测数据集。读者关注点在于 FG-RCA 在资源受限 IoT 端点上的开销，以及 eBPF 程序在低版本内核上的可用性限制。",
         "summary_en": "Zero-day intrusions on IoT endpoints demand defenses that curtail attacker impact and persistence after breach. This article presents Fine-Grained Run...",
         "source": "Semantic Scholar",
         "tags": [
@@ -64,7 +64,7 @@
       {
         "title": "Assessing the Cloud-RAN in the Linux Kernel: Sharing Computing and Network Resources",
         "url": "https://www.semanticscholar.org/paper/09b592037a740fdb1035bd6ce8be57f65a77d01a",
-        "summary": "Cloud-based Radio Access Network (Cloud-RAN) leverages virtualization to enable the coexistence of multiple virtual Base Band Units (vBBUs) with collocated workloads on a single edge computer, aiming for economic and ope...",
+        "summary": "云化无线接入网（Cloud-RAN）借助虚拟化使多个虚拟基带单元（vBBU）与共置负载同驻一台边缘主机，追求经济与运维收益。研究在 Linux 内核中评估 Cloud-RAN 的计算与网络资源共享，涉及 TCP/IP、内核网络栈与性能优化。原摘要截断后未提供具体共享机制（如是否用 cgroup CPU 隔离、是否用 SR-IOV/virtio 网络加速）、评测指标（vBBU 数量、时延、吞吐）及对比基线。读者关注点在于 Cloud-RAN 在通用 Linux 内核上的可行性及与专用实时平台的性能差距。",
         "summary_en": "Cloud-based Radio Access Network (Cloud-RAN) leverages virtualization to enable the coexistence of multiple virtual Base Band Units (vBBUs) with collo...",
         "source": "Semantic Scholar",
         "tags": [
@@ -79,7 +79,7 @@
       {
         "title": "SPAC: Automating FPGA-based Network Switches with Protocol Adaptive Customization",
         "url": "http://arxiv.org/abs/2604.21881v1",
-        "summary": "With network requirements diverging across emerging applications, latency-critical services demand minimal logic delay, while hyperscale training and collectives require sustained line-rate throughput for synchronized bu...",
+        "summary": "新兴应用对网络需求分化：时延敏感服务要求最小逻辑延迟，超大规模训练与集合通信要求持续线速吞吐。研究提出 SPAC，通过协议自适应定制自动化 FPGA 网络交换机，属包处理与网络优化方向。原摘要截断后未提供具体协议自适应机制（是否对接 P4/OpenFlow）、FPGA 平台选型、与 Linux 内核网络栈的交互方式（如是否通过 TC/AF_XDP 卸载），以及吞吐/时延量化评测。读者关注点在于 SPAC 与软件交换（如基于 eBPF/XDP 的方案）的性能边界。",
         "summary_en": "With network requirements diverging across emerging applications, latency-critical services demand minimal logic delay, while hyperscale training and ...",
         "source": "arXiv",
         "tags": [
@@ -108,7 +108,7 @@
       {
         "title": "Scheduling Analysis of UAV Flight Control Workloads using Raspberry Pi 5 Using PREEMPT_RT Linux",
         "url": "http://arxiv.org/abs/2604.19275v1",
-        "summary": "Modern UAV architectures increasingly aim to unify high-level autonomy and low-level flight control on a single General-Purpose Operating System (GPOS). However, complex multi-core System-on-Chips (SoCs) introduce signif...",
+        "summary": "现代无人机架构趋向在单一通用操作系统（GPOS）上统一高层自主与低层飞行控制。复杂多核 SoC 引入显著调度挑战。研究使用 Raspberry Pi 5 与 PREEMPT_RT Linux 对 UAV 飞控负载进行调度分析，涉及 TCP/IP、内核网络与性能。原摘要截断后未提供具体飞控任务集（如姿态控制环周期）、调度策略对比（CFS vs PREEMPT_RT FIFO/RR）、最坏情况时延与抖动量化数据，以及网络负载在其中的角色。读者关注点在于 PREEMPT_RT 能否满足飞控硬实时约束及网络栈对时延的影响。",
         "summary_en": "Modern UAV architectures increasingly aim to unify high-level autonomy and low-level flight control on a single General-Purpose Operating System (GPOS...",
         "source": "arXiv",
         "tags": [
@@ -122,7 +122,7 @@
       {
         "title": "Infrastructure-as-Code in Open-Networking: Git, Ansible, and Cumulus-Linux Case Study",
         "url": "https://www.semanticscholar.org/paper/622a009ad02f07c9e19e6a4baa7f9a66fdfcbe1b",
-        "summary": "One of the necessities for modern connectivity infrastructures is decreasing devices setup-times and giving configuration visibility to troubleshoot complex scenarios more easily. This proof-of-concept and case study sce...",
+        "summary": "现代连接基础设施需要缩短设备配置时间并提升配置可见性以简化复杂场景排障。研究以 Git、Ansible 与 Cumulus Linux 为案例，给出基础设施即代码（IaC）在开放网络中的概念验证与案例研究，涉及 TCP/IP 与网络优化。原摘要截断后未提供具体配置工作流（如 Ansible playbook 模块、Cumulus 网络栈/NCLU）、与 Netbox/Ansible Tower 之类工具的集成，以及部署规模与配置一致性量化指标。读者关注点在于 IaC 对网络运维自动化的实际增益及 Cumulus Linux（Debian 衍生）的可复现性。",
         "summary_en": "One of the necessities for modern connectivity infrastructures is decreasing devices setup-times and giving configuration visibility to troubleshoot c...",
         "source": "Semantic Scholar",
         "tags": [

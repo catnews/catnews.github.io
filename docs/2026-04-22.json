@@ -34,7 +34,7 @@
       {
         "title": "eBandit: Kernel-Driven Reinforcement Learning for Adaptive Video Streaming",
         "url": "http://arxiv.org/abs/2604.08791v2",
-        "summary": "User-space Adaptive Bitrate (ABR) algorithms cannot see the transport layer signals that matter most, such as minimum RTT and instantaneous delivery rate, and they respond to network changes only after damage has already...",
+        "summary": "用户态自适应码率（ABR）算法无法直接观测传输层关键信号（如最小 RTT、瞬时投递速率），只能在性能受损后才被动响应网络变化。针对该问题，研究在 Linux 内核侧驱动强化学习完成 ABR 决策，利用内核就近获取 min RTT、delivery rate 等传输层信号输入 RL 策略，使码率选择主动跟随网络波动。原摘要截断后未提供具体评测数据集、对比基线（如基于 MPC 的 ABR 算法）及吞吐/卡顿率等量化指标，也未说明与内核网络栈的具体 hook 点及 eBPF 取信号的额外开销。读者关注点在于内核态 ABR 相对用户态 ABR 在 QoE 上的实测增益。",
         "summary_en": "User-space Adaptive Bitrate (ABR) algorithms cannot see the transport layer signals that matter most, such as minimum RTT and instantaneous delivery r...",
         "source": "arXiv",
         "tags": [
@@ -78,7 +78,7 @@
       {
         "title": "ProcRoute: Process-Scoped Authorization of Split-Tunnel Routes",
         "url": "http://arxiv.org/abs/2604.16080v1",
-        "summary": "In most split-tunnel VPN/ZTNA deployments, installing an internal route authorizes the entire device, not a specific application, to use it. An unprivileged malicious process can therefore reach internal services by reus...",
+        "summary": "多数 split-tunnel VPN/ZTNA 部署中，安装一条内网路由即授权整台设备访问而非仅限特定应用，非特权恶意进程可复用该路由触达内部服务。针对这一进程级授权缺失，提出基于 eBPF、Socket 与 Netfilter 的进程范围（process-scoped）授权方案，使仅被授权进程可使用对应内网路由。原摘要截断后未提供具体 hook 点选型（如 cgroup BPF 还是 netfilter 链）、拦截是否依赖 conntrack、评测数据集与对比基线。读者应关注该方案在多租户/容器环境下的落地限制及与现有 VPN 客户端路由安装流程的兼容性。",
         "summary_en": "In most split-tunnel VPN/ZTNA deployments, installing an internal route authorizes the entire device, not a specific application, to use it. An unpriv...",
         "source": "arXiv",
         "tags": [

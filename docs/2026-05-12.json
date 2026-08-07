@@ -5,7 +5,7 @@
       {
         "title": "Shepherd: A Runtime Substrate Empowering Meta-Agents with a Formalized Execution Trace",
         "url": "http://arxiv.org/abs/2605.10913v1",
-        "summary": "We introduce Shepherd, a functional programming model that formalizes meta-agent operations on target agents as functions, with core operations mechanized in Lean. Shepherd records every agent-environment interaction as ...",
+        "summary": "研究引入 Shepherd，一种函数式编程模型，将元代理对目标代理的操作形式化为函数，核心操作在 Lean 中机械化实现。Shepherd 将每次代理-环境交互记录为形式化执行轨迹，赋能元代理运行时底座，涉及性能（标签标注）。原摘要截断后未提供具体目标代理类型、执行轨迹格式、与现有 agent 框架对比及量化评测。该工作偏 AI 代理形式化方法，与 Linux 内核网络子系统无直接关联，tags 仅为性能，读者需核对实际网络相关性。",
         "summary_en": "We introduce Shepherd, a functional programming model that formalizes meta-agent operations on target agents as functions, with core operations mechan...",
         "source": "arXiv",
         "tags": [
@@ -17,7 +17,7 @@
       {
         "title": "Pomegranate: A Lightweight Compartmentalization Architecture using Virtualization Extensions",
         "url": "http://arxiv.org/abs/2605.07008v1",
-        "summary": "The monolithic nature of widely used commodity operating systems means that vulnerabilities in one software component potentially compromise the entire kernel. Formally verifying these systems, or redesigning them altoge...",
+        "summary": "广泛使用的商品操作系统因单体性，单一组件漏洞可能危及整个内核。形式化验证这些系统或重新设计代价过高。研究提出 Pomegranate，一种利用虚拟化扩展（如 ARM vEI/EL2、x86 VMX）的轻量级分区架构，将组件隔离于独立 compartment，涉及 TCP/IP、驱动、包处理与网络优化。原摘要截断后未提供具体隔离粒度（是否按网络栈子组件划分）、与现有容器/seccomp 对比、性能开销及对网络数据路径的影响。读者关注点在于 Pomegranate 对网络栈（netfilter/socket）的分区方式及虚拟化扩展开销。",
         "summary_en": "The monolithic nature of widely used commodity operating systems means that vulnerabilities in one software component potentially compromise the entir...",
         "source": "arXiv",
         "tags": [

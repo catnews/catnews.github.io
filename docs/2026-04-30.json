@@ -5,7 +5,7 @@
       {
         "title": "FLASH: Fast Linked AF_XDP Sockets for High Performance Network Function Chains",
         "url": "https://www.semanticscholar.org/paper/980073261eea8ebd787c0f752c9ca6c25546d5e7",
-        "summary": "Recent advances in the Linux kernel, such as eXpress Data Path (XDP) and AF_XDP sockets, enable high-speed packet processing for software NFs while preserving access to kernel features. However, the default AF_XDP implem...",
+        "summary": "Linux 内核的 XDP 与 AF_XDP socket 支持高速包处理同时保留内核特性，但默认 AF_XDP 实现在网络功能链（NF chain）场景下存在不足。研究提出 FLASH（Fast Linked AF_XDP Sockets），面向高性能网络功能链优化 AF_XDP 数据路径，涉及 XDP、Socket、驱动与包处理。原摘要截断后未提供具体优化机制（如零拷贝/共享 UMEM、ring 链接方式）、对比基线（DPDK/VPP/默认 AF_XDP）、吞吐与时延量化指标（如是否达 100Gbps 级）。读者关注点在于 FLASH 对现有 AF_XDP 内核接口的改动量及在多 NF 串联下的可扩展性。",
         "summary_en": "Recent advances in the Linux kernel, such as eXpress Data Path (XDP) and AF_XDP sockets, enable high-speed packet processing for software NFs while pr...",
         "source": "Semantic Scholar",
         "tags": [
@@ -20,7 +20,7 @@
       {
         "title": "ChainIO: Bridging Disk and Network Domains with eBPF",
         "url": "https://www.semanticscholar.org/paper/0488fdf74ba3b385e59fb3a796a5010131d1a7cb",
-        "summary": "Modern data-driven services from analytical databases and key-value stores to stream processors suffer high tail-latencies because each disk read and subsequent packet send/recv incurs a separate user-kernel crossing and...",
+        "summary": "现代数据驱动服务（分析型数据库、KV 存储、流处理）因每次磁盘读与后续包收发各自触发一次用户—内核穿越而承受高尾时延。研究提出 ChainIO，借助 eBPF 在磁盘与网络域之间桥接，统一 I/O 路径以减少穿越开销，涉及 eBPF、XDP、TCP/IP 与 Socket。原摘要截断后未提供具体桥接机制（如是否用 BPF 在 io_uring 与 XDP 间共享 buffer）、对比基线（同步/异步 syscall）、尾时延（P99）与吞吐量化提升。读者关注点在于 ChainIO 对 POSIX 语义的偏离程度及在 io_uring + XDP 组合下的落地限制。",
         "summary_en": "Modern data-driven services from analytical databases and key-value stores to stream processors suffer high tail-latencies because each disk read and ...",
         "source": "Semantic Scholar",
         "tags": [
@@ -80,7 +80,7 @@
       {
         "title": "SRA: Leveraging AF_XDP for Programmable Network Functions with IPv6 Segment Routing",
         "url": "https://www.semanticscholar.org/paper/e86153967b512ed383cc3f9126d6ab45755ce8b5",
-        "summary": "The IPv6 Segment Routing (SRv6) is a promising solution to support services such as service function chain (SFC) and network function virtualization (NFV). But the SRv6 implementation in the Linux kernel is being critici...",
+        "summary": "IPv6 分段路由（SRv6）是支持服务功能链（SFC）与网络功能虚拟化（NFV）的有前景方案，但 Linux 内核中 SRv6 实现因性能问题被批评。研究提出 SRA，利用 AF_XDP 实现可编程网络功能以承载 IPv6 分段路由，绕过内核 SRv6 数据路径，涉及 XDP、TCP/IP、路由与包处理。原摘要截断后未提供具体实现（如 SRv6 End 行为卸载到 AF_XDP 用户态、是否保留 sid 表）、对比基线（内核 SRv6 vs SRA）、吞吐与时延量化。读者关注点在于 SRA 相对内核原生 SRv6 的性能增益及可编程性代价。",
         "summary_en": "The IPv6 Segment Routing (SRv6) is a promising solution to support services such as service function chain (SFC) and network function virtualization (...",
         "source": "Semantic Scholar",
         "tags": [

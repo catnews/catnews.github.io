@@ -5,7 +5,7 @@
       {
         "title": "VISTA: A Benchmark for Real-Time Video Streaming under Network Impairments in Surgical Teleoperation",
         "url": "http://arxiv.org/abs/2605.08886v1",
-        "summary": "Real-time video streaming is crucial in surgical teleoperation, yet reproducible evaluation under realistic network impairments remains limited. This paper presents VISTA, a benchmark designed to study how impairments al...",
+        "summary": "实时视频流在手术遥操作中至关重要，但在真实网络损伤下的可复现评测仍有限。研究提出 VISTA，一个用于研究网络损伤如何影响手术遥操作中实时视频流的 benchmark，涉及网络优化与性能。原摘要截断后未提供具体损伤模型（丢包/时延/抖动/带宽限制）、视频编解码器（H.264/H.265）、对比基线及量化指标（任务完成率、帧率、端到端时延）。读者关注点在于 VISTA 对网络损伤的建模保真度及对内核网络栈（tc netem 之类）的依赖。",
         "summary_en": "Real-time video streaming is crucial in surgical teleoperation, yet reproducible evaluation under realistic network impairments remains limited. This ...",
         "source": "arXiv",
         "tags": [
@@ -18,7 +18,7 @@
       {
         "title": "CrashFixer: A crash resolution agent for the Linux kernel",
         "url": "https://www.semanticscholar.org/paper/d5c2df0b28b29d256d93bf43a12935a656396987",
-        "summary": "Code large language models (LLMs) have shown impressive capabilities on a multitude of software engineering tasks. In particular, they have demonstrated remarkable utility in the task of code repair. However, common benc...",
+        "summary": "代码大语言模型（LLM）在众多软件工程任务上表现出色，尤其在代码修复任务上展现出显著实用性。但常见 benchmark 与真实内核崩溃修复存在差距。研究提出 CrashFixer，面向 Linux 内核的崩溃修复代理，涉及 Linux 内核网络与性能（标签标注）。原摘要截断后未提供具体代理流程（崩溃根因定位→patch 生成）、训练/微调数据、对比基线（人工修复/通用 LLM）及修复成功率/通过率量化。读者关注点在于 CrashFixer 对内核网络子系统崩溃的实际覆盖及 patch 可合并性。",
         "summary_en": "Code large language models (LLMs) have shown impressive capabilities on a multitude of software engineering tasks. In particular, they have demonstrat...",
         "source": "Semantic Scholar",
         "tags": [

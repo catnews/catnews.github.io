@@ -5,7 +5,7 @@
       {
         "title": "Parallel-SFT: Improving Zero-Shot Cross-Programming-Language Transfer for Code RL",
         "url": "http://arxiv.org/abs/2604.20835v1",
-        "summary": "Modern language models demonstrate impressive coding capabilities in common programming languages (PLs), such as C++ and Python, but their performance in lower-resource PLs is often limited by training data availability....",
+        "summary": "现代语言模型在 C++、Python 等主流编程语言上表现出色，但低资源语言上因训练数据不足性能受限。研究面向代码强化学习的零样本跨编程语言迁移，提出 Parallel-SFT 方法以提升模型在低资源 PL 上的代码生成与修复能力。该工作属 LLM/代码生成方向，原摘要截断后未提供具体迁移机制、评测 benchmark（如 HumanEval/XCodeEval）及 pass@k 等量化结果，也未说明与 Linux 内核网络子系统是否存在关联。从 tags（TCP/IP、性能）看，归类可能与内核网络相关性较弱，读者需核对实际内容是否涉及内核代码场景。",
         "summary_en": "Modern language models demonstrate impressive coding capabilities in common programming languages (PLs), such as C++ and Python, but their performance...",
         "source": "arXiv",
         "tags": [

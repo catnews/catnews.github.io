@@ -5,7 +5,7 @@
       {
         "title": "APIOT: Autonomous Vulnerability Management Across Bare-Metal Industrial OT Networks",
         "url": "http://arxiv.org/abs/2605.02346v1",
-        "summary": "Bare-metal operational technology (OT) devices -- especially the microcontrollers running Modbus/TCP and CoAP at the base of industrial control systems -- have remained outside the reach of autonomous security attacks. P...",
+        "summary": "裸机运维技术（OT）设备——尤其是运行于工业控制系统底层的 Modbus/TCP 与 CoAP 微控制器——长期处于自主安全攻击可达范围之外。研究提出 APIOT，面向裸机工业 OT 网络的自主漏洞管理，涉及 TCP/IP 与网络优化。原摘要截断后未提供具体漏洞发现/利用机制、OT 协议覆盖（Modbus/TCP、CoAP）、对微控制器资源约束的适配及评测量化。读者关注点在于 APIOT 是否依赖 Linux 侧探针及对低资源 OT 设备的可达性限制。",
         "summary_en": "Bare-metal operational technology (OT) devices -- especially the microcontrollers running Modbus/TCP and CoAP at the base of industrial control system...",
         "source": "arXiv",
         "tags": [
@@ -18,7 +18,7 @@
       {
         "title": "Geometry-Aware State Space Model: A New Paradigm for Whole-Slide Image Representation",
         "url": "http://arxiv.org/abs/2605.05164v1",
-        "summary": "Accurate analysis of histopathological images is critical for disease diagnosis and treatment planning. Whole-slide images (WSIs), which digitize tissue specimens at gigapixel resolution, are fundamental to this process ...",
+        "summary": "组织病理图像精确分析对疾病诊断与治疗规划至关重要。全切片图像（WSI）以吉像素分辨率数字化组织标本，是该过程的基础。研究提出几何感知状态空间模型，作为全切片图像表示的新范式，涉及 TCP/IP 与网络优化（标签标注，疑似误分类）。原摘要截断后未提供具体模型架构（如基于 Mamba/SSM）、数据集（TCGA/CAMELYON）、对比基线及量化指标。该工作属医学影像/机器学习，与 Linux 内核网络子系统无直接关联，tags 标注明显不当。",
         "summary_en": "Accurate analysis of histopathological images is critical for disease diagnosis and treatment planning. Whole-slide images (WSIs), which digitize tiss...",
         "source": "arXiv",
         "tags": [
@@ -31,7 +31,7 @@
       {
         "title": "Survey of Real-World Process Sandboxing",
         "url": "https://www.semanticscholar.org/paper/2c538e65bd19e831fbb0d9a81739594a5cfbff9c",
-        "summary": "Attackers often exploit vulnerabilities in network-facing processes to gain access to the rest of the system. To combat this, modern operating systems such as Android, iOS and major Linux distributions allow running vuln...",
+        "summary": "攻击者常利用面向网络的进程漏洞获取系统其余部分访问权。为对抗此威胁，Android、iOS 与主流 Linux 发行版等现代操作系统允许以沙箱运行易受攻击进程。研究对真实世界进程沙箱进行综述，涉及网络优化与容器网络（标签标注）。原摘要截断后未提供具体沙箱技术分类（seccomp-bpf、namespaces、Landlock、Pledge）、覆盖平台、对比维度及安全性与性能开销分析。读者关注点在于 Linux 沙箱机制（seccomp/Landlock/namespace）的对比及与容器网络隔离的关系。",
         "summary_en": "Attackers often exploit vulnerabilities in network-facing processes to gain access to the rest of the system. To combat this, modern operating systems...",
         "source": "Semantic Scholar",
         "tags": [

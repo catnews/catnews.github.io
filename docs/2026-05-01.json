@@ -5,7 +5,7 @@
       {
         "title": "ClariNet: Optimizing Cross-Workload Connectivity in VM-Container Hybrid Environments",
         "url": "https://www.semanticscholar.org/paper/2c2141cf5df99f429f2884b8d706d09b60e7a46b",
-        "summary": "Container and VM workloads frequently coexist in modern environments but operate on distinct networking architectures: containers rely on network namespaces, veth pairs, and iptables, whereas VMs use virtual NICs connect...",
+        "summary": "容器与虚拟机负载在现代环境中常共存，但二者运行于不同网络架构：容器依赖 network namespace、veth pair 与 iptables，而 VM 使用连接到网桥的虚拟网卡。研究提出 ClariNet，优化 VM-容器混合环境下的跨负载连通性，借助 eBPF、TCP/IP、Netfilter 与路由机制。原摘要截断后未提供具体优化点（如是否消除多余 veth/iptables 跳、是否用 eBPF 直连 pod 与 VM）、对比基线（Cilium/默认 CNI）、吞吐与时延量化。读者关注点在于 ClariNet 对跨域连通路径的裁剪及与现有 CNI 的兼容性。",
         "summary_en": "Container and VM workloads frequently coexist in modern environments but operate on distinct networking architectures: containers rely on network name...",
         "source": "Semantic Scholar",
         "tags": [
@@ -93,7 +93,7 @@
       {
         "title": "NetSatBench: A Distributed LEO Constellation Emulator with an SRv6 Case Study",
         "url": "http://arxiv.org/abs/2604.27854v1",
-        "summary": "NetSatBench is a distributed emulation platform for evaluating communication protocols and application workloads over large-scale LEO satellite systems. Satellites, gateways, and user terminals are implemented as Linux c...",
+        "summary": "大规模低轨（LEO）卫星星座通信协议与应用负载的评测需要可复现的分布式仿真平台。研究提出 NetSatBench，将卫星、地面站与用户终端实现为 Linux 容器并以 SRv6 案例研究承载，涉及 TCP/IP、路由、驱动与容器网络。原摘要截断后未提供具体仿真机制（如是否用 network namespace + tc netem 模拟链路时延/丢包）、SRv6 用例细节、对比基线及量化指标。读者关注点在于 NetSatBench 对 LEO 动态拓扑（轨道、切换）的建模保真度及在普通 Linux 内核上的可运行性。",
         "summary_en": "NetSatBench is a distributed emulation platform for evaluating communication protocols and application workloads over large-scale LEO satellite system...",
         "source": "arXiv",
         "tags": [

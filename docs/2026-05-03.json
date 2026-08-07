@@ -35,7 +35,7 @@
       {
         "title": "Enterprise Linux Administration at Scale: Strategies for Efficient Installation, Migration, Performance Optimization, and Production Support",
         "url": "https://www.semanticscholar.org/paper/45c03c8dabdcf5fdc07e43b04b4af7aba76d5a3d",
-        "summary": "This paper aims to develop a structured framework for managing large scale Enterprise Linux environments. It focuses on reducing operational friction during installation, migration, performance tuning, and ongoing produc...",
+        "summary": "大规模企业 Linux 环境管理需要结构化框架。研究面向安装、迁移、性能调优与生产运维，提出降低运营摩擦的策略框架，涉及 eBPF、TCP/IP、容器网络与性能。原摘要截断后未提供具体策略（如是否用 Ansible/Kickstart 自动化、是否用 eBPF 做性能观测）、部署规模、与基准工具对比及量化收益。该工作偏运维方法论而非内核网络子系统深度研究，读者应关注其中可落地的内核/网络调优参数清单。",
         "summary_en": "This paper aims to develop a structured framework for managing large scale Enterprise Linux environments. It focuses on reducing operational friction ...",
         "source": "Semantic Scholar",
         "tags": [
@@ -50,7 +50,7 @@
       {
         "title": "Affinity Tailor: Dynamic Locality-Aware Scheduling at Scale",
         "url": "http://arxiv.org/abs/2604.27915v1",
-        "summary": "Modern large multicore systems often run multiple workloads that share CPUs under schedulers such as Linux CFS. To keep CPUs busy, these schedulers load-balance runnable work, causing each workload to execute on many cor...",
+        "summary": "大型多核系统常在 Linux CFS 等调度器下共享 CPU 运行多负载。为保持 CPU 繁忙，调度器做负载均衡导致每个负载在多个核上执行，破坏局部性。研究提出 Affinity Tailor，面向大规模的动态局部性感知调度，涉及 TCP/IP 与性能（标签标注）。原摘要截断后未提供具体调度机制（如是否扩展 CFS 调度域、是否用 NUMA 亲和）、对比基线（CFS/EEVDF）、缓存命中率与时延量化。读者关注点在于 Affinity Tailor 与内核 CFS 的关系（用户态策略还是内核 patch）及对网络软中断负载的影响。",
         "summary_en": "Modern large multicore systems often run multiple workloads that share CPUs under schedulers such as Linux CFS. To keep CPUs busy, these schedulers lo...",
         "source": "arXiv",
         "tags": [
