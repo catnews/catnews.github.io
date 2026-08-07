@@ -1,0 +1,61 @@
+{
+  "date": "2026-08-07",
+  "categories": {
+    "papers": [
+      {
+        "title": "Disdp: Disaggregating Compute, Network, and Storage for Model-Sharded Data-Parallel Training",
+        "url": "https://doi.org/10.1109/isca66397.2026.00171",
+        "summary": "原摘要要点：Model-sharded data parallelism (MSDP), e.g., ZeRO, evenly shards the model states across all GPUs, and thus has been widely adopted by LLM pre-training, such as Llama and DeepSeek, due to its low GPU memory capacity requirement. However, MSDP introduces severe overhead from additional network communication collectives (i.e., AllGather and ReduceScatter). Although the collectives themselves only occupy fewer than 10% of GPU SMs, their execution time increases by 41% due to the...",
+        "summary_en": "Model-sharded data parallelism (MSDP), e.g., ZeRO, evenly shards the model states across all GPUs, and thus has been widely adopted by LLM pre-training, such as Llama and DeepSeek, due to its low GPU memory capacity requirement. However, MSDP introduces severe overhead from additional network communication collectives (i.e., AllGather and ReduceScatter). Although the collectives themselves only occupy fewer than 10% of GPU SMs, their execution time increases by 41% due to the serial execution of aggregated CPU/GPU-managed compute (i.e., GEMM), network (i.e., NCCL), and storage (i.e., optimizer...",
+        "source": "OpenAlex",
+        "tags": [
+          "驱动",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 1
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for July 30, 2026",
+        "url": "https://lwn.net/Articles/1084315/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for July 30, 2026 This edition contains the following feature content: Hazard pointers for the kernel : an alternative approach to lockless data updates that may offer better performance. A report from Debian's new DFSG team : how the ftpmaster team split is working out for the project so far. An operations structure for swap devices : different approaches to an abstraction layer for swap storage. Additional coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : An update on netkit and the use of BPF in user space : the work to allow zero-copy networking within virtual machines continues. Debugging information for inlined functions : adding information about inlined functions to BTF. Fedora approves a smaller GRUB : FESCo gives the go-ahead to a slimmed-down GRUB package for confidential computing and other use cases. Progress toward compiling Linux with gccrs : a look at how the Rust frontend for GCC is progressing. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please",
+        "summary": "本期LWN.net周刊（2026年7月30日）涵盖多项内核与社区动态。其中与网络相关的重要内容是netkit与用户态BPF的进展，旨在实现虚拟机内部的零拷贝网络传输，相关工作在2026年Linux存储、文件系统、内存管理与BPF峰会上进行了汇报。另一项值得关注的是内核中引入的危险指针（hazard pointers）机制，由Mathieu Desnoyers和Paul McKenney提出，作为RCU读拷贝更新之外的另一种无锁数据更新方案。RCU虽然广泛应用，但会增加内存占用并延迟无用对象的回收；危险指针则设计为允许抢占，在某些场景下性能更优。API层面，每个并发引用需分配一个struct hazptr_ctx（通常置于栈上），通过hazptr_acquire获取保护对象、hazptr_release释放、hazptr_detach跨上下文释放、hazptr_synchronize等待所有引用消失后再释放旧对象。实现上采用每CPU四槽位数组，并引入HAZPTR_WILLCARD（0x1UL）作为赋值中间状态以避免acquire与synchronize之间的竞态。当槽位耗尽时使用hazptr_ctx内的备用槽并接入每CPU链表；上下文切换时会通过调度器回调将每CPU槽位移至溢出槽，以让出快速槽位。该补丁系列目前尚无实际用户，可能在上游合并前继续演进。",
+        "keyPoints": [
+          "本期周刊包含netkit与用户态BPF的更新，相关工作致力于在虚拟机内部实现零拷贝网络传输，并在2026年Linux存储、文件系统、内存管理与BPF峰会上汇报进展",
+          "危险指针由Mathieu Desnoyers和Paul McKenney提出，作为RCU读拷贝更新之外的替代方案，旨在对短生命周期不可变对象的引用提供无锁保护",
+          "与RCU要求关闭抢占不同，危险指针设计为允许抢占使用，尽管这种用法可能并非完全最优",
+          "危险指针API要求每个并发使用的指针分配一个struct hazptr_ctx结构体，通常放置在调用栈上",
+          "API包含四个核心调用：hazptr_acquire获取受保护对象的当前值、hazptr_release在完成访问后释放引用、hazptr_detach允许在其他执行上下文释放指针、hazptr_synchronize等待所有引用消失",
+          "实现采用每CPU数组并预留四个槽位，hazptr_acquire会找到空闲槽并存储待保护地址，hazptr_synchronize扫描各CPU槽位直至目标地址不再被任何槽位引用",
+          "为防止acquire读取指针与写入槽位之间发生竞态导致对象被提前释放，引入第三种槽位状态HAZPTR_WILLCARD（值为0x1UL），acquire先写入通配符再读取真实地址，synchronize将通配符视为匹配目标",
+          "当每CPU四槽位全部被占用时，使用hazptr_ctx中的备用溢出槽，并将该结构链入每CPU链表；为避免读写链表时的竞态，实际维护两套每CPU链表分别用于添加与扫描",
+          "调度器在上下文切换时注册的回调会将每CPU槽位转移到对应的溢出槽位，使被抢占线程让出快速槽位给后续运行线程使用",
+          "hazptr_detach调用会将指定指针立即移入溢出槽（若尚未在溢出槽中），从而释放被占用的每CPU槽位供其他用途",
+          "危险指针补丁系列仍处于较早期状态，尚未包含任何API使用者，而内核子系统通常要求有用户随补丁一起提交，作者预计API可能在上游合并前继续调整",
+          "本期周刊其他专题包括Debian新DFSG团队报告（2025年10月从ftpmaster拆分而来，负责审查新软件包是否符合Debian自由软件指南）、交换设备的operations抽象层、内联函数的BTF调试信息、Fedora批准更小的GRUB用于机密计算等场景、Linux用gccrs编译的Rust前端进展"
+        ],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "危险指针",
+          "无锁同步",
+          "RCU"
+        ],
+        "readingTime": 12,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "驱动": 1,
+    "网络优化": 1,
+    "Linux内核网络": 1,
+    "危险指针": 1,
+    "无锁同步": 1,
+    "RCU": 1
+  }
+}
