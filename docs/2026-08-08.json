@@ -1,0 +1,242 @@
+{
+  "date": "2026-08-08",
+  "categories": {
+    "papers": [
+      {
+        "title": "EPSO: A Caching-Based Efficient Superoptimizer for BPF Bytecode",
+        "url": "http://arxiv.org/abs/2511.15589v1",
+        "summary": "研究面向 Linux 内核 eBPF 字节码的超级优化问题。背景：eBPF 通过内核内的 verifier 强制执行严格安全约束（如 BPF 程序最大指令数），叠加 eBPF 在网络/XDP/可观测性等性能敏感场景的广泛使用，使得编译后优化至关重要；而 Clang 等现有编译器对 eBPF 的优化能力有限，许多语义保持的变换会被 verifier 拒绝，导致手工编写优化规则代价高且收益有限。核心方法 EPSO 采用基于缓存的超级优化器：离线阶段通过超级优化自动搜索 eBPF 等价重写规则并缓存，在运行时复用这些规则完成高质量代码优化，从而降低逐次求解的计算开销。实验部分在 Linux 内核基准以及 Cilium、Katran、hXDP、Sysdig、Tetragon、Tracee 等 eBPF 项目的 benchmark 上评估，EPSO 共发现 795 条重写规则，相对 Clang 输出最高削减 68.87%、平均 24.37% 的程序规模，并在所有基准上优于 K2、在 92.68% 基准上优于 Merlin；运行时长平均缩短 6.60%，对网络应用的吞吐与延迟均有提升。读者应关注：原摘要未提供 verifier 对重写后指令的实际接受性细节以及在 XDP/TC 等具体数据面 hook 上的端到端性能数据；EPSO 属工具链层优化，不修改内核 BPF 子系统源码，但其产出的程序直接运行在内核 eBPF 虚拟机，对 BPF 程序维护者与内核网络数据面开发者具有参考价值。",
+        "summary_en": "Extended Berkeley Packet Filter (eBPF) allows developers to extend Linux kernel functionality without modifying its source code. To ensure system safety, an in-kernel safety checker, the verifier, enforces strict safety constraints (for example, a limited program size) on eBPF programs loaded into the kernel. These constraints, combined with eBPF's performance-critical use cases, make effective optimization essential. However, existing compilers (such as Clang) offer limited optimization support, and many semantics-preserving transformations are rejected by the verifier, which makes handcrafte...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "超级优化",
+          "verifier",
+          "容器网络"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 10
+      },
+      {
+        "title": "hXDP: Efficient Software Packet Processing on FPGA NICs",
+        "url": "http://arxiv.org/abs/2010.14145v1",
+        "summary": "针对FPGA NIC资源有限、编程门槛高的问题，研究在FPGA上运行Linux XDP/eBPF程序的可行性。eBPF的迭代执行模型与FPGA加速器不匹配，但研究指出大量eBPF指令在专用FPGA执行器上可被压缩、并行化或消除。基于此设计hXDP系统，包含三个核心组件：(i) 优化编译器，将eBPF字节码并行化并翻译为自定义扩展eBPF ISA；(ii) 软核CPU，在FPGA上执行该ISA指令；(iii) FPGA基础设施，复现Linux内核定义的XDP maps与helper函数。系统在FPGA NIC上完整实现并运行未经修改的真实eBPF程序，时钟频率156.25MHz，仅占用约15% FPGA资源，支持动态加载程序。实测吞吐量达到单核高端CPU水平，数据包转发延迟降低10倍。该工作直接面向Linux XDP卸载场景，对内核网络社区的参考价值在于验证了eBPF指令级并行化与硬件映射的可行性，以及将XDP maps/helper函数移植到非CPU执行环境的兼容边界；限制在于软核CPU顺序执行模型与eBPF helper调用的硬件实现成本，落地时需关注具体FPGA型号的 LUT/BRAM/ DSP资源配比。",
+        "summary_en": "FPGA accelerators on the NIC enable the offloading of expensive packet processing tasks from the CPU. However, FPGAs have limited resources that may need to be shared among diverse applications, and programming them is difficult.   We present a solution to run Linux's eXpress Data Path programs written in eBPF on FPGAs, using only a fraction of the available hardware resources while matching the performance of high-end CPUs. The iterative execution model of eBPF is not a good fit for FPGA accelerators. Nonetheless, we show that many of the instructions of an eBPF program can be compressed, par...",
+        "source": "arXiv",
+        "tags": [
+          "XDP",
+          "eBPF",
+          "FPGA NIC offload",
+          "硬件卸载"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 9
+      },
+      {
+        "title": "Implementing the L4S Architecture in the ns-3 Simulator",
+        "url": "http://arxiv.org/abs/2603.20166v1",
+        "summary": "针对云游戏、增强现实等应用对超低时延的需求，传统拥塞控制在 bufferbloat 上表现不佳。L4S 架构通过可扩展拥塞控制（如 TCP Prague）、低延迟队列管理与优先级调度、AccECN 精确反馈三类机制联合解决该问题。论文在 ns-3 中实现了一套完整的 L4S 高保真模型，覆盖 ECN-echo 与 AccECN 协商、Per-Packet 标记的可扩展拥塞控制、L4S-aware dual-queue（FQ 中的低延迟/经典双优先级类）以及共享 low-q delay 估计等组件，并提供可复现实验框架。评估通过 ns-3 仿真场景对比 L4S 流与经典 CUBIC 流在瓶颈链路上的队列延迟、单向时延分布、吞吐与 ECN 反馈频率等指标，验证所建模型与已有 Linux 内核实测行为的吻合度。该工作不直接修改 Linux 内核 TCP/qdisc 路径，而是为研究人员提供脱离真机即可评估 TCP Prague、双队列 FQ、AccECN 等机制的工具。对内核网络读者的落地点在于：可借助该仿真器在协议修订、参数调优（如 L4S 阈值、AccECN CE 编码）阶段做前置验证，但与真实内核 L4S 数据面（如 sch_fq 中的 L4S_BIT）在丢包/重传时序上可能存在差异，原文未提供与 Linux 实测的逐字节对齐结论，需重点核对。",
+        "summary_en": "The demand for ultra-low latency in modern applications, such as cloud gaming and augmented reality, has exposed the limitations of traditional congestion control algorithms regarding bufferbloat. The Low Latency, Low Loss, and Scalable Throughput (L4S) architecture addresses this challenge by combining scalable congestion controls, such as TCP Prague, low-latency queue management with prioritization, and Accurate ECN (AccECN) feedback. Although Linux kernel implementations exist, the research community lacks a complete, high-fidelity model within the Network Simulator 3 (ns-3) for reproducibl...",
+        "source": "arXiv",
+        "tags": [
+          "L4S",
+          "TCP-Prague",
+          "AccECN",
+          "ns-3"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 8
+      },
+      {
+        "title": "SENS: Semantic-Aware Coalescing for High-Performance NVMe over TCP Storage Networks",
+        "url": "https://doi.org/10.3390/electronics15091801",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "In HPC systems and hyper-scale data centers, the adoption of high-performance NVMe SSDs and high-speed networks has shifted storage bottlenecks to the network stack. Under high-concurrency workloads, frequent interrupt processing exhausts CPU resources while protocol-level control–data dependencies in the NVMe over TCP write path introduce additional serialization penalties. Existing optimizations either require specialized hardware, dedicate CPU cores to user-space polling, or apply semantically blind batching that delays time-sensitive control messages. We present SENS, a Semantic-aware NVMe...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "Linux内核网络",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 10
+      },
+      {
+        "title": "Leveraging Coupled BBR and Adaptive Packet Scheduling to Boost MPTCP",
+        "url": "http://arxiv.org/abs/2002.06284v2",
+        "summary": "针对现有 MPTCP 在丢包与动态网络下因基于丢包的拥塞控制和多子流调度困难导致性能不佳的问题，提出 Coupled BBR 拥塞控制算法与 Adaptively Redundant and Packet-by-Packet (AR&P) 调度器。Coupled BBR 在丢包网络中实现高吞吐与稳定发送速率，保证与 TCP BBR 单流之间的公平性，并平衡各子流间的拥塞水平；AR&P 调度器包含两种调度方法，分别用于提升高动态网络场景下的自适应能力与维持非对称网络中的有序交付。实验基于 Linux 内核 MPTCP 实现完成，分别在测试床和真实网络场景中验证。结果显示方案在高丢包与动态条件下相比既有 MPTCP 拥塞控制方案提供更高吞吐，增强鲁棒性，并降低乱序包数量。论文直接修改 Linux 内核 MPTCP 子系统的拥塞控制与调度路径，对内核网络维护者的参考点在于 BBR 与多子流耦合的窗口/Pacing 控制以及冗余+逐包混合调度在异构路径下的实际收益。",
+        "summary_en": "Quite a few algorithms have been proposed to optimize the transmission performance of Multipath TCP (MPTCP). However, existing MPTCP protocols are still far from satisfactory in lossy and ever-changing networks because of their loss-based congestion control and the difficulty of managing multiple subflows. Recently, a congestion-based congestion control, BBR, is proposed to promote TCP transmission performance through better use of bandwidth. Due to the superior performance of BBR, we try to boost MPTCP with it. For this propose, coupled congestion control should be redesigned for MPTCP, and a...",
+        "source": "arXiv",
+        "tags": [
+          "MPTCP",
+          "BBR",
+          "coupled_congestion_control",
+          "packet_scheduler"
+        ],
+        "readingTime": 7,
+        "relevance": "high",
+        "innovationScore": 8
+      },
+      {
+        "title": "SafeBPF: Hardware-assisted Defense-in-depth for eBPF Kernel Extensions",
+        "url": "http://arxiv.org/abs/2409.07508v1",
+        "summary": "针对 Linux 内核 eBPF 框架长期暴露内存安全漏洞、被迫禁止非特权 eBPF 加载的现状，提出 SafeBPF 设计，将 eBPF 程序与内核其余部分隔离，阻止内存安全漏洞被利用以破坏内核。实现包含两条路径：一条纯软件方案，基于 Software-based Fault Isolation（SFI）在 eBPF 解释器/JIT 出口插入内存边界检查；另一条硬件辅助方案，利用 ARM Memory Tagging Extension（MTE）为 eBPF 使用的栈/对象打标签，运行时检测指针标签失配以拦截越界访问。评估在 macrobenchmark 上测量，SafeBPF 带来最高约 4% 的性能开销，同时满足期望的内存隔离与控制流完整性安全属性。该工作面向所有依赖 eBPF 的子系统，包括内核网络栈中的 XDP、tc、socket BPF 与 netfilter hook，因此对 Linux 内核 eBPF 维护者而言，SafeBPF 提供了非特权 eBPF 重新开放的可能性路径。读者需关注的具体落地点：SFI 方案对 eBPF 指令集的检查点完备性、MTE 方案在通用 ARM 服务器上的标签分配开销，以及与现有 BPF verifier 的关系（是否替代或互补）。原摘要未提供具体 microbenchmark 数据集、对比基线名称与各方案分别的开销数值。",
+        "summary_en": "The eBPF framework enables execution of user-provided code in the Linux kernel. In the last few years, a large ecosystem of cloud services has leveraged eBPF to enhance container security, system observability, and network management. Meanwhile, incessant discoveries of memory safety vulnerabilities have left the systems community with no choice but to disallow unprivileged eBPF programs, which unfortunately limits eBPF use to only privileged users. To improve run-time safety of the framework, we introduce SafeBPF, a general design that isolates eBPF programs from the rest of the kernel to pre...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "内存安全",
+          "ARM MTE",
+          "SFI"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "In-Network Cyber Protection for Modern EPES: The COCOON Programmable Node Architecture",
+        "url": "https://doi.org/10.1109/eucnc/6gsummit68295.2026.11577562",
+        "summary": "针对现代电力与能源系统（EPES）面临的网络安全威胁，COCOON 项目提出可编程节点架构 CPN，用于在 IoT、Edge、工业网络等资源受限环境中执行高速网络安全监控与控制。CPN 架构核心是 eBPF-based 可编程数据面，支持状态化的端主机网络栈编程与功能组合（function composition），并通过 CPN 控制器进行编排与预配置管理（pre-configuration）。整体设计强调平台无关性（platform independent），可在不同硬件与操作系统间部署。\n\n该工作与 Linux 内核网络的关联点在于 eBPF 作为网络数据包处理的内核接口：论文利用 BPF hook 实现可编程数据面，但并未深入修改内核网络栈源码路径（如 sk_buff、netfilter、qdisc、TCP 内部等），属于通过内核暴露的 eBPF 接口扩展网络能力的范畴。读者应关注的限制包括：eBPF 程序在内核验证器约束下的表达能力上限（受限于指令数、循环、栈深度），状态化处理需要借助 BPF map 或 ringbuffer 等结构带来的开销，以及在 IoT/工业资源受限设备上部署 BPF 运行时（如 libbpf/cilium）的兼容性与性能权衡。原摘要未提供具体的吞吐量、时延、丢包率等量化评估指标与对比基线结果，需查阅正文补充。",
+        "summary_en": "As part of the COoperative Cyber prOtectiON for modern power grids (COCOON) Horizon Europe Innovation Action11https://cordis.europa.eu/project/id/101120221, researchers at the University of Glasgow have built COCOON Programmable Node (CPN) architecture to support stateful end-host network stack programmability and function composition for high-speed cybersecurity monitoring and control in resource-constrained environments such as IoT, Edge, and industrial networks while being platform independent. This CPN architecture comprises an eBPF-based programmable data plane, CPN controller with pre-co...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "可编程数据面",
+          "网络安全",
+          "工业IoT"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 2
+      },
+      {
+        "title": "ALCS: An Adaptive Latency Compensation Scheduler for Multipath TCP in Satellite-Terrestrial Integrated Networks",
+        "url": "http://arxiv.org/abs/2503.07973v1",
+        "summary": "针对卫星-地面融合网络（STIN）下传统多路径调度器难以处理链路异构、不稳定与频繁切换的问题，提出自适应时延补偿调度器 ALCS。ALCS 在传输时延估计中融合 RTT、拥塞窗口（cwnd）、在飞包数（inflight）、排队包数以及 LEO 卫星轨迹信息，对慢路径进行时延补偿并预测切换窗口，从而提前切换以避免丢包与吞吐抖动。算法落地于 Linux 内核 MPTCP 调度器（替换 mptcp 子系统中的 scheduler 回调），在基于网络模拟器构建的 STIN 仿真测试床中对比 BLEST、ECF、最小 RTT 等基准调度器。实验结果显示 ALCS 在卫星-地面混合拓扑下吞吐提升 9.8%–44.0%，并显著降低切换期间的数据中断时长。读者关注点包括：依赖仿真而非真实 LEO 实测链路、对 cwnd/inflight 估计依赖内核 MPTCP 路径管理器暴露的状态、对被动切换场景的处理能力、以及在 v0/v1 不同 MPTCP 内核接口上的兼容成本。",
+        "summary_en": "The Satellite-Terrestrial Integrated Network (STIN) enhances end-to-end transmission by simultaneously utilizing terrestrial and satellite networks, offering significant benefits in scenarios like emergency response and cross-continental communication. Low Earth Orbit (LEO) satellite networks offer reduced Round Trip Time (RTT) for long-distance data transmission and serve as a crucial backup during terrestrial network failures. Meanwhile, terrestrial networks are characterized by ample bandwidth resources and generally more stable link conditions. Therefore, integrating Multipath TCP (MPTCP) ...",
+        "source": "arXiv",
+        "tags": [
+          "MPTCP",
+          "多路径调度",
+          "STIN",
+          "Linux内核网络"
+        ],
+        "readingTime": 6,
+        "relevance": "high",
+        "innovationScore": 8
+      },
+      {
+        "title": "Implementation and Evaluation of Data Center Congestion Controller with Switch Assistance",
+        "url": "http://arxiv.org/abs/2106.14100v1",
+        "summary": "研究针对数据中心网络（DCN）中租户虚拟机无法被运营商修改的现实约束，提出由交换机驱动的拥塞控制算法。核心机制在交换机侧修改数据包 TCP 头部的 receive-window 字段，将预计算的目标速率强制作用到发送端，从而无需改动 TCP 源端或接收端代码。系统给出两套实现：一是作为 Linux 内核模块部署，二是作为新增特性集成到 Open vSwitch（OVS）软件交换机中，使运营商可在公开云环境下对租户流量实施速率约束。实验基于小型测试床部署两套原型，对比评估吞吐量、带宽分配公平性以及面向延迟敏感短流的流完成时间（FCT）。结果表明该机制在高吞吐、共享链路公平分配以及短流快速完成方面均有效。该工作对 Linux 内核网络的落地点在于：内核模块形态直接介入 TCP 协议栈出口路径并改写窗口字段，属于内核网络子系统的扩展点；OVS 形态则利用内核态 datapath 与用户态 ovs-vswitchd 协作完成策略执行，需关注 GSO/TSO 校验和重算、sk_buff 字段回写以及与 conntrack、tc 分类器的协同；读者应留意该方案对端到端窗口语义的影响，以及与内核现有拥塞控制（BBR/CUBIC/dctcp）的冲突边界。",
+        "summary_en": "In this work, we provide the design and implementation of a switch-assisted congestion control algorithm for data center networks (DCNs). In particular, we provide a prototype of the switch-driven congestion control algorithm and deploy it in a real data center. The prototype is based on few simple modifications to the switch software. The modifications imposed by the algorithm on the switch are to enable the switch to modify the TCP receive-window field in the packet headers. By doing so, the algorithm can enforce a pre-calculated (or target rate) to limit the sending rate at the sources. The...",
+        "source": "arXiv",
+        "tags": [
+          "data center networking",
+          "congestion control",
+          "TCP receive window",
+          "Open vSwitch"
+        ],
+        "readingTime": 6,
+        "relevance": "high",
+        "innovationScore": 7
+      },
+      {
+        "title": "Design and Implementation of Fair Congestion Control for Data Centers Networks",
+        "url": "http://arxiv.org/abs/2012.00339v1",
+        "summary": "研究针对数据中心中突发复合流量、小带宽时延积与有限交换机缓冲区所导致的拥塞问题。传统TCP拥塞控制在此场景表现不佳，而修改TCP在公有环境中又不可行。核心方法采用基于交换机的队列管理方案，不改动TCP发送端/接收端算法，仅在交换机/节点侧处理队列，理论分析给出了方案的稳定性证明。共给出三种真实实现：Linux内核模块、Open vSwitch新增特性以及配合现有交换机的部署形态。评估包含NS-2仿真与小规模测试集群上的实测，对比指标涵盖总吞吐、流间公平性以及面向延迟敏感短流的流完成时间（FCT）。结果显示该方案在保持高吞吐的同时改善了短流延迟和公平性。与Linux内核网络的关联在于其内核模块实现落在qdisc/队列管理路径上，读者应关注：测试集群规模较小，公有数据中心实际部署的可扩展性与对现有tc/qdisc框架的兼容性；以及与DCTCP、ECN等数据中心已有拥塞控制机制的对比缺失。",
+        "summary_en": "In data centers, the nature of the composite bursty traffic along with the small bandwidth-delay product and switch buffers lead to several congestion problems that are not handled well by traditional congestion control mechanisms such as TCP. Existing work try to address the problem by modifying TCP to suit the operational nature of data centers. This is practically feasible in private settings, however, in public environments, such modifications are prohibited. Therefore, in this work, we design simple switch-based queue management to deal with such congestion issues adequately. This approac...",
+        "source": "arXiv",
+        "tags": [
+          "qdisc",
+          "Open vSwitch",
+          "数据中心拥塞控制",
+          "Linux内核模块"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 8
+      },
+      {
+        "title": "Model Predictive Congestion Control for TCP Endpoints",
+        "url": "http://arxiv.org/abs/2002.09825v1",
+        "summary": "针对科研网络与私有广域网中多并发流难以维持稳定 pacing 速率的问题，提出基于模型预测控制 (MPC) 的 TCP 拥塞控制算法。该方法将瓶颈链路建模为队列，推导 pacing 速率与 RTT 之间的解析关系，并据此设计 MPC 控制器，使发送端在拥塞时不再出现当前主流算法 (CUBIC / BBR 类) 的极端拥塞窗口回落，从而维持平滑的 pacing 速率与低抖动 RTT。算法以 Linux 内核模块形式落地，直接接入 TCP 拥塞控制子系统，可在多个并发流间按需分配不同的目标 pacing 速率，只要总和小于瓶颈带宽即可保持各自分配的速率。实验通过仿真与真实网络测试验证：即使瓶颈链路接近满载、不同流 RTT 差异显著，RTT 与 pacing 速率的标准差仍维持低位。读者应关注其 Linux 内核模块对拥塞状态机与 pacing 定时器的改动位置，以及 MPC 求解在每 RTT 周期的计算开销对吞吐的影响；摘要未提供具体 RTT/速率数值与基线对比算法名称。",
+        "summary_en": "A common problem in science networks and private wide area networks (WANs) is that of achieving predictable data transfers of multiple concurrent flows by maintaining specific pacing rates for each. We address this problem by developing a control algorithm based on concepts from model predictive control (MPC) to produce flows with smooth pacing rates and round trip times (RTTs). In the proposed approach, we model the bottleneck link as a queue and derive a model relating the pacing rate and the RTT. A MPC based control algorithm based on this model is shown to avoid the extreme window (which t...",
+        "source": "arXiv",
+        "tags": [
+          "TCP 拥塞控制",
+          "Linux 内核模块",
+          "模型预测控制",
+          "pacing"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 5
+      }
+    ],
+    "news": [
+      {
+        "title": "Cilium 1.20, Network Policy enhancements, Multi Pool IPAM goes stable, IPv6 progress, and more!",
+        "url": "https://isovalent.com/blog/post/cilium-1-20/?utm_medium=referral&utm_campaign=cilium-blog",
+        "summary": "Cilium 1.20 发布多项关键能力：Multi Pool IPAM 转正，支持在集群内同时配置多个 IP 地址池并按 Pod/命名空间等维度分配 IPv4/IPv6，简化多租户与跨网络互联；Network Policy 增强，包括基于 FQDN 过滤的 DNS 可见性优化、L7 策略对 gRPC/HTTP 更细粒度匹配，以及对 egress gateway 的策略联动；IPv6 路径持续推进，双栈部署更成熟，IPv6 BIG TCP 支持以提升吞吐；内核版本基线继续上调，依赖更新的 eBPF 特性如 kprobe multi-link、ringbuf 等。该版本是 eBPF 数据面容器网络的重要演进，值得关注对生产集群内核版本要求及对 ClusterMesh 的影响。",
+        "source": "Cilium Blog",
+        "tags": [
+          "容器网络",
+          "eBPF/XDP",
+          "容器网络数据面",
+          "IPv6/IPAM"
+        ],
+        "readingTime": 4,
+        "relevance": "high"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF": 4,
+    "超级优化": 1,
+    "verifier": 1,
+    "容器网络": 1,
+    "XDP": 1,
+    "FPGA NIC offload": 1,
+    "硬件卸载": 1,
+    "L4S": 1,
+    "TCP-Prague": 1,
+    "AccECN": 1,
+    "ns-3": 1,
+    "TCP/IP": 1,
+    "驱动": 1,
+    "Linux内核网络": 2,
+    "网络优化": 1,
+    "MPTCP": 2,
+    "BBR": 1,
+    "coupled_congestion_control": 1,
+    "packet_scheduler": 1,
+    "内存安全": 1,
+    "ARM MTE": 1,
+    "SFI": 1,
+    "可编程数据面": 1,
+    "网络安全": 1,
+    "工业IoT": 1,
+    "多路径调度": 1,
+    "STIN": 1,
+    "data center networking": 1,
+    "congestion control": 1,
+    "TCP receive window": 1,
+    "Open vSwitch": 2,
+    "qdisc": 1,
+    "数据中心拥塞控制": 1,
+    "Linux内核模块": 1,
+    "TCP 拥塞控制": 1,
+    "Linux 内核模块": 1,
+    "模型预测控制": 1,
+    "pacing": 1,
+    "eBPF/XDP": 1,
+    "容器网络数据面": 1,
+    "IPv6/IPAM": 1
+  }
+}
