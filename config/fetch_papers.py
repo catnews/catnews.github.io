@@ -958,17 +958,15 @@ def contains_chinese(text):
 
 def chinese_fallback_summary(title, content, tags, is_news=False):
     """Heuristic fallback when LLM is unavailable or returns a generic
-    summary. Provide a short Chinese lead plus the original abstract's
-    key sentences, without echoing the paper title and without templated
-    filler like "归入...方向。阅读时重点核对三点...".
+    summary. Returns a clear Chinese hint instead of dumping the English
+    abstract verbatim with a Chinese prefix ("原摘要要点：<english>"),
+    which previously read like a bug rather than a deliberate fallback.
+    The Phase 6.5 retry round in main() attempts to replace this with a
+    real LLM-generated Chinese summary; if retry still fails, this hint
+    stays and the reader falls back to summary_en.
     """
-    source_content = content if has_usable_abstract(content, title, min_len=60) else ""
-    sentences = extract_abstract_sentences(source_content, max_sentences=4)
-    if sentences:
-        brief = " ".join(sentences)
-        if len(brief) > 480:
-            brief = brief[:480].rstrip() + "..."
-        return f"原摘要要点：{brief}"
+    if has_usable_abstract(content, title, min_len=60):
+        return "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。"
     return "原摘要信息不足，建议打开原文查看研究目标、方法与实验设置。"
 
 def parse_json_object(response):
@@ -2058,6 +2056,49 @@ def main():
         
         if len(selected_papers) >= MAX_PAPERS:
             break
+
+    # Phase 6.5: Retry LLM for papers that fell into chinese_fallback_summary
+    # (typically because the first call_minimax hit a transient 429 / timeout
+    # while quick_filter phase was draining the MiniMax quota). A short
+    # cool-off + spaced retries usually recovers real Chinese summaries
+    # instead of leaving the ugly "⚠️ 此论文 AI 中文总结暂未生成..." hint.
+    def _is_fallback_summary(s):
+        s = (s or "").lstrip()
+        return s.startswith("⚠️") or s.startswith("原摘要信息不足")
+
+    fallback_papers = [p for p in selected_papers if _is_fallback_summary(p.get("summary", ""))]
+    if fallback_papers:
+        print(f"\n[Phase 6.5] Retrying LLM for {len(fallback_papers)} papers that fell into fallback...")
+        time.sleep(25)
+        retry_rounds = 2
+        for round_idx in range(retry_rounds):
+            if not fallback_papers:
+                break
+            print(f"  retry round {round_idx + 1}/{retry_rounds}: {len(fallback_papers)} papers left")
+            still_failed = []
+            for i, paper in enumerate(fallback_papers):
+                print(f"  [{i+1}/{len(fallback_papers)}] {paper['title'][:50]}...")
+                time.sleep(LLM_DELAY_MAX)
+                retry_content = paper.get("summary_en", "") or paper.get("title", "")
+                analysis = analyze_item_with_llm(paper["title"], retry_content, is_news=False)
+                new_summary = (analysis or {}).get("summary", "")
+                if new_summary and not _is_fallback_summary(new_summary):
+                    paper["summary"] = new_summary
+                    if analysis.get("tags"):
+                        paper["tags"] = normalize_tags(analysis["tags"], max_tags=4)
+                    paper["readingTime"] = analysis.get("readingTime", paper.get("readingTime", 5))
+                    paper["relevance"] = analysis.get("relevance", paper.get("relevance", "high"))
+                    paper = sanitize_item(paper, is_news=False)
+                    print(f"    ✓ retry succeeded")
+                else:
+                    print(f"    ✗ retry still failed; keeping fallback")
+                    still_failed.append(paper)
+            fallback_papers = still_failed
+            if fallback_papers and round_idx < retry_rounds - 1:
+                wait_s = 45
+                print(f"  cool-off {wait_s}s before next round...")
+                time.sleep(wait_s)
+        print(f"[Phase 6.5] done: {len(selected_papers) - len(fallback_papers)}/{len(selected_papers)} papers have LLM summaries")
     
     print(f"\n[Phase 7] Detailed analysis of {len(filtered_news)} filtered news...")
     for i, item in enumerate(filtered_news):
