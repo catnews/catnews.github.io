@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-10",
+  "categories": {
+    "papers": [
+      {
+        "title": "Sandboxing and Data Protection in Cloud Computing Environments",
+        "url": "https://hdl.handle.net/10446/330565",
+        "summary": "研究针对云计算环境中敏感数据处理与服务编排的复杂安全问题，提出基于 Linux 内核模块的进程级沙箱强制机制。原摘要为书稿介绍，正文未展开具体技术细节，仅指出方法依赖 Linux kernel module 加载机制对运行中进程实施访问控制与隔离约束，目标是为云端多服务场景提供更强的安全与数据保护支撑。摘要截断处提及系统可扩展地拦截进程的系统调用与资源访问行为，但具体拦截点（是否涉及 seccomp、LSM、netfilter、eBPF 等）未在已提供文本中说明，与 Linux 内核网络子系统的 tcp/ip stack、netfilter、XDP、socket、virtio-net、qdisc 等代码路径无直接关联。从可见信息判断，本书面向云安全与容器/多租户隔离场景，读者如关注 Linux 内核网络栈或高速网络数据面，本书不在其参考范围内。读者应关注：原摘要未提供具体数据结构、算法名称、实验数据集、性能指标（如吞吐/时延/丢包率）或对比基线等技术细节，仅有高层目标描述。",
+        "summary_en": "Cloud systems provide a flexible and efficient approach to managing modern applications and services. Their adaptability enables developers to define interactions among services, allocate resources as needed, and support scalable application development. However, the complexity of these systems, along with the sensitive data they often handle, necessitates robust security and data protection mechanisms. This book presents novel approaches to enhancing security in cloud environments by leveraging Linux kernel modules to enforce sandboxing on running processes. The proposed solutions aim to stre...",
+        "source": "OpenAlex",
+        "tags": [
+          "云安全",
+          "Linux内核模块",
+          "进程沙箱",
+          "数据保护"
+        ],
+        "readingTime": 3,
+        "relevance": "none",
+        "innovationScore": 7
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "云安全": 1,
+    "Linux内核模块": 1,
+    "进程沙箱": 1,
+    "数据保护": 1
+  }
+}
