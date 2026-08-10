@@ -1,0 +1,50 @@
+{
+  "date": "2026-08-11",
+  "categories": {
+    "papers": [
+      {
+        "title": "Mitigating the Double-Reallocation Issue for IPv6 Lightweight Tunnel Encapsulations in the Linux Kernel",
+        "url": "https://www.semanticscholar.org/paper/828e4443c4568024e8307f9b01cf54c156b46b0c",
+        "summary": "研究聚焦 Linux 内核 IPv6 轻量级隧道（LWT）封装路径中存在的 sk_buff 双重重复分配性能缺陷。LWT 作为内核按路由封装机制，被 IOAM、SRv6、RPL 等协议广泛使用；其现有实现在特定条件下触发对 sk_buff 的两次重复拷贝，造成吞吐率显著下降。作者通过分析定位该缺陷的根因，发现其触发条件与 CPU 架构以及 NIC 的处理特性耦合：在某些 CPU/NIC 组合下，封装路径先做一次 skb 再分配随后又因后续处理再次重新分配，构成冗余路径。提出面向 Linux 内核的修复补丁，将双重 reallocation 替换为单次高效分配，避免冗余 sk_buff 拷贝与内存压力。性能评估以转发吞吐率为关键指标，在受影响的 IOAM、SRv6、RPL 隧道场景下进行对比，验证补丁可消除效率低下的双重分配，转发速率最高提升 28.8%。该工作直接落在内核网络数据面代码路径，对维护者的落地点在于：LWT 封装流程的 sk_buff 生命周期需对齐 NIC scatter-gather / 头预取能力，避免在非必要路径上重复拷贝；补丁应关注与现有 SRv6 行为及 RPL 低功耗场景下内存约束的兼容性，避免修复引入新的边界场景性能回退。",
+        "summary_en": "Lightweight Tunnels (LWTs) in the Linux kernel enable efficient per-route tunneling and are widely used by protocols such as In Situ Operations, Administration, and Maintenance (IOAM), Segment Routing over IPv6 (SRv6), and Routing Protocol for Low-Power and Lossy Networks (RPL). However, a performance issue was detected in their implementations, where a double-reallocation of socket buffers occurs under specific conditions, leading to significant throughput degradation. This paper investigates the root cause of the issue, which depends on the architecture of the Central Processing Unit (CPU) a...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "LWT",
+          "sk_buff",
+          "IPv6隧道",
+          "内核补丁"
+        ],
+        "readingTime": 4,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "Aggregating Without Bloating: Hard Times for TCP on Wi-Fi",
+        "url": "https://www.semanticscholar.org/paper/353a55c6eb3de8dd1a0ce2a3bdb0006ab40ebe52",
+        "summary": "研究聚焦 Linux 内核 TCP 栈中两个关键机制——TCP Small Queues (TSQ) 与 TCP Pacing (TP)——在 IEEE 802.11n/ac WLAN 场景下与 MAC 层帧聚合逻辑的交互及性能权衡。TSQ 通过在物理层未确认传输完成前限制每个 TCP socket 在 sk_buff 队列中的积压包数（典型上限 4 个），降低 qdisc 与 driver queue 中的 bufferbloat；TP 则在 FQ qdisc 或 TCP 内部 pacing clock 调度下，控制 socket 入队速率以平滑突发，避免链路突发超出 MAC 聚合窗口。两者本意缓解 buffer bloat，但与 802.11n/ac 的 A-MPDU 帧聚合期望发送长突发以填充分组数量的设计形成张力：过严的 TSQ/激进 pacing 会拆散 MAC 聚合块、降低 PPDU 利用率，进而压低吞吐；过松则恢复 bufferbloat，抬升 RTT 与丢包。论文在不同 TSQ 与 TP 策略组合下，对多种 TCP 拥塞控制算法（CUBIC、BBR 等）的吞吐、时延与帧聚合效率做实验测量，揭示延迟—吞吐帕累托前沿在 WLAN 上的偏移。该工作对内核网络维护者的价值在于提供 TSQ/pacing 阈值与 WLAN 聚合参数协同调整的实测依据；落地点为内核 sysctl（如 tcp_tso_win_divisor、tcp_pacing_ss_ratio）及驱动/固件侧的聚合窗口配置。",
+        "summary_en": "ABSTRACT\n\nA number of Linux kernel modules have been added to the TCP/IP stack since the buffer bloat phenomena was defined, although there aren’t many experimental research on their impacts.\nwhen used with WLAN technology, specifically IEEE 802.11n and IEEE 802.11ac. TCP Small Queues (TSQ) is a crucial method that limits how many packets a TCP socket can queue in the stack. It does this by waiting for the physical layer to transfer the packets before enqueuing additional data. TCP Pacing (TP), a second important TCP mechanism, controls the speed at which the socket enqueues packets in the sta...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TSQ",
+          "TCP_Pacing",
+          "WiFi帧聚合",
+          "bufferbloat"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 9
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "LWT": 1,
+    "sk_buff": 1,
+    "IPv6隧道": 1,
+    "内核补丁": 1,
+    "TSQ": 1,
+    "TCP_Pacing": 1,
+    "WiFi帧聚合": 1,
+    "bufferbloat": 1
+  }
+}
