@@ -17,22 +17,6 @@
         "readingTime": 4,
         "relevance": "medium",
         "innovationScore": 8
-      },
-      {
-        "title": "Optimising Demanding I/O Applications ",
-        "url": "http://cds.cern.ch/record/2962759",
-        "summary": "研究面向欧洲核子中心大型强子对撞机HL-LHC升级后的ATLAS探测器读出系统I/O性能优化。升级后探测器将通过约15000条1 MHz光链路输出数据，总吞吐达5 TB/s。读出系统使用基于FPGA的定制PCIe卡（FELIX）完成反序列化，随后由Data Handler软件在400 Gb/s商品以太网上进行数据聚合与分发至计算集群，同时承担timing与trigger分发功能。优化目标聚焦于该高能物理数据获取流水线的吞吐、缓冲、CPU占用与链路利用率。原摘要未提供具体的I/O优化技术、数据结构、对比基线或量化指标（如实测吞吐增益、端到端延迟、内存使用）。整体工作属于高能物理实验数据获取领域，与Linux内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、virtio-net、napi、qdisc等）无直接关联，仅作为400 Gb/s商品网络的高带宽用户。读者若关注Linux内核网络代码路径或旁路高速网络栈，需另行查阅专用论文。",
-        "summary_en": "Optimising demanding I/O applications: the HL-LHC ATLAS Readout case study After a four-year upgrade ending in 2030, the ATLAS detector at the Large Hadron Collider will be read out by about 15,000 optical links operating at 1 MHz, generating a total data throughput of 5 TB/s. The Readout system is tasked with ingesting, aggregating, and distributing these data to a computer farm over a 400 Gb/s commodity network. Data is first de-serialised using custom FPGA-based PCIe cards (FELIX), and then processed by the Data Handler software. In addition, the Readout system delivers timing and trigger i...",
-        "source": "OpenAlex",
-        "tags": [
-          "高能物理数据获取",
-          "FPGA PCIe卡",
-          "I/O优化",
-          "400GbE网络"
-        ],
-        "readingTime": 4,
-        "relevance": "none",
-        "innovationScore": 8
       }
     ],
     "news": []
@@ -41,10 +25,6 @@
     "eBPF": 1,
     "network-stack profiling": 1,
     "Tofino/P4": 1,
-    "data center TCP": 1,
-    "高能物理数据获取": 1,
-    "FPGA PCIe卡": 1,
-    "I/O优化": 1,
-    "400GbE网络": 1
+    "data center TCP": 1
   }
 }

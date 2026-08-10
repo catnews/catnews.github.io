@@ -6,10 +6,10 @@
     "quick_high_medium": 1,
     "fill_medium_high": 3,
     "fill_low": 0,
-    "hotspot_final": 2,
-    "final": 2,
+    "hotspot_final": 1,
+    "final": 1,
     "dedup_rate": "33.5%",
-    "final_rate": "3.8%"
+    "final_rate": "1.9%"
   },
   "news": {
     "raw": 16,

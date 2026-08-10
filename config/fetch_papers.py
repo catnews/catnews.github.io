@@ -2087,18 +2087,30 @@ def main():
                     if analysis.get("tags"):
                         paper["tags"] = normalize_tags(analysis["tags"], max_tags=4)
                     paper["readingTime"] = analysis.get("readingTime", paper.get("readingTime", 5))
-                    paper["relevance"] = analysis.get("relevance", paper.get("relevance", "high"))
-                    paper = sanitize_item(paper, is_news=False)
-                    print(f"    ✓ retry succeeded")
-                else:
-                    print(f"    ✗ retry still failed; keeping fallback")
-                    still_failed.append(paper)
-            fallback_papers = still_failed
-            if fallback_papers and round_idx < retry_rounds - 1:
-                wait_s = 45
-                print(f"  cool-off {wait_s}s before next round...")
-                time.sleep(wait_s)
-        print(f"[Phase 6.5] done: {len(selected_papers) - len(fallback_papers)}/{len(selected_papers)} papers have LLM summaries")
+                paper["relevance"] = analysis.get("relevance", paper.get("relevance", "high"))
+                paper = sanitize_item(paper, is_news=False)
+                print(f"    ✓ retry succeeded (relevance={paper.get('relevance')})")
+            else:
+                print(f"    ✗ retry still failed; keeping fallback")
+                still_failed.append(paper)
+        fallback_papers = still_failed
+        if fallback_papers and round_idx < retry_rounds - 1:
+            wait_s = 45
+            print(f"  cool-off {wait_s}s before next round...")
+            time.sleep(wait_s)
+    # Phase 6.5 收尾：retry 可能将 relevance 校正为 'none'（LLM 判定
+    # kernelNetworkScope=unrelated，reconcile_relevance 强制改 none）。
+    # Phase 6 主路径根本不会收录 relevance='none' 的论文，但 retry 在
+    # 论文已加入 selected_papers 之后才更新 relevance，导致 'none' 论文
+    # 仍留在结果里（如 2026-08-09 的 ATLAS HL-LHC I/O 论文）。在此统一
+    # 清理，避免与 Linux 内核网络无关的论文被发布到首页。
+    removed = [p for p in selected_papers if p.get("relevance") == "none"]
+    if removed:
+        for p in removed:
+            print(f"  ✗ removing unrelated paper from selection: {p.get('title', '')[:60]}")
+        selected_papers[:] = [p for p in selected_papers if p.get("relevance") != "none"]
+    still_fallback = sum(1 for p in selected_papers if _is_fallback_summary(p.get("summary", "")))
+    print(f"[Phase 6.5] done: kept {len(selected_papers)} (removed {len(removed)} unrelated, {still_fallback} still fallback)")
     
     print(f"\n[Phase 7] Detailed analysis of {len(filtered_news)} filtered news...")
     for i, item in enumerate(filtered_news):
