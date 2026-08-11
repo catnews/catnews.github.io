@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-12",
+  "categories": {
+    "papers": [
+      {
+        "title": "denet, A lightweight command-line tool for process monitoring in benchmarking and beyond",
+        "url": "http://arxiv.org/abs/2510.13818v2",
+        "summary": "denet 是一款面向基准测试场景的轻量级命令行进程监控工具，实时采集运行中进程的 CPU、内存、磁盘 I/O、网络活动与线程使用情况，并支持递归监控子进程。核心机制采用自适应采样率，根据进程活动强度动态调整采集频率，输出格式为 JSONL，每条记录包含性能指标（CPU/内存/IO/网络吞吐等）以及进程元数据（PID、执行命令）。工具提供两种调用接口：带彩色输出的 CLI，以及便于脚本化集成的 Python API。JSONL 结构化输出便于后续 pipeline 解析与自动化分析。论文以生物信息学数据密集型 pipeline 为典型用例展示使用方式，原摘要未提供与具体数据集的对比基线（如 ps、pidstat、htop 等工具）以及量化性能数字（如采样开销、CPU 占用率）。该工具不触及 Linux 内核网络栈内部实现，仅依赖 procfs/netfs 等用户态可见接口读取聚合网络计数；与内核网络维护者无直接关联，关注点在于跨平台资源监控工具的轻量化设计与 JSONL 在基准测试流水线中的可消费性。",
+        "summary_en": "Summary: denet is a lightweight process monitoring tool providing real-time resource profiling of running processes. It reports CPU, memory, disk I/O, network activity, and thread usage, including recursive child monitoring, with adaptive sampling rates. denet exposes two interfaces: a CLI with colorized output and a Python API. Output format is JSONL. Each record carries performance metrics and process metadata (PID and the executed command). Structured output makes denet suitable for benchmarking and tuning data-intensive pipelines in bioinformatics and beyond. We provide CLI and API example...",
+        "source": "arXiv",
+        "tags": [
+          "process monitoring",
+          "benchmarking",
+          "userspace tool",
+          "JSONL"
+        ],
+        "readingTime": 3,
+        "relevance": "low",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "process monitoring": 1,
+    "benchmarking": 1,
+    "userspace tool": 1,
+    "JSONL": 1
+  }
+}
