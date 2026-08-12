@@ -80,6 +80,26 @@ SEARCH_KEYWORDS = [
     "SmartNIC offload network stack",
     "DPDK kernel bypass network",
     "RDMA Linux kernel network",
+    # AI 沙箱 / 代码执行沙箱网络隔离
+    # （LLM code interpreter / agent sandbox 的网络面，最终仍落到 netns / veth / eBPF）
+    "AI code interpreter sandbox network",
+    "LLM agent sandbox network namespace",
+    "code execution sandbox Linux network",
+    # MicroVM 沙箱数据面
+    # （firecracker / kata / cloud-hypervisor 的 virtio-net / vhost-net 数据面）
+    "Firecracker microVM virtio network",
+    "Kata containers virtio-net sandbox",
+    "Cloud Hypervisor vhost-net network",
+    "microVM network isolation kernel",
+    # 容器 / eBPF 网络策略（AI 工作负载网络隔离）
+    "Cilium NetworkPolicy AI workload",
+    "eBPF sandbox network isolation",
+    "Tetragon sandbox network policy",
+    # AI 推理 / 训练网络（GPU 直通 / SR-IOV / RDMA 在沙箱容器内的网络栈）
+    "GPU SR-IOV container networking",
+    "RDMA RoCE AI training network",
+    "virtio GPU passthrough networking",
+    "AI inference container network stack",
 ]
 
 HOT_TOPIC_KEYWORDS = [
@@ -112,6 +132,18 @@ HOT_TOPIC_KEYWORDS = [
     "af_xdp",
     "io_uring",
     "busy poll",
+    # AI 沙箱 / MicroVM 热点加权
+    "microvm",
+    "firecracker",
+    "kata",
+    "cloud hypervisor",
+    "code interpreter",
+    "agent sandbox",
+    "ai sandbox",
+    "llm sandbox",
+    "gpu passthrough",
+    "sriov vf",
+    "rdma roce",
 ]
 
 DOMAIN_KEYWORDS = {
@@ -158,6 +190,21 @@ DOMAIN_KEYWORDS = {
     "latency": "性能",
     "throughput": "性能",
     "performance": "性能",
+    # AI 沙箱 / MicroVM 沙箱（网络面）
+    "microvm": "沙箱",
+    "firecracker": "沙箱",
+    "kata": "沙箱",
+    "cloud hypervisor": "沙箱",
+    "code interpreter": "沙箱",
+    "agent sandbox": "沙箱",
+    "ai sandbox": "沙箱",
+    "llm sandbox": "沙箱",
+    "sandbox network": "沙箱",
+    # AI 推理 / 训练网络
+    "gpu passthrough": "虚拟化",
+    "sriov vf": "虚拟化",
+    "vfio": "虚拟化",
+    "rdma roce": "旁路",
 }
 
 CANONICAL_TAGS = {
@@ -214,6 +261,19 @@ CANONICAL_TAGS = {
     "ovs": "容器网络",
     "cilium": "容器网络",
     "service mesh": "容器网络",
+    # AI 沙箱 / MicroVM 沙箱网络面
+    "microvm": "沙箱",
+    "microvm network": "沙箱",
+    "firecracker": "沙箱",
+    "kata": "沙箱",
+    "kata container": "沙箱",
+    "cloud hypervisor": "沙箱",
+    "code interpreter sandbox": "沙箱",
+    "agent sandbox": "沙箱",
+    "ai sandbox": "沙箱",
+    "llm sandbox": "沙箱",
+    "沙箱": "沙箱",
+    "沙箱网络": "沙箱",
 }
 
 NEGATIVE_KEYWORDS = [
@@ -334,6 +394,29 @@ KERNEL_SPECIFIC_TERMS = [
     "user space network stack",
     # 其他
     "proc/sys/net", "sysctl net", "rxhash", "kfunc",
+    # AI 沙箱 / MicroVM 沙箱数据面
+    # （这些虽不是源码符号，但论文摘要中只要提到通常都依赖内核网络能力，
+    # 与 SmartNIC / kernel bypass 同等对待，作为硬锚点放行）
+    "microvm",
+    "microvm network",
+    "firecracker",
+    "firecracker network",
+    "kata containers",
+    "kata container",
+    "cloud hypervisor",
+    "qemu microvm",
+    # AI 工作负载 GPU 直通 / SR-IOV 网络面（virtio/vfio 路径与内核网络栈交互）
+    "vfio",
+    "vfio mdev",
+    "sriov vf",
+    "sriov network",
+    "rdma roce",
+    "gpu passthrough network",
+    # 沙箱网络隔离常用内核机制（netns+veth+eBPF 已在前文，这里补具体子项）
+    "code interpreter sandbox",
+    "agent sandbox",
+    "ai sandbox",
+    "llm sandbox",
 ]
 
 NETWORK_ANCHOR_KEYWORDS = [
@@ -388,11 +471,17 @@ TECH_NEWS_STRONG_TERMS = [
     "linux kernel", "linux network", "kernel network", "netdev", "ebpf", "bpf", "xdp",
     "cilium", "datapath", "cubic", "bbr", "congestion control", "tcp", "quic",
     "smartnic", "dpu", "dpdk", "rdma", "af_xdp", "napi", "qdisc", "netfilter",
+    # AI 沙箱 / MicroVM 沙箱数据面
+    "microvm", "firecracker", "kata", "cloud hypervisor", "code interpreter",
+    "agent sandbox", "ai sandbox", "llm sandbox", "gpu passthrough", "sriov vf",
 ]
 
 TECH_NEWS_REQUIRED_CONTEXT = [
     "network", "networking", "packet", "datapath", "tcp", "quic", "socket", "latency",
     "throughput", "performance", "kernel", "linux", "ebpf", "xdp", "cilium",
+    # 沙箱 / AI 推理网络相关上下文
+    "sandbox", "microvm", "firecracker", "kata", "virtio", "vhost", "vfio", "sriov",
+    "rdma", "gpu passthrough",
 ]
 
 PAPER_PROMPT = """你是 Linux 内核网络论文筛选与摘要专家。严格判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
