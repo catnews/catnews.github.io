@@ -1,0 +1,183 @@
+{
+  "date": "2026-08-13",
+  "categories": {
+    "papers": [
+      {
+        "title": "Synthesizing Safe and Efficient Kernel Extensions for Packet Processing",
+        "url": "http://arxiv.org/abs/2103.00022v2",
+        "summary": "针对 Linux 内核 Extended BPF 子系统在网络数据包处理场景下的开发门槛高、验证器拒绝程序、性能优化依赖专家手工三大痛点，提出基于程序合成技术的 BPF 字节码编译器 K2。K2 在保留内核验证器要求的崩溃安全、内存访问安全、无内核数据泄露等不变式的前提下，自动生成等价的优化后 BPF 字节码。其核心方法是通过领域定制化的程序合成，将 BPF 优化建模为受约束的等价变换搜索，并利用专用技术将 BPF 程序等价性检验速度提升 6 个数量级，使大规模合成搜索在实际时间内可行。评估使用从 Cilium、Facebook 及 Linux 内核本身提取的 BPF benchmark 程序，对比最优的 clang 编译产物：K2 生成的代码体积缩减 6–26%，平均数据包处理时延降低 1.36%–55.03%，单核包吞吐提升 0–4.75%。K2 还解决了传统基于规则的优化编译器（如 LLVM pass）与内核验证器安全约束不兼容的问题。该工作面向 eBPF/XDP 等内核数据面开发者，对内核网络维护者的价值在于提供一条保持验证器通过性的自动化优化路径；落地限制在于合成搜索空间仍受 BPF 程序规模与等价性求解器能力制约，原摘要未提供在生产环境真实网络负载下的端到端吞吐与 CPU 占用数据。",
+        "summary_en": "Extended Berkeley Packet Filter (BPF) has emerged as a powerful method to extend packet-processing functionality in the Linux operating system. BPF allows users to write code in high-level languages (like C or Rust) and execute them at specific hooks in the kernel, such as the network device driver. To ensure safe execution of a user-developed BPF program in kernel context, Linux uses an in-kernel static checker. The checker allows a program to execute only if it can prove that the program is crash-free, always accesses memory within safe bounds, and avoids leaking kernel data.   BPF programmi...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF",
+          "程序合成",
+          "内核验证器",
+          "数据包处理性能优化"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 9
+      },
+      {
+        "title": "MONITORING AND ANALYZING LATENCY AND PERFORMANCE IN ULTRA LOW LATENCY ENVIRONMENTS POWERED BY RDMA",
+        "url": "https://www.semanticscholar.org/paper/94dcd83bd40c69abd877fb4b54df48e82d9ff028",
+        "summary": "研究面向HPC、AI/ML训练与分布式系统等实时负载，针对RDMA支撑的超低延迟（ULL）环境，系统分析端到端（E2E）与往返时延（RTT）的监测方法。RDMA通过InfiniBand与RoCE等技术在现代数据中心实现微秒级传输，但因绕过内核网络栈，传统基于socket/内核探针的观测手段失效，导致可观测性受限。研究重点剖析该环境下面临的四类挑战：内核旁路带来的可观测性缺失、测量自身引入的开销（probe effect）、大规模部署下的可扩展性瓶颈，以及RDMA共享内存与无加密传输带来的安全风险。原摘要未提供具体监控框架名称、对比基线工具（如perf、ibstat、rdma_monitor）或量化指标（如额外时延开销百分比、监控对吞吐的影响）。该工作不修改Linux内核网络代码路径，也不直接使用XDP/eBPF/AF_XDP等接口，而是围绕RDMA verbs层与网卡硬件计数器（如InfiniBand的性能计数器）展开分析。对内核网络维护者的价值在于：明确RDMA场景下内核旁路导致的观测盲区，为未来内核与用户态协同的遥测机制（如eBPF over RDMA、devlink健康报告扩展）提供需求输入。",
+        "summary_en": "This paper explores methods for monitoring and analyzing end-to-end (E2E) or round-trip time (RTT) latency in ultra-low latency (ULL) environments, focusing on Remote Direct Memory Access (RDMA) for real-time workloads such as high-performance computing (HPC), AI/ML training, and distributed systems. It highlights the adoption of RDMA-enabled technologies like InfiniBand and RoCE in modern data centers to achieve microsecond-level performance, while addressing challenges including limited observability due to kernel bypass, measurement overhead, scalability constraints, and security concerns s...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "RDMA",
+          "InfiniBand/RoCE",
+          "超低延迟监控",
+          "内核旁路可观测性"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 3
+      },
+      {
+        "title": "Inline Security Enforcement for Containers Using eBPF",
+        "url": "https://lup.lub.lu.se/student-papers/record/9232746",
+        "summary": "研究面向 Kubernetes 等云环境下的容器运行时安全，利用 eBPF 程序可挂载到多种内核事件的特性，提出一种 inline security enforcement 方案，自动生成容器负载的运行时安全配置文件。核心方法将 eBPF 程序附加到内核事件点，模仿现有的 Linux Security Module（LSM）AppArmor 的 Mandatory Access Control（MAC）机制，通过限制程序对系统资源的操作来强制执行安全策略。原摘要未提供具体的 eBPF 程序类型（如 kprobe / tracepoint / LSM BPF）、挂载点列表、配置文件生成算法细节以及吞吐或时延等量化评估指标，也未说明测试用集群规模与对比基线的具体性能数据。论文与 Linux 内核网络的关联主要在于 eBPF 基础设施（BPF hook、map、program 类型），这些接口最初在网络子系统（XDP、tc、socket filter）中被广泛使用，但本研究的应用场景是容器安全而非网络数据面吞吐或拥塞控制。读者关注点包括 eBPF 在 LSM 路径上的开销与可观察性限制、自动 profiling 在多租户容器场景下的误报 / 漏报率，以及与已有 AppArmor / SELinux 策略体系的兼容边界。",
+        "summary_en": "This thesis explores the possibility of using extended Berkeley Packet Filter (eBPF) to implement inline security enforcement for containerized workloads. The objective is to automatically create profiles for runtime enforcement within cloud environments such as Kubernetes. A key feature of eBPF programs is that they can attach to various different kernel events, similar to the Linux Security Module (LSM) AppArmor, which is already used in cloud security. AppArmor enforces Mandatory Access Control (MAC) policies by restricting the actions that programs can perform on a system. By attaching eBP...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "容器安全",
+          "LSM AppArmor",
+          "容器网络"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 2
+      },
+      {
+        "title": "Vela: A Virtualized LLM Training System with GPU Direct RoCE",
+        "url": "https://www.semanticscholar.org/paper/6ef42fd2756167f5e0e47f33fd284f99692a078f",
+        "summary": "研究面向大语言模型训练的云原生虚拟化系统Vela，解决多租户云环境中GPU集群共享与高性能网络通信的问题。核心方法采用Linux KVM虚拟化叠加SR-IOV网卡直通，在虚拟机内部暴露RoCE（RDMA over Converged Ethernet）能力，并启用GPU Direct RDMA实现GPU与网卡之间的peer-to-peer DMA，绕过CPU与系统内存拷贝完成跨节点梯度同步。系统运行于IBM Cloud数据中心的NVIDIA A100 GPU集群之上，整套栈基于商用现成硬件（off-the-shelf）而非定制DPU方案。文章重心不在某项新算法，而是在2.5年的实际运营经验中分享体系结构设计权衡，包括RoCE无损网络配置（PFC/ECN）、SR-IOV VF在VM间的隔离与性能隔离、GPU Direct与虚拟化兼容层的工程坑点、KVM侧SR-IOV配置、拥塞控制与PFC死锁规避等。原文摘要未提供具体吞吐量/时延数值或对比基线（与DPDK、BlueField DPU等方案的量化对比尚需查正文）。对关注内核网络的读者而言，Vela代表的是一类RDMA+虚拟化的高速网络旁路方案，其在Linux KVM+SR-IOV软件栈中的配置方式、CPU占用与PFC部署经验对运维RDMA云有直接参考价值。",
+        "summary_en": "Vela is a cloud-native system designed for LLM training workloads built using off-the-shelf hardware, Linux KVM-based virtualization, and a virtualized RDMA over Converged Ethernet (RoCE) network. Vela virtual machines (VMs) support peer-to-peer DMA between the GPUs and SRIOV-based network interface. In this paper, we share Vela's key architectural aspects with details from an NVIDIA A100 GPU-based deployment in one of the IBM Cloud data centers. Throughout the paper, we share insights and experiences from designing, building, and operating the system over a ~2.5 year timeframe to highlight th...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "RDMA",
+          "RoCE",
+          "GPU-Direct",
+          "KVM虚拟化"
+        ],
+        "readingTime": 12,
+        "relevance": "medium",
+        "innovationScore": 3
+      },
+      {
+        "title": "Tlaloc: A Generic Multipath Load Balancing for RoCE",
+        "url": "https://www.semanticscholar.org/paper/e7e055ea04f7c01acf84c4eb1e879c5172e73411",
+        "summary": "针对大规模数据中心中RDMA over Converged Ethernet（RoCE）面临的拥塞热点与故障恢复难题，提出与RNIC硬件解耦的通用多径负载均衡方案Tlaloc。现有方案要么工作于Linux内核网络栈，要么需要修改RNIC固件，在异构RNIC环境中难以部署。Tlaloc在主机端RNIC驱动层实现三个核心机制：(1) 通过消息拆分（message splitting）与速率控制（pace control）实时采集精确网络状态信息，弥补主机端缺乏传输逻辑的盲区；(2) 动态维护高质量连接子集（high-quality connection set）以应对网络不确定性；(3) 构建consistent-pace负载调度框架，实现跨路径弹性负载分配。该方案无需修改Linux内核网络代码路径，直接部署在商用RNIC驱动之上，对异构RNIC友好。测试床实验在分布式训练场景下相比ECMP提升网络利用率达53%、训练速度提升达34%；大规模仿真在真实工作负载下相对其他方案将FCT（Flow Completion Time）改善达20%。对Linux内核网络维护者的参考价值在于：揭示了RDMA旁路数据面在多径调度层面对拥塞控制与ECMP等内核默认路径选择机制的替代空间，以及RNIC驱动层做细粒度路径决策的可行性边界。需关注其方案是否对RoCE v2 / DCQCN（RDMA拥塞控制）交互产生影响，原摘要未提供丢包率与时延详细分布信息。",
+        "summary_en": "As Remote Direct Memory Access (RDMA) is applied in larger data centers, load balancing is more necessary to reduce congestion hotspots and handle failures. However, the existing load balancing solutions are hard to be deployed in practical data centers with heterogenous RDMA NICs (RNICs) since they either work in Linux kernel or require to modify RNICs. In this paper, we propose Tlaloc, a general-purpose load balancing solution with high performance and low resource consumption. We overcome the information and operational limitations caused by the lack of transmission logic on the host and ma...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "RDMA",
+          "RoCE",
+          "多径负载均衡",
+          "拥塞控制"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 6
+      },
+      {
+        "title": "NeVerMore: Exploiting RDMA Mistakes in NVMe-oF Storage Applications",
+        "url": "http://arxiv.org/abs/2202.08080v1",
+        "summary": "研究针对InfiniBand RDMA架构及基于RDMA的NVMe-oF（NVMe-over-Fabrics）协议进行安全分析。NVMe-oF作为工业级分解存储的关键协议，利用RDMA实现对远程SSD的低延迟、高带宽访问。研究团队构建了工具NeVerMore，系统性地发现RDMA协议中的新型漏洞，揭示针对RDMA应用与NVMe-oF协议的多种攻击向量，并证明NVMe-oF当前的安全机制（authentication、authorization、key management）未能覆盖RDMA引入的安全风险。攻击面包括RDMA的内存注册、QP（Queue Pair）通信、MR（Memory Region）访问控制、连接管理等多个层面。评估方式为基于InfiniBand硬件与NVMe-oF目标端（target）的漏洞复现与攻击演示。该工作属于旁路高速网络（kernel-bypass）安全研究范畴，与Linux内核网络代码路径无直接关系，RDMA通过verbs接口（如libibverbs、mlx5驱动）绕过内核协议栈。原摘要未提供具体实验量化指标（如吞吐下降、延迟增加、具体CVE编号或漏洞数量）的详细信息。读者关注点在于RDMA在生产环境中部署时的安全加固、NVMe-oF与RDMA的信任边界划分，以及对内核RDMA子系统（如drivers/infiniband）的潜在加固建议。",
+        "summary_en": "This paper presents a security analysis of the InfiniBand architecture, a prevalent RDMA standard, and NVMe-over-Fabrics (NVMe-oF), a prominent protocol for industrial disaggregated storage that exploits RDMA protocols to achieve low-latency and high-bandwidth access to remote solid-state devices. Our work, NeVerMore, discovers new vulnerabilities in RDMA protocols that unveils several attack vectors on RDMA-enabled applications and the NVMe-oF protocol, showing that the current security mechanisms of the NVMe-oF protocol do not address the security vulnerabilities posed by the use of RDMA. In...",
+        "source": "arXiv",
+        "tags": [
+          "RDMA",
+          "NVMe-oF",
+          "InfiniBand安全",
+          "旁路高速网络"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 6
+      },
+      {
+        "title": "Identifying Linux Kernel Instability Due to Poor RCU Synchronization",
+        "url": "http://arxiv.org/abs/2511.00237v1",
+        "summary": "研究聚焦 Linux 内核 RCU（Read-Copy-Update）同步机制在 hash 表更新路径中缺失 synchronize_rcu() 调用所引发的内核稳定性问题。具体案例为 Intel ICE 网络驱动中 Virtual Function（VF）管理的 hash 表删除流程，在移除 RCU 受保护条目时未调用 synchronize_rcu()，导致陈旧指针残留、UAF 漏洞及内存碎片化。方法层面，论文首先复盘历史漏洞（如 RDS 可靠数据报套接字子系统中由 RCU 同步缺失引发的内核崩溃），随后在 ICE 驱动 VF 场景下构造快速 insert/delete 工作负载进行实验，量化评估条目移除后的内存回收延迟、残留陈旧条目比例以及碎片化程度。实验结果表明，缺乏显式同步会使 RCU grace period 内的内存迟迟无法回收，在高频增删场景下产生显著内存碎片并最终触发 OOM。论文提出缓解措施：在 hash 表条目删除路径中显式插入 synchronize_rcu() 以保证及时安全的内存回收。该结论对内核网络维护者的参考价值在于：net_device 驱动、virtio-net、路由子系统等大量依赖 RCU hash 表的代码路径均需审视删除流程是否满足 RCU 安全要求，ICE VF 这一具体案例可作为其他 RCU 受保护 hash 表审计的参照模板。",
+        "summary_en": "Read-Copy-Update (RCU) is widely used in the Linux kernel to manage concurrent access to shared data structures.However, improper synchronization when removing RCU protected hash table entries can lead to stale pointers, inconsistent lookups, and critical use after free (UAF) vulnerabilities. This paper investigates a driver-level synchronization issue arising from the omission of explicit synchronize_rcu() calls during hash table updates, using a discovered weakness in the Intel ICE network drivers Virtual Function (VF) management. Previous kernel vulnerabilities, such as a bug in the Reliabl...",
+        "source": "arXiv",
+        "tags": [
+          "RCU同步",
+          "ICE网络驱动",
+          "内核稳定性",
+          "UAF漏洞"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 7
+      },
+      {
+        "title": "Aquila: Efficient In-Kernel System Call Telemetry for Cloud-Native Environments",
+        "url": "https://doi.org/10.3390/s25216511",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "System call telemetry is essential for understanding runtime behavior in cloud-native infrastructures, but existing eBPF-based monitors suffer from high per-event overhead, unreliable delivery under load, and limited context for correlating multi-step activities. These issues reduce scalability, create blind spots in telemetry streams, and complicate the analysis of complex workload behaviors. This work presents Aquila, a lightweight telemetry framework that emphasizes efficiency, reliability, and semantic fidelity. Aquila employs a dual-path kernel pipeline that separates fixed-size metadata ...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "容器网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 8
+      },
+      {
+        "title": "Energy-Proportional Data Center Network Architecture Through OS, Switch and Laser Co-design",
+        "url": "http://arxiv.org/abs/2112.02083v2",
+        "summary": "针对大规模数据中心光收发模块（optical transceiver）始终保持上电、激光器效率低所导致的大量空载能耗问题，提出 LC/DC 数据中心网络架构，将 OS、交换机和光器件三者协同设计以实现能耗随流量伸缩（energy proportionality）。其核心机制利用数据中心网络的多路径拓扑（path divergence）特性，按流量需求关闭冗余路径上的光模块与电子驱动单元，同时保持全连通以隐藏激光器开启延迟；在节点侧，OS 拦截 send 请求，将 NIC 激光器开启延迟完整覆盖在 TCP/IP 包处理流水线之后，使出口链路可在无流量时保持关闭而对性能零损耗。实验通过三条路径验证：i) 在 Linux 内核与设备驱动中实现相应修改；ii) 实现 10 Gbit/s FPGA 交换机；iii) 使用真实光器件与电路仿真。基于大学自建数据中心 trace 以及 Facebook、Microsoft 数据中心流量模型进行评估，结果显示平均节省 60%（最高 68%）光模块功耗，代价仅为 6% 的额外包延迟。读者应关注其对 Linux 内核网络栈的改动细节（send 拦截点、TCP/IP 处理流水与 NIC 激光器状态机的协同），以及原型局限于 10 Gbit/s FPGA 交换机、尚未覆盖更高速率商用交换芯片的事实。",
+        "summary_en": "Optical interconnects are already the dominant technology in large-scale data center networks. However, the high optical loss of many optical components coupled with the low efficiency of laser sources result in high aggregate power requirements for the thousands of optical transceivers used by these networks. As optical interconnects stay always on even as traffic demands ebb and flow, most of this power is wasted. We present LC/DC, a data center network system architecture in which the operating system, the switch, and the optical components are co-designed to achieve energy proportionality....",
+        "source": "arXiv",
+        "tags": [
+          "Linux内核驱动修改",
+          "光互连能耗优化",
+          "数据中心网络",
+          "TCP/IP包处理流水线"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 8
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 3,
+    "程序合成": 1,
+    "内核验证器": 1,
+    "数据包处理性能优化": 1,
+    "RDMA": 4,
+    "InfiniBand/RoCE": 1,
+    "超低延迟监控": 1,
+    "内核旁路可观测性": 1,
+    "容器安全": 1,
+    "LSM AppArmor": 1,
+    "容器网络": 2,
+    "RoCE": 2,
+    "GPU-Direct": 1,
+    "KVM虚拟化": 1,
+    "多径负载均衡": 1,
+    "拥塞控制": 1,
+    "NVMe-oF": 1,
+    "InfiniBand安全": 1,
+    "旁路高速网络": 1,
+    "RCU同步": 1,
+    "ICE网络驱动": 1,
+    "内核稳定性": 1,
+    "UAF漏洞": 1,
+    "TCP/IP": 1,
+    "性能": 1,
+    "Linux内核驱动修改": 1,
+    "光互连能耗优化": 1,
+    "数据中心网络": 1,
+    "TCP/IP包处理流水线": 1
+  }
+}
