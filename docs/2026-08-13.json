@@ -117,7 +117,7 @@
       {
         "title": "Aquila: Efficient In-Kernel System Call Telemetry for Cloud-Native Environments",
         "url": "https://doi.org/10.3390/s25216511",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "针对云原生环境下系统调用遥测在现有 eBPF 监视器中存在的 per-event 开销高、负载下事件投递不可靠、多步活动关联上下文不足等问题，提出 Aquila 遥测框架。其核心是 dual-path kernel pipeline：将固定大小元数据与可变长度属性分离传输，降低序列化开销以支撑高吞吐事件处理；引入 priority-aware 缓冲与显式 drop 检测，在过载时优先保留对丢失敏感的事件并对外暴露丢包可见性；用户态将内核 trace 与 Kubernetes 元数据（pod、container、namespace）富化关联，把底层 syscall 映射到工作负载实体。评估显示相比既有方案在可扩展性、事件丢失率与遥测语义完整度上均有提升。该工作直接修改 Linux 内核侧系统调用采集路径，通过 K8s 元数据富化打通内核事件与容器工作负载的边界，对内核网络维护者的参考点在于 syscall 遥测路径与 eBPF 既有采集机制的取舍；需注意论文未给出具体吞吐/时延数值，评估以遥测质量指标为主。",
         "summary_en": "System call telemetry is essential for understanding runtime behavior in cloud-native infrastructures, but existing eBPF-based monitors suffer from high per-event overhead, unreliable delivery under load, and limited context for correlating multi-step activities. These issues reduce scalability, create blind spots in telemetry streams, and complicate the analysis of complex workload behaviors. This work presents Aquila, a lightweight telemetry framework that emphasizes efficiency, reliability, and semantic fidelity. Aquila employs a dual-path kernel pipeline that separates fixed-size metadata ...",
         "source": "OpenAlex",
         "tags": [

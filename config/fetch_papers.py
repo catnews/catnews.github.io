@@ -2176,17 +2176,17 @@ def main():
                     if analysis.get("tags"):
                         paper["tags"] = normalize_tags(analysis["tags"], max_tags=4)
                     paper["readingTime"] = analysis.get("readingTime", paper.get("readingTime", 5))
-                paper["relevance"] = analysis.get("relevance", paper.get("relevance", "high"))
-                paper = sanitize_item(paper, is_news=False)
-                print(f"    ✓ retry succeeded (relevance={paper.get('relevance')})")
-            else:
-                print(f"    ✗ retry still failed; keeping fallback")
-                still_failed.append(paper)
-        fallback_papers = still_failed
-        if fallback_papers and round_idx < retry_rounds - 1:
-            wait_s = 45
-            print(f"  cool-off {wait_s}s before next round...")
-            time.sleep(wait_s)
+                    paper["relevance"] = analysis.get("relevance", paper.get("relevance", "high"))
+                    paper = sanitize_item(paper, is_news=False)
+                    print(f"    ✓ retry succeeded (relevance={paper.get('relevance')})")
+                else:
+                    print(f"    ✗ retry still failed; keeping fallback")
+                    still_failed.append(paper)
+            fallback_papers = still_failed
+            if fallback_papers and round_idx < retry_rounds - 1:
+                wait_s = 45
+                print(f"  cool-off {wait_s}s before next round...")
+                time.sleep(wait_s)
     # Phase 6.5 收尾：retry 可能将 relevance 校正为 'none'（LLM 判定
     # kernelNetworkScope=unrelated，reconcile_relevance 强制改 none）。
     # Phase 6 主路径根本不会收录 relevance='none' 的论文，但 retry 在

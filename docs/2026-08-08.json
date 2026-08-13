@@ -53,7 +53,7 @@
       {
         "title": "SENS: Semantic-Aware Coalescing for High-Performance NVMe over TCP Storage Networks",
         "url": "https://doi.org/10.3390/electronics15091801",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "针对 NVMe SSD 与高速网络普及后存储瓶颈转向网络栈、高并发下中断处理耗尽 CPU、NVMe over TCP 写路径的 control-data 依赖带来串行开销，以及既有优化要么依赖专用硬件、要么独占 CPU 核心做用户态 polling、要么盲批处理拖延控制消息等问题，提出 SENS——一个嵌入 Linux 内核 NVMe over TCP 驱动的语义感知调度器。核心机制两条：PDU vectorization 把离散 PDU 聚合为内存向量再发往网络，分摊 per-I/O syscall 开销并降低 soft-interrupt 频率；instruction-aware dispatch 检测 R2T 等控制型 PDU 并提前 flush 聚合窗口，缓解写路径串行阻塞。原型在物理 NVMe SSD 与 100 GbE 网络上评估，SENS 仅用 4-5 个 CPU 核即可打满 SSD 吞吐上限，相比原生 TCP 驱动将主机侧核心预算减半；以 RAMDisk 后端去除存储介质约束后可支撑最高 2.5× 并发 IOPS。该工作直接修改 Linux 内核 NVMe over TCP 驱动路径，对内核网络维护者的参考点在于 syscall 开销分摊与 soft-interrupt 频率控制；需注意实验仅覆盖写路径且依赖 100 GbE + 物理 NVMe 硬件组合。",
         "summary_en": "In HPC systems and hyper-scale data centers, the adoption of high-performance NVMe SSDs and high-speed networks has shifted storage bottlenecks to the network stack. Under high-concurrency workloads, frequent interrupt processing exhausts CPU resources while protocol-level control–data dependencies in the NVMe over TCP write path introduce additional serialization penalties. Existing optimizations either require specialized hardware, dedicate CPU cores to user-space polling, or apply semantically blind batching that delays time-sensitive control messages. We present SENS, a Semantic-aware NVMe...",
         "source": "OpenAlex",
         "tags": [
