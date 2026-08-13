@@ -3,181 +3,179 @@
   "categories": {
     "papers": [
       {
-        "title": "Synthesizing Safe and Efficient Kernel Extensions for Packet Processing",
-        "url": "http://arxiv.org/abs/2103.00022v2",
-        "summary": "针对 Linux 内核 Extended BPF 子系统在网络数据包处理场景下的开发门槛高、验证器拒绝程序、性能优化依赖专家手工三大痛点，提出基于程序合成技术的 BPF 字节码编译器 K2。K2 在保留内核验证器要求的崩溃安全、内存访问安全、无内核数据泄露等不变式的前提下，自动生成等价的优化后 BPF 字节码。其核心方法是通过领域定制化的程序合成，将 BPF 优化建模为受约束的等价变换搜索，并利用专用技术将 BPF 程序等价性检验速度提升 6 个数量级，使大规模合成搜索在实际时间内可行。评估使用从 Cilium、Facebook 及 Linux 内核本身提取的 BPF benchmark 程序，对比最优的 clang 编译产物：K2 生成的代码体积缩减 6–26%，平均数据包处理时延降低 1.36%–55.03%，单核包吞吐提升 0–4.75%。K2 还解决了传统基于规则的优化编译器（如 LLVM pass）与内核验证器安全约束不兼容的问题。该工作面向 eBPF/XDP 等内核数据面开发者，对内核网络维护者的价值在于提供一条保持验证器通过性的自动化优化路径；落地限制在于合成搜索空间仍受 BPF 程序规模与等价性求解器能力制约，原摘要未提供在生产环境真实网络负载下的端到端吞吐与 CPU 占用数据。",
-        "summary_en": "Extended Berkeley Packet Filter (BPF) has emerged as a powerful method to extend packet-processing functionality in the Linux operating system. BPF allows users to write code in high-level languages (like C or Rust) and execute them at specific hooks in the kernel, such as the network device driver. To ensure safe execution of a user-developed BPF program in kernel context, Linux uses an in-kernel static checker. The checker allows a program to execute only if it can prove that the program is crash-free, always accesses memory within safe bounds, and avoids leaking kernel data.   BPF programmi...",
-        "source": "arXiv",
-        "tags": [
-          "eBPF",
-          "程序合成",
-          "内核验证器",
-          "数据包处理性能优化"
-        ],
-        "readingTime": 8,
-        "relevance": "high",
-        "innovationScore": 9
-      },
-      {
-        "title": "MONITORING AND ANALYZING LATENCY AND PERFORMANCE IN ULTRA LOW LATENCY ENVIRONMENTS POWERED BY RDMA",
-        "url": "https://www.semanticscholar.org/paper/94dcd83bd40c69abd877fb4b54df48e82d9ff028",
-        "summary": "研究面向HPC、AI/ML训练与分布式系统等实时负载，针对RDMA支撑的超低延迟（ULL）环境，系统分析端到端（E2E）与往返时延（RTT）的监测方法。RDMA通过InfiniBand与RoCE等技术在现代数据中心实现微秒级传输，但因绕过内核网络栈，传统基于socket/内核探针的观测手段失效，导致可观测性受限。研究重点剖析该环境下面临的四类挑战：内核旁路带来的可观测性缺失、测量自身引入的开销（probe effect）、大规模部署下的可扩展性瓶颈，以及RDMA共享内存与无加密传输带来的安全风险。原摘要未提供具体监控框架名称、对比基线工具（如perf、ibstat、rdma_monitor）或量化指标（如额外时延开销百分比、监控对吞吐的影响）。该工作不修改Linux内核网络代码路径，也不直接使用XDP/eBPF/AF_XDP等接口，而是围绕RDMA verbs层与网卡硬件计数器（如InfiniBand的性能计数器）展开分析。对内核网络维护者的价值在于：明确RDMA场景下内核旁路导致的观测盲区，为未来内核与用户态协同的遥测机制（如eBPF over RDMA、devlink健康报告扩展）提供需求输入。",
-        "summary_en": "This paper explores methods for monitoring and analyzing end-to-end (E2E) or round-trip time (RTT) latency in ultra-low latency (ULL) environments, focusing on Remote Direct Memory Access (RDMA) for real-time workloads such as high-performance computing (HPC), AI/ML training, and distributed systems. It highlights the adoption of RDMA-enabled technologies like InfiniBand and RoCE in modern data centers to achieve microsecond-level performance, while addressing challenges including limited observability due to kernel bypass, measurement overhead, scalability constraints, and security concerns s...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "RDMA",
-          "InfiniBand/RoCE",
-          "超低延迟监控",
-          "内核旁路可观测性"
-        ],
-        "readingTime": 6,
-        "relevance": "medium",
-        "innovationScore": 3
-      },
-      {
-        "title": "Inline Security Enforcement for Containers Using eBPF",
-        "url": "https://lup.lub.lu.se/student-papers/record/9232746",
-        "summary": "研究面向 Kubernetes 等云环境下的容器运行时安全，利用 eBPF 程序可挂载到多种内核事件的特性，提出一种 inline security enforcement 方案，自动生成容器负载的运行时安全配置文件。核心方法将 eBPF 程序附加到内核事件点，模仿现有的 Linux Security Module（LSM）AppArmor 的 Mandatory Access Control（MAC）机制，通过限制程序对系统资源的操作来强制执行安全策略。原摘要未提供具体的 eBPF 程序类型（如 kprobe / tracepoint / LSM BPF）、挂载点列表、配置文件生成算法细节以及吞吐或时延等量化评估指标，也未说明测试用集群规模与对比基线的具体性能数据。论文与 Linux 内核网络的关联主要在于 eBPF 基础设施（BPF hook、map、program 类型），这些接口最初在网络子系统（XDP、tc、socket filter）中被广泛使用，但本研究的应用场景是容器安全而非网络数据面吞吐或拥塞控制。读者关注点包括 eBPF 在 LSM 路径上的开销与可观察性限制、自动 profiling 在多租户容器场景下的误报 / 漏报率，以及与已有 AppArmor / SELinux 策略体系的兼容边界。",
-        "summary_en": "This thesis explores the possibility of using extended Berkeley Packet Filter (eBPF) to implement inline security enforcement for containerized workloads. The objective is to automatically create profiles for runtime enforcement within cloud environments such as Kubernetes. A key feature of eBPF programs is that they can attach to various different kernel events, similar to the Linux Security Module (LSM) AppArmor, which is already used in cloud security. AppArmor enforces Mandatory Access Control (MAC) policies by restricting the actions that programs can perform on a system. By attaching eBP...",
+        "title": "Multi-Signal Trust Scoring for Cloud-Native Microservice Security: An eBPF-Based Framework for Stealth Attack Detection Without Sidecar Proxies",
+        "url": "https://doi.org/10.21275/sr26629100308",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Cloud-native microservice environments generate extensive east-west service communication that existing eBPF-based security tools-including Cilium Tetragon and Falco-cannot adequately detect stealth trust-boundary violations due to their reliance on single-signal detection. This work proposes Context-Aware eBPF Trust Boundary Evaluation (CA-eBPF), a sidecar-less detection framework that computes adaptive trust scores by continuously correlating five contextual dimensions-workload identity, behavioral consistency, network telemetry, process integrity, and distributed trace correlation-from kern...",
         "source": "OpenAlex",
         "tags": [
           "eBPF",
-          "容器安全",
-          "LSM AppArmor",
+          "驱动",
+          "网络优化",
           "容器网络"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "SG-IOV: Socket-Granular I/O Virtualization for SmartNIC-Based Container Networks",
+        "url": "https://www.semanticscholar.org/paper/4d3eb08d78f99b2dab68a70ad5dd6715ebaf85aa",
+        "summary": "针对 SR-IOV 在容器网络场景下扩展性差（VF 上限远低于容器密度）、以数据包层抽象适配应用层处理粒度粗、虚拟化粒度难以匹配细粒度容器负载三大矛盾，提出 Socket-Granular I/O Virtualization（SG-IOV）：把 socket 抽象直接暴露为 SmartNIC 上的虚拟设备，以 message-stream 为单位支持变长消息处理，并实现细粒度虚拟化。核心设计原则是 software mediates signals（描述符等控制信号由软件处理）while accelerators touch the payload（加速器只触数据负载），由此派生资源复用（resource multiplexing）扩展设备数、对变长任务的自适应处理、以及用于虚拟化强制的中间队列（intermediate queuing）三项机制。在最新 NVIDIA BlueField-3 上完成原型并交付端到端容器网络方案。评估显示 SG-IOV 可扩展至 4K+ 虚拟设备（是 VF 数量的 10 倍），相对 Cilium 等主机侧容器网络方案，在 10Gbps 流量下每路径节省最多 1.9 个 CPU 核。该工作不直接修改 Linux 内核网络代码路径，将 socket、容器网络栈下沉到 SmartNIC DPU，对内核旁路卸载架构师及 BlueField 用户具有参考意义；落地限制包括依赖 BlueField-3 板载硬件能力、与主机侧 eBPF/Cilium 数据面的互操作边界，以及描述符软件接管带来的额外主机介入开销原摘要未提供具体测量数值。",
+        "summary_en": "I/O Virtualization (IOV) is a cornerstone of cloud computing, with container networking as a critical form of IOV in modern cloud paradigms. While container networks serve as feature-rich infrastructure, they incur a high CPU tax yet leave room for efficiency improvement. A natural idea is to offload container networks onto hardware such as SmartNICs via IOV interfaces. However, existing IOV mechanisms, such as SR-IOV, are misaligned with container requirements: limited device scalability versus high container density, packet-layer abstraction versus application-layer processing demands, and c...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "BlueField-3",
+          "IO虚拟化",
+          "容器网络卸载"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 7
+      },
+      {
+        "title": "Isolation Guarantee for Efficient Virtualized Network I/O on Cloud Platform",
+        "url": "https://www.semanticscholar.org/paper/7e5f1f3e73e2482f19b3b91e4ef9f7e699cbf480",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Virtualized Network I/O (VNIO) is an enabling technology in cloud computing environment as it provides virtual machines (VMs) the network connectivity. Among existing VNIO implementations, vHost-User para-virtualized solution has been commonly adopted by the industry as it achieves a good trade-off between performance and flexibility. In vHost-User, the packet transferring procedure is implemented by a user space virtual Switch (vSwitch) process, which is granted to access all VMs’ memory without restrictions. This kind of memory sharing model brings significant isolation risk, and numerous re...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "包处理",
+          "虚拟化",
+          "网络优化",
+          "性能"
         ],
         "readingTime": 5,
         "relevance": "high",
         "innovationScore": 2
       },
       {
-        "title": "Vela: A Virtualized LLM Training System with GPU Direct RoCE",
-        "url": "https://www.semanticscholar.org/paper/6ef42fd2756167f5e0e47f33fd284f99692a078f",
-        "summary": "研究面向大语言模型训练的云原生虚拟化系统Vela，解决多租户云环境中GPU集群共享与高性能网络通信的问题。核心方法采用Linux KVM虚拟化叠加SR-IOV网卡直通，在虚拟机内部暴露RoCE（RDMA over Converged Ethernet）能力，并启用GPU Direct RDMA实现GPU与网卡之间的peer-to-peer DMA，绕过CPU与系统内存拷贝完成跨节点梯度同步。系统运行于IBM Cloud数据中心的NVIDIA A100 GPU集群之上，整套栈基于商用现成硬件（off-the-shelf）而非定制DPU方案。文章重心不在某项新算法，而是在2.5年的实际运营经验中分享体系结构设计权衡，包括RoCE无损网络配置（PFC/ECN）、SR-IOV VF在VM间的隔离与性能隔离、GPU Direct与虚拟化兼容层的工程坑点、KVM侧SR-IOV配置、拥塞控制与PFC死锁规避等。原文摘要未提供具体吞吐量/时延数值或对比基线（与DPDK、BlueField DPU等方案的量化对比尚需查正文）。对关注内核网络的读者而言，Vela代表的是一类RDMA+虚拟化的高速网络旁路方案，其在Linux KVM+SR-IOV软件栈中的配置方式、CPU占用与PFC部署经验对运维RDMA云有直接参考价值。",
-        "summary_en": "Vela is a cloud-native system designed for LLM training workloads built using off-the-shelf hardware, Linux KVM-based virtualization, and a virtualized RDMA over Converged Ethernet (RoCE) network. Vela virtual machines (VMs) support peer-to-peer DMA between the GPUs and SRIOV-based network interface. In this paper, we share Vela's key architectural aspects with details from an NVIDIA A100 GPU-based deployment in one of the IBM Cloud data centers. Throughout the paper, we share insights and experiences from designing, building, and operating the system over a ~2.5 year timeframe to highlight th...",
-        "source": "Semantic Scholar",
+        "title": "INTERPROCESS COMMUNICATION IN LINUX FOR HIGH PERFORMANCE COMPUTING: COMPARATIVE THROUGHPUT ANALYSIS AND PRACTICAL RECOMMENDATIONS",
+        "url": "https://doi.org/10.52058/2786-6025-2026-5(59)-3491-3505",
+        "summary": "研究面向 HPC 场景下 Linux 经典 IPC 机制的大消息吞吐性能，作为两期研究的第二部分，聚焦 large-message 吞吐、紧通信循环下的累积 syscall 开销、NUMA 拓扑影响以及 IPC 选型实践指南。方法上提出一个代价模型，把 IPC 总时延拆解为 syscall、copy、synchronisation 三个分量，在不同消息规模下显化主导开销；并据此识别出 ~7.5 KB 的解析交叉点——低于该值时 syscall 占主导，高于该值时内核缓冲拷贝成为主因。实验对比 shared memory 与 pipe、Unix-domain socket、message queue 的吞吐，确认大消息下共享内存因避免双倍内核缓冲拷贝而显著领先。同时分析 Spectre/Meltdown 缓解措施对 syscall 开销的抬升及其体系结构根因，并论证 NUMA-aware 的进程与内存放置对带宽可达性至关重要。论文给出面向 intranode MPI 交换、producer-consumer、一对多 fan-out、pipeline 并行以及 hybrid MPI+OpenMP 等典型 HPC 模式的选型建议，并将 io_uring、eBPF-based 可观测性工具作为降低 syscall 开销和支持运行时 IPC 分析的现代 Linux 接口加以讨论。对内核网络/系统读者的落地点在于：Unix-domain socket 与 pipe 在大消息场景下因内核缓冲双拷贝成为吞吐瓶颈，io_uring 可减少 syscall 频次，NUMA 拓扑误配直接侵蚀可达带宽，Spectre/Meltdown 缓解使 syscall 路径进一步劣化。",
+        "summary_en": "This paper completes a two-part study of classical interprocess communication (IPC) mechanisms in the Linux operating system for highperformance computing (HPC).While the first part focused on architectural properties and latency of small-message exchange, the present work investigates throughput for large-message transfers, cumulative syscall overhead in tight communication loops, the impact of Non-Uniform Memory Access (NUMA) topology, and practical guidelines for selecting IPC mechanisms in HPC applications.A cost model is proposed that decomposes the total IPC time into syscall, copy, and ...",
+        "source": "OpenAlex",
         "tags": [
-          "RDMA",
-          "RoCE",
-          "GPU-Direct",
-          "KVM虚拟化"
-        ],
-        "readingTime": 12,
-        "relevance": "medium",
-        "innovationScore": 3
-      },
-      {
-        "title": "Tlaloc: A Generic Multipath Load Balancing for RoCE",
-        "url": "https://www.semanticscholar.org/paper/e7e055ea04f7c01acf84c4eb1e879c5172e73411",
-        "summary": "针对大规模数据中心中RDMA over Converged Ethernet（RoCE）面临的拥塞热点与故障恢复难题，提出与RNIC硬件解耦的通用多径负载均衡方案Tlaloc。现有方案要么工作于Linux内核网络栈，要么需要修改RNIC固件，在异构RNIC环境中难以部署。Tlaloc在主机端RNIC驱动层实现三个核心机制：(1) 通过消息拆分（message splitting）与速率控制（pace control）实时采集精确网络状态信息，弥补主机端缺乏传输逻辑的盲区；(2) 动态维护高质量连接子集（high-quality connection set）以应对网络不确定性；(3) 构建consistent-pace负载调度框架，实现跨路径弹性负载分配。该方案无需修改Linux内核网络代码路径，直接部署在商用RNIC驱动之上，对异构RNIC友好。测试床实验在分布式训练场景下相比ECMP提升网络利用率达53%、训练速度提升达34%；大规模仿真在真实工作负载下相对其他方案将FCT（Flow Completion Time）改善达20%。对Linux内核网络维护者的参考价值在于：揭示了RDMA旁路数据面在多径调度层面对拥塞控制与ECMP等内核默认路径选择机制的替代空间，以及RNIC驱动层做细粒度路径决策的可行性边界。需关注其方案是否对RoCE v2 / DCQCN（RDMA拥塞控制）交互产生影响，原摘要未提供丢包率与时延详细分布信息。",
-        "summary_en": "As Remote Direct Memory Access (RDMA) is applied in larger data centers, load balancing is more necessary to reduce congestion hotspots and handle failures. However, the existing load balancing solutions are hard to be deployed in practical data centers with heterogenous RDMA NICs (RNICs) since they either work in Linux kernel or require to modify RNICs. In this paper, we propose Tlaloc, a general-purpose load balancing solution with high performance and low resource consumption. We overcome the information and operational limitations caused by the lack of transmission logic on the host and ma...",
-        "source": "Semantic Scholar",
-        "tags": [
-          "RDMA",
-          "RoCE",
-          "多径负载均衡",
-          "拥塞控制"
-        ],
-        "readingTime": 8,
-        "relevance": "medium",
-        "innovationScore": 6
-      },
-      {
-        "title": "NeVerMore: Exploiting RDMA Mistakes in NVMe-oF Storage Applications",
-        "url": "http://arxiv.org/abs/2202.08080v1",
-        "summary": "研究针对InfiniBand RDMA架构及基于RDMA的NVMe-oF（NVMe-over-Fabrics）协议进行安全分析。NVMe-oF作为工业级分解存储的关键协议，利用RDMA实现对远程SSD的低延迟、高带宽访问。研究团队构建了工具NeVerMore，系统性地发现RDMA协议中的新型漏洞，揭示针对RDMA应用与NVMe-oF协议的多种攻击向量，并证明NVMe-oF当前的安全机制（authentication、authorization、key management）未能覆盖RDMA引入的安全风险。攻击面包括RDMA的内存注册、QP（Queue Pair）通信、MR（Memory Region）访问控制、连接管理等多个层面。评估方式为基于InfiniBand硬件与NVMe-oF目标端（target）的漏洞复现与攻击演示。该工作属于旁路高速网络（kernel-bypass）安全研究范畴，与Linux内核网络代码路径无直接关系，RDMA通过verbs接口（如libibverbs、mlx5驱动）绕过内核协议栈。原摘要未提供具体实验量化指标（如吞吐下降、延迟增加、具体CVE编号或漏洞数量）的详细信息。读者关注点在于RDMA在生产环境中部署时的安全加固、NVMe-oF与RDMA的信任边界划分，以及对内核RDMA子系统（如drivers/infiniband）的潜在加固建议。",
-        "summary_en": "This paper presents a security analysis of the InfiniBand architecture, a prevalent RDMA standard, and NVMe-over-Fabrics (NVMe-oF), a prominent protocol for industrial disaggregated storage that exploits RDMA protocols to achieve low-latency and high-bandwidth access to remote solid-state devices. Our work, NeVerMore, discovers new vulnerabilities in RDMA protocols that unveils several attack vectors on RDMA-enabled applications and the NVMe-oF protocol, showing that the current security mechanisms of the NVMe-oF protocol do not address the security vulnerabilities posed by the use of RDMA. In...",
-        "source": "arXiv",
-        "tags": [
-          "RDMA",
-          "NVMe-oF",
-          "InfiniBand安全",
-          "旁路高速网络"
-        ],
-        "readingTime": 6,
-        "relevance": "medium",
-        "innovationScore": 6
-      },
-      {
-        "title": "Identifying Linux Kernel Instability Due to Poor RCU Synchronization",
-        "url": "http://arxiv.org/abs/2511.00237v1",
-        "summary": "研究聚焦 Linux 内核 RCU（Read-Copy-Update）同步机制在 hash 表更新路径中缺失 synchronize_rcu() 调用所引发的内核稳定性问题。具体案例为 Intel ICE 网络驱动中 Virtual Function（VF）管理的 hash 表删除流程，在移除 RCU 受保护条目时未调用 synchronize_rcu()，导致陈旧指针残留、UAF 漏洞及内存碎片化。方法层面，论文首先复盘历史漏洞（如 RDS 可靠数据报套接字子系统中由 RCU 同步缺失引发的内核崩溃），随后在 ICE 驱动 VF 场景下构造快速 insert/delete 工作负载进行实验，量化评估条目移除后的内存回收延迟、残留陈旧条目比例以及碎片化程度。实验结果表明，缺乏显式同步会使 RCU grace period 内的内存迟迟无法回收，在高频增删场景下产生显著内存碎片并最终触发 OOM。论文提出缓解措施：在 hash 表条目删除路径中显式插入 synchronize_rcu() 以保证及时安全的内存回收。该结论对内核网络维护者的参考价值在于：net_device 驱动、virtio-net、路由子系统等大量依赖 RCU hash 表的代码路径均需审视删除流程是否满足 RCU 安全要求，ICE VF 这一具体案例可作为其他 RCU 受保护 hash 表审计的参照模板。",
-        "summary_en": "Read-Copy-Update (RCU) is widely used in the Linux kernel to manage concurrent access to shared data structures.However, improper synchronization when removing RCU protected hash table entries can lead to stale pointers, inconsistent lookups, and critical use after free (UAF) vulnerabilities. This paper investigates a driver-level synchronization issue arising from the omission of explicit synchronize_rcu() calls during hash table updates, using a discovered weakness in the Intel ICE network drivers Virtual Function (VF) management. Previous kernel vulnerabilities, such as a bug in the Reliabl...",
-        "source": "arXiv",
-        "tags": [
-          "RCU同步",
-          "ICE网络驱动",
-          "内核稳定性",
-          "UAF漏洞"
+          "Linux IPC",
+          "Unix-domain socket",
+          "io_uring",
+          "NUMA"
         ],
         "readingTime": 8,
         "relevance": "high",
         "innovationScore": 7
       },
       {
-        "title": "Aquila: Efficient In-Kernel System Call Telemetry for Cloud-Native Environments",
-        "url": "https://doi.org/10.3390/s25216511",
-        "summary": "针对云原生环境下系统调用遥测在现有 eBPF 监视器中存在的 per-event 开销高、负载下事件投递不可靠、多步活动关联上下文不足等问题，提出 Aquila 遥测框架。其核心是 dual-path kernel pipeline：将固定大小元数据与可变长度属性分离传输，降低序列化开销以支撑高吞吐事件处理；引入 priority-aware 缓冲与显式 drop 检测，在过载时优先保留对丢失敏感的事件并对外暴露丢包可见性；用户态将内核 trace 与 Kubernetes 元数据（pod、container、namespace）富化关联，把底层 syscall 映射到工作负载实体。评估显示相比既有方案在可扩展性、事件丢失率与遥测语义完整度上均有提升。该工作直接修改 Linux 内核侧系统调用采集路径，通过 K8s 元数据富化打通内核事件与容器工作负载的边界，对内核网络维护者的参考点在于 syscall 遥测路径与 eBPF 既有采集机制的取舍；需注意论文未给出具体吞吐/时延数值，评估以遥测质量指标为主。",
-        "summary_en": "System call telemetry is essential for understanding runtime behavior in cloud-native infrastructures, but existing eBPF-based monitors suffer from high per-event overhead, unreliable delivery under load, and limited context for correlating multi-step activities. These issues reduce scalability, create blind spots in telemetry streams, and complicate the analysis of complex workload behaviors. This work presents Aquila, a lightweight telemetry framework that emphasizes efficiency, reliability, and semantic fidelity. Aquila employs a dual-path kernel pipeline that separates fixed-size metadata ...",
+        "title": "A Scale-Up Optimized Layer7 Proxy Architecture with Deterministic Session Control and Logical Slicing",
+        "url": "https://doi.org/10.20944/preprints202510.2163.v2",
+        "summary": "针对 NGINX 等 Layer7 反向代理每请求 connect() 引发 TCP 三次握手与频繁内核态/用户态上下文切换的开销，提出一种双向 Layer7 代理架构：引入轻量 Acceptor 模块，业务模块把已经完成 TCP 握手的 socket 提前注册到 Acceptor，NGINX 通过 UNIX domain socket 以文件描述符传递方式接收，避免每请求重复 connect() 与握手。该设计结合确定性会话控制与逻辑切片，使连接复用率与处理吞吐提升。在评估方面，原摘要未提供具体数据集、流量模型、并发数、QPS、p99 延迟、上下文切换次数与对比基线（如原生 NGINX、HAProxy、Envoy）等量化结果，也未说明 Acceptor 模块与 NGINX worker 的具体交互协议与 socket 池管理数据结构。该工作面向用户态反向代理性能优化，不直接涉及 Linux 内核网络栈的 sk_buff 处理、netfilter、qdisc、BPF/XDP 等代码路径，对内核网络读者的参考价值在于：在不改动内核前提下，借助 fd 传递与预建立 socket 池来规避 connect() 热路径的可行性与边界。",
+        "summary_en": "This paper proposes a bidirectional Layer7 Proxy architecture using NGINX and a minimal Acceptor module. In conventional Layer7 load balancers, NGINX issues connect() to the backend for each request, making context switches between kernel and user space structurally unavoidable due to TCP handshakes. In the proposed approach, service modules register sockets with completed TCP handshakes to the Acceptor in advance, and NGINX receives the file descriptors via UNIX domain sockets. This eliminates connect() calls and skips per-request TCP handshakes.Performance evaluation demonstrates that the pr...",
         "source": "OpenAlex",
         "tags": [
-          "eBPF",
-          "TCP/IP",
-          "容器网络",
-          "性能"
+          "NGINX",
+          "Layer7 Proxy",
+          "UNIX domain socket",
+          "fd passing"
         ],
-        "readingTime": 5,
-        "relevance": "medium",
-        "innovationScore": 8
+        "readingTime": 2,
+        "relevance": "low",
+        "innovationScore": 9
       },
       {
-        "title": "Energy-Proportional Data Center Network Architecture Through OS, Switch and Laser Co-design",
-        "url": "http://arxiv.org/abs/2112.02083v2",
-        "summary": "针对大规模数据中心光收发模块（optical transceiver）始终保持上电、激光器效率低所导致的大量空载能耗问题，提出 LC/DC 数据中心网络架构，将 OS、交换机和光器件三者协同设计以实现能耗随流量伸缩（energy proportionality）。其核心机制利用数据中心网络的多路径拓扑（path divergence）特性，按流量需求关闭冗余路径上的光模块与电子驱动单元，同时保持全连通以隐藏激光器开启延迟；在节点侧，OS 拦截 send 请求，将 NIC 激光器开启延迟完整覆盖在 TCP/IP 包处理流水线之后，使出口链路可在无流量时保持关闭而对性能零损耗。实验通过三条路径验证：i) 在 Linux 内核与设备驱动中实现相应修改；ii) 实现 10 Gbit/s FPGA 交换机；iii) 使用真实光器件与电路仿真。基于大学自建数据中心 trace 以及 Facebook、Microsoft 数据中心流量模型进行评估，结果显示平均节省 60%（最高 68%）光模块功耗，代价仅为 6% 的额外包延迟。读者应关注其对 Linux 内核网络栈的改动细节（send 拦截点、TCP/IP 处理流水与 NIC 激光器状态机的协同），以及原型局限于 10 Gbit/s FPGA 交换机、尚未覆盖更高速率商用交换芯片的事实。",
-        "summary_en": "Optical interconnects are already the dominant technology in large-scale data center networks. However, the high optical loss of many optical components coupled with the low efficiency of laser sources result in high aggregate power requirements for the thousands of optical transceivers used by these networks. As optical interconnects stay always on even as traffic demands ebb and flow, most of this power is wasted. We present LC/DC, a data center network system architecture in which the operating system, the switch, and the optical components are co-designed to achieve energy proportionality....",
+        "title": "Exploring the Use of WebAssembly in HPC",
+        "url": "http://arxiv.org/abs/2301.03982v1",
+        "summary": "研究针对 HPC 系统采用 Linux 内核 namespace 容器化方案时面临的若干挑战，包括科学应用容器镜像难以在 HPC 资源上以非特权方式运行与构建、HPC 架构异构性加剧、以及对仅在 HPC 节点可用的特定网络库（如 MPI、InfiniBand verbs、libfabric 等）的访问限制。论文探索将 WebAssembly（Wasm）作为容器外的另一种隔离与分发机制，用于 HPC 科学应用。在系统设计上，Wasm 运行时提供沙箱与跨 ISA 可移植性，意图绕开容器构建链路、缓解异构架构带来的镜像分发问题，并通过模块化设计应对 HPC 专用网络库的可用性。论文摘要正文在 'These challenges of container-based HPC applic...' 处截断，原摘要未提供具体实验平台、Wasm 运行时选型、性能指标（如启动开销、吞吐、跨节点 MPI 调用延迟）等评估细节，也未说明与 Linux 内核 namespace / cgroup / seccomp 的关系。读者应关注其是否仅停留在概念层面、对实际 HPC 工作负载（如 CFD、生物信息学管线）有无实测，以及 Wasm 与现有 HPC 网络栈（UCX、OpenSHMEM）的兼容策略。",
+        "summary_en": "Containerization approaches based on namespaces offered by the Linux kernel have seen an increasing popularity in the HPC community both as a means to isolate applications and as a format to package and distribute them. However, their adoption and usage in HPC systems faces several challenges. These include difficulties in unprivileged running and building of scientific application container images directly on HPC resources, increasing heterogeneity of HPC architectures, and access to specialized networking libraries available only on HPC systems. These challenges of container-based HPC applic...",
         "source": "arXiv",
         "tags": [
-          "Linux内核驱动修改",
-          "光互连能耗优化",
-          "数据中心网络",
-          "TCP/IP包处理流水线"
+          "WebAssembly",
+          "HPC",
+          "容器化",
+          "Linux-namespace"
         ],
-        "readingTime": 5,
-        "relevance": "high",
-        "innovationScore": 8
+        "readingTime": 8,
+        "relevance": "low",
+        "innovationScore": 6
+      },
+      {
+        "title": "Oasis: Hiding the Cost of Querying Parquet Files in the Datapath",
+        "url": "https://arxiv.org/abs/2608.02268",
+        "summary": "针对云原生数据库存算分离架构中Parquet列存格式解码消耗大量CPU、削弱云成本效率的问题，提出Oasis——一种将Parquet解码卸载到SmartNIC网络数据路径的数据处理加速方案。核心设计包含三部分：定制硬件解码器架构（直接解析Parquet压缩/编码数据流）、软件抽象层（向上暴露给查询引擎调用）、与DuckDB的端到端集成，使扫描阶段与解码在网卡侧透明完成。评估基于该SmartNIC原型对DuckDB查询流水线进行端到端测试，结果显示解码耗时被有效隐藏在网络数据路径之后，与查询其余执行阶段重叠，最佳情况下DuckDB查询吞吐接近翻倍。该工作不修改Linux内核网络子系统代码路径，亦不涉及sk_buff、NAPI、qdisc、netfilter或XDP等机制；其内核网络相关价值在于展示了SmartNIC作为应用数据通路加速器的可行性，对网络栈维护者而言，关注点在于SmartNIC可编程数据面与主机侧网络栈之间的边界划分、卸载后剩余控制路径如何回退到标准网络接口，以及硬件加速单元与TCP/RDMA传输层之间的解耦设计。原摘要未提供具体解码吞吐、Parquet编码类型支持范围、SmartNIC型号及与CPU解码基线的详细对比数值。",
+        "summary_en": "Cloud-native database systems disaggregate compute and storage resources to improve cost efficiency over traditional monolithic architectures through elasticity and resource pooling. Studies of production data warehouse workloads show that scans (including round trips to storage) account for roughly half of total query runtime. Data lakes and lakehouses amplify this bottleneck through per-query decoding of storage-optimized, compressed file formats such as Parquet. As storage and network bandwidth continue to outpace CPU cost-performance, the CPU cycles spent on decoding increasingly undermine...",
+        "source": "OpenAlex",
+        "tags": [
+          "SmartNIC",
+          "硬件卸载",
+          "Parquet",
+          "DuckDB"
+        ],
+        "readingTime": 4,
+        "relevance": "medium",
+        "innovationScore": 4
       }
     ],
-    "news": []
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for August 6, 2026",
+        "url": "https://lwn.net/Articles/1086134/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for August 6, 2026 This edition contains the following feature content: The beginning of a process-builder API : a proof of concept for an alternative to the classic UNIX fork()/exec() pattern for process creation. Fedora considers conflict-of-interest policy : the project may adopt a policy to ensure fair and impartial decisions related to participation in Fedora. More coverage from the 2026 Linux Storage, Filesystem, Memory Management, and BPF Summit : Buffer sizes for FUSE io_uring : a discussion on how to implement multiple io_uring buffer sizes for FUSE filesystems. Examining other network namespaces using BPF : Jordan Rife proposes allowing BPF programs to enumerate sockets in foreign network namespaces. FUSE status and plans : a discussion on maintenance, new features, and plans for the FUSE subsystem. The future of libraries in BPF : Song Liu muses on how recent changes to programming practices will affect BPF. Reconsidering O_CREAT|O_DIRECTORY : the problems in creating a single, race-free system call to create and open a directory. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the ",
+        "summary": "本周LWN.net头条聚焦Linux内核网络命名空间与BPF的交叉领域。Jordan Rife提出一项提案，允许BPF程序枚举外部网络命名空间（foreign network namespaces）中的套接字。当前BPF程序只能访问自身所在网络命名空间的套接字信息，这一限制使得在多租户容器环境、跨命名空间网络监控等场景下，网络可观测性受限。该提案若被接受，将显著扩展BPF在网络监控、流量分析和故障排查中的应用范围，需要解决跨命名空间的安全与隔离问题。本期其他重要内容还包括：Li Chen提出的进程构建API（process-builder API）概念验证，通过pidfd_open()加PIDFD_EMPTY标志创建空进程壳，再使用pidfd_spawn_run()和pidfd_config()两个新系统调用分步构造并启动新进程，避免传统fork()/exec()模式中的冗余复制开销，但当前实现仍基于vfork()内部机制，距真正从零创建进程尚有差距。Fedora理事会则正在讨论制定利益冲突（COI）政策，适用于FESCo、SIG等决策机构，但不包含理事会本身，旨在规范项目治理决策。",
+        "keyPoints": [
+          "网络命名空间BPF提案：Jordan Rife提议允许BPF程序枚举外部网络命名空间（foreign network namespaces）中的套接字，突破了当前BPF只能访问本命名空间套接字的限制，对多租户容器、跨命名空间网络监控场景具有重要意义。",
+          "进程构建API背景：传统Unix的fork()/exec()模式中，fork()创建子进程副本后，execve()会丢弃大部分副本状态，造成效率浪费；Li Chen（曾提出spawn-template工作）发布了新补丁系列，展示了一种从零组装新进程的替代接口思路。",
+          "空进程壳创建机制：调用现有的pidfd_open()系统调用并传入新标志PIDFD_EMPTY，即可创建一个进程壳，返回的是真实pidfd但尚未分配PID、内核task_struct，也不计入父进程的资源限制；大多数针对pidfd的内核操作此时会拒绝执行。",
+          "进程配置数据结构：核心结构体struct pidfd_spawn_run_args包含flags、nr_actions、path、argv、envp、actions、action_size等字段，其中path可为空，argv和envp指向标准的参数与环境数组。",
+          "进程启动系统调用：pidfd_spawn_run(int pidfd, struct pidfd_spawn_run_args *args, int arg_size)用于填充并启动进程，成功时返回完整进程的PID，原始pidfd保持有效；若失败，进程壳进入死状态，后续操作均会失败。",
+          "操作（actions）配置：通过struct pidfd_spawn_action数组定义进程启动前的预处理动作，包括PIDFD_SPAWN_ACTION_DUP2（fd复制）、PIDFD_SPAWN_ACTION_CLOSE_RANGE（关闭fd范围，支持CLOSE_RANGE_CLOEXEC和CLOSE_RANGE_UNSHARE标志）、PIDFD_SPAWN_ACTION_FCHDIR（更改工作目录）；这些动作在定位可执行镜像之前执行，nr_actions和action_size字段分别表示动作数量与结构体大小，任何动作失败都会导致整个系统调用失败。",
+          "辅助配置接口：pidfd_config(int pidfd, unsigned int cmd, char *ukey, char *value, int aux)是另一个新系统调用，当前仅支持PIDFD_CONFIG_SET_STRING命令和PIDFD_CONFIG_KEY_PATH参数，用于设置可执行文件路径；当pidfd_spawn_run()传入的path为NULL时必须先调用此接口，而非NULL的path会覆盖此前配置。",
+          "API完善方向：当前动作集合远小于完整实现所需，要支持posix_spawn()还需补充信号处理、调度参数控制、文件打开等动作类型；最大缺口是pidfd_spawn_run()内部仍基于vfork()实现，理论上可替换为真正从零创建进程，但内核目前仅对init和kthreadd两个特殊用途进程提供从零创建机制，通用实现需要大量编程工作。",
+          "社区反馈现状：该补丁系列于7月16日发布，截至撰稿时仅收到一条评审意见，API设计需要更多开发者审阅后才能推进完整实现；多年来众多开发者一直呼吁此类进程创建接口，现在正是评估该提案是否符合社区期望的时机。",
+          "Fedora利益冲突政策：Fedora理事会正在讨论制定COI（conflict-of-interest）政策，适用于FESCo、特殊兴趣小组（SIG）等向理事会汇报的决策机构和个人，但草案暂不适用于理事会本身；公开讨论始于7月23日，理事会将在8月13日的会议上再次讨论此议题。",
+          "Fedora政策动因：Aoife Moloney宣布讨论时表示，理事会推动COI政策的想法源于某治理团队做出的决定所引发的反响；尽管开源项目拥有COI政策很常见，但对于Fedora这样一个已定义诸多政策却仍缺乏COI政策的项目而言，这种情况略显反常。"
+        ],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "eBPF",
+          "网络命名空间",
+          "进程管理"
+        ],
+        "readingTime": 15,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
   },
   "tagStats": {
-    "eBPF": 3,
-    "程序合成": 1,
-    "内核验证器": 1,
-    "数据包处理性能优化": 1,
-    "RDMA": 4,
-    "InfiniBand/RoCE": 1,
-    "超低延迟监控": 1,
-    "内核旁路可观测性": 1,
-    "容器安全": 1,
-    "LSM AppArmor": 1,
-    "容器网络": 2,
-    "RoCE": 2,
-    "GPU-Direct": 1,
-    "KVM虚拟化": 1,
-    "多径负载均衡": 1,
-    "拥塞控制": 1,
-    "NVMe-oF": 1,
-    "InfiniBand安全": 1,
-    "旁路高速网络": 1,
-    "RCU同步": 1,
-    "ICE网络驱动": 1,
-    "内核稳定性": 1,
-    "UAF漏洞": 1,
-    "TCP/IP": 1,
+    "eBPF": 1,
+    "驱动": 1,
+    "网络优化": 2,
+    "容器网络": 1,
+    "SmartNIC": 2,
+    "BlueField-3": 1,
+    "IO虚拟化": 1,
+    "容器网络卸载": 1,
+    "包处理": 1,
+    "虚拟化": 1,
     "性能": 1,
-    "Linux内核驱动修改": 1,
-    "光互连能耗优化": 1,
-    "数据中心网络": 1,
-    "TCP/IP包处理流水线": 1
+    "Linux IPC": 1,
+    "Unix-domain socket": 1,
+    "io_uring": 1,
+    "NUMA": 1,
+    "NGINX": 1,
+    "Layer7 Proxy": 1,
+    "UNIX domain socket": 1,
+    "fd passing": 1,
+    "WebAssembly": 1,
+    "HPC": 1,
+    "容器化": 1,
+    "Linux-namespace": 1,
+    "硬件卸载": 1,
+    "Parquet": 1,
+    "DuckDB": 1,
+    "Linux内核网络": 1,
+    "网络命名空间": 1,
+    "进程管理": 1
   }
 }
