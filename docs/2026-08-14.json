@@ -1,0 +1,48 @@
+{
+  "date": "2026-08-14",
+  "categories": {
+    "papers": [
+      {
+        "title": "Un-IOV: Achieving Bare-Metal Level I/O Virtualization Performance for Cloud Usage With Migratability, Scalability and Transparency",
+        "url": "https://www.semanticscholar.org/paper/5f6f3997e21b1047d91579a542ae3269e73711c2",
+        "summary": "研究针对云平台I/O虚拟化中性能与可管理性之间的矛盾展开。传统paravirtualization方案在guest中部署virtio前端驱动、在host中部署virtio后端驱动，虽提供丰富的云功能（迁移、伸缩、隔离），但引入宿主侧额外数据通路导致吞吐下降与CPU开销上升；SR-IOV硬件直通虽逼近裸金属性能，却丧失可迁移性与多租户共享能力。Un-IOV提出在遵循virtio规范的SR-IOV硬件加速器上重构虚拟化层，使单个VF直接对外暴露virtio兼容接口，从而在保留硬件直通性能的同时复用virtio生态的迁移与可扩展能力。论文围绕virtio-net与virtio-blk两条路径讨论前端/后端驱动重构、PCI SR-IOV PF/VF映射、mmio/bar寄存器布局以及guest无感知迁移等机制。原摘要未提供具体吞吐基准数值、对比基线（如vhost-net、vhost-user、DPDK或裸金属SR-IOV）的实测结果以及延迟/CPU占用指标，实验评估细节需查阅正文。读者应关注其virtio硬件实现对内核virtio-net驱动数据路径的影响、与现有QEMU/host kernel vhost子系统的兼容边界，以及在云数据中心实际部署中可迁移性约束的落地条件。",
+        "summary_en": "I/O virtualization is utilized by cloud platforms to provide tenants with efficient, scalable, and manageable network and storage services. The de-facto industrial standard, paravirtualization, offers rich cloud functionality by introducing split front-end and back-end drivers in the guest and host operating systems, respectively. Given this fact, paravirtualization incurs host inefficiency and performance overhead. Thus, emerging hardware virtio accelerators (i.e., SRIOV-capable devices that conform to virtio specification) with device passthrough technologies mitigate the performance issue. ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "虚拟化",
+          "SR-IOV",
+          "I/O虚拟化",
+          "云网络"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "Cold Start Latency in Serverless Computing: Snapshotting, Fork-Based Models, and the Firecracker MicroVM Approach",
+        "url": "https://doi.org/10.63721/26jsea0149",
+        "summary": "研究针对无服务器计算中长期未解决的冷启动延迟问题，构建了分解模型并将延迟拆解为VM/容器引导、运行时初始化、应用框架加载三个阶段。基于五种具备生产代表性的负载（具体类型原摘要未详细列举），对三种缓解策略进行基准对比：内存快照（snapshot restore）、基于fork的REAP执行模型、以及Firecracker微VM的快照恢复。实测显示快照恢复将冷启动中位数从145ms降至28ms，REAP fork模型进一步压到12ms。作者还推导了暖池（warm pool）容量公式，并在并发负载下建模了copy-on-write内存行为，刻画快照/fork机制在多租户场景下的内存开销与扩展性。结论指出fork方案在延迟维度领先，而快照方案在隔离强度上更优，最终选型取决于负载对延迟与隔离的权衡。Firecracker虽基于KVM并使用virtio设备，但论文并未涉及virtio-net驱动、TCP/IP协议栈、NAPI或XDP等内核网络路径，也不评估网络吞吐或包处理时延，其内核关联仅限于KVM微VM基础设施层。读者关注点应放在服务器无状态函数平台的调度决策、warm pool容量规划以及微VM快速恢复在用户态的可行性边界，而非内核网络性能。",
+        "summary_en": "Cold start latency is a persistent, largely unsolved problem in serverless computing. When a function hasn't run recently, the platform must boot a VM or container, initialize a runtime, load the application framework, and only then handle the request — a process that takes 100ms to several seconds depending on platform and runtime. For latency-sensitive workloads, that overhead disqualifies the platform. We examine the root causes, build a decomposition model, and evaluate three mitigation strategies: memory snapshotting, fork-based execution (REAP), and Firecracker snapshot restore. We bench...",
+        "source": "OpenAlex",
+        "tags": [
+          "serverless",
+          "cold-start",
+          "沙箱"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 2
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "虚拟化": 1,
+    "SR-IOV": 1,
+    "I/O虚拟化": 1,
+    "云网络": 1,
+    "serverless": 1,
+    "cold-start": 1,
+    "沙箱": 1
+  }
+}
