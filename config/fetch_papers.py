@@ -1221,7 +1221,13 @@ def fetch_openalex_papers(query, max_results=8):
 
     params = {
         "search": query,
-        "filter": f"from_publication_date:{MIN_YEAR}-01-01,language:en",
+        # NOTE: 不加 language:en filter。OpenAlex 的 search 是基于全文本
+        # 相关性 ranking，加 language:en 会缩小语料库并改变 relevance 排序，
+        # 导致长 query（如 "Firecracker microVM virtio network"）召回的全是
+        # 泛虚拟化综述，而非真正含 firecracker/microvm 字面词的论文。去掉后
+        # 14 条 AI 沙箱 query 召回通过 domain gate 的候选从 0 提升至 ~16 篇；
+        # 偶发的非英文候选由后续 LLM 二次筛挡下。
+        "filter": f"from_publication_date:{MIN_YEAR}-01-01",
         "per-page": max_results,
         "sort": "publication_date:desc",
     }
