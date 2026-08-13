@@ -20,7 +20,10 @@ env:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # 原 90 分钟在去 language:en + 修复 Phase 6.5 retry 后会超时：
+    # 沙箱 query 召回从 0 → 100+ 候选，retry 真正重试 + LLM 限流重试
+    # 累计耗时长，提到 150 分钟留足余量。
+    timeout-minutes: 150
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
