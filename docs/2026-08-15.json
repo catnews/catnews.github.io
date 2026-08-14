@@ -1,0 +1,164 @@
+{
+  "date": "2026-08-15",
+  "categories": {
+    "papers": [
+      {
+        "title": "XFAST: Efficient Feature Selection for High-Performance Network Traffic Analysis using eBPF/XDP and Genetic Algorithms",
+        "url": "https://www.semanticscholar.org/paper/e65205b54151b45dc59842c88a45b06aa343b0a5",
+        "summary": "入侵检测系统（IDS）在高吞吐网络中需要对流特征做降维与异常检测，传统特征选择在用户态执行，难以满足实时性要求。该工作提出 XFAST 框架，将流级特征的计算与基于遗传算法（GA）的特征子集优化全部下沉到 Linux 内核，利用 eBPF/XDP 在网卡驱动最早可执行点进行特征采集与筛选，避免数据拷贝到用户态带来的时延。核心机制是 tail-call-based GA 执行模型：将 GA 的进化过程按包维度拆分到多个 XDP 包处理调用之间，配合 hit-based fitness function 对候选特征子集进行增量评估，从而在保证线速处理的同时完成特征子集的演化寻优。实验以 Isolation Forest 作为下游异常检测模型，部署 XFAST 后 F1-score 从 0.80 提升到 0.85，CPU 与内存开销可忽略，具备边缘与云原生环境下的可扩展性。与内核网络的关联点在于：XDP hook、eBPF tail call、per-CPU map 等内核机制被用作 GA 的承载原语，读者可关注 tail call 跳转深度限制（默认 33）对 GA 代数与种群规模的设计约束，以及 hit-based 统计在多流并发下的一致性问题。原文未提供具体吞吐（Gbps）与包速率基准数据。",
+        "summary_en": "Intrusion Detection Systems (IDS) rely heavily on feature-rich data and dimensionality reduction to identify anomalies in high-throughput networks. However, traditional approaches to feature selection are often computationally expensive user-space processes that limit real-time use. In this paper, we present XFAST, a novel in-kernel feature extraction and selection framework built using eBPF/XDP and Genetic Algorithms (GA). XFAST enables low-latency, real-time analysis of network traffic by efficiently computing and refining flow-level features entirely within the Linux kernel. Our system intr...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "feature-selection",
+          "IDS"
+        ],
+        "readingTime": 7,
+        "relevance": "high",
+        "innovationScore": 10
+      },
+      {
+        "title": "Reviving eBPF-Based Storage Isolation in FaaS via Model-Rule Decoupling",
+        "url": "https://www.semanticscholar.org/paper/4b37891fc31d20b6811c1cf2348a715e2a7c41e4",
+        "summary": "研究针对 FaaS（Function as a Service）平台中不可信函数的大规模细粒度高性能隔离需求，提出基于 eBPF 的存储沙箱隔离机制。现有 eBPF 存储隔离方案受限于指令数量、栈大小与循环约束，每个函数需手工编写受限的 eBPF 程序，难以在规模化 FaaS 部署中落地。论文采用 model-rule decoupling（模型-规则解耦）思路，将隔离策略中的规则部分从 eBPF 程序中分离，使单一 eBPF 骨架程序可复用于多函数，并通过外部规则描述支撑细粒度控制。原摘要未提供具体算法名称、eBPF 程序结构、挂载点（如 LSM hook、tracepoint、kprobe）以及性能评估的吞吐/时延数值。整体工作落在应用层 FaaS 安全与隔离领域，利用 Linux 内核 BPF 子系统作为底层执行机制，但不涉及 TCP/IP 协议栈、netfilter、XDP、tc、socket、net_device 等网络代码路径，与 Linux 内核网络栈维护和高速网络栈旁路研究无直接关系。读者关注点应放在 FaaS 平台安全隔离机制设计、eBPF 编程模型限制及规则外置方案上，而非网络性能优化。",
+        "summary_en": "The rapid development of Function as a Service (FaaS) has introduced emerging security demands for untrusted functions. Specifically, they necessitate large-scale, fine-grained, high-performance isolation. eBPF offers a promising mechanism for fine-grained isolation in process granularity. However, it suffers from inherent programming constraints (e.g., limitations on instruction count, stack size, and loop). Thus, existing eBPFbased storage isolation (sandbox) requires manual and restricted development of per-function eBPF programs, which hinders practical deployment in FaaS at scale. To addr...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "FaaS",
+          "eBPF",
+          "存储隔离",
+          "沙箱安全"
+        ],
+        "readingTime": 4,
+        "relevance": "low",
+        "innovationScore": 5
+      },
+      {
+        "title": "Demystifying Performance of eBPF Network Applications",
+        "url": "https://www.semanticscholar.org/paper/4ed9483cabcf7c512959388924f6d3ab7a12a59b",
+        "summary": "针对 eBPF 在网络加速场景中的实际收益问题，通过多组基准测试与不同负载下的测试用例，系统评估了各类网络应用使用 eBPF 后的吞吐、延迟与性能隔离表现。核心方法围绕对比 eBPF 旁路与传统网络栈路径在多种工作负载下的行为差异，识别 eBPF 程序部署带来的 performance isolation violations，并讨论正在进行的修复工作与社区未来方向。实验结论指出，并非所有网络应用都能从 eBPF 中获益，部分场景下 eBPF 反而限制了应用的可部署性与可处理负载类型。论文与 Linux 内核网络直接相关，eBPF 程序通过 XDP / tc / socket 等 hook 接入内核网络栈路径，评估结果对内核网络维护者与 eBPF 开发者均有参考价值；原摘要未提供具体基准名称、对比基线（如内核原生协议栈、DPDK 等用户态方案）与关键数值（吞吐、延迟、CPU 占用），阅读时需重点核对实验设置、所采用的 eBPF 程序类型与 hook 点。",
+        "summary_en": "Recently, eBPF has emerged as the latest answer to how we should accelerate networked applications. In this paper we ask can all networked applications benefit from eBPF? We answer this question by running several benchmarks under different workloads and by designing different test cases. Our results show that in reality many networked applications cannot benefit from eBPF, and worse the use of eBPF can limit how applications are deployed (because eBPF can lead to performance isolation violations) and the workloads they can handle. We then discuss whether ongoing work can fix the limitations w...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "network-performance",
+          "performance-isolation"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "eBPF Anomaly Detection Baselines: Evaluating Syscall and Network Instrumentation Layers",
+        "url": "https://www.semanticscholar.org/paper/e8464e6eb2719fcefcd2e329e09673c8a51c34b2",
+        "summary": "研究针对 eBPF 安全监控中应选用 syscall（kprobe）还是网络层（XDP）插桩点进行运行时异常检测的架构选择问题，在统一的机器学习协议下分别对两类插桩层进行独立案例研究。方法上采用同一 ML 流程：Isolation Forest 无监督 + Random Forest 有监督 + 5-fold 交叉验证，并配合 per-layer 特征重要性分析与混淆矩阵。Syscall 案例基于 1,196 条进程级样本，过程异常 F1=0.458±0.044；网络案例基于 2.1M 包聚合的 761,065 条流（99.965% 为攻击），在 1:5 平衡的 1,596 条子集上 Random Forest 取得 AUC=0.998，对良性流识别率 98.1%（FPR 1.9%），并检出全部攻击。论文明确指出 F1 在类别极度不平衡下被通胀，因此以 AUC 与良性类混淆矩阵作为网络层主要证据；并声明两类数据集的攻击类型不同（网络为合成 volumetric DDoS，syscall 为进程级异常），性能差异反映任务特性而非插桩层固有能力。与 Linux 内核网络的关系在于使用 XDP/kprobe 这类 BPF 程序挂载点作为观测面，不修改 sk_buff 处理、netfilter 或驱动路径。落地上读者需关注：两类数据集不可直接横向对比、1:5 平衡子集的代表性，以及 kprobe/XDP 在生产环境的 hook 开销与可见信号差异。",
+        "summary_en": "Security practitioners deploying extended Berkeley Packet Filter (eBPF) monitoring face a critical architectural decision: which kernel instrumentation layers should be monitored to detect runtime anomalies? Different eBPF instrumentation points—syscall-level kprobes, network-level XDP filters, file I/O hooks—introduce distinct computational costs and reveal different behavioral signals. Yet empirical baselines on per-instrumentation-layer detection capability remain limited. This paper presents two independent per-instrumentation-layer case studies of syscall and network eBPF monitoring under...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "Syscall-kprobe",
+          "Anomaly-Detection"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 5
+      },
+      {
+        "title": "A Framework for eBPF-Based Network Functions in an Era of Microservices",
+        "url": "https://www.semanticscholar.org/paper/42bb24ba0f1142cfa365d812df2e23c56ad39dde",
+        "summary": "研究针对 NFV 场景下现有框架普遍依赖内核旁路（DPDK 等）而忽视内核数据包处理演化困难、编程复杂的问题，提出 Polycube 软件框架，将 NFV 灵活性带回 in-kernel 数据面。核心机制是利用 eBPF/TC 钩子在 Linux 内核网络栈中动态注入称为 Cube 的网络函数，每个 Cube 包含高效的 in-kernel 数据面（基于 eBPF 程序）和隔离、持久化、可组合的 user-space 控制面。Cube 之间可动态链接形成任意复杂链式服务，部署不依赖自定义内核或额外内核模块，便于调试和内省（introspection）。实验部分通过与已有 NFV 应用对比，展示在吞吐、时延和资源占用上的显著提升，并以 Kubernetes 网络 provider 作为典型用例验证编程模型的通用性，证明了在容器编排场景下以 in-kernel eBPF 路径替代传统 CNI 用户态/旁路方案的可行性。对内核网络维护者而言，Polycube 展示了 eBPF 数据面与 user-space 控制面解耦的一种系统化设计模式，但原摘要未提供具体的吞吐/时延数值、对比基线（如 OVS、DPDK 应用）以及 BPF 程序 hook 点的具体协议层（如 TC ingress/egress 或 XDP）细节，阅读时需核对原文中关于 maps 共享、cgroup 隔离与 BPF verifier 兼容性方面的实现细节。",
+        "summary_en": "By moving network functionality from dedicated hardware to software running on end-hosts, Network Functions Virtualization (NFV) pledges the benefits of cloud computing to packet processing. While most of the NFV frameworks today rely on kernel-bypass approaches, no attention has been given to kernel packet processing, which has always proved hard to evolve and to program. In this article, we present Polycube, a software framework whose main goal is to bring the power of NFV to in-kernel packet processing applications, enabling a level of flexibility and customization that was unthinkable befo...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "NFV",
+          "内核网络栈",
+          "Kubernetes网络"
+        ],
+        "readingTime": 6,
+        "relevance": "high",
+        "innovationScore": 3
+      },
+      {
+        "title": "SNI-GNN: SmartNIC-Assisted Full-Graph GNN Training with In-Network Embedding Prediction",
+        "url": "https://arxiv.org/abs/2608.06441",
+        "summary": "针对全图 GNN 训练在多服务器集群中因节点间嵌入交换不规则导致通信开销过大的问题，提出 SNI-GNN 系统，在 SmartNIC 上以网内预测方式缩减远程嵌入传输并保持精度。核心方法包括：(1) 在 BlueField-3 DPU 上部署轻量级 linear-trend predictor，对缓存的历史嵌入进行修正，预测即将到来的远程嵌入；(2) 基于重要性的 boundary-node 采样策略，进一步削减跨节点消息量；(3) 异步 DPU–GPU 数据通路并复用中间结果，缓解 GPU 因等待 DPU 而产生的空泡。理论部分给出了在有界二阶动态下预测误差的上界，以及基于不精确梯度的标准非凸收敛性证明。实验在 BlueField-3 上集成 BNS-GCN、SANCUS 等 SOTA 全图系统，对比基线为 BNS-GCN 与 SANCUS：在数千万条边的图上实现 21–45% 通信量削减，端到端加速 1.3–3.6×（相对 BNS-GCN）、最高 1.29×（相对 SANCUS），精度损失 ≤ 0.01，并可线性扩展到 16 块 GPU。该工作面向分布式 GNN 训练，落到 SmartNIC 网内计算路径而非 Linux 内核网络栈代码；与内核网络维护者的关联点在于 BlueField-3 的 DPU 数据通路如何与 RDMA/GPUDirect 协同，以及网内计算对 RoCE / kernel-bypass 传输层的假设；落地点需关注 predictor 对非平稳 embedding 漂移的鲁棒性，以及与现有分区/压缩方案的叠加收益边界。",
+        "summary_en": "Full-graph GNN training delivers high accuracy but scales poorly on multi-server clusters due to heavy, irregular inter-node embedding exchanges. We present SNI-GNN, a SmartNIC-assisted full-graph training system that reduces communication while preserving accuracy by predicting remote embeddings in-network. SNI-GNN deploys a lightweight linear-trend predictor on SmartNICs to refine cached historical embeddings, coupled with an importance-based boundary-node sampling policy and an asynchronous DPU--GPU data pipeline with intermediate-result reuse. We provide error and convergence bounds showin...",
+        "source": "OpenAlex",
+        "tags": [
+          "SmartNIC",
+          "BlueField-3",
+          "GNN训练",
+          "网内计算"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 0
+      },
+      {
+        "title": "Concentrated isolation for container networks toward application-aware sandbox tailoring",
+        "url": "https://www.semanticscholar.org/paper/904587d0a8795414fff99edf9e9b837ef30856b4",
+        "summary": "研究针对容器现有弱隔离带来的安全风险与全量沙箱方案（gVisor、Kata Containers）破坏轻量化、可扩展性的矛盾，提出集中强化网络隔离的局部加固沙箱机制（partially fortified sandboxing）。核心方法不替换容器运行时全栈，而是在网络层面选择性加厚隔离边界：通过 para-passthrough hypervisor 技术，仅对容器网络数据通道实施硬件虚拟化辅助的拦截与控制，使计算侧保持容器原生轻量级特性。评估以 benchmark 与真实 PaaS/FaaS 应用负载为输入，对比在该网络隔离增强机制下容器网络的吞吐、延迟与开销，并验证针对不同应用特征（CPU 敏感型、I/O 密集型、网络密集型）裁剪差异化沙箱强度的可行性。结果显示集中式网络隔离加固在保持容器轻量化优势的同时，能针对网络密集型负载提供有效隔离边界。该工作面向容器云平台安全运维而非 Linux 内核网络栈优化，未涉及 sk_buff 处理路径、netfilter hook、XDP/BPF 数据面或 socket 内核实现，也不属于 SmartNIC/DPDK/RDMA 等旁路高速网络研究。读者关注点应放在 PaaS/FaaS 平台沙箱策略选择、网络隔离粒度与硬件虚拟化辅助开销的权衡，原摘要未提供具体基准数值与吞吐量指标。",
+        "summary_en": "Containers provide a lightweight and fine-grained isolation for computational resources such as CPUs, memory, storage, and networks, but their weak isolation raises security concerns. As a result, research and development efforts have focused on redesigning truly sandboxed containers with system call intercept and hardware virtualization techniques such as gVisor and Kata Containers. However, such fully integrated sandboxing could overwhelm the lightweight and scalable nature of the containers. In this work, we propose a partially fortified sandboxing mechanism that concentratedly fortifies th...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "container sandboxing",
+          "network isolation",
+          "para-passthrough hypervisor",
+          "PaaS/FaaS"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 2
+      },
+      {
+        "title": "Performance Evaluation of Container Networking Technology",
+        "url": "https://www.semanticscholar.org/paper/8cb902d87d9e86c13ec2c58d110119868e11ef0b",
+        "summary": "针对混合云与异构云场景下容器网络方案选型问题，对 Flannel、Calico、Weave 三种用户态容器网络方案与 SR-IOV+DPDK 高性能方案进行性能对比。方法上构建统一测试床，使用一致的负载与拓扑对四种方案的吞吐量、延迟、CPU 占用等指标进行采集。Flannel 基于 VXLAN/UDP 封装，Calico 使用 BGP 路由 + IPIP，Weave 基于 UDP/TCP 自定义协议，三者均运行在 Linux bridge/veth 等内核接口之上但本身不修改内核网络代码路径；SR-IOV+DPDK 通过 SR-IOV 将网卡 VF 直通给容器并由 DPDK 用户态驱动接管数据面，绕开内核协议栈以降低延迟。摘要原文未提供具体实验数值、对比基线细节及关键结论数据，原摘要未给出吞吐/时延定量结果。该工作面向混合云容器编排选型而非内核网络栈研究，对内核网络维护者参考价值有限，读者重点应关注 SR-IOV+DPDK 与纯用户态方案在容器场景下的性能边界与运维复杂度差异。",
+        "summary_en": "Hybrid cloud and heterogeneous cloud have become industry hotspots in recent years, and are also one of the main growth points of cloud computing market in the coming years. We hope to investigate container virtual network solutions and virtual machine container fusion solutions to manage hybrid and heterogeneous cloud. In this paper, a performance comparison of different container networking solutions, including Flannel, Calico, Weave and SR-IOV+DPDK, are presented. We aim to provide a fair comparison of these solutions for management problems of hybrid cloud and heterogeneous cloud. Results ...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "容器网络",
+          "SR-IOV",
+          "旁路",
+          "混合云"
+        ],
+        "readingTime": 4,
+        "relevance": "low",
+        "innovationScore": 1
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 5,
+    "XDP": 3,
+    "feature-selection": 1,
+    "IDS": 1,
+    "FaaS": 1,
+    "存储隔离": 1,
+    "沙箱安全": 1,
+    "network-performance": 1,
+    "performance-isolation": 1,
+    "Syscall-kprobe": 1,
+    "Anomaly-Detection": 1,
+    "NFV": 1,
+    "内核网络栈": 1,
+    "Kubernetes网络": 1,
+    "SmartNIC": 1,
+    "BlueField-3": 1,
+    "GNN训练": 1,
+    "网内计算": 1,
+    "container sandboxing": 1,
+    "network isolation": 1,
+    "para-passthrough hypervisor": 1,
+    "PaaS/FaaS": 1,
+    "容器网络": 1,
+    "SR-IOV": 1,
+    "旁路": 1,
+    "混合云": 1
+  }
+}
