@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-16",
+  "categories": {
+    "papers": [
+      {
+        "title": "The Bi-Channel Networking Paradigm for Database Systems in the Cloud",
+        "url": "https://arxiv.org/abs/2606.19969",
+        "summary": "研究针对云数据库系统中内核TCP栈CPU开销成为性能瓶颈的问题，提出双通道网络范式。该范式将数据库通信拆分为高吞吐/低延迟的数据通道与基于TCP的可靠控制通道：数据通道采用用户态UDP绕过内核TCP处理路径，控制通道保留内核TCP以提供可靠性、顺序性与恢复语义，从而在利用现代NIC硬件卸载能力的同时不牺牲关键传输保证。论文在两类典型数据库场景中验证设计：分布式shuffle在200 Gbit/s网络下仅占用三个CPU核即达到线速，复制型键值存储实现每秒百万级消息吞吐。该工作属于内核旁路类高速网络栈研究，通过用户态UDP+内核TCP组合绕开内核sk_buff/TCP协议栈处理，与DPDK等用户态网络栈思路一致；其核心贡献在于双通道架构设计而非网络栈本身实现。对Linux内核网络维护者的直接参考价值有限，更适合数据库系统设计者评估用户态网络路径与内核TCP协同的可行性边界，以及在何种负载特征下值得放弃内核TCP的通用语义换取CPU效率。",
+        "summary_en": "When network links were slow, cloud and distributed database systems could rely on generic kernel abstractions and treat network communication as a black box. With today's fast cloud networks, this approach breaks down: database performance becomes limited by the CPU overhead of the kernel TCP stack. Replacing TCP with user-space UDP can reduce this overhead, but it requires reimplementing essential guarantees, such as reliability and ordering. To solve this conundrum, database systems should no longer treat networking as a black box but co-design it with database operations. We propose the bi...",
+        "source": "OpenAlex",
+        "tags": [
+          "双通道网络",
+          "用户态UDP",
+          "内核旁路",
+          "数据库网络"
+        ],
+        "readingTime": 4,
+        "relevance": "medium",
+        "innovationScore": 3
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "双通道网络": 1,
+    "用户态UDP": 1,
+    "内核旁路": 1,
+    "数据库网络": 1
+  }
+}
