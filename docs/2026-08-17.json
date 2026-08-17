@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-17",
+  "categories": {
+    "papers": [
+      {
+        "title": "Aquifer: Hierarchical Memory Pooling with CXL and RDMA for MicroVM Snapshots",
+        "url": "https://arxiv.org/abs/2606.24079",
+        "summary": "研究针对云集群中 25-35% DRAM 因内存碎片化而闲置的问题，提出基于 CXL 与 RDMA 的分层内存池化架构 Aquifer，用于 MicroVM serverless 场景下的快照恢复加速。CXL 提供 pod 内部低延迟 load/store 透明访问，RDMA 提供跨节点集群级访问但延迟更高且存在软件开销，二者结合形成分层拓扑填补单一技术的能力缺口。核心方法包括分层内存池设计、CXL/RDMA 两级访问路径选择策略、以及针对 MicroVM 快照恢复流水线的预取/放置优化。实验在 production-scale cloud cluster 模拟环境中评估快照恢复延迟（cold-start latency）、DRAM 利用率、以及对比纯 CXL、纯 RDMA 与本地 DRAM 基线的吞吐/带宽开销。论文将快照恢复延迟定位为 serverless 冷启动主导瓶颈，原摘要未提供具体延迟数值与对比基线量化结果。该工作属云基础设施/虚拟化层面，未触及 Linux 内核网络子系统（socket、netfilter、XDP、qdisc、tcp 协议栈等），RDMA 仅作为内存语义介质而非网络栈旁路使用。对内核网络维护者参考价值有限；落地点在于 serverless 平台调度器与 MicroVM runtime 集成。",
+        "summary_en": "Memory stranding wastes 25-35% of installed DRAM in production cloud clusters. Memory pooling over CXL and RDMA offers a remedy, but neither technology alone suffices: CXL provides low-latency, load/store-transparent access limited to a pod, while RDMA provides cluster-wide reach at higher latency with software overhead. A hierarchical architecture combining both tiers is the practical path forward, yet remains unexplored for MicroVM-based serverless computing, where snapshot restore latency is the dominant cold-start bottleneck. We present Aquifer, the first system to serve MicroVM snapshots ...",
+        "source": "OpenAlex",
+        "tags": [
+          "MicroVM快照",
+          "CXL内存池化",
+          "RDMA",
+          "Serverless冷启动"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "MicroVM快照": 1,
+    "CXL内存池化": 1,
+    "RDMA": 1,
+    "Serverless冷启动": 1
+  }
+}
