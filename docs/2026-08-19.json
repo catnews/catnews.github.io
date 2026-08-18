@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-19",
+  "categories": {
+    "papers": [
+      {
+        "title": "Meshlib: In-Process Policy Enforcement for Sidecar-less Service Meshes",
+        "url": "https://arxiv.org/abs/2608.13107",
+        "summary": "针对微服务架构中service mesh依赖sidecar proxy（如Istio中的Envoy）导致的每请求应用层冗余解析与延迟开销，设计了无sidecar的服务网格扩展Meshlib。系统将职责分层：L7策略通过非侵入式应用绑定库在进程内执行；传输层身份标识与路由委托给Cilium的eBPF数据面完成。该架构保留service mesh的安全语义，移除sidecar带来的额外解析跳数，并与未修改的服务完全兼容，支持在现有部署中增量落地。实验在TrainTicket基准上对比Istio、Linkerd与未修改的Cilium，部署126条安全策略覆盖37个服务，结果显示Meshlib在所有配置中端到端延迟最低，资源占用与基线方案相当。Meshlib不直接修改Linux内核网络代码路径，而是通过Cilium消费内核BPF hook完成身份与转发，体现内核eBPF接口在sidecar消除场景下的工程价值。读者关注点包括：进程内库的侵入性边界、L7策略表达能力是否弱于sidecar方案、eBPF数据面在策略增多时的复杂度上限，以及对未接入Meshlib的存量服务的兼容性边界。",
+        "summary_en": "Service meshes facilitate service-to-service communication and enforce security policies in microservice architectures. However, they often depend on per-pod sidecar proxies, which introduce significant latency and resource overhead due to redundant application-layer parsing on every request. Eliminating sidecars without compromising security guarantees remains a central challenge. To address this, we introduce Meshlib, a sidecar-less service mesh extension built on Cilium as a control-plane extension. Meshlib incorporates a non-intrusive application-bound library that enforces Layer-7 policie...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "容器网络",
+          "service-mesh",
+          "sidecar"
+        ],
+        "readingTime": 15,
+        "relevance": "medium",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "容器网络": 1,
+    "service-mesh": 1,
+    "sidecar": 1
+  }
+}
