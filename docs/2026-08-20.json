@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-20",
+  "categories": {
+    "papers": [
+      {
+        "title": "A method for detecting re-entry vulnerabilities in large local area network smart contracts based on eBPF",
+        "url": "https://www.semanticscholar.org/paper/878f5c9d039b9dbea8821d46c5023b4c713addd3",
+        "summary": "针对区块链智能合约中重入漏洞的安全检测问题，提出基于 eBPF 虚拟机机制的大规模局域网智能合约重入漏洞检测方法。核心思路是利用 eBPF 在 Linux 内核中创建的虚拟机机制，将 C 代码编译为字节码并在沙箱环境中执行，从而对智能合约的调用路径与状态变更进行追踪，识别重入攻击模式。方法将传统智能合约静态分析与 eBPF 动态插桩结合，可在合约部署前/运行中捕获重入调用链。原摘要未提供具体实验数据集、对比基线（如 Mythril、Slither、Securify 等）、检测准确率/召回率/FPR 数值，也未说明目标区块链平台（以太坊/Fabric/Hyperledger 等）与合约语言（Solidity/Go/JS）。与 Linux 内核网络子系统无直接关联：eBPF 在此被用作通用安全执行沙箱，而非 XDP/tc/socket 等网络数据面挂钩；论文既未修改网络协议栈，也未涉及旁路卸载或高速网络栈。读者关注点应放在：检测方法在真实合约规模下的误报/漏报、eBPF 字节码执行开销对检测延迟的影响，以及该方法是否仅限特定合约语言或虚拟机模型。",
+        "summary_en": "As one of the important applications of blockchain technology, smart contracts aim to achieve decentralized trusted transactions. However, the security of smart contracts has always been a focus of industry attention, with reentry vulnerabilities being the most representative and harmful. In response to this issue, this article proposes a large-scale local area network smart contract re-entry vulnerability detection method based on eBPF (Extended Berkeley Packet Filter). EBPF technology creates a virtual machine mechanism in the Linux kernel that allows for compiling C code into bytecode and m...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "智能合约安全",
+          "eBPF",
+          "重入漏洞检测",
+          "区块链"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "智能合约安全": 1,
+    "eBPF": 1,
+    "重入漏洞检测": 1,
+    "区块链": 1
+  }
+}
