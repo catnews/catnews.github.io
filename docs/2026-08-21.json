@@ -1,0 +1,29 @@
+{
+  "date": "2026-08-21",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for August 13, 2026",
+        "url": "https://lwn.net/Articles/1087432/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for August 13, 2026 This edition contains the following feature content: Bringing BPF to binfmt_misc : BPF programs may soon be able to manage interpreters for binfmt_misc. A look at CrossPoint e-reader firmware : open-source firmware for tiny ebook readers. KVM planes head for takeoff : an abstraction layer for managing multiple security domains within a single virtualized system. Even more formal verification for BPF : exploring the use of additional formal verification for application-specific constraints. Changes in shadow-utils password-expiration features : making periodic password rotation a thing of the past. Block-layer error injection : producing disk errors on demand to help with kernel-storage-code debugging. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (none posted) Bringing BPF to binfmt_misc By Jonathan Corbet August 6, 2026 The kernel is able to run a few types of executable files, including",
+        "summary": "本期LWN重点关注内核BPF基础设施的两项进展：一是将BPF程序引入binfmt_misc机制，允许通过BPF程序动态决定任意二进制格式的解释器执行方式，扩展了BPF的挂载点和在用户态格式处理上的应用场景；二是探索针对BPF程序特定应用约束的更深入形式化验证方法，旨在进一步保障BPF程序在生产环境下的安全性与正确性。这两项变化虽然不直接涉及网络数据面，但扩展了BPF生态的适用面并强化了BPF验证器能力，对eBPF/XDP/Cilium等网络场景的长期可靠性与扩展性具有重要参考价值。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "eBPF",
+          "BPF验证",
+          "内核子系统扩展"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "BPF验证": 1,
+    "内核子系统扩展": 1
+  }
+}
