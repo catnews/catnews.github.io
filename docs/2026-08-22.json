@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-22",
+  "categories": {
+    "papers": [
+      {
+        "title": "A Functional and Performance Benchmark of Lightweight Virtualization Platforms for Edge Computing",
+        "url": "https://www.semanticscholar.org/paper/ddff38bd9cd4b2dce601d10ff8cd084cf2dd73fc",
+        "summary": "研究针对边缘计算与 FaaS 场景，对 Firecracker、gVisor、Docker、containerd 等轻量级虚拟化平台（含 microVM 与容器两类）进行功能与性能基准测试。评估维度涵盖工具链成熟度、网络能力、启动时间、CPU/内存占用、微服务吞吐延迟，以及 ARM 架构（Raspberry Pi 4）与 x86-64 平台的对比。实验在 Raspberry Pi 4 和 x86-64 两套硬件上分别运行 HTTP/微服务工作负载，记录冷启动时延、稳态吞吐与资源消耗曲线。结果显示标准 Docker 容器在启动速度与资源开销上最优，microVM 提供更强隔离但代价更高；ARM 平台上部分运行时兼容性受限。该工作面向边缘编排平台选型，不修改 sk_buff、netfilter、qdisc、XDP、virtio-net 等内核网络路径，也不涉及 DPDK/SmartNIC/RDMA 等高速旁路数据面，仅在用户态容器/虚拟化层面比较网络栈封装与微服务延迟，对内核网络维护者参考价值有限。",
+        "summary_en": "The recent rise of edge computing and FaaS triggered a revolution in the field of software virtualization, improving performance and security. This paper benchmarks various lightweight virtualization platforms, such as microVMs and containers, in the context of edge microservices. Factors taken into account include toolchain maturity, networking capabilities, boot time, resource use, microservice performance, and ARM architecture readiness. We present a functional comparison and benchmarks on both a Raspberry Pi 4 and an x86-64 platform. The results indicate standard Docker containers offer re...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "虚拟化",
+          "边缘计算",
+          "容器",
+          "沙箱"
+        ],
+        "readingTime": 3,
+        "relevance": "low",
+        "innovationScore": 2
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "虚拟化": 1,
+    "边缘计算": 1,
+    "容器": 1,
+    "沙箱": 1
+  }
+}
