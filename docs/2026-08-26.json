@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-26",
+  "categories": {
+    "papers": [
+      {
+        "title": "Offering Microsecond-Scale Cross-VM Core Elasticity on Colocated Lightweight Virtual Machines",
+        "url": "https://arxiv.org/abs/2608.12633",
+        "summary": "研究无服务器（serverless）平台中轻量虚拟机（VM）的物理核跨VM弹性分配问题。当前做法是按峰值需求过度配置VM以保护突发流量下的尾延迟，但牺牲部署密度；传统VM基座只能在毫秒级粒度调整guest核心数，无法满足突发流量的快速响应需求。论文提出在共置（colocated）轻量VM之间实现微秒级物理核迁移与回收机制，使基础设施能在突发流量到达时迅速将空闲核分配给延迟敏感型VM，并在突发结束后回收。系统面向Firecracker等fast-booting microVM形态，核心挑战包括：跨VM核状态保存/恢复的延迟压缩、调度器感知尾延迟的核分配策略、以及在多租户共置场景下避免核争抢。原摘要未提供具体数据结构、算法名称、实验数据集与对比基线（如Linux CFS、Kubernetes CPU manager等），也未提供吞吐/CPU占用/尾延迟等量化指标。论文与Linux内核网络子系统无直接关联，其落地点在hypervisor层和serverless运行时（如Firecracker/gVisor类microVM），对网络栈维护者的参考价值有限。",
+        "summary_en": "Serverless platforms commonly colocate many diverse workloads, each in a fast-booting, memory-lean virtual machine (VM), to improve deployment density. Overprovisioning each VM for its peak protects tail latency during traffic bursts but hurts density; maintaining high density while effectively protecting tail latency requires the infrastructure to be able to shift physical cores, at a microsecond timescale, to whichever latency-sensitive VM is bursting and reclaim them as the burst subsides. No VM substrate delivers this: conventional VMs resize a guest's cores only through a millisecond-scal...",
+        "source": "OpenAlex",
+        "tags": [
+          "serverless",
+          "沙箱",
+          "CPU弹性调度",
+          "虚拟化"
+        ],
+        "readingTime": 12,
+        "relevance": "low",
+        "innovationScore": 2
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "serverless": 1,
+    "沙箱": 1,
+    "CPU弹性调度": 1,
+    "虚拟化": 1
+  }
+}
