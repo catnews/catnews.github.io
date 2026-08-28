@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-28",
+  "categories": {
+    "papers": [
+      {
+        "title": "Comparing UPF Dataplane I/O Modes in a Cloud-Native 5G Core: AF_PACKET, AF_XDP, CNDP, and DPDK on SD-Core BESS-UPF",
+        "url": "https://arxiv.org/abs/2608.14589",
+        "summary": "针对 5G 核心网 UPF 用户面数据面选型,论文在单一开源 SD-Core BESS-UPF(BESS 端口驱动可替换)上,分别以 AF_PACKET、AF_XDP、CNDP、DPDK 四种 I/O 后端跑同一条 GTP-U/PDR/FAR/QER 处理流水线,基于 Intel XXV710(i40e)25G 网卡、Canonical Kubernetes Charmed operator 部署,使用 RFC 2544 NDR 方法在 64B 包长下评估吞吐、时延、CPU 占用与稳定性,并端到端对接解耦 O-RAN RAN 与商用终端。实测结果:AF_PACKET 约 0.25 Mpps,CNDP 5.52 Mpps、AF_XDP 6.47 Mpps(均 2 workers),DPDK 在 4 workers 达 10.30 Mpps、8 workers 达 13.09 Mpps 且平均时延最低 8.1 µs。关键发现是 DPDK 的领先来自扩展上限——其原生 PMD 经 vfio-pci 摆脱了 AF_XDP 单 netdev socket 限制将 CNDP/AF_XDP 钉在 2 workers 的瓶颈,而非单包处理效率优势;在相同 worker 数下三种旁路模式差距落在噪声内,且 AF_XDP 每核领先。作者给出选型建议:无 hugepages/vfio-pci/核隔离条件时 CNDP 与 AF_XDP 是云原生甜点;独立主机场景 DPDK 更合理。同时披露合成基准测不到的真实部署坑,例如 Kubernetes limits.cpu 误设会使 DPDK 吞吐静默减半。该工作对内核网络维护者的参考价值在于 AF_XDP 多 socket 扩展性与 vfio-pci 用户态驱动边界的实测证据。",
+        "summary_en": "The User Plane Function (UPF) carries all user-plane traffic in a 5G network, and its throughput depends on how packets move between the NIC and the application, that is, on the packet I/O mode. We compare four widely used modes, AF_PACKET, AF_XDP, the Cloud Native Data Plane (CNDP), and the Data Plane Development Kit (DPDK), on a single open-source UPF. Using SD-Core BESS-UPF deployed as a Charmed operator on Intel XXV710 NICs in Canonical Kubernetes, we run the same GTP-U/PDR/FAR/QER pipeline under each mode and change only the BESS port driver, so any difference is attributable to the I/O b...",
+        "source": "OpenAlex",
+        "tags": [
+          "XDP",
+          "旁路",
+          "UPF",
+          "i40e"
+        ],
+        "readingTime": 12,
+        "relevance": "medium",
+        "innovationScore": 9
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "XDP": 1,
+    "旁路": 1,
+    "UPF": 1,
+    "i40e": 1
+  }
+}
