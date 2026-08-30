@@ -1,0 +1,30 @@
+{
+  "date": "2026-08-31",
+  "categories": {
+    "papers": [
+      {
+        "title": "Scalable datacenter replication with mostly-synchronous consensus on hardware",
+        "url": "https://arxiv.org/abs/2608.24622",
+        "summary": "研究针对分布式强一致复制吞吐量低、延迟高、难以横向扩展的问题，提出 scarHW：一种将共识协议直接卸载到网卡硬件的可扩展复制方案。其核心是新型 POPUC 共识算法，可在网络卡上以硬件流水线方式执行多数派投票与日志排序，从而在副本数增加时仍保持低延迟与高吞吐，相比现有系统在副本规模与一致性强度上的取舍更具优势。论文面向对延迟敏感的副本状态机（如 Paxos/Raft 类服务），在硬件层面避免传统软件共识栈中消息序列化、网卡中断与内核协议栈带来的开销。原摘要未提供具体吞吐量数值、副本规模上限、对比基线（Paxos / Raft / EPaxos / NOPaxos 等）以及 FPGA/ASIC 评估平台的细节。基于网卡卸载共识的思路与 Linux 内核无直接代码耦合，但与 SmartNIC-centric network stack、DPDK/RDMA 类用户态高速数据面同属旁路方向，对关注硬件卸载网络栈、可预期 NIC 卸载能力边界的读者有参考价值。",
+        "summary_en": "Consistent replication of data among distributed processes -- a task involving the well-known consensus problem -- is notoriously expensive and hard to scale, affecting especially datacenter services with stringent performance requirements. To mitigate this problem, we introduce scalable replication in-hardware ( scarHW ): a network card design that improves throughput and latency of consistent replication even when increasing the number of replicas, whereas current systems operate at a small scale or with relaxed consistency guarantees. At the heart of scarHW is our novel POPUC consensus algo...",
+        "source": "OpenAlex",
+        "tags": [
+          "SmartNIC",
+          "硬件卸载",
+          "共识协议",
+          "数据中心复制"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "SmartNIC": 1,
+    "硬件卸载": 1,
+    "共识协议": 1,
+    "数据中心复制": 1
+  }
+}
