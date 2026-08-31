@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-01",
+  "categories": {
+    "papers": [
+      {
+        "title": "eBPF-based cybersecurity mechanisms: a systematic literature review",
+        "url": "https://doi.org/10.1007/s10207-026-01326-x",
+        "summary": "研究采用PRISMA方法对eBPF网络安全机制进行系统综述，从6个数据库筛选3735篇记录，最终纳入54篇2018-2026年的核心研究，构建涵盖DDoS缓解、入侵检测、IoT安全、容器安全、微服务防护、网络及安全工具的七域分类法。分析显示eBPF在安全执行中具有低开销特征：CPU平均使用率中位数2.4%（区间1.1–8.6%），低频hook可达纳秒级开销，热路径下为10–20%；检测准确率达94–99%，在核级监控、实时包处理与云原生负载保护方面表现突出。挑战方面：verifier约束限制算法复杂度，85.1%研究要求低层编程专长，内核版本碎片化影响可移植性，96.2%研究未涉及eBPF自身安全漏洞。综述识别出多租户隔离、对抗ML鲁棒性、生产环境验证与标准化评估框架等关键空白。该综述与Linux内核网络直接相关，因eBPF运行于内核并通过XDP、tc、kprobe、tracepoint等接口介入网络数据面与协议栈；读者应关注其对verifier限制、内核版本兼容性与eBPF自身安全性的实证归纳，以及对eBPF网络安全方案落地部署的指导意义。",
+        "summary_en": "Abstract Extended Berkeley Packet Filter (eBPF) has emerged as a kernel-level programmable framework enabling dynamic security enforcement in modern operating systems. While eBPF’s potential for cybersecurity applications has attracted significant research attention, existing work remains fragmented across disparate domains, evaluation methodologies, and deployment contexts. This systematic literature review applies PRISMA methodology to identify, categorize, and synthesize peer-reviewed research on eBPF-based cybersecurity mechanisms. Following structured screening of 3735 records from six da...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "网络安全",
+          "系统综述",
+          "Linux内核网络"
+        ],
+        "readingTime": 8,
+        "relevance": "high",
+        "innovationScore": 3
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "网络安全": 1,
+    "系统综述": 1,
+    "Linux内核网络": 1
+  }
+}
