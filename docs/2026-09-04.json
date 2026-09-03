@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-04",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "2026 Kubernetes and Cilium Networking Predictions",
+        "url": "https://vmblog.com/archive/2026/01/08/2026-kubernetes-and-cilium-networking-predictions.aspx",
+        "summary": "该文章为对2026年Kubernetes与Cilium网络方向的预测性内容。Cilium是基于eBPF/XDP构建的容器网络数据面，其发展轨迹直接关联Linux内核网络能力（如eBPF程序、kube-proxy替代、service mesh数据面卸载）。预测类文章通常涉及CNI演进、eBPF在内核中的进一步落地、与传统iptables/IPVS的对比取舍、以及在多集群、零信任场景下的网络策略实施方向。由于仅提供标题未含具体技术细节（如新增eBPF hook、性能基准、API变化），无法判断其技术深度，但Cilium作为Linux内核eBPF生态最重要的容器网络落地项目，其方向性预测值得eBPF/netdev社区跟踪者关注。",
+        "source": "Cilium Blog",
+        "tags": [
+          "容器网络",
+          "eBPF",
+          "Kubernetes网络",
+          "容器网络数据面"
+        ],
+        "readingTime": 5,
+        "relevance": "medium"
+      },
+      {
+        "title": "LWN.net Weekly Edition for August 27, 2026",
+        "url": "https://lwn.net/Articles/1089643/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for August 27, 2026 This edition contains the following feature content: An ongoing 3D-printer AGPL violation : what is being done to try to provide users of Bambu Lab 3D-printer software with alternatives. Considering the OpenMDW license : a license for distributing LLMs and related materials seems unlikely to gain OSI approval in its current form. How to be safe from quantum computing : a look at configuration changes and protocol updates needed to protect today's encrypted data from tomorrow's quantum computers. The beginning of the 7.3 merge window : some of the noteworthy changes coming to the next kernel release. Old-school calendaring at the command line with Remind : a look at a calendaring system older than Linux. A look at the Quickshell desktop-component toolkit : the project behind popular desktop shells for minimal window managers. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (none posted) An o",
+        "summary": "该期汇编涵盖AGPL开源许可争议、量子计算带来的协议升级，以及Linux 7.3合并窗口概览等主题。所给内容未具体展开网络子系统、eBPF/XDP、NIC驱动、容器网络数据面或RDMA/DPDK变更，也未提供性能测试、方法或评估结论。因此无法判断其对Linux网络栈及高速网络路径的实际影响，筛选价值主要在通用内核和协议演进。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "开源许可",
+          "后量子密码"
+        ],
+        "readingTime": 30,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "容器网络": 1,
+    "eBPF": 1,
+    "Kubernetes网络": 1,
+    "容器网络数据面": 1,
+    "Linux内核网络": 1,
+    "开源许可": 1,
+    "后量子密码": 1
+  }
+}
