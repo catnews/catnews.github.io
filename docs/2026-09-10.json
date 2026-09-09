@@ -1,0 +1,28 @@
+{
+  "date": "2026-09-10",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "Zero-Trust Developer Platforms with Cilium Network Policies",
+        "url": "https://cilium.io/blog/2026/08/28/zero-trust-developer-platforms-with-cilium-network-policies",
+        "summary": "文章讨论如何借助 Cilium 网络策略构建零信任开发者平台，解决平台团队在隔离多租户工作负载时的安全诉求。Cilium 基于 eBPF 实现 Kubernetes 网络数据面，其网络策略在内核态完成 L3/L4 与 L7 过滤，绕过 iptables 性能瓶颈。内容聚焦于以命名空间标签、CiliumNetworkPolicy CRD 描述细粒度白名单准入，结合 Hubble 可观测性验证连接行为。关注点在于将零信任模型落地为可声明、可审计的策略对象，以及在 CI/CD 阶段通过准入控制器校验策略合规性，而非深入 eBPF/XDP 内核实现细节。",
+        "source": "Cilium Blog",
+        "tags": [
+          "容器网络",
+          "eBPF",
+          "零信任",
+          "Kubernetes网络"
+        ],
+        "readingTime": 4,
+        "relevance": "medium"
+      }
+    ]
+  },
+  "tagStats": {
+    "容器网络": 1,
+    "eBPF": 1,
+    "零信任": 1,
+    "Kubernetes网络": 1
+  }
+}
