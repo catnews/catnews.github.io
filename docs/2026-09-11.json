@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-11",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for September 3, 2026",
+        "url": "https://lwn.net/Articles/1090824/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for September 3, 2026 This edition contains the following feature content: A pause for the Python JIT : work has been paused on the JIT since June, after the steering council asked for a PEP to define the work. The \"rnull\" Rust block driver : a blueprint for adding new block devices using Rust. Using steal time to moderate CPU demands : a patch set to allow virtual machines to give up vCPUs when contention is high. Governing GNOMEs: how the project's technical decision-making is evolving : a look at GNOME's evolving RFC process and other technical-governance progress. The rest of the 7.3 merge window : noteworthy changes coming to the next kernel release. Securely suspending LUKS-encrypted disks : fixing a regression that allowed disk-encryption keys to remain in memory when a system was put to sleep. A note on subscription prices from LWN : LWN's subscription prices are changing for the first time since 2022. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as al",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "性能"
+        ],
+        "readingTime": 3,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "驱动": 1,
+    "性能": 1
+  }
+}
