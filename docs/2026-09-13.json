@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-13",
+  "categories": {
+    "papers": [
+      {
+        "title": "Defending AI Sentinels: A Multi-Layered Runtime Security Architecture for Generative AI in AIOps",
+        "url": "https://www.semanticscholar.org/paper/e5f12c88fc18035d43f74aeada6a55f08622f20a",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "The rapid integration of Generative AI into Automated IT Operations (AIOps) has introduced \"AI Sentinels\", an autonomous agents capable of managing critical infrastructure. However, these systems introduce a novel attack surface evidenced in inference-time adversarial manipulations such as prompt injection and jailbreaking. While existing security paradigms protect network perimeters, they fail to safeguard the internal logic of AI agents, creating a research gap in runtime defense for autonomous infrastructure controllers. This study aims to develop a multi-layered, defense-in-depth architect...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 6
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "TCP/IP": 1,
+    "网络优化": 1,
+    "性能": 1
+  }
+}
