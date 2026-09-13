@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-14",
+  "categories": {
+    "papers": [
+      {
+        "title": "Beyond UDP: RDMA as the Missing Link for Gigasample Software-Defined Radio",
+        "url": "https://arxiv.org/abs/2609.05623",
+        "summary": "软件定义无线电（SDR）前端采样率已提升一个数量级达到gigasample/s级别，但承载其输出的传输方式仍停留在UDP+Ethernet报文模式。gigasample速率下，传统UDP传输同时耗尽主机的每包处理时间与拷贝所需的内存带宽，研究者明确指出常规kernel bypass机制（如DPDK）在此场景下无法同时兼顾两者。论文提出以RDMA替代UDP作为SDR前端与主机之间的传输链路，利用RDMA的零拷贝与内核旁路特性直接将采样写入主机内存，绕过CPU协议栈处理与数据复制开销。原摘要未提供具体的吞吐量指标、延迟数值、所用RDMA网卡型号（如ConnectX系列/Mellanox）以及实验对比基线的细节，也未说明评估使用的SDR前端设备型号与采样率参数。读者应关注：RDMA在该高带宽流式场景下相比DPDK等用户态旁路方案的具体优势边界、对SDR生态（GNU Radio等）的集成方式，以及是否依赖专用RoCE/InfiniBand网卡硬件而非标准以太网。",
+        "summary_en": "Software-defined radio (SDR) front ends have gained an order of magnitude in sample rate within a single product generation, while the transport that carries their output has not changed: samples are packed into Ethernet datagrams and reassembled by the host processor.At gigasample rates this fails on two counts at once, exhausting the time the host has per packet and the memory bandwidth it has for copying, and no amount of tuning or kernel bypass recovers both.The burden has instead been passed to the user, who must supply operating system expertise that has nothing to do with radio.We show ...",
+        "source": "OpenAlex",
+        "tags": [
+          "RDMA",
+          "kernel-bypass",
+          "SDR",
+          "high-throughput-transport"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 0
+      },
+      {
+        "title": "Influence of Logging Frameworks on Bind9",
+        "url": "https://arxiv.org/abs/2609.00954",
+        "summary": "研究聚焦于基于主机的入侵防御系统（IPS）在高速网络环境中因日志子系统吞吐不足而失效的安全问题。具体对象是广泛部署的 Fail2Ban 监控 BIND9 场景：攻击者通过生成充足的 DNS 流量淹没 BIND9 日志管线，使关键告警/阻断痕迹被丢弃，从而绕过 IPS 检测。论文给出量化阈值——低于 65 Mbps 的 DNS 流量即可击败该组合。进一步探索的缓解方向是将 IPS 架构中的核心组件替换为更高性能的等价物，摘要中明确提到 iptables（即由用户态配置 netfilter 的过滤路径）。评估方式为基于 BIND9 + Fail2Ban 真实部署的日志回放/洪水攻击实验，对比替换前后日志丢失率与攻击成功率。原摘要未提供替换组件的完整列表、具体实验拓扑、吞吐/时延等关键指标的数值结果，也未说明评估是否触及内核网络栈内部。该工作面向 DNS 服务运维与 IPS 选型，不直接修改 sk_buff 处理、netfilter hook、qdisc 等内核网络代码路径，对 Linux 内核网络维护者的参考价值有限；阅读时需关注其是否将 iptables/nftables 卸载路径的实测吞吐与日志管线吞吐对齐比较。",
+        "summary_en": "Host-based Intrusion Prevention Systems (IPS) rely on application logs to detect and block malicious activity. However, on modern high-speed networks the logging subsystem itself becomes a bottleneck: an attacker can hide traces simply by generating enough traffic to overwhelm the application's log pipeline, dropping crucial traces. In this work, we show that widely deployed setups such as Fail2Ban monitoring BIND9 can be defeated with less than 65 Mbps of DNS traffic. Further, we show that when replacing core components of the IPS architecture with their higher-performance equivalent, iptable...",
+        "source": "OpenAlex",
+        "tags": [
+          "BIND9",
+          "Fail2Ban",
+          "Netfilter",
+          "日志瓶颈"
+        ],
+        "readingTime": 4,
+        "relevance": "low",
+        "innovationScore": 9
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "RDMA": 1,
+    "kernel-bypass": 1,
+    "SDR": 1,
+    "high-throughput-transport": 1,
+    "BIND9": 1,
+    "Fail2Ban": 1,
+    "Netfilter": 1,
+    "日志瓶颈": 1
+  }
+}
