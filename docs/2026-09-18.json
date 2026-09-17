@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-18",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for September 10, 2026",
+        "url": "https://lwn.net/Articles/1092273/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for September 10, 2026 This edition contains the following feature content: Stabilizing Rust's never type : after more than two years of work, and a small breaking change, Rust will soon have a stable never type. CERN's migration path from CentOS Linux to Debian : a look behind the scenes at how CERN is planning to move to Debian to control the world's largest particle accelerator. Recent work in memory tiering : does a new design proposal make sense for tiered-memory systems? Deterministic testing for multithreaded Python : Larry Hastings explains how his blanket project can help provide better testing for multithreaded Python code. Fixing the TCMalloc regression with RSEQ operations : a look at Olivier Dion's work on the restartable-sequences API to bring TCMalloc back into the fold. Typst makes big strides : the most recent release of the typesetting system brings support for variable fonts, MathML, and more. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as ",
+        "summary": "这是 LWN.net 2026 年 9 月 10 日的每周摘要，汇集了若干独立技术专题：Rust 语言的 never 类型稳定化、CERN 从 CentOS 迁移至 Debian 的方案、内存分层（memory tiering）新设计提案、多线程 Python 确定性测试、利用 RSEQ（restartable sequences）修复 TCMalloc 性能回归，以及排版系统 Typst 的进展。其中 RSEQ 属于 Linux 内核机制但用于用户态调度优化与内存分配器加速，内存分层涉及内核内存管理，但均与网络子系统、eBPF/XDP、SmartNIC/DPDK/RDMA 等高速网络路径无直接关联，整期内容不包含值得关注的网络栈更新。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "LWN-Weekly",
+          "Linux-Kernel",
+          "Rust"
+        ],
+        "readingTime": 3,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "LWN-Weekly": 1,
+    "Linux-Kernel": 1,
+    "Rust": 1
+  }
+}
