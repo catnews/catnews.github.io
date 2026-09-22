@@ -1,0 +1,70 @@
+{
+  "date": "2026-09-23",
+  "categories": {
+    "papers": [
+      {
+        "title": "Netkit: Specializing Linux Packet Delivery for Container Networks",
+        "url": "https://doi.org/10.1145/3837779.3838164",
+        "summary": "云原生微服务普遍依赖 Linux network namespace 做隔离，但跨 namespace 的容器通信仍是显著的性能瓶颈；同主机共存（co-locate）虽能缓解开销，仍无法达到单一 namespace 内通信的吞吐与时延水平。现有方案要么要求重写应用（如共享内存 IPC），要么放弃了容器期望的完整 Linux 网络栈语义（如 socket 接口、netfilter、协议处理）。Netkit 针对该痛点，对 Linux packet delivery 数据面进行专门化（specialization），在保留完整 Linux 网络栈特性的前提下，把跨 netns 的 veth / 路由 / 转发路径优化到接近单 namespace 内的直接交付性能。原摘要未提供具体数据结构、算法名称（如是否借助 eBPF/XDP 重写 netns 间转发、或修改 netns/veth 内核路径）以及具体吞吐量、时延、CPU 占用对比数字，也未说明对比基线（cni bridge / macvlan / ipvlan / tc redirect / AF_PACKET 等）。读者应关注：方案在内核网络栈中的具体切入位置（veth、sk_buff 转发、netfilter hook、还是 eBPF datapath）、对 netns 隔离语义的保持程度、对 conntrack / NAT / tc qdisc 等上层机制的影响，以及是否需要新的内核接口或内核补丁。",
+        "summary_en": "Cloud-native microservices architectures rely on network namespaces for isolation, with the overhead of container communications remaining a critical performance bottleneck. While colocating containers on the same host mitigates some of this overhead, it cannot match the performance of communication within a single network namespace. Existing solutions either require application rewrites or fail to support the full Linux network stack expected by containerized applications.",
+        "source": "OpenAlex",
+        "tags": [
+          "container networking",
+          "network namespace",
+          "Linux packet delivery",
+          "kernel specialization"
+        ],
+        "readingTime": 6,
+        "relevance": "high",
+        "innovationScore": 0
+      },
+      {
+        "title": "XTLS: Scalable TLS Offloading through Host-SmartNIC Stack Co-Design",
+        "url": "https://www.semanticscholar.org/paper/b7b9758c5eb6a28e6181e14c4a12656b61919391",
+        "summary": "研究针对数据中心 / 租户场景中 TLS 握手对主机 CPU 的持续占用问题，提出 XTLS（eXtract TLS）架构，将完整 TLS 协议栈卸载到 SmartNIC 上执行，使主机 CPU 可专注于租户负载。核心机制是 host-SmartNIC 双栈协同设计：SmartNIC 端承担 TLS 握手协商、对称 / 非对称加解密、记录层封装与状态管理，主机端仅保留与应用层解耦的数据面交互；通过明确的接口划分避免传统 offload 方案中主机仍需解析部分 TLS 控制消息的问题。文中强调这种 co-design 需要重新考虑连接状态、密钥材料与片上 / 主机内存之间的归属，并对典型云租户场景中的握手频率与连接并发数进行分析。评估侧重点为 SmartNIC 资源（如板载内存、加密加速器吞吐、ARM 核心占用）在承担完整 TLS 栈后的开销，以及主机 CPU cycles 因握手税被消除后释放的可用算力。原摘要未提供具体的吞吐数值、延迟指标、对比基线（如 OpenSSL / 部分卸载方案）及 SmartNIC 型号等细节，但读者应关注：完整栈卸载对片上资源的压力、密钥材料共享的安全模型、与 Linux 内核 TLS（ktls）路径的关系，以及在多租户场景下 SmartNIC 成为瓶颈的风险。",
+        "summary_en": "Transport Layer Security (TLS) has become indispensable to modern network communication, yet its cryptographic overhead remains a well-known burden. Despite extensive acceleration of cryptographic operations, the TLS handshake continues to impose a substantial \"tax\" on host CPUs, consuming precious cycles that could otherwise be utilized for tenant workloads. This paper presents XTLS (eXtract TLS), a TLS offloading architecture that liberates the host CPU from this \"TLS tax\". We present a dual-stack design that offloads the entire TLS stack to the NIC—leaving the host to focus on application l...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "TLS offload",
+          "硬件卸载",
+          "host-NIC协同"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 2
+      },
+      {
+        "title": "Kernel Bypass Surgery: A Viable Procedure for Maximizing QUIC Bandwidth?",
+        "url": "https://www.semanticscholar.org/paper/0edfebaff561e9a35d79a8f2f175fc4e8e846aec",
+        "summary": "QUIC 协议通常以用户态实现，基于 Linux 内核 UDP socket 进行收发，每次报文处理都需经历 kernel↔user 上下文切换，在高带宽场景下成为吞吐瓶颈。论文将 DPDK FBSD 轮询模式驱动集成进三个开源 QUIC 实现（msquic、quiche、quic-go 等，具体名以原文为准），并修订一个此前已与 DPDK 结合的第四个实现，以完全旁路内核 UDP/socket 数据路径。评估两类部署形态：(1) DPDK QUIC 独占 NIC 物理端口；(2) 通过 SR-IOV 把同一端口的 VF 与内核共享，对比 goodput、CPU 占用与延迟。关键结果：DPDK 内核旁路可让 QUIC goodput 最高提升约 3×，跨过 10 Gbit/s 链路带宽上限；性能增益高度依赖具体实现，其中一个实现在引入 DPDK 后并未进一步提速，提示数据面瓶颈不一定位于内核路径。同时在支持相关特性的平台上，TSO/LRO、checksum offload 等网卡卸载可逼近 DPDK 的吞吐，说明纯软件旁路并非唯一解法。读者应关注：(a) 不同 QUIC 实现内部 I/O 循环（reactor/uring/epoll 等）的差异对旁路收益的影响；(b) SR-IOV 共享场景下 PF/VF 资源争用与队列分配；(c) DPDK 改造对握手、连接迁移、流多路复用等 QUIC 语义的兼容性约束。该工作未直接修改 Linux 内核网络源码，但对 net_device、UDP socket 数据路径以及 SR-IOV 卸载生态具有参考价值。",
+        "summary_en": "QUIC is a protocol that aims to solve many problems of the TCP/TLS stack. Previous work has shown that the performance of those implementations differs greatly in highbandwidth scenarios. One major reason for this is that QUIC is usually implemented in user space, building on the existing UDP functionality offered by the kernel network stack. While this design decision enables fast development cycles, it comes at the cost of a high number of context switches between kernel and user space. In this paper, we investigate the impact of kernel bypass on performance. We integrated the Data Plane Dev...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "旁路",
+          "QUIC",
+          "kernel-bypass",
+          "SR-IOV"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 2
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "container networking": 1,
+    "network namespace": 1,
+    "Linux packet delivery": 1,
+    "kernel specialization": 1,
+    "SmartNIC": 1,
+    "TLS offload": 1,
+    "硬件卸载": 1,
+    "host-NIC协同": 1,
+    "旁路": 1,
+    "QUIC": 1,
+    "kernel-bypass": 1,
+    "SR-IOV": 1
+  }
+}
