@@ -1,0 +1,49 @@
+{
+  "date": "2026-09-24",
+  "categories": {
+    "papers": [
+      {
+        "title": "Bypassing the Linux Kernel at 400 Gbps: A Comparative Microarchitectural Latency, Cache Thrashing, and CPU Overhead Benchmark of eBPF/XDP versus User-Space DPDK in High-Throughput Kubernetes Clusters",
+        "url": "https://doi.org/10.5281/zenodo.22898701",
+        "summary": "研究针对 400 Gigabit Ethernet 在多租户云数据中心与高密度 Kubernetes 集群中的线速转发需求展开评估，指出 64 字节帧下到达速率达 595.23 Mpps，单包处理预算仅 1.68 ns，而基于 sk_buff、netfilter 规则遍历、softirq 上下文切换与 per-core atomic lock 的传统 Linux 内核网络路径在单核 15 Mpps 以下即饱和崩溃。论文以微架构维度对比 eBPF/XDP 与用户态 DPDK 两种方案，考察缓存抖动（cache thrashing）、L1/LLC miss 率、单核吞吐与 CPU 占用。评估场景包括 400GbE 线速回放、Kubernetes CNI 数据面替换，以及不同 NUMA 拓扑与 RSS 配置下的扩展性。原摘要截断部分未提供具体数值结果与对比基线表格，但研究动机明确指向 XDP AF_XDP zero-copy、eBPF JIT 与 DPDK PMD 轮询模式在等价负载下的能效比与尾延迟差异。读者应重点关注 XDP redirect 与 DPDK rte_ring 跨核传递时的 L3 cache miss 边界，以及 K8s CNI 集成 eBPF host-level 数据面（cilium/calico 风格）相比 DPDK vhost-user 的运维复杂度与吞吐取舍。该工作属于系统层基准研究，不直接修改 Linux 内核 sk_buff 或 netfilter 路径，但对评估下一代 100/400GbE NIC（ConnectX、Intel E810、BlueField-3）下 XDP_HW_OFFLOAD 与 AF_XDP 的可落地性具有参考意义。",
+        "summary_en": "The deployment of 400 Gigabit Ethernet (400GbE) in modern multi-tenant cloud data centers and high-density Kubernetes clusters has pushed packet arrival rates to 595.23 million packets per second (Mpps) for 64-byte frames, corresponding to a budget of merely 1.68 nanoseconds per packet. Under these hyper-scale line rates, classical Linux kernel network processing—dominated by socket buffers (sk_buff), netfilter rule traversals, softirq context switches, and per-core atomic lock contentions—completely collapses, saturating CPU cores at fewer than 15 Mpps per core. To overcome this fundamental b...",
+        "source": "OpenAlex",
+        "tags": [
+          "旁路",
+          "eBPF/XDP",
+          "400GbE",
+          "容器网络"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 10
+      },
+      {
+        "title": "Deterministic Sub-Microsecond Tick-to-Trade Architectures: Empirical Benchmarking of FPGA-Accelerated Kernel-Bypass Pipelines (AMD Xilinx UltraScale+, Intel Agilex) versus High-Core-Count x86 Processors in High-Frequency Limit Order Book Matching",
+        "url": "https://doi.org/10.5281/zenodo.22898301",
+        "summary": "研究针对现代电子金融市场中纳秒级高频做市/流动性供给场景，系统量化分析 kernel context-switch、TLB shootdown、L1/L2/L3 cache miss、NUMA 跨 socket 访问、OS 调度抖动等微架构瓶颈对 tick-to-trade 延迟确定性的影响。论文搭建并实测四条执行流水线：(1) 基于双路 AMD EPYC 9654（192 核 / 384 线程）的标准 Linux 内核 POSIX socket 基线；(2) 基于 Intel Xeon Platinum 8480+（112 核）运行 Solarflare OpenOnload 用户态 kernel-bypass，通过 EF_VI API 直接访问网卡；(3) DPDK Poll-Mode Driver 流水线，配合 CPU core pinning 与 hugepage 内存锁定实现用户态轮询收包；(4) 纯硬件 ASIC 流水线，部署在 AMD Xilinx Virtex UltraScale+ VU9P（16nm FinFET）与 Intel Agilex 7（10nm SuperFin）FPGA 上，分别对接 10GbE 与 25GbE 光网络接口。论文对延迟分布尾部分位、jitter、订单簿撮合吞吐等指标进行跨架构对比，旨在为 HFT 系统选型提供确定性 sub-microsecond 量级的工程依据。该工作面向金融低延迟数据面，未直接修改 Linux 内核网络代码路径；与内核网络社区的关联在于其将标准内核 socket 栈作为对照基线，量化暴露了内核协议栈在硬实时场景下的尾部延迟上限，对评估内核网络在极端低延迟负载下的可替代性具有参考价值。原文摘要信息在最后被截断，具体数值结果（p99/p999 延迟、吞吐上限、单笔撮合能耗等）原摘要未提供足够线索。",
+        "summary_en": "Modern electronic financial markets operate as hyper-competitive, nanosecond-scale latency arenas governed by continuous double auction matching mechanisms. High-frequency trading (HFT) market makers and liquidity providers compete in a zero-sum structural environment where queue priority and trade execution are awarded solely to the fastest participant. In this technological regime, conventional software-defined trading architectures—relying on standard commodity Linux OS kernels, POSIX socket network stacks, and multi-core x86 server processors—suffer from severe microarchitectural execution...",
+        "source": "OpenAlex",
+        "tags": [
+          "kernel-bypass",
+          "旁路",
+          "FPGA",
+          "HFT"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 10
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "旁路": 2,
+    "eBPF/XDP": 1,
+    "400GbE": 1,
+    "容器网络": 1,
+    "kernel-bypass": 1,
+    "FPGA": 1,
+    "HFT": 1
+  }
+}
