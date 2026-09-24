@@ -1,0 +1,29 @@
+{
+  "date": "2026-09-25",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for September 17, 2026",
+        "url": "https://lwn.net/Articles/1093434/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for September 17, 2026 This edition contains the following feature content: Ways to encrypt data on servers : a FOSSY talk on the why and how of encrypting data on servers. PostgreSQL 19's \"scary patch contest\" : the PostgreSQL 19 release is delayed due to some patches that have not really stabilized yet. Accelerating the kernel's build process : some LLM-assisted changes that result in a significant speedup for kernel builds. Adding BPF to blk-iocost : a way to allow BPF programs to decide on the cost of I/O operations for the blk-iocost control-group controller. Lessons learned as the Debian Project Leader : Andreas Tille was the Debian Project Leader for two years and related what he learned at MiniDebConf Winterthur. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (none posted) Ways to encrypt data on servers By Jake Edge September 16, 2026 FOSSY At the 2026 edition of FOSSY , Romeo Solano gave a fast-pace",
+        "summary": "LWN 2026年9月17日周刊摘要，包含多篇文章：服务器加密方法（FOSSY 演讲）、PostgreSQL 19 因不稳定补丁延期发布、利用 LLM 辅助加速内核编译过程、为 blk-iocost 控制组添加 BPF 支持以让 BPF 程序决定 I/O 操作成本、Debian 项目领导经验总结。其中与所关注领域相关性较高的是 BPF 应用扩展，但本次扩展方向是块设备 IQoS（blk-iocost），属于存储调度而非网络数据面；其他文章均为通用运维、数据库和社区治理话题，未涉及 Linux 网络栈、eBPF 网络/XDP、Cilium 数据面、SmartNIC/DPDK/RDMA 等高速网络路径。本期周刊整体对网络技术关注度低。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "eBPF",
+          "blk-iocost",
+          "LWN"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "blk-iocost": 1,
+    "LWN": 1
+  }
+}
