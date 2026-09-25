@@ -1,0 +1,69 @@
+{
+  "date": "2026-09-26",
+  "categories": {
+    "papers": [
+      {
+        "title": "A Real-Time eBPF-Based Intrusion Detection Framework for Adaptive and Scalable Linux Kernel Security",
+        "url": "https://doi.org/10.65405/ee569x23",
+        "summary": "针对 Linux 内核作为特权攻击面易遭受权限提升与 APT 攻击的问题，提出基于 eBPF 的实时入侵检测框架。核心方法是在内核 tracepoint 与 kprobe 上挂载 eBPF 程序采集细粒度运行时事件，无需修改内核源码或重启系统；行为建模采用上下文特征提取配合 Random Forest 分类器做运行时检测，并通过 eBPF maps 支持动态策略更新。实验使用自采集的约 38,000 条内核运行时事件（良性与受控攻击）数据集，达到 99.92% 准确率与 0.99 召回率，连续监控下 CPU 占用低于 1%；在公开 DongTing 基准数据集上达到 99.60% 准确率，证明跨异构内核行为环境的泛化能力。该工作与 Linux 内核网络栈的关系在于其重度依赖 BPF 子系统基础设施（verifier、prog 类型、map 类型、ringbuf/perf event 输出），但不修改 XDP/tc/socket 等网络路径上的 BPF 程序。对内核网络维护者而言，关注点在于 eBPF 在安全可观测性场景下对 kprobe/tracepoint 的开销模式、map 选型对热路径性能的影响，以及在高吞吐网络环境下 IDS 采样与事件丢失的边界条件。",
+        "summary_en": "The Linux kernel represents a critical attack surface due to its privileged execution level, making it a frequent target for attacks such as privilege escalation and advanced persistent threats (APTs). Traditional intrusion detection systems (IDS)typically operate in user space and rely on static or signature based techniques, limiting visibility into kernel-level activities. This paper presents a real-time intrusion detection framework based on Extended Berkeley Packet Filter (eBPF). The framework utilizes eBPF programs attached to kernel trace points and kprobes to capture runtime events wit...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "kprobe/tracepoint",
+          "内核安全",
+          "入侵检测"
+        ],
+        "readingTime": 6,
+        "relevance": "high",
+        "innovationScore": 8
+      },
+      {
+        "title": "DeepSeek Elastic Compute (DSec): A Sandbox Infrastructure for Effective Agentic Training at Scale",
+        "url": "https://arxiv.org/abs/2609.22978",
+        "summary": "面向大语言模型 agentic 训练与评估的高密度弹性沙箱平台。系统暴露 FnCall、container、microVM、full-VM 四类沙箱后端，通过统一 SDK 接入，跨集群协调放置与生命周期。核心机制包括：基于 3FS（Fire-Flyer File System）集群分布式文件系统按需加载镜像层、独立版本化层组合环境、内存共享/回收与 CPU 调度结合以提升高密度执行效率。平台与强化学习框架协同设计，将有状态的 rollout 执行与可抢占的 GPU 训练解耦，回收闲置资源同时保留 rollout 状态，并缓解 reward hacking 等 agent 异常行为。生产规模单单元约 160 节点，每日服务约 300 万沙箱实例，支持 38 万并发沙箱与 5000+ 沙箱创建/秒的稳态吞吐。评估与部署经验表明，这些机制降低了环境搭建与镜像分发开销，提升了内存效率，并在高密度超配场景下保持了对延迟敏感的性能。原摘要未提供与 Linux 内核网络栈（socket、netfilter、XDP、qdisc 等）相关的具体改动或测量，也未涉及旁路高速网络或硬件卸载，仅作为用户态编排与运行时基础设施呈现，对内核网络维护者无直接参考价值。",
+        "summary_en": "Large-scale agentic training and evaluation with large language models (LLMs) rely on isolated, stateful execution environments in which models inspect repositories, invoke tools, execute commands, and interact with task-specific services. These workloads create sandboxes in large bursts, span heterogeneous functionality and isolation requirements, retain state across long interactions, and draw from large image corpora with limited reuse. Supporting them therefore requires an elastic execution platform rather than a single sandbox runtime. This report presents DeepSeek Elastic Compute (DSec),...",
+        "source": "OpenAlex",
+        "tags": [
+          "沙箱基础设施",
+          "agentic训练",
+          "分布式调度",
+          "强化学习"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 3
+      },
+      {
+        "title": "NCCLbpf: Verified, Composable Policy Execution for GPU Collective Communication",
+        "url": "https://doi.org/10.1145/3837779.3838156",
+        "summary": "研究在 NVIDIA NCCL（GPU 集合通信库）中引入 eBPF 作为可扩展策略执行框架，解决现有 NCCL 插件以原生代码形式运行在 NCCL 地址空间内所引发的进程崩溃、静默状态损坏以及策略更新导致的重启停机等问题。核心方案 NCCLbpf 借鉴 Linux 内核 eBPF 的可扩展模型，将策略以 eBPF 程序形式注入 NCCL 运行时，并针对分布式部署场景设计 verifier 机制，使 verifier 在面对分布式多节点、多次执行的部署时仍能保证策略的一致性与安全性（具体一致性协议与 verifier 扩展细节原摘要未提供）。论文面向大规模 GPU 训练集群中集体通信策略（如路由、拓扑感知、拥塞应对）的安全热更新需求。评估部分原摘要未提供对比基线、吞吐/时延数值或实验规模数据。需注意，该工作将 eBPF 应用于用户态 GPU 通信库而非 Linux 内核网络数据面（不涉及 XDP、tc、socket、netfilter 等代码路径），对内核网络维护者参考价值有限；其贡献集中在分布式系统层面的 eBPF 验证器扩展与 NCCL 插件安全模型上。",
+        "summary_en": "NCCL is the de facto standard for collective GPU communication in large-scale training, relying on plugins to customize runtime behavior. However, these plugins execute as native code within NCCL's address space, risking job crashes, silent state corruption, and downtime from restarts during policy updates. Inspired by kernel extensibility models, this paper proposes NCCLbpf, an extension framework for NCCL with eBPF. Bringing eBPF to distributed systems like NCCL is challenging since a verifier sees one program in one execution, but distributed deployments require consistency. In NCCL, all ra...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "NCCL",
+          "GPU collective communication",
+          "distributed systems"
+        ],
+        "readingTime": 8,
+        "relevance": "low",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 2,
+    "kprobe/tracepoint": 1,
+    "内核安全": 1,
+    "入侵检测": 1,
+    "沙箱基础设施": 1,
+    "agentic训练": 1,
+    "分布式调度": 1,
+    "强化学习": 1,
+    "NCCL": 1,
+    "GPU collective communication": 1,
+    "distributed systems": 1
+  }
+}
