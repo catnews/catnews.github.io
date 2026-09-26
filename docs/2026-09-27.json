@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-27",
+  "categories": {
+    "papers": [
+      {
+        "title": "Networking Technologies for Distributed Databases: From TCP/IP to RDMA and Programmable Fabrics",
+        "url": "https://doi.org/10.31224/8290",
+        "summary": "针对分布式数据库对网络底座的强依赖，综述按五层结构梳理支撑技术：数据中心与广域网 fabric 层（Ethernet、InfiniBand、RoCE、可编程交换机/P4 fabric）、传输层（TCP、QUIC）、RPC 与 kernel-bypass 机制（用户态 RPC、共享内存通信、eBPF/XDP 类数据面旁路）、加速与虚拟化（TLS offload、SR-IOV、DPDK 风格 polling）、以及数据库协调协议层（共识、复制、租约）。对比 TCP 与 RDMA（InfiniBand/RoCE）在延迟、吞吐与 CPU 占用上的差异，引用典型量化指标如 RDMA 微秒级单边操作延迟相对于 TCP 软件栈的 10×–100× 改进；讨论 kernel-bypass RPC（基于共享内存 ring、用户态 TCP 栈如 mTCP/DPDK）在分布式数据库副本同步中的吞吐收益。明确指出 QUIC 用户态实现对 0-RTT 与连接迁移的支持，及其与内核 TCP 在丢包恢复与多路复用上的取舍。覆盖 TLS 卸载到 NIC、可编程 fabric（如 Tofino/P4）在 in-network 聚合与 consensus 卸载上的方案，并讨论虚拟化层（vhost/virtio、SR-IOV）对数据库虚拟节点的网络影响。读者应关注的是：综述层面而非具体实现细节，缺少对 Linux 内核网络代码路径（如 sk_buff 处理、qdisc、netfilter）的深入分析；对内核网络维护者参考价值在于 RDMA/RoCE 与 TCP 在分布式数据库负载下的边界条件与迁移路径。",
+        "summary_en": "Distributed databases are networked systems: every remote read, replicated write, quorum decision, failure-detection event, and reconfiguration crosses a communication substrate whose latency, throughput, loss behavior, and isolation properties shape database performance and availability. This survey organizes the supporting technologies into five layers---data-center and wide-area fabrics, transports, RPC and kernel-bypass mechanisms, acceleration and virtualization, and database coordination protocols. It compares TCP, QUIC, Ethernet, InfiniBand, RoCE, RDMA, user-space RPC, overlays, TLS, cl...",
+        "source": "OpenAlex",
+        "tags": [
+          "RDMA",
+          "kernel-bypass RPC",
+          "可编程网络",
+          "分布式数据库"
+        ],
+        "readingTime": 25,
+        "relevance": "medium",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "RDMA": 1,
+    "kernel-bypass RPC": 1,
+    "可编程网络": 1,
+    "分布式数据库": 1
+  }
+}
