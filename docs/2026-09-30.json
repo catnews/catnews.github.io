@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-30",
+  "categories": {
+    "papers": [
+      {
+        "title": "LLM Sandbox: a portable runtime for securely executing LLM-generated code",
+        "url": "https://doi.org/10.5281/zenodo.21760525",
+        "summary": "LLM Sandbox 是一个面向大语言模型生成代码安全执行的轻量级可移植沙箱运行时，核心目标是隔离执行 Python、JavaScript、Java、C++、Go、R、Ruby 等多语言代码。系统采用可插拔容器后端设计，支持 Docker、Podman、Kubernetes，并提供基于 Micromamba 的 Docker 后端变体以加速 Python 依赖解析。安全机制包括执行前静态分析（AST 解析检测危险调用）、可配置安全策略、资源配额与网络限制。运行时层引入容器池化（container pooling）技术，复用预创建容器实例以降低冷启动延迟，支撑 notebook 风格交互会话与自动 artifact/plot 抽取。系统还实现 Model Context Protocol（MCP）服务器，允许 Claude 等 AI 助手直接调用沙箱作为工具后端。文档地址为 vndee.github.io/llm-sandbox。\n\n原摘要未提供具体性能基准数据（如冷启动时延、吞吐量、并发能力）、安全策略有效性评估、与 gVisor/Firecracker 等替代沙箱方案的对比指标。该工作面向 LLM Agent / AI 编程助手落地场景，与 Linux 内核网络子系统无直接关系；其网络限制功能依赖容器命名空间与 iptables 规则，属于编排面而非内核网络栈改造。对内核网络维护者参考价值有限，读者关注点应放在沙箱隔离模型、容器池化复用策略与 MCP 集成模式。",
+        "summary_en": "LLM Sandbox is a lightweight, portable sandbox runtime (code interpreter) for executing Large Language Model generated code in isolation. It provides pluggable container backends (Docker, Podman, Kubernetes) with a Micromamba variant of the Docker backend, configurable security policies with static pre-execution analysis, resource and network limits, multi-language execution (Python, JavaScript, Java, C++, Go, R, Ruby), automatic artifact and plot extraction, container pooling for low-latency reuse, interactive notebook-style sessions, and a Model Context Protocol (MCP) server for AI assistant...",
+        "source": "OpenAlex",
+        "tags": [
+          "LLM代码沙箱",
+          "容器隔离",
+          "MCP协议",
+          "安全执行环境"
+        ],
+        "readingTime": 5,
+        "relevance": "low",
+        "innovationScore": 1
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "LLM代码沙箱": 1,
+    "容器隔离": 1,
+    "MCP协议": 1,
+    "安全执行环境": 1
+  }
+}
