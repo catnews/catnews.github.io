@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-02",
+  "categories": {
+    "papers": [
+      {
+        "title": "ContractWarden: Kernel-Enforced Damage Boundaries for AI Agents via Human-Authorized Contracts",
+        "url": "http://arxiv.org/abs/2609.38248v1",
+        "summary": "研究针对大语言模型 Agent 可执行命令、创建子进程、直接访问文件与网络，从而将提示注入或规划错误转化为操作系统副作用的安全风险。提出 ContractWarden，一个 Linux 参考监控器（reference monitor），在不信任 Agent 自身或其策略建议的前提下，强制执行人类授权的损害边界（damage boundary）。模型可提出三态资产合约（allow / deny / no_egress），由人类做最终决策；执行门（execution gate）在不可信代码运行前将合约绑定到具体任务。系统基于 eBPF Linux Security Module（LSM）钩子在内核层强制执行策略，并结合 seccomp 系统调用过滤与 Linux namespaces 实现进程隔离与资源访问控制。其中 no_egress 合约通过 eBPF 在网络层阻断外联流量，约束 Agent 的网络外泄风险。原摘要未提供具体实验数据集、性能对比基线或量化评估指标（如系统调用开销、eBPF 程序执行时延、策略生效延迟）。对内核网络维护者而言，关注点在于 LSM 钩子在 egress 路径上的执行点选择、eBPF 与 seccomp/namespace 的协同开销，以及在 AI Agent 工作负载下参考监控器引入的性能损耗边界。",
+        "summary_en": "Large language model agents can execute commands, create subprocesses, and directly access files and networks, allowing prompt injection or planning errors to become operating-system side effects. We present ContractWarden, a Linux reference monitor that enforces a human-authorized damage boundary without trusting the agent or its policy suggestions. A model may propose a tri-state asset contract - allow, deny, or no_egress - but a human makes the final choice. An execution gate binds the contract to a concrete task before untrusted code runs. An extended Berkeley Packet Filter (eBPF) Linux Se...",
+        "source": "arXiv",
+        "tags": [
+          "eBPF-LSM",
+          "seccomp",
+          "namespaces",
+          "AI-Agent沙箱"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 6
+      },
+      {
+        "title": "LatencyLab: A DPDK-Based P4 Pipeline Latency Measurement Framework for FPGA SmartNICs",
+        "url": "https://www.semanticscholar.org/paper/2d7eb255111afed460e732e8ec1606ea3872943a",
+        "summary": "研究针对可编程FPGA SmartNIC上P4管线延迟难以直接测量的问题：开源FPGA P4工具链（如VitisNetP4）未在管线边界暴露时间戳，PHC/PTP与跨时钟同步又会引入额外开销。LatencyLab利用FPGA SmartNIC两个端口共享网段的特点，让P4目标将每个探测包组播复制为两份：一份走VitisNetP4数据面管线，另一份走等长旁路路径；DPDK用户态接收端采用busy-poll方式从NIC接收环形队列取包，并以CPU TSC寄存器时间戳记录每包到达时刻。两份到达时刻相减即可消去发送时刻，得到纯管线延迟，并以空bitstream作为基线做校准。评估在AMD Alveo U280（250 MHz）上对四个VitisNetP4程序（FiveTuple、Forward、RemoveHeader、Checksum）各注入20,000包探测流，每会话测10次、独立重复5个会话：99%包延迟落在中位数20 ns以内，会话中位数重复性1–2 ns（107/137、149、177、364 ns）。两个独立交叉验证包括：内核无关reflector把探测对返回给ConnectX-5网卡，由adapter clock复现分布（ns级一致）；所有被测包延迟均低于厂商给出的最差情况延迟下界18–22个时钟周期。该工作面向硬件卸载数据面开发者，对Linux内核网络维护者的参考价值在于：DPDK busy-poll + TSC方案可作为SmartNIC管线延迟的轻量化测量基线；与Linux内核网络栈无关，不修改sk_buff/netfilter/tc等代码路径。",
+        "summary_en": "P4-programmable FPGA SmartNICs place packet processing directly on the wire, but open FPGA P4 toolflows do not expose timestamping at the pipeline boundary, so the latency a P4 program adds on the target FPGA is rarely measured. This paper presents LatencyLab, a DPDK-based measurement framework for FPGA P4 pipeline latency that needs neither PHC/PTP support on the datapath nor clock synchronization. The FPGA's two ports share a network segment, so the switch multicasts a copy of each probe packet to both: one copy passes through the VitisNetP4 pipeline, the other through a matched bypass path....",
+        "source": "Semantic Scholar",
+        "tags": [
+          "SmartNIC",
+          "旁路",
+          "P4",
+          "FPGA"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 2
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for September 24, 2026",
+        "url": "https://lwn.net/Articles/1094840/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for September 24, 2026 This edition contains the following feature content: Looking forward to Git 2.56 — and 3.0 : new features in the latest Git release, and the roadmap beyond. Compiling the kernel with gccrs : the status of the gccrs project and a look at the work still needed to compile the kernel. Testing compat_linux on NetBSD with the Linux Test Project : using Linux's own test project to test NetBSD's ability to run Linux binaries. Thread-identity switcheroo for io_uring : a somewhat radical, maybe even scary, solution to a maintaining io_uring's \"never blocks\" guarantee. Ideas on modernizing the open-source desktop : Scott Jenson wants open source to take the lead on updating the desktop experience. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (none posted) Looking forward to Git 2.56 — and 3.0 By Jonathan Corbet September 18, 2026 The Git source-code management system is at the core of developmen",
+        "summary": "本篇是LWN.net 2026年9月24日周刊的导读，其中展开了关于Git 2.56及未来Git 3.0的详细报道。Git 2.56预计于9月底发布，包含700余个非合并提交，主要特性包括：实验性的`git history drop`子命令用于从历史中移除指定提交并重放后续提交（但仍不支持包含合并提交的历史）；`git status`在分支落后于跟踪分支时会建议执行`git pull`；`git refs`新增create、delete、update、rename等子命令；`git branch --delete-merged`可删除已合并到远程跟踪分支的本地分支；尝试删除正用于二分查找的分支时会给出有用错误信息；配置文件锁获取失败会进行重试；`git add --resolved`只添加冲突已解决的文件。然而Git 2.56本身并非重大版本，项目正在为3.0积蓄重要变更。围绕下一个版本是3.0还是继续2.x的讨论中，GitHub员工brian m. carlson建议直接发布3.0。3.0的核心变更包括：默认切换至SHA-256哈希函数（GitLab 2024年起、Forgejo已支持，GitHub的支持即将公布）；统一对象ID大小写处理（仅接受小写十六进制ID，消除大小写歧义导致的bug和安全漏洞）；默认启用reftable引用存储机制以应对超大规模仓库（如Android仓库超过80万个refs时的性能问题）；要求构建系统必须支持Rust编译器。Patrick Steinhardt已为libgit2添加reftable支持并于8月默认启用SHA-256，JGit和Gitoxide也被提前告知。维护者Junio Hamano尚未正式宣布决定，但社区普遍支持进入3.x时代，旧仓库仍会得到完全支持。",
+        "keyPoints": [
+          "Git 2.56版本包含超过700个非合并提交，预期在2026年9月底发布，但相比3.0来说属于较为常规的版本",
+          "新增实验性的`git history drop commit-id`子命令可以从当前分支历史中移除指定提交并重放后续提交，但遇到合并提交时仍拒绝工作",
+          "`git status`现在会在分支落后于其跟踪分支时建议执行`git pull`，但若远程跟踪分支未获取，本地仍会显示为'up to date'",
+          "`git refs`新增create、delete、update、rename四个子命令，这些子命令的行为与其名称完全一致",
+          "`git branch --delete-merged`选项可删除已合并到远程跟踪分支的所有本地分支",
+          "尝试使用`git branch -d`删除正在用于二分查找的分支时会失败并给出有用的错误信息",
+          "锁定配置文件失败时会进行重试，避免多命令并发修改配置文件时的困扰",
+          "`git add --resolved`选项仅添加已解决合并冲突的文件",
+          "围绕下一个版本是否直接发布Git 3.0还是继续2.x版本，Git维护者Junio Hamano向社区发起了讨论",
+          "Git 3.0最重大的变更是默认使用SHA-256哈希函数取代自项目开始就使用的SHA-1，因为SHA-1长期被视为弱哈希函数，可能危及历史提交的验证",
+          "GitLab自2024年起支持SHA-256，Forgejo也已支持；GitHub的支持仍未公布，但GitHub员工brian m. carlson暗示相关消息即将到来",
+          "Git 2.42（2023年）就已加入SHA-256的非实验性支持，但与其他仓库互操作的胶水代码耗时更久",
+          "brian m. carlson希望将对象ID统一为仅接受小写十六进制形式，因为历史上接受大小写混用导致过bug和安全漏洞（如f00f00和F00F00实际指向同一对象）",
+          "Git 3.0将默认启用reftable引用存储机制，取代`.git/refs/`下的文件存储方式，以解决超大规模仓库的性能问题",
+          "Android仓库拥有超过80万个refs，在使用现有packed-refs机制时查找refs或判断是否有refs指向特定commit代价高昂",
+          "Git 2.45已加入reftable支持，但从未成为默认；切换对Git用户应无可见影响（除性能提升外），但会影响访问Git仓库的其他软件",
+          "Patrick Steinhardt已在libgit2中添加reftable支持，并于2026年8月默认启用SHA-256支持，因此libgit2不会成为3.0发布的阻碍",
+          "JGit和Gitoxide至少一年前就被告知SHA-256将在Git 3.0中到来，因此不太可能成为阻碍",
+          "Git 3.0要求构建环境必须支持Rust编译器，任何没有可用Rust编译器的平台将无法升级",
+          "brian m. carlson综合评估后认为这些变更不应阻碍3.0发布，建议直接发布3.0",
+          "Junio Hamano尚未正式宣布决定，并强调'这不是人气竞赛，也不是民主投票'",
+          "周刊其他内容还包括：gccrs编译Linux内核项目的进展、使用Linux Test Project测试NetBSD的compat_linux二进制兼容层、io_uring线程身份切换以维持其'永不阻塞'保证的方案，以及Scott Jenson关于开源桌面现代化的观点"
+        ],
+        "source": "LWN.net",
+        "tags": [
+          "Git",
+          "版本发布",
+          "SHA-256",
+          "reftable"
+        ],
+        "readingTime": 18,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF-LSM": 1,
+    "seccomp": 1,
+    "namespaces": 1,
+    "AI-Agent沙箱": 1,
+    "SmartNIC": 1,
+    "旁路": 1,
+    "P4": 1,
+    "FPGA": 1,
+    "Git": 1,
+    "版本发布": 1,
+    "SHA-256": 1,
+    "reftable": 1
+  }
+}
