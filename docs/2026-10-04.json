@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-04",
+  "categories": {
+    "papers": [
+      {
+        "title": "io_uring in Oracle Database: A Hybrid Storage I/O Architecture at Production Scale",
+        "url": "https://arxiv.org/abs/2609.22781",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "We describe the integration of io_uring into Oracle Database's storage layer and the architectural decisions required to deploy it in a production multi-process RDBMS. Our design uses per-process ring contexts that eliminate inter-process synchronization, a shared buffer registration mechanism now part of the mainline Linux kernel, and a transparent fallback to libaio on error. Evaluation on an internal development build of Oracle Database 26ai shows that io_uring's benefits concentrate on asynchronous batched I/O paths: on a mixed OLTP workload (TPC-C), io_uring delivers identical throughput ...",
+        "source": "OpenAlex",
+        "tags": [
+          "Linux内核网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "Linux内核网络": 1,
+    "性能": 1
+  }
+}
