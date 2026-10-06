@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-06",
+  "categories": {
+    "papers": [
+      {
+        "title": "Line-Rate GTP-U Admission Control at the Edge of a Cloud-Native 5G Core: An XDP-Based Design for Kubernetes-Hosted User Plane Functions",
+        "url": "http://arxiv.org/abs/2610.02296v1",
+        "summary": "针对 5G 独立组网核心网中用户面功能（UPF）在 N3 接口上的 GTP-U 包处理瓶颈展开：当运营商把核心网化迁移至 Kubernetes 与公有云后，UPF 与通用负载共享 Linux 内核，传统的 DPDK 等内核旁路框架在云原生环境下运维成本上升，难以保持线速处理。文章提出 GTP-Guard，在 Linux 内核的 eXpress Data Path（XDP）hook 上构建线速 GTP-U 准入控制机制，将 GTP-U 隧道的解封装与会话准入下推至 XDP 早丢弃/早处理阶段，以避免在 sk_buff 完整分配或 netfilter 路径上消耗过多 CPU。该设计面向 Kubernetes 托管的 UPF Pod 部署形态，强调与通用 Linux 内核栈共存而非旁路。评估方面，原摘要未提供具体数据集、对比基线（如 DPDK UPF、纯内核 GTP-U 处理）和吞吐/时延/CPU 占用等量化指标信息。读者应重点关注其 XDP 程序对 GTP-U TEID 的解析与会话表查找机制、与 Kubernetes 网络（CNI/host network）模型的耦合、以及相比 DPDK 在云原生场景下的运维简化收益与吞吐权衡尚未在原文摘要中给出。",
+        "summary_en": "The User Plane Function (UPF) of a 5G Standalone core terminates every GPRS Tunnelling Protocol user-plane (GTP-U) packet arriving from the radio access network, which makes its N3 interface both the busiest and the most exposed point of the mobile data path. As operators migrate the core onto Kubernetes and public cloud, the UPF increasingly shares a general-purpose Linux kernel with other workloads, and kernel-bypass frameworks such as DPDK become harder to operate. This paper presents GTP-Guard, a design for line-rate GTP-U admission control built on the eXpress Data Path (XDP) hook of the ...",
+        "source": "arXiv",
+        "tags": [
+          "XDP",
+          "GTP-U",
+          "5G UPF",
+          "容器网络"
+        ],
+        "readingTime": 7,
+        "relevance": "high",
+        "innovationScore": 10
+      },
+      {
+        "title": "Extending eBPF observability to Non-standard execution environments",
+        "url": "https://arxiv.org/abs/2609.39530",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "eBPF observability of non-standard execution environments (NEEs) like TEEs or LibOSes is hindered by their unconventional exception-handling and memory-access mechanisms that limit standard Linux tooling. This work introduces two mechanisms that enable eBPF-based observability for NEEs: (1) kernel memory extensions for safely accessing NEE memory from eBPF programs, and (2) a lightweight flexible probe performance measurement unit (LWFP PMU) that provides flexible and generic probing, for NEEs, through the following LWFP: simple (SLWFP), enclave (ELWFP) and extended (ExLWFP) probes. We demonst...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 3
+      },
+      {
+        "title": "Locking Down Science Gateways with Landlock and Seccomp",
+        "url": "https://doi.org/10.1007/s42979-026-05332-7",
+        "summary": "研究 Linux 内核较新的安全沙箱机制 Landlock 与已有机制 Seccomp 在科学网关（science gateways，需解析并执行用户提交代码的场景）中的组合适用性。Landlock 与 Seccomp 功能互补，允许运行中的进程选择性放弃对部分系统资源的访问，包括网络访问与文件系统访问。论文评估 Landlock/Seccomp 联合使用能否在科学网关中构建最小权限沙箱，以限制用户提交代码对系统调用（包括 socket/bind/connect 等网络相关 syscall）的访问，同时不破坏正常功能。方法上对两类机制的规则表达能力、文件系统与网络域的覆盖粒度进行对比分析，探讨科学网关场景下的策略组合方式。原摘要未提供具体数据集、量化评估指标或与 SELinux/AppArmor 等机制的实测吞吐/时延对比。Landlock 与 Seccomp 是 LSM/安全子系统提供的内核接口，不涉及 tcp/ip 协议栈、netfilter、XDP、qdisc 等网络数据面代码路径，论文面向应用层安全而非网络性能优化。对内核网络维护者的参考价值在于沙箱对网络 syscall 的拦截粒度对高性能网络路径（如 io_uring、AF_XDP）的潜在影响。",
+        "summary_en": "Abstract The most recent Linux kernels have a new feature for securing applications: Landlock. Like Seccomp before it, Landlock makes it possible for a running process to selectively relinquish access to certain system resources including network and filesystem access. Rather than being a proper successor to Seccomp, Landlock has different and somewhat complementary capabilities. In this paper, we will evaluate the applicability of using a combination of Landlock and Seccomp (Landlock/Seccomp) in the setting of securing science gateways—codes which need to parse and act upon user-supplied and ...",
+        "source": "OpenAlex",
+        "tags": [
+          "Landlock",
+          "Seccomp",
+          "Linux安全沙箱",
+          "科学网关"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 3
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "XDP": 1,
+    "GTP-U": 1,
+    "5G UPF": 1,
+    "容器网络": 1,
+    "eBPF": 1,
+    "性能": 1,
+    "Landlock": 1,
+    "Seccomp": 1,
+    "Linux安全沙箱": 1,
+    "科学网关": 1
+  }
+}
