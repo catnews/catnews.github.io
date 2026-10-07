@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-08",
+  "categories": {
+    "papers": [
+      {
+        "title": "PREreview of \"Sandlock: Confining AI Agent Code with Unprivileged Linux Primitives\"",
+        "url": "https://doi.org/10.5281/zenodo.23197346",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "This Zenodo record is a permanently preserved version of a PREreview. You can view the complete PREreview at https://prereview.org/reviews/23197347. ## Summary Sandlock is a Rust process sandbox aimed squarely at the AI-agent workstation: short-lived, frequent, untrusted code execution (model-generated shell commands, package scripts, MCP tool servers, third-party plugins) on developer machines where root is unavailable and container startup costs are visible. The central design is a split enforcement model: static, input-independent policy compiles into kernel-enforced rules (Landlock for fil...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "驱动",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 9
+      },
+      {
+        "title": "Architectural Paradigm Shifts in Data Center Servers: A Review of Workload Offloading, Security Isolation, and the Rise of Infrastructure Processing Units (IPUs)",
+        "url": "https://al-kindipublisher.com/index.php/jcsts/article/view/13494",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "In hyperscale cloud computing, general-purpose central processing units (CPUs) face a fundamental scalability bottleneck driven by the cessation of Dennard scaling, decelerating Moore’s Law, and exponential growth in network I/O bandwidth (scaling from 100 Gbps to 400–800 Gbps). As distributed microservices, disaggregated NVMe storage fabrics, and massive machine learning clusters expand, host CPUs are increasingly burdened by the \"datacenter tax\" - consuming 20% to 35% or more of total compute cycles on software-defined networking (SDN), storage virtualization, packet cryptography, and hyperv...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "包处理",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "TCP/IP": 2,
+    "驱动": 2,
+    "网络优化": 2,
+    "包处理": 1
+  }
+}
