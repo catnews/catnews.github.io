@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-10",
+  "categories": {
+    "papers": [
+      {
+        "title": "QEMU-based hardware/software co-development for DAQ systems",
+        "url": "http://arxiv.org/abs/2109.14735v3",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Modern DAQ systems typically use the FPGA-based PCIe cards to concentrate and deliver the data to a computer used as an entry node of the data processing network. This paper presents a QEMU-based methodology for the co-development of the FPGA-based hardware part, the Linux kernel driver, and the data receiving application. This approach enables quick verification of the FPGA firmware architecture, organization of control registers, the functionality of the driver, and the user-space application. The developed design may be tested in different emulated architectures with a changeable CPU, IOMMU...",
+        "source": "arXiv",
+        "tags": [
+          "驱动",
+          "Linux内核网络",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "驱动": 1,
+    "Linux内核网络": 1,
+    "网络优化": 1
+  }
+}
