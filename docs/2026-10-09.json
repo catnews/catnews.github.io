@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-09",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for October 1, 2026",
+        "url": "https://lwn.net/Articles/1096293/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for October 1, 2026 This edition contains the following feature content: The kernel from a PostgreSQL point of view : Andres Freund's thoughts on how PostgreSQL could help the kernel project. Native support for Rust on the GPU : a vision for how GPUs could become an ordinary compiler target for Rust. The year in Plasma and what's ahead : Marco Martin's highlights on new features and upcoming developments for the Plasma desktop. Reducing undefined behavior in the C language : thoughts on whether C can become a memory-safe language. Listening to the radio with Rust : decoding radio signals with cheap hardware and Rust. How KDE got funding to add enterprise features : turning public funds into open-source features that benefit everyone. Comparing Chromium development at Google and Igalia : how contributing to Chromium works from the inside and outside of Google. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (no",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "Linux内核网络",
+          "性能"
+        ],
+        "readingTime": 3,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "驱动": 1,
+    "Linux内核网络": 1,
+    "性能": 1
+  }
+}
