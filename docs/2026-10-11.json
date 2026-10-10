@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-11",
+  "categories": {
+    "papers": [
+      {
+        "title": "Locked In, Leaked Out: Measuring Isolation via Kernel Locks",
+        "url": "https://www.semanticscholar.org/paper/313e92a7c766919c0fea5bc2589a92bb2c92c1b2",
+        "summary": "研究在多租户共享基础设施（公有云、超融合节点）下，如何量化由内核共享数据结构引发的性能干扰与隔离漏洞。提出以内核锁（kernel lock）持有/等待时间作为新型侧信道信号，用以度量 workload 之间因争抢同一内核数据结构导致的性能泄漏。系统覆盖全虚拟机、microVM、Linux 容器、安全容器（gVisor/Kata）等不同隔离层级，通过在内核中埋点跟踪锁的争用模式，识别跨 workload 的锁争用热点（例如调度器锁、页锁、inode 锁等）。实验在真实云实例和本地服务器上以 CPU-bound、I/O-bound、混合负载构造跨租户干扰场景，对比不同隔离机制下的锁争用泄漏比例与吞吐量/延迟退化的相关性。结果显示容器化隔离在共享内核数据结构层面仍存在显著泄漏，全虚拟机隔离效果更优但代价更高；microVM 在某些内核路径上仍暴露锁争用信息。论文不直接修改 Linux 网络栈源码，读者关注点在于其度量方法可移植到锁争用高发的网络子系统（如 socket 锁、sk_buff 锁、conntrack 锁），用于诊断网络路径上的跨租户干扰。原摘要未提供具体数值结果与具体评测基线名称。",
+        "summary_en": "Isolation is a critical property for shared infrastructure to limit exposure and interference among simultaneous running workloads. Cloud providers use different isolation mechanisms such as full Virtual Machines, microVMs, Linux containers, secure containers, etc., to confine workloads running in a multi-tenant environment. We propose a novel way to understand and measure performance interference and isolation at the system software layer that occurs due to shared access to data structures. We observe that interference takes place through shared structures, such as a kernel-level data structu...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "内核锁",
+          "多租户隔离",
+          "性能干扰度量",
+          "云基础设施"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 3
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "内核锁": 1,
+    "多租户隔离": 1,
+    "性能干扰度量": 1,
+    "云基础设施": 1
+  }
+}
