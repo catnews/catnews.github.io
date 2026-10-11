@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-12",
+  "categories": {
+    "papers": [
+      {
+        "title": "Containing the Autonomous Operator: A Defense-in-Depth Framework and Reference Architecture for Securing AI Agents on Kubernetes",
+        "url": "https://arxiv.org/abs/2610.02861",
+        "summary": "研究针对 LLM Agent 直接在生产 Kubernetes 集群中执行代码、调用工具、修改集群状态所带来的安全风险，提出模型本身不应作为安全边界，而将 Agent 安全视为基础设施问题。核心方法包括：构建纵深防御（defense-in-depth）框架，将传统云原生安全中“数据/控制平面”的边界重新拉回；围绕 RBAC、NetworkPolicy、Pod Security Admission、运行时沙箱（如 gVisor/Kata）、镜像签名与策略执行点（如 OPA/Kyverno）构建参考架构；强调 prompt/tool description 等可读内容同样属于攻击面，需在 Ingress、API Server admission control、egress 流量过滤层设置额外纵深防线。评估侧原摘要未提供具体数据集、基线系统或量化指标（如检测率/延迟/吞吐），仅以场景化威胁建模进行论证。该工作面向 Kubernetes 平台工程与 SRE 团队，可与 Cilium/NetworkPolicy 配合限制 Agent 横向移动，但与 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf 数据面、virtio-net、NAPI 等）无直接关联，对内核网络维护者参考价值有限。原摘要未提供具体性能指标与原型实现细节。",
+        "summary_en": "Large language model (LLM) agents are moving from chat interfaces into infrastructure operations, where they read telemetry, call tools, generate and execute code, and change the state of production Kubernetes clusters. This collapses a boundary that conventional cloud-native security assumes: the boundary between data and control. Content that an agent merely reads (a log line, a ticket, a tool description) can redirect what it does. This paper argues that the model must not be treated as a security boundary and that agent safety on Kubernetes is therefore an infrastructure problem: every gua...",
+        "source": "OpenAlex",
+        "tags": [
+          "容器网络",
+          "LLM Agent安全",
+          "云原生安全",
+          "纵深防御"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "容器网络": 1,
+    "LLM Agent安全": 1,
+    "云原生安全": 1,
+    "纵深防御": 1
+  }
+}
