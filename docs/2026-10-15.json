@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-15",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "Epic Games To Improve Easy Anti-Cheat On Linux With Anti-Cheat Systemd Service &amp; eBPF",
+        "url": "https://www.phoronix.com/news/Easy-Anti-Cheat-Better-Linux",
+        "summary": "Epic Games 宣布在 Linux 平台改进 Easy Anti-Cheat 反作弊系统，核心技术方案是引入一个 systemd 服务单元配合 eBPF 程序来监控游戏进程。eBPF 用于在内核层面挂钩和跟踪系统调用、进程行为及关键内核事件，从而更准确地识别作弊行为，相比传统用户态检测可降低被绕过的风险。该方案将作为可选组件集成进 EAC Linux 客户端，便于发行版打包和自动启用。该进展体现了 eBPF 在 Linux 内核可编程能力方面的应用拓展——虽然这里聚焦于反作弊/安全追踪场景，而非网络数据面，但展示了 eBPF 作为通用内核观测与控制工具在游戏生态中的落地。对关注 Linux 内核 eBPF 生态跨领域应用的人有一定参考价值。",
+        "source": "Phoronix",
+        "tags": [
+          "eBPF",
+          "Linux内核网络",
+          "反作弊",
+          "systemd"
+        ],
+        "readingTime": 2,
+        "relevance": "medium"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "Linux内核网络": 1,
+    "反作弊": 1,
+    "systemd": 1
+  }
+}
