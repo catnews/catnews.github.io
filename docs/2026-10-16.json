@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-16",
+  "categories": {
+    "papers": [
+      {
+        "title": "Deploying RDMA for Distributed Inference and Training At Scale",
+        "url": "https://arxiv.org/abs/2610.12815",
+        "summary": "研究在 ByteDance 参数服务器架构的推理与训练系统中部署 RDMA 所面临的工程挑战。问题背景是 RDMA 虽能降低分布式机器学习通信开销，但生产环境中变长消息、并发连接、突发 incast、服务故障使得单纯硬件卸载不足以解决问题。核心系统 ByteExpress 是建立在硬件 RDMA 之上的软件通信层，包含六个组件：RDMA-aware 内存分配器、零拷贝传输、QP 多路复用（QP multiplexing）、receive-credit 流量控制、软件发送窗口（software send window）、以及 RPC 辅助的故障恢复机制。三条核心经验分别是：缓冲管理需跨应用层与传输层协同；可扩展通信需要连接、接收能力与在途数据的协调管理；服务可用性需要在传输层之上实现恢复。生产评估方面：推理场景下 ByteExpress 相比 kernel TCP 将模型参数获取的平均延迟降低 35.7%、P99 延迟降低 43.7%，CPU 占用降低 10.69%；训练场景下 P99 参数推送延迟相对 TCP 降低最高 74.0%，运行期间未观察到 PFC pause。该工作通过 RDMA 旁路内核 TCP/IP 协议栈，对比基线即 kernel TCP，对关注内核网络 vs 用户态高速网络权衡的读者具有参考价值；局限在于其方案是字节内部 PS 架构的垂直整合，未直接贡献 Linux 内核网络代码路径。",
+        "summary_en": "RDMA can reduce communication overhead in distributed machine learning systems, but realizing these benefits in production requires more than replacing TCP. Variable-size messages, concurrent connections, bursty incasts, and service failures introduce challenges that hardware offload alone cannot address. This paper reports our experience deploying ByteExpress, a software communication layer over hardware RDMA, in ByteDance's parameter-server-based inference and training systems. We present three lessons from the deployment: efficient RDMA requires buffer management across application and tran...",
+        "source": "OpenAlex",
+        "tags": [
+          "RDMA",
+          "kernel-bypass",
+          "distributed ML",
+          "parameter server"
+        ],
+        "readingTime": 6,
+        "relevance": "medium",
+        "innovationScore": 3
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for October 8, 2026",
+        "url": "https://lwn.net/Articles/1097859/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for October 8, 2026 This edition contains the following feature content: Coping with the onslaught of kernel security bugs : how the kernel's security team is handling the flood of LLM-assisted bug reports. Last rites for Gentoo's Chromium package : challenges in packaging Chromium for the distribution have finally taken their toll on Gentoo's volunteer packagers. Beyond the & : making smart pointers as flexible as built-in references for Rust. An update on the Sashiko patch-review system : Roman Gushchin highlights how the review system works as well as improvements being made. Analyzing Rust programs with Charon : toward providing a stable API for accessing internal information from the Rust compiler. Evolving the LAVD scheduler from gaming to servers : how the LAVD scheduler continues to improve. Python's two modules for random numbers : all random-number generators are not created equal. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for",
+        "summary": "报道 Greg Kroah-Hartman 在 2026 年 Kernel Recipes 会议上的演讲，主题是 Linux 内核安全团队如何应对 LLM 辅助带来的漏洞报告洪流。Kroah-Hartman 强调“不要恐慌”，并用数据说明内核项目已经做好了准备：每个版本修复的 CVE 数量从约 500 暴涨到四倍，现在每天修复 33 个 CVE。他以 Mythos LLM 报告的 79 个所谓“漏洞”为例进行了详细拆解：其中 24 个没有具体细节、14 个根本不是 bug、3 个数据是虚构的、15 个是已经修复的旧问题，去重后剩 20 个，剔除需要恶意文件系统镜像或 root 权限的情况，以及两个仅影响 NOMMU 系统（一个在 io_uring 中）和若干边缘情况，最终只产出 10 个真实修复——对内核这种每小时合并 10 个补丁的项目来说只是“一小时的工作量”。他指出真正令人担忧的是漏洞从被发现到被利用的平均时间从 2018 年的 63 天缩短到 2026 年的 7 天，根本问题在于人们不更新系统。但这种情况与多年前模糊测试器带来的漏洞潮类似，清掉一波后报告会自然减少。他建议开发者应对 LLM 生成内容保持警惕：当前最佳模型仍有 50% 的错误率，常见错误包括把 mutex_unlock() 错写成 mutex_destroy()、写冗长无用的 changelog、添加过多注释；用内核历史训练的机器人会产生“糟糕的代码”。他还提醒这些系统会泄漏信息，不应上传敏感数据，并推荐使用本地模型（如 Chris Mason 的 kres）。社区的应对包括完善威胁模型文档、要求报告抄送维护者、要求附上初步补丁、为 security@kernel.org 提供全职开发资金。预测未来 18 个月会比较艰难，但代码质量最终会变得更好。",
+        "keyPoints": [
+          "Kroah-Hartman 在 Kernel Recipes 2026 演讲中强调内核社区面对 LLM 辅助漏洞报告的洪流应“不要恐慌”，当前工具链已具备扩展能力，“我们做得很好，而且还能更快”。",
+          "数据显示每个内核版本修复的 CVE 数量从长期稳定的约 500 个突然翻了两番，当前节奏相当于每天修复 33 个 CVE，变化源自 LLM 的普及。",
+          "他拿 Mythos LLM 报告的 79 个 Linux 内核漏洞作样本分析：24 个没有细节、14 个不是 bug、3 个是虚构数据、15 个是已经在当前内核中修复的旧问题，表现了 LLM 工具的奉承倾向——会主动从邮件列表寻找已修复问题。",
+          "去重后剩下 20 个真实 bug，其中 7 个需要恶意文件系统镜像（社区已认为不是安全问题）、2 个需要 root 权限才能注入恶意数据包、2 个仅影响 NOMMU 系统（其中一个在 io_uring 中）、2 个是小 IPv6 问题、1 个 GPU 相关问题需要本地恶意用户身份。最终本次只产生 10 个真实修复，对一个每小时合并约 10 个补丁的项目来说只是“一小时的工作量”。",
+          "真正值得担忧的不是漏洞数量，而是平均利用时间（mean time to exploit）：2018 年是 63 天，到 2026 年缩短到 7 天，根源在于大量用户运行过时系统，多年安全投入不足的“账单”正在到期。",
+          "Kroah-Hartman 认为这种漏洞潮与多年前模糊测试器出现时的情形类似，把 bug 都修完，报告会自然减少；rsync 就是一个例证，Tridgell 修完一轮后所有代码扫描器都报告干净。",
+          "他警告当前最佳 LLM 仍有 50% 错误率，常见错误模式包括：错误地把 mutex_unlock() 替换成 mutex_destroy()、生成冗长无用的 changelog、在代码中加入过多注释。",
+          "用内核开发历史训练的代码机器人会重复社区早已放弃的反模式，产出“糟糕透顶的代码”，维护者应当敢于回退，并反问“如何测试的”。",
+          "这些系统会泄漏信息，开发者上传的任何非公开内容都会被分发给其他人，这也是研究者“发现”的漏洞常常是前一天就已公开问题的原因；非公开信息绝不应上传到非本地系统。",
+          "曾经高质量的 Coverity 静态扫描因为用户不愿付费而未能盈利，Kroah-Hartman 预测当前错误率 50% 的 LLM 工具将面临同样的命运——好用时没人愿意付费，错误率高时更不会。",
+          "社区的应对措施包括：完善内核威胁模型文档并让机器人在补丁中实际引用、要求安全报告抄送对应维护者、要求报告者提交初始修复、为 security@kernel.org 提供全职开发人员；开发者和维护者都有权拒绝不回复问题的报告者。",
+          "他推荐开发者本地运行模型，推荐 Chris Mason 的 kres 工具和 Willy Tarreau 关于如何用本地模型查找代码缺陷的文章；要求管理者必读 OpenSSF 的“Securing Open Source in the Age of AI”文档。",
+          "他对未来并不乐观：报告洪流不会在未来几个月内消退，预计将是“艰难的 18 个月”，但尘埃落定后代码质量会比现在更好，这本身是件好事；他还对模型训练数据的合法性来源（引用 LG Research 称仅 20% 为合法获得）以及 Microsoft 内部关于模型数据来源的讨论表示了关注。",
+          "文章是 2026 年 10 月 8 日 LWN Weekly Edition 的头条，演讲视频已发布在 YouTube 上。"
+        ],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核安全",
+          "LLM漏洞报告",
+          "内核CVE",
+          "Kernel Recipes 2026"
+        ],
+        "readingTime": 12,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "RDMA": 1,
+    "kernel-bypass": 1,
+    "distributed ML": 1,
+    "parameter server": 1,
+    "Linux内核安全": 1,
+    "LLM漏洞报告": 1,
+    "内核CVE": 1,
+    "Kernel Recipes 2026": 1
+  }
+}
