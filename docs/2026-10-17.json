@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-17",
+  "categories": {
+    "papers": [
+      {
+        "title": "Extended Berkeley Packet Filter (eBPF) for Cloud-Native Observability, Micro-Segmentation, and Line-Rate Networking: Architecture, Safety Verification, and Performance Benchmarks",
+        "url": "https://doi.org/10.5281/zenodo.23387221",
+        "summary": "研究聚焦 eBPF 在云原生场景下替代传统 Linux 网络栈的可行性，背景是 iptables 线性规则匹配（O(N)）、sidecar 代理（如 Envoy）带来的上下文切换开销以及用户态日志采集器的内存膨胀问题，均无法满足亚毫秒级延迟与线速转发需求。核心方法围绕 eBPF 三条数据面路径展开：在 XDP hook 处实现线速包处理以卸载 ingress 过滤，在 TC clsact hook 处附加 micro-segmentation 策略以替代 iptables nftables 长链规则匹配，并在 socket 层 hook 与 kprobe 上采集 L7 可观测数据；安全验证部分依赖 BPF verifier 的静态分析（指针追踪、循环有界性、helper 白名单）保证内核态程序不会破坏内核状态。性能基准对比基线包括原生 iptables、nftables、Envoy sidecar 注入路径与纯用户态 DPDK 转发，指标覆盖吞吐量（pps）、尾延迟（p99/p999）、CPU 占用与规则数量伸缩性下的退化曲线，原摘要显示 eBPF 在数万条规则规模下仍接近线速且延迟稳定，而 iptables 规则数增长后吞吐呈线性下降。对 Linux 内核网络维护者的价值在于给出了 eBPF/XDP 在大规模规则集下的实测优势区间及 verifier 安全边界；限制在于原摘要未提供具体数值（如线速阈值、p99 延迟数字、所使用的网卡型号与驱动如 ice/mlx5）以及具体 BPF 程序类型（XDP_DROP vs XDP_TX vs tc-clsact）的细分评估，落地时需核对生产内核版本对 BPF 特性（如 kfunc、arena）的支持情况。",
+        "summary_en": "Abstract—Modern cloud-native systems and hyperscale microservice fabrics demand sub-millisecond network latencies, fine-grained layer-7 observability, and adaptive micro-segmentation. However, conventional Linux networking stacks and userspace daemon-based observability architectures introduce severe computational inefficiencies. Traditional approaches—such as iptables-driven packet filtering, sidecar proxy interception (e.g., Envoy in service meshes), and userspace log scrapers—suffer from O(N) linear rule-matching evaluation, pervasive context-switch penalties, and high memory footprints. Th...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "micro-segmentation",
+          "BPF-verifier"
+        ],
+        "readingTime": 6,
+        "relevance": "high",
+        "innovationScore": 10
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "XDP": 1,
+    "micro-segmentation": 1,
+    "BPF-verifier": 1
+  }
+}
