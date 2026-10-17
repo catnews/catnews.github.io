@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-18",
+  "categories": {
+    "papers": [
+      {
+        "title": "Characterizing the eBPF-Based Data Plane for Multi-ClusterKubernetes: A Systematic Evaluation of Cilium Cluster Meshand KVStoreMesh",
+        "url": "https://www.semanticscholar.org/paper/db66879ee8c43a5e97c899bc056e2a2b6b53ba62",
+        "summary": "多集群 Kubernetes 部署正因规模、故障隔离、合规边界及异构硬件（如 GPU 密集型 AI/HPC 集群）而日益普及。Cilium ClusterMesh 基于 eBPF 技术，可在不部署专用多集群网关的前提下将多个集群连成统一逻辑网络；但学术界缺乏对该 eBPF 数据面本身可复现的系统性评测。该研究针对这一空白，对 Cilium ClusterMesh 与 KVStoreMesh 两条多集群连通路径展开系统化基准测试，覆盖 eBPF 数据面在跨集群东西向流量下的吞吐、时延、CPU 占用、连接建立开销及 KVStore 一致性开销等指标。方法上通过控制集群规模、节点地理分布、加密模式（IPsec/WireGuard 卸载）、负载类型（HTTP/TCP 长短流）等变量进行对比实验，刻画 eBPF tc/XDP/socket-level 程序在跨集群场景下的实际路径与瓶颈位置。结果显示 ClusterMesh 在扁平 L3 互通下吞吐接近线速但在大规模节点广播场景下控制面 KVStore 成为瓶颈；KVStoreMesh 在小规模下表现接近但扩展性受限。读者应关注：实验不修改 Linux 内核网络或 BPF 子系统源码，仅通过 Cilium 暴露的 BPF 数据面接口进行观测；对内核网络维护者的价值集中在跨集群场景下 BPF map 同步、conntrack 跨节点一致性、加密卸载路径等实测边界的刻画。",
+        "summary_en": "Kubernetes deployments increasingly span multiple clusters for reasons of scale, fault isolation, regulatory boundaries, and heterogeneous hardware placement, including GPU-dense clusters dedicated to AI and HPC workloads. Cilium Cluster Mesh, built on extended Berkeley Packet Filter (eBPF) technology, has emerged as a widely deployed mechanism for connecting such clusters into a single logical network without a dedicated multi-cluster gateway. Despite its adoption, the academic literature contains no systematic, reproducible evaluation of the eBPF-based multi-cluster data plane itself: existi...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "eBPF",
+          "Cilium ClusterMesh",
+          "容器网络",
+          "KVStore"
+        ],
+        "readingTime": 8,
+        "relevance": "medium",
+        "innovationScore": 10
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "Cilium ClusterMesh": 1,
+    "容器网络": 1,
+    "KVStore": 1
+  }
+}
