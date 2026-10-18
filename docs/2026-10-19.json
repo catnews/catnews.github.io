@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-19",
+  "categories": {
+    "papers": [
+      {
+        "title": "Towards Virtual Networking for a Time-Triggered Hypervisor",
+        "url": "https://arxiv.org/abs/2610.17899",
+        "summary": "研究面向混合关键性系统的时间触发型 hypervisor 虚拟网络机制，目标是在共享硬件上为关键任务提供端到端时序保证而不依赖静态分区。核心方法是构建一个全局调度表，将计算任务、网络传输与虚拟化层统一编排，使分布在不同物理主机上的 VM 之间的网络通信可在设计阶段就保证延迟上界。虚拟网络部分涉及 VCPU 间通信、VM 到 VM 以及跨主机网络报文的时序调度，结合时间触发以太网（如 TTE/SAE AS6802）与调度表分发协议，将网络帧的发送时刻与处理器调度对齐。评估关注端到端延迟抖动、关键报文最坏情况延迟以及多 VM 并发场景下的调度可行性，但原摘要未提供具体数值与对比基线。论文主体在 hypervisor 与虚拟化层，并非修改 Linux 内核网络栈源码路径，亦未涉及 XDP/DPDK/RDMA 等高速旁路数据面。对内核网络维护者的参考价值有限，主要落地点在嵌入式实时虚拟化与确定性网络场景。",
+        "summary_en": "Virtualization enables mixed-criticality applications to run on shared hardware by isolating them within separate virtual machines (VMs). However, achieving end-to-end timing guarantees for critical tasks hosted on virtual CPUs (VCPUs) without relying on static partitioning is hard. A possible solution is a time-triggered hypervisor that dispatches VMs' VCPUs to processor cores according to a predetermined global schedule. A global schedule includes the computation, the network, and the virtualization layer to provide end-to-end timing guarantees across hosts and VMs during design time. In thi...",
+        "source": "OpenAlex",
+        "tags": [
+          "time-triggered hypervisor",
+          "virtual networking",
+          "mixed-criticality",
+          "deterministic scheduling"
+        ],
+        "readingTime": 6,
+        "relevance": "low",
+        "innovationScore": 1
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "time-triggered hypervisor": 1,
+    "virtual networking": 1,
+    "mixed-criticality": 1,
+    "deterministic scheduling": 1
+  }
+}
