@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-22",
+  "categories": {
+    "papers": [
+      {
+        "title": "eBPF-Accelerated Cloud Networking and Kernel-Bypass Service Mesh for High-Throughput AI Clusters",
+        "url": "https://doi.org/10.5281/zenodo.23513310",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Abstract: Distributed artificial intelligence training, disaggregated retrieval-augmented generation (RAG) inference, and high-frequency cloud-native microservices place unprecedented bandwidth and tail-latency demands on Kubernetes cluster networking. Conventional Kubernetes Container Network Interfaces (CNIs) and sidecar-based service meshes rely on chained `iptables` netfilter rules and per-pod user-space Envoy proxies that traverse the Linux kernel TCP/IP stack up to six times for a single pod-to-pod RPC. Under high-concurrency AI tensor streaming and gRPC microservice fan-out, this archit...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "TCP/IP",
+          "Socket"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 10
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "XDP": 1,
+    "TCP/IP": 1,
+    "Socket": 1
+  }
+}
