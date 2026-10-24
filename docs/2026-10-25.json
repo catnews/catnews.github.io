@@ -1,0 +1,88 @@
+{
+  "date": "2026-10-25",
+  "categories": {
+    "papers": [
+      {
+        "title": "Connection Escrow: Holding AI-Agent Pod Egress in the Kernel Until an Isolated Verifier Rules",
+        "url": "https://arxiv.org/abs/2610.26501",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "AI agents in containers act by opening network connections, and the text that drives them can be hostile. Controls placed between the agent and its tools are bypassed by a child process or a direct socket, and their approval is not tied to the connection the kernel later opens. We present connection escrow: every outbound TCP connection from a supervised pod is parked inside the kernel's connect() path, before any packet exists, by a 98-instruction eBPF program on the pod's cgroup. A node interceptor attributes the held socket to its kernel socket cookie, process, executable digest, cgroup and...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "Socket",
+          "Netfilter"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 9
+      },
+      {
+        "title": "S.T.A.R.K: System for Threat Analysis and Real-Time Kernel-Isolation for IOT Security",
+        "url": "https://www.semanticscholar.org/paper/14f868632d15b97974e614ddbe358ba0a67298d6",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "ABSTRACT\nIn the contemporary landscape of 2026, the exponential proliferation of Internet of Things (IoT) devices within academic and corporate infrastructures has introduced a critical surface for cyber-attacks. Traditional security paradigms, which rely on perimeter-based defenses and reactive patching, are increasingly inadequate against sophisticated firmware-level threats such as hardcoded credentials, hidden backdoors, and insecure binary configurations. This paper presents S.T.A.R.K., an innovative, autonomous zero-trust framework designed to bridge the gap between firmware auditing and...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "Netfilter",
+          "网桥",
+          "网络优化"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 7
+      },
+      {
+        "title": "AI Code Sandboxes: A Comparative Security Study. Part 1 of 2 -- Engine-Level Properties (Attack Surface, Leakage, Stackability, CVE History, Patch Cadence, Fuzzing)",
+        "url": "https://arxiv.org/abs/2606.08433",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "This paper reads six engine-level measurements together -- 1.1 host attack surface, 1.2 information leakage, 1.3 defense-in-depth stackability, 1.4 public CVE history, 1.5 patch cadence, and 1.6 upstream fuzzing posture -- to describe how five AI-sandbox products isolate guest code from the host kernel. No single axis is a sufficient basis for a comparative judgement; the cross-axis reading is the load-bearing analysis. Three high-level findings: (1) engine classes (microVM, userspace kernel, OCI container) separate cleanly on every architectural axis, but products within a class do not; (2) p...",
+        "source": "OpenAlex",
+        "tags": [
+          "容器网络",
+          "性能",
+          "沙箱"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 1
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for October 15, 2026",
+        "url": "https://lwn.net/Articles/1099247/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for October 15, 2026 This edition contains the following feature content: The 2026 Maintainers Summit : a writeup of topics discussed at the yearly, invite-only, gathering of kernel maintainers. An update on Rust's project goals : an inside view of the process of making changes to Rust. GCC development with large-language models : GCC's LLM policy is restrictive of LLM-generated code, but contributors are still using them for bug-hunting, research, and more. Adding kernel control-flow-integrity checking to GCC : Kees Cook explains changes to GCC to help prevent one form of kernel exploits. The state of systemd: 2026 edition : how the project is coping with LLMs, and some of the major new features added in the last year. Owning C types from Rust code : a look at work to provide a Rust trait for objects allocated in C. Collaborating with out-of-tree tracers : the frustrating catch-22 keeping the LTTng tracing framework from inclusion in the mainline kernel. The [vx]swap showdown : there are two solutions competing to solve the inefficient use of swap resources, but it may be a while before one makes it to the kernel. KDE Linux at two : Project Ba",
+        "summary": "这是一期LWN.net内核开发周报，汇总维护者峰会、Rust for Linux项目目标与C类型所有权、LLM辅助GCC开发、控制流完整性检查、systemd现状、out-of-tree追踪器合并及swap方案等专题。文章主要采用会议记录、项目进展分析和开发策略讨论的方法，没有给出网络子系统的具体补丁、性能测试或评估结论，也未明确涉及eBPF/XDP、网卡驱动、容器网络数据面、DPDK或RDMA，因而与目标高速网络技术路径关联很弱。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "内核周报",
+          "Rust",
+          "内核安全"
+        ],
+        "readingTime": 20,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "TCP/IP": 2,
+    "Socket": 1,
+    "Netfilter": 2,
+    "网桥": 1,
+    "网络优化": 1,
+    "容器网络": 1,
+    "性能": 1,
+    "沙箱": 1,
+    "Linux内核网络": 1,
+    "内核周报": 1,
+    "Rust": 1,
+    "内核安全": 1
+  }
+}
