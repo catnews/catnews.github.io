@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-26",
+  "categories": {
+    "papers": [
+      {
+        "title": "DMMU: SmartNIC-Based On-Device MMU for Scalable Virtualized I/O and Memory Overcommitment",
+        "url": "https://doi.org/10.1145/3847659",
+        "summary": "针对SR-IOV虚拟化中VF数量增长导致主机IOMMU的IOTLB容量不足、吞吐下降，以及无法识别DMA区域而必须锁定全部VM内存的问题，提出部署于可编程SmartNIC的DMMU。其combo-DMA依据IOMMU负载，在主机IOMMU与网卡片上翻译引擎之间动态路由地址转换；direct-PRI则允许SmartNIC直接向宿主机驱动发送缺页请求，绕过传统PRI的多层模拟。系统通过微代码更新部署在双端口100G NIC上，在Intel Skylake与Ice Lake服务器、120个VF的代表性配置下，相比基线IOMMU将NIC吞吐提升65%，IOTLB未命中降低38倍，并解除整VM内存固定以支持内存超配。其价值在于把虚拟I/O地址转换和页故障处理卸载到旁路硬件，对Linux virtio-net、RDMA及云网络数据面具有启发；但原摘要未给出绝对吞吐、时延、CPU占用及真实工作负载分布，硬件可编程性和微代码依赖也限制通用性。",
+        "summary_en": "Cloud data centers increasingly rely on device virtualization to share high-bandwidth network adapters and accelerators among virtual machines (VMs). Single Root I/O Virtualization (SR-IOV) exposes Virtual Functions (VFs) directly to guest VMs, but the Input/Output Memory Management Unit (IOMMU) on the host processor becomes a bottleneck as the number of VFs grows: its small translation lookaside buffer (TLB) causes severe throughput degradation. Meanwhile, because the hypervisor cannot determine which guest memory regions are used for Direct Memory Access (DMA), it must pin the entire VM memo...",
+        "source": "OpenAlex",
+        "tags": [
+          "SmartNIC",
+          "IOMMU",
+          "SR-IOV",
+          "DMA卸载"
+        ],
+        "readingTime": 4,
+        "relevance": "medium",
+        "innovationScore": 5
+      },
+      {
+        "title": "ExpLinux: Reproducible Linux kernel exploit labs from public CVE disclosures",
+        "url": "https://doi.org/10.1016/j.array.2026.101369",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Public proof-of-concept exploits for Linux kernel privilege-escalation vulnerabilities often depend on undocumented environmental assumptions, limiting their reproducibility. This paper presents ExpLinux , a methodology and framework for converting public vulnerability artifacts into reproducible, mitigation-aware exploitation labs. A five-stage process (import, assess, develop, harden, and promote) combines scripted tools with a large language model agent that assesses and ports public exploits under human supervision. Each lab pins its kernel image and configuration, root filesystem, mitigat...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "Linux内核网络"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 6
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "SmartNIC": 1,
+    "IOMMU": 1,
+    "SR-IOV": 1,
+    "DMA卸载": 1,
+    "TCP/IP": 1,
+    "驱动": 1,
+    "Linux内核网络": 1
+  }
+}
