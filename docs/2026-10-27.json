@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-27",
+  "categories": {
+    "papers": [
+      {
+        "title": "Zero-Copy 64-Byte Cache-Aligned L1 Atomic Execution Core: Sub-0.04 Microsecond Lock-Free State Transitions for Ultra-High-Frequency Sovereign Financial Pipelines",
+        "url": "https://doi.org/10.5281/zenodo.23627062",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Next-generation sovereign Real-Time Gross Settlement (RTGS) systems and multilateral central bank cross-border settlement rails face an irreconcilable structural conflict: while post-quantum cryptographic verification ensures cryptographic survival against Fault-Tolerant Quantum Computers (FTQC), traditional multi-threaded database engines, operating system locking primitives (e.g., POSIX mutexes, futexes, spinlocks), and managed runtimes introduce catastrophic tail-latency jitter ranging from 15 to 450 microseconds per state mutation. These delays are primarily driven by OS kernel context swi...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "Socket",
+          "驱动",
+          "旁路"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 7
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "Socket": 1,
+    "驱动": 1,
+    "旁路": 1
+  }
+}
