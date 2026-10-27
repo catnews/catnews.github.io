@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-28",
+  "categories": {
+    "papers": [
+      {
+        "title": "Analysis of NVMe-SSD to passthrough GPU data transfer in virtualized systems",
+        "url": "https://www.semanticscholar.org/paper/5b99d3d75707f61ee5882bc32e92ecee2bf14460",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Non-volatile storage (NVM) technologies provide faster data access compared to traditional hard disk drives and can benefit applications executing on accelerators like general purpose graphics processing units (GPGPUs). Many contemporary GPU-friendly applications process huge volumes of data residing in the secondary storage. Several research work propose techniques to optimize data transfer overheads between devices connected to the same bus e.g., peer-to-peer data transfer between NVMe-SSD and GPU connected to a PCI bus. The applicability of these techniques, extent of their benefit and asso...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "虚拟化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 2
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "虚拟化": 1,
+    "性能": 1
+  }
+}
