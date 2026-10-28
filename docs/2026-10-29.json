@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-29",
+  "categories": {
+    "papers": [
+      {
+        "title": "Isolation Failure From Shared Storage: Characterizing and Exploiting Page-Cache SCA Leakage Across Containers and VMs",
+        "url": "https://www.semanticscholar.org/paper/a6060d73b321634981e21346eb29170baf7bb8bd",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Modern cloud platforms increasingly combine strong software isolation mechanisms with shared hardware resources to improve performance and resource efficiency. Conventional containers do this by sharing the host kernel directly, whereas sandboxed runtimes (e.g., gVisor) and VM-based runtimes (e.g., Kata, QEMU/KVM) provide progressively stronger isolation. In all cases, when tenants access host-backed filesystem state, the host page cache can remain shared and observable. Although OS-managed, this page-cache channel forms an OS-mediated microarchitectural timing side channel whose signal is sha...",
+        "source": "Semantic Scholar",
+        "tags": [
+          "TCP/IP",
+          "虚拟化",
+          "容器网络",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 5
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TCP/IP": 1,
+    "虚拟化": 1,
+    "容器网络": 1,
+    "性能": 1
+  }
+}
