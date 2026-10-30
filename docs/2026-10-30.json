@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-30",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for October 22, 2026",
+        "url": "https://lwn.net/Articles/1100612/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for October 22, 2026 This edition contains the following feature content: Vendor hooks in the Android kernel : a look at how Android deals with out-of-tree changes to the kernel. Hash-based module integrity for reproducible distributions : ideas on how to accommodate kernel-module integrity guarantees while still allowing reproducible builds. Safe self-referential data structures in kernel Rust : a possible way to remove unsafe Rust code related to lifetimes in the kernel. Recent and future changes to the Linux NFS server : an overview of new features added to the Linux implementation of NFS, as well as what may be coming soon. SUSE's efforts to disable setuid system-wide : Thorsten Kukuk has been working to improve security by enabling no_new_privs system-wide. Discussing a rewrite of XArray : a look at work to implement XArray in Rust. Cross-crate forward declarations in Rust : a proposal for cleaning up the kernel's handling of integer overflows in Rust code. Development statistics for the 7.3 kernel : the busiest development cycle in Linux history—so far. Understanding Nix flakes : a look at an experimental, but widely popular, Nix feature.",
+        "summary": "这期LWN周报并非单篇论文，而是专题汇编，涵盖Android内核厂商钩子、模块完整性与可复现构建、内核Rust安全自引用结构、XArray的Rust重写及Linux NFS服务器演进等。文章主要通过补丁提案解析和实现机制分析，讨论内核扩展、安全性及Rust化方向。现有内容未明确涉及网络子系统、eBPF/XDP、网卡驱动、容器网络数据面或DPDK/RDMA，NFS专题也未展示具体网络栈改动，故仅弱相关。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "内核Rust",
+          "NFS服务器",
+          "Android内核"
+        ],
+        "readingTime": 12,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "Linux内核网络": 1,
+    "内核Rust": 1,
+    "NFS服务器": 1,
+    "Android内核": 1
+  }
+}
