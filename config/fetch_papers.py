@@ -454,6 +454,22 @@ MIN_PAPERS_TARGET = 12
 MIN_NEWS_TARGET = 4
 ENABLE_NEWS = True
 
+# 论文 LLM 批量处理大小。论文路径此前逐条调用 MiniMax（quick_filter
+# 最多 MAX_CANDIDATES 次 + 分析最多 MAX_PAPERS*2 次），请求密集导致限流
+# 摘要 fallback。改成批处理后，请求量下降 QUICK_BATCH_SIZE / ANALYZE_BATCH_SIZE
+# 倍，大幅降低 429 概率。可通过环境变量 PAPER_QUICK_BATCH / PAPER_ANALYZE_BATCH
+# 覆盖（设为 1 即退回逐条调用），便于调试。
+def _env_int(name, default):
+    try:
+        return int(os.environ.get(name, ""))
+    except (TypeError, ValueError):
+        return default
+
+QUICK_BATCH_SIZE = max(1, _env_int("PAPER_QUICK_BATCH", 10))
+ANALYZE_BATCH_SIZE = max(1, _env_int("PAPER_ANALYZE_BATCH", 4))
+QUICK_BATCH_MAX_TOKENS = 4000      # 初筛批量输出上限
+ANALYZE_BATCH_MAX_TOKENS = 10000   # 详细分析批量输出上限
+
 TECH_NEWS_RSS_FEEDS = [
     {
         "source": "Cloudflare Blog",
@@ -1115,6 +1131,177 @@ def analyze_item_with_llm(title, content, is_news=False):
         "tags": infer_tags(f"{title} {content}"),
         "readingTime": 3 if is_news else 5,
     }
+
+# ---------------- Batch LLM for papers (cut request count) ----------------
+# 论文路径此前逐条调用 MiniMax，请求密集导致 429 限流、摘要落到
+# chinese_fallback_summary。这里像 netdev patch 一样把多条论文打包进
+# 一次 LLM 调用，把请求量降 QUICK_BATCH_SIZE / ANALYZE_BATCH_SIZE 倍。
+PAPER_QUICK_BATCH_PROMPT = """你是 Linux 内核网络论文初筛助手。下面给你 N 篇论文，请快速判断每篇是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
+
+严格标准：必须直接涉及 Linux 内核网络代码 / 实现，或属于 SmartNIC offload / DPDK / RDMA / DPU / 用户态高速网络栈等 kernel bypass 类研究，而非通用网络研究或纯应用层。
+
+判断维度（kernelNetworkScope）：
+- kernel_internal: 论文直接修改 / 分析 / 评估 Linux 内核网络源码路径。
+- kernel_interface: 论文通过内核暴露的稳定接口（socket / netlink / tc / BPF hook / ethtool）使用或扩展内核网络能力，但不深入内核源码。
+- kernel_bypass_offload: SmartNIC offload / DPDK / RDMA / DPU / 用户态高速网络栈研究。
+- userspace_application: 论文聚焦用户态应用层 / 容器编排 / 微服务，未触内核代码也未做高速网络栈研究。
+- unrelated: 与 Linux 内核网络无关。
+
+强约束：kernel_internal→high/medium；kernel_interface→medium/low；kernel_bypass_offload→medium/low；userspace_application→low；unrelated→none。
+
+返回严格 JSON 数组（数组长度必须等于输入论文数量），每条形如：
+[
+  {"index": 1, "kernelNetworkScope": "kernel_internal", "relevance": "high"},
+  {"index": 2, "kernelNetworkScope": "userspace_application", "relevance": "low"}
+]
+index 必须对应输入的论文编号（1-based）。"""
+
+PAPER_ANALYZE_BATCH_PROMPT = """你是 Linux 内核网络论文筛选与摘要专家。下面给你 N 篇论文，请为每篇单独分析并生成中文总结。严格判断论文是否直接涉及 Linux 内核网络子系统（tcp/ip stack、netfilter、xdp、bpf、socket、net_device、virtio-net、napi、qdisc 等代码路径），或与之密切相关的旁路 / 硬件卸载高速网络研究。
+
+判断维度（kernelNetworkScope）：
+- kernel_internal / kernel_interface / kernel_bypass_offload / userspace_application / unrelated。
+
+强约束：
+1. relevance 必须与 kernelNetworkScope 一致：kernel_internal→high/medium；kernel_interface→medium/low；kernel_bypass_offload→medium/low；userspace_application→low；unrelated→none。
+2. 若论文仅讨论 Kubernetes/Docker 等编排面或纯应用层网络，强制 userspace_application→low。
+3. tags 数组最多 3-4 个最重要标签。
+4. summary 必须为基于摘要原文的真实总结，覆盖：研究问题/背景、核心方法或系统设计（必须具体到数据结构 / 算法 / 机制名称）、实验评估（数据集、对比基线、关键指标）、与 Linux 内核网络 / 旁路高速网络的关系、读者应关注的限制或落地点。长度 220-400 字。
+5. summary 严禁复述、引用或翻译论文标题；不要以 "《论文标题》"、"本文"、"该论文" 等开头提及标题。
+6. summary 严禁空泛套话（"主要围绕"、"实现与优化"、"建议重点关注"、"参考信息："、"归入"、"被归入" 等）。
+7. summary 必须从摘要原文提取具体名词、数值、方法名 / 系统名，不能只给形容词。
+8. 如果摘要原文信息不足，summary 必须直说 "原摘要未提供 X 信息"。
+
+返回严格 JSON 数组（数组长度必须等于输入论文数量），每条形如：
+[
+  {"index": 1, "kernelNetworkScope": "kernel_internal", "relevance": "high", "summary": "中文总结220-400字", "tags": ["eBPF", "XDP"], "readingTime": 5},
+  {"index": 2, "kernelNetworkScope": "userspace_application", "relevance": "low", "summary": "...", "tags": ["..."], "readingTime": 4}
+]
+index 必须对应输入的论文编号（1-based）。"""
+
+_PAPER_BATCH_ARRAY_RE = re.compile(r"\[[\s\S]*\]")
+
+
+def _format_paper_quick_batch(batch):
+    parts = [f"共 {len(batch)} 篇论文："]
+    for k, paper in enumerate(batch, 1):
+        parts.append(
+            f"--- 论文 #{k} ---\n"
+            f"标题：{paper['title']}\n"
+            f"摘要：{paper['abstract'][:600]}"
+        )
+    return "\n\n".join(parts)
+
+
+def _format_paper_analyze_batch(batch):
+    parts = [f"共 {len(batch)} 篇论文："]
+    for k, paper in enumerate(batch, 1):
+        parts.append(
+            f"--- 论文 #{k} ---\n"
+            f"标题：{paper['title']}\n"
+            f"内容：{paper['abstract'][:1800]}"
+        )
+    return "\n\n".join(parts)
+
+
+def _parse_paper_batch_response(resp, batch_size):
+    """解析批量 LLM 响应，返回 {1-based 序号: item_dict}。"""
+    if not resp:
+        return {}
+    m = _PAPER_BATCH_ARRAY_RE.search(resp)
+    if not m:
+        return {}
+    try:
+        arr = json.loads(m.group(0))
+    except Exception:
+        return {}
+    if not isinstance(arr, list):
+        return {}
+
+    by_index = {}
+    sequential = []
+    for item in arr:
+        if not isinstance(item, dict):
+            continue
+        idx_hint = item.get("index") or item.get("idx")
+        if idx_hint is not None:
+            try:
+                by_index[int(idx_hint)] = item
+            except Exception:
+                pass
+        sequential.append(item)
+
+    out = {}
+    for k in range(1, batch_size + 1):
+        if k in by_index:
+            out[k] = by_index[k]
+        elif k <= len(sequential):
+            out[k] = sequential[k - 1]
+    return out
+
+
+def batch_quick_filter(papers):
+    """批量初筛一批论文，返回 {1-based 序号: relevance}。
+
+    缺失 / 解析失败的项不会出现在结果里，由调用方回退到逐条
+    quick_filter_relevance。
+    """
+    results = {}
+    if not papers:
+        return results
+    try:
+        response = call_minimax(
+            _format_paper_quick_batch(papers),
+            PAPER_QUICK_BATCH_PROMPT,
+            max_tokens=QUICK_BATCH_MAX_TOKENS,
+        )
+    except Exception as e:
+        print(f"  batch quick filter LLM call failed: {e}")
+        return results
+    parsed = _parse_paper_batch_response(response, len(papers))
+    for k, item in parsed.items():
+        results[k] = reconcile_relevance(
+            item.get("kernelNetworkScope", ""),
+            item.get("relevance", "none"),
+        )
+    return results
+
+
+def batch_analyze_papers(papers):
+    """批量分析一批论文，返回 {1-based 序号: analysis_dict}。
+
+    analysis_dict 与 analyze_item_with_llm 成功路径返回结构一致
+    （含 summary / tags / relevance / readingTime 等）。缺失 / 解析失败的
+    项不会出现在结果里，由调用方回退到逐条 analyze_item_with_llm。
+    """
+    results = {}
+    if not papers:
+        return results
+    try:
+        response = call_minimax(
+            _format_paper_analyze_batch(papers),
+            PAPER_ANALYZE_BATCH_PROMPT,
+            max_tokens=ANALYZE_BATCH_MAX_TOKENS,
+        )
+    except Exception as e:
+        print(f"  batch analyze LLM call failed: {e}")
+        return results
+    parsed = _parse_paper_batch_response(response, len(papers))
+    for k, item in parsed.items():
+        title = papers[k - 1]["title"]
+        content = papers[k - 1]["abstract"]
+        tags = item.get("tags", [])
+        if isinstance(tags, list) and len(tags) > 4:
+            item["tags"] = tags[:4]
+        summary = item.get("summary", "")
+        if not isinstance(summary, str) or is_generic_summary(summary):
+            summary = chinese_fallback_summary(title, content, item.get("tags", []))
+        item["summary"] = summary
+        item["relevance"] = reconcile_relevance(
+            item.get("kernelNetworkScope", ""),
+            item.get("relevance", "none"),
+        )
+        results[k] = item
+    return results
 
 def fetch_arxiv_papers(query, max_results=8):
     papers = []
@@ -1976,25 +2163,34 @@ def main():
     
     print(f"\n[Phase 3] Quick filtering {len(paper_candidates)} paper candidates...")
     filtered_candidates = []
+    # 先做本地硬排除 + 领域门槛（不调用 LLM），把通过门槛的候选收集起来，
+    # 再批量调用 LLM 初筛，把请求量降 QUICK_BATCH_SIZE 倍，避免逐条限流。
+    gate_passed = []
     for i, paper in enumerate(paper_candidates[:MAX_CANDIDATES]):
-        print(f"  [{i+1}] {paper['title'][:40]}...")
-        random_delay(2, 3)
-
         if is_hard_excluded(f"{paper['title']} {paper['abstract']}"):
-            print("    -> excluded by hard rules")
+            print(f"  [{i+1}] {paper['title'][:40]}... -> excluded by hard rules")
             continue
-
         if not passes_domain_gate(paper['title'], paper['abstract'], paper.get('source', '')):
-            print("    -> excluded by domain gate")
+            print(f"  [{i+1}] {paper['title'][:40]}... -> excluded by domain gate")
             continue
-        
-        relevance = quick_filter_relevance(paper['title'], paper['abstract'])
-        print(f"    -> {relevance}")
-        
-        if relevance in ['high', 'medium']:
-            filtered_candidates.append(paper)
-            stats["paper_quick_high_medium"] += 1
-        
+        gate_passed.append((i, paper))
+    print(f"  gate kept {len(gate_passed)}/{min(len(paper_candidates), MAX_CANDIDATES)} candidates")
+
+    for offset in range(0, len(gate_passed), QUICK_BATCH_SIZE):
+        batch = gate_passed[offset:offset + QUICK_BATCH_SIZE]
+        random_delay(2, 3)
+        batch_results = batch_quick_filter([paper for _, paper in batch])
+        for k, (_, paper) in enumerate(batch, 1):
+            if k in batch_results:
+                relevance = batch_results[k]
+            else:
+                relevance = quick_filter_relevance(paper['title'], paper['abstract'])
+            print(f"    -> {paper['title'][:40]}... {relevance}")
+            if relevance in ['high', 'medium']:
+                filtered_candidates.append(paper)
+                stats["paper_quick_high_medium"] += 1
+            if len(filtered_candidates) >= MAX_PAPERS * 2:
+                break
         if len(filtered_candidates) >= MAX_PAPERS * 2:
             break
     
@@ -2099,11 +2295,22 @@ def main():
     selected_news = []
     
     print(f"\n[Phase 6] Detailed analysis of {len(filtered_candidates)} filtered papers...")
+    # 先批量调用 LLM 生成摘要，把请求量降 ANALYZE_BATCH_SIZE 倍；
+    # 批量缺失 / 解析失败的项回退到逐条 analyze_item_with_llm。
+    analyses = {}
+    for offset in range(0, len(filtered_candidates), ANALYZE_BATCH_SIZE):
+        batch = filtered_candidates[offset:offset + ANALYZE_BATCH_SIZE]
+        random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
+        batch_results = batch_analyze_papers(batch)
+        for k in range(1, len(batch) + 1):
+            analyses[offset + (k - 1)] = batch_results.get(k)
+
     for i, paper in enumerate(filtered_candidates):
         print(f"\n[{i+1}/{len(filtered_candidates)}] {paper['title'][:50]}...")
-        random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
-        
-        analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
+        analysis = analyses.get(i)
+        if analysis is None:
+            random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
+            analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
         
         paper_hot_score = hot_topic_score(f"{paper['title']} {paper['abstract']}")
         if (
