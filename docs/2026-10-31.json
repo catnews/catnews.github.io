@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-31",
+  "categories": {
+    "papers": [
+      {
+        "title": "CCAaaS: An Orchestration Platform for High-Velocity Design, Development, and Deployment of Data Center Transports at Meta",
+        "url": "https://arxiv.org/abs/2610.33231",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Today, data center networks run multiple congestion control algorithms (CCAs), each tailored to distinct traffic characteristics, from latency-sensitive intra-region RPCs to high-throughput cross-region AI workloads. The rapid evolution of AI training and inference further accelerates this trend by continually introducing new traffic characteristics that demand new CCAs. This paper introduces CCA-as-a-Service (CCAaaS), our eBPF-based ecosystem for the rapid design, deployment, and operation of production-grade CCAs at hyperscale. We present (1) a modular BPF-TCP framework and general lessons f...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "网络优化",
+          "性能"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 9
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "eBPF": 1,
+    "TCP/IP": 1,
+    "网络优化": 1,
+    "性能": 1
+  }
+}
