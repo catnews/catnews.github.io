@@ -1311,8 +1311,9 @@ def batch_analyze_papers(papers):
         if isinstance(tags, list) and len(tags) > 4:
             item["tags"] = tags[:4]
         summary = item.get("summary", "")
-        if not isinstance(summary, str) or is_generic_summary(summary):
-            summary = chinese_fallback_summary(title, content, item.get("tags", []))
+        if not isinstance(summary, str) or not contains_chinese(summary) or is_generic_summary(summary):
+            print(f"  batch analysis missing usable summary for: {title[:60]}")
+            continue
         item["summary"] = summary
         item["relevance"] = reconcile_relevance(
             item.get("kernelNetworkScope", ""),
@@ -2124,6 +2125,9 @@ def build_metrics(today, stats, selected_papers, selected_news):
 def main():
     print("Starting Linux kernel networking content fetch...")
     print("=" * 50)
+    probe = call_minimax('仅返回 JSON：{"ok": true}', '只返回 JSON。', max_tokens=1000)
+    if not (parse_json_object(probe) or {}).get("ok"):
+        raise RuntimeError("MiniMax preflight failed; check API key, model, quota and preceding API errors")
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
     docs_dir = os.path.join(script_dir, "..", "docs")
@@ -2350,11 +2354,22 @@ def main():
         for k in range(1, len(batch) + 1):
             analyses[offset + (k - 1)] = batch_results.get(k)
 
+    single_retries = 0
+    usable_analyses = 0
     for i, paper in enumerate(filtered_candidates):
         print(f"\n[{i+1}/{len(filtered_candidates)}] {paper['title'][:50]}...")
         analysis = analyses.get(i)
         if analysis is None:
-            analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False, use_llm=False)
+            if single_retries >= 8:
+                print("  Skipping: single-paper retry budget exhausted")
+                continue
+            single_retries += 1
+            random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
+            analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
+        if not analysis or not contains_chinese(analysis.get('summary', '')) or is_generic_summary(analysis.get('summary', '')):
+            print("  Skipping: no usable AI summary")
+            continue
+        usable_analyses += 1
         
         paper_hot_score = hot_topic_score(f"{paper['title']} {paper['abstract']}")
         if (
@@ -2458,6 +2473,8 @@ def main():
         selected_papers[:] = [p for p in selected_papers if p.get("relevance") != "none"]
     still_fallback = sum(1 for p in selected_papers if _is_fallback_summary(p.get("summary", "")))
     print(f"[Phase 6.5] done: kept {len(selected_papers)} (removed {len(removed)} unrelated, {still_fallback} still fallback)")
+    if filtered_candidates and not usable_analyses:
+        raise RuntimeError("No papers with usable AI summaries; refusing to overwrite published results")
     
     print(f"\n[Phase 7] Detailed analysis of {len(filtered_news)} filtered news...")
     for i, item in enumerate(filtered_news):

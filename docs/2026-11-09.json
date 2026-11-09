@@ -5,7 +5,7 @@
       {
         "title": "uBPF-based Network Intrusion Detection and Prevention Systems empowered by machine learning algorithms",
         "url": "https://doi.org/10.1016/j.comnet.2026.112868",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "针对内核 eBPF 入侵检测程序难以跨运行环境迁移的问题，研究将机器学习驱动的 DDoS 检测与防御逻辑放入用户态 uBPF，并接入 AF_XDP、DPDK 等旁路框架，使同一检测逻辑能够在不同数据包处理环境中运行。作者同时评估攻击分类与包处理性能：摘要称系统具有较高分类性能，运行于 DPDK 数据面时，包处理速率达到所评估内核态实现的 3.38—8.60 倍。该结果体现了可移植检测逻辑与内核旁路的性能潜力；原摘要未给出具体数据集和分类准确率，跨实现比较仍需结合实验配置阅读。",
         "summary_en": "Network Intrusion Detection and Prevention Systems (NIDPSs) play a crucial role in identifying and blocking malicious traffic. In-kernel NIDPSs leveraging extended Berkeley Packet Filter (eBPF) have achieved high detection performance and throughput by operating directly in kernel space. However, eBPF-based NIDPSs face portability challenges across diverse runtime environments, limiting their deployment on kernel-bypassing frameworks such as AF_XDP and the Data Plane Development Kit (DPDK). In this paper, we propose a userspace BPF (uBPF)-based NIDPS empowered by machine learning (ML) algorith...",
         "source": "OpenAlex",
         "tags": [
@@ -21,7 +21,7 @@
       {
         "title": "NIC and DPU Landscape for QUIC Cryptographic Offload A Survey and Gap Analysis",
         "url": "https://scholarship.libraries.rutgers.edu/esploro/outputs/report/NIC-and-DPU-Landscape-for-QUIC/991032377766204646",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "面向大规模边缘服务器，报告调查商用 NIC 与 DPU 对 QUIC 分段、载荷加密和头部保护的卸载能力，并分析同一明文向大量独立密钥连接扇出的需求。引用的主机侧测试中，双路服务器 HTTPS 吞吐约为 1000 Gbps，QUIC 约为 300 Gbps。调研认为普通 UDP 分段卸载无法生成各自具有包号、nonce 和头部保护的 QUIC 包；Broadcom Thor 2 接近完整方案，但仍有算法及分段限制。FPGA 方案可支持扇出，却受成本和存储等约束。该报告侧重硬件卸载能力对比，并非 Linux 内核网络代码研究。",
         "summary_en": "We survey the commercial NIC and DPU landscape to assess how well existing hardware supports QUIC cryptographic offload for edge servers at scale, including media delivery and general-purpose HTTP/3. An edge server terminates one independently keyed QUIC connection per subscriber. Thus every object it delivers to 10,000 to 100,000 subscribers requires as many separate encryptions, each on the host CPU. Host-only measurements reported at Mile High Video 2026 locate the ceiling in QUIC's per-packet cryptography: a dual-socket server that sustains about 1,000 Gbps of HTTPS sustains about 300 Gbps...",
         "source": "OpenAlex",
         "tags": [
@@ -37,7 +37,7 @@
       {
         "title": "MODELING AND EVALUATING THE IMPACT OF INTRUSION DETECTION SYSTEMS ON THE PERFORMANCE OF ISOLATED INFORMATION AND COMMUNICATION SYSTEMS",
         "url": "https://doi.org/10.20998/3083-6298.2026.02.04",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "研究使用隔离虚拟机测试环境，比较无安全防护、启用入侵检测与日志、以及遭受大量分片 DDoS 流量三种情况下的路由性能，关注深度包检测与中断处理带来的资源消耗。摘要报告，无防护基线约占用 3% CPU、延迟 2.2 毫秒；启用安全规则后延迟升至 4.3 毫秒，遭受分片洪泛时 CPU 升至 48%，其中内核软中断处理成为主要负担并导致正常报文丢弃。研究涉及 ksoftirqd 与包处理性能，但原摘要未说明具体内核版本、硬件配置及流量规模，结果不宜直接推广。",
         "summary_en": "Topicality. Today’s information and communication systems (ICS) face a growing number of complex cyber threats, making active defense mechanisms absolutely necessary. Yet, running these security tools constantly, especially Intrusion Detection and Prevention Systems (IDS/IPS), takes a toll on network bandwidth and creates heavy computational loads at the routing level. The subject of the study is the direct impact of IDS/IPS on the performance characteristics of an isolated network segment under various load conditions, with an emphasis on resource depletion due to fragmentation at layer 3 of ...",
         "source": "OpenAlex",
         "tags": [
@@ -53,7 +53,7 @@
       {
         "title": "TenonAgent: Virtualizing Execution Residency for Memory-Oversubscribed LLM Agents",
         "url": "https://arxiv.org/abs/2611.00051",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "针对长生命周期智能体按峰值配置沙箱造成的内存浪费，以及超额分配引发的 OOM 和任务重试，TenonAgent 将智能体逻辑生命周期与物理沙箱驻留解耦。在动作边界，系统结合预测式准入控制与可重启机制，按全局内存压力动态创建或释放沙箱；工具执行期间，通过基于 sched_ext 的内核门控调节执行机会。摘要称在所测工作负载和参数下，8.6 倍内存超额分配的突发场景仍达到 100% 任务成功率，相比无管理执行最高加速 5.5 倍。系统覆盖 Docker 和 Firecracker，但重点是内存与调度，并非内核网络数据面。",
         "summary_en": "LLM agents execute as long-lived, multi-stage workflows with substantial resource-demand variation across phases. Provisioning each agent or sandbox for its lifetime peak leads to low resource utilization, particularly for memory, whereas aggressive oversubscription risks memory contention, out-of-memory failures, and costly workflow retries. This tension limits the concurrency and efficiency of agent serving under constrained host memory. We present TenonAgent, a runtime system that virtualizes sandbox residency by decoupling the logical agent's lifetime from its physical execution environmen...",
         "source": "OpenAlex",
         "tags": [
@@ -67,7 +67,7 @@
       {
         "title": "LiHA: Worse is Better for Lightweight Hash-based Source Authentication",
         "url": "https://scholarship.libraries.rutgers.edu/esploro/outputs/report/LiHA-Worse-is-Better-for-Lightweight/991032379962404646",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "为降低源 IP 认证的部署门槛，LiHA 使用最长前缀匹配将密钥与源前缀绑定，对每个数据包计算一次固定长度消息认证码；验证端重复查找和计算，仅转发认证通过的包，数据面无需逐流状态或握手。作者实现了用户态库、eBPF 和 FPGA 三种版本：摘要称用户态实现开销较高，eBPF 单线程性能较合理，FPGA 达到 100 Gbps，但该吞吐是在 DPDK 绕过内核的条件下获得。方案主要抵御链路外的源地址伪造；链路内攻击者仍可在密钥轮换前重放有效报文，也不能消除所有拒绝服务风险。",
         "summary_en": "The omission of source IP authentication remains a fundamental vulnerability in the Internet. Existing approaches rely on routing plausibility, topology assumptions, per-flow state, or wide deployment. These requirements have kept strong source authentication out of the data plane. As simplicity is the key to deployability, we present LIHA, a lightweight source authentication mechanism built around operations that routers already perform efficiently. LIHA binds secret keys to source prefixes using longest prefix match and authenticates each packet with a single message authenti-cation code (MA...",
         "source": "OpenAlex",
         "tags": [
@@ -83,7 +83,7 @@
       {
         "title": "Tracekit Box: Running AI Agents in Micro-VMs Where Every Way Out Is Decided and Signed",
         "url": "https://arxiv.org/abs/2610.38458",
-        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary": "面向智能体执行代码时的网络访问和凭据泄露风险，Tracekit Box 为每项任务启动不带网卡的 Firecracker microVM，将命令、外联、密钥、模型调用和工作区补丁收敛到通过 vsock 访问的宿主机入口，由独立签名组件逐项决策并记录。域名由宿主机解析，私网和云元数据地址被拒绝；密钥以占位符形式留在虚拟机内，由宿主代理按目标替换。摘要报告 13 项端到端检查通过，15 个模糊测试目标发现并修复 9 个问题。当前尚未启用 Firecracker jailer，且依赖同机签名器；研究侧重沙箱边界，而非内核网络栈实现。",
         "summary_en": "AI agents now install packages, call model APIs with their operators' keys and change code in repositories that deploy to production. The network, credentials and write access they need are also how they can leak data, steal a key or change a system nobody approved. Sandboxes contain an agent but leave little evidence of what crossed their boundary; tracing records what happened but contains nothing. We present Tracekit Box, an open-source system (MIT, v0) that does both. Each job runs in its own Firecracker micro-VM with no network card. The only ways out are doors on the host, served over vs...",
         "source": "OpenAlex",
         "tags": [
