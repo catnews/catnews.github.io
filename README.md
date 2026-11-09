@@ -101,9 +101,10 @@ catnews.github.io/
 
 GitHub Actions 文件：`.github/workflows/fetch-papers.yml`
 
-- 每天 UTC `21:00`（北京时间 `05:00`）自动运行
+- 每天 UTC `18:00`（北京时间次日 `02:00`）自动运行
 - 支持手动触发 `workflow_dispatch`
 - 若 `docs` 目录有更新则自动提交
+- 论文和补丁分步骤执行；补丁步骤最多运行 45 分钟，避免影响论文结果提交。
 
 ## 本地开发说明
 
@@ -112,6 +113,10 @@ GitHub Actions 文件：`.github/workflows/fetch-papers.yml`
 ```bash
 MINIMAX_API_KEY=your_key python config/fetch_papers.py
 ```
+
+使用 `--skip-lore` 只抓取论文和资讯，使用 `--lore-only` 只抓取补丁。
+各论文数据源并行运行，同一数据源内仍保留请求间隔，每个数据源在开始下一次查询前检查 5 分钟预算；补丁摘要批量请求失败时保留兜底结果，返回内容缺项时仍会逐条补试。
+MiniMax 请求最多尝试两次，论文兜底摘要最多补试 4 篇，以避免服务异常时耗尽任务时间。
 
 ### 2) 本地查看页面
 

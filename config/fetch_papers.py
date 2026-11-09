@@ -14,6 +14,7 @@ import random
 import html as html_lib
 import threading
 import socket
+from concurrent.futures import ThreadPoolExecutor
 
 # Process-wide MiniMax rate-limit throttle. Any worker that receives an
 # HTTP 429 sets `_MINIMAX_THROTTLE_UNTIL` to a future epoch timestamp;
@@ -23,7 +24,7 @@ import socket
 _MINIMAX_LOCK = threading.Lock()
 _MINIMAX_THROTTLE_UNTIL = 0.0
 
-ARXIV_API = "http://export.arxiv.org/api/query"
+ARXIV_API = "https://export.arxiv.org/api/query"
 SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/paper/search"
 OPENALEX_API = "https://api.openalex.org/works"
 CROSSREF_API = "https://api.crossref.org/works"
@@ -574,6 +575,9 @@ def _parse_retry_after(headers):
     return 0
 
 
+_HTTP_STATUS = threading.local()
+
+
 def _http_get(url, *, as_json=True, timeout=30, retries=3, base_delay=15,
               max_delay=120, source_name="http"):
     """GET helper with polite rate-limit handling.
@@ -589,6 +593,7 @@ def _http_get(url, *, as_json=True, timeout=30, retries=3, base_delay=15,
     Returns parsed JSON (when as_json) or raw text on success, or None on
     persistent failure.
     """
+    _HTTP_STATUS.failed = False
     last_err = None
     for attempt in range(retries):
         try:
@@ -606,6 +611,7 @@ def _http_get(url, *, as_json=True, timeout=30, retries=3, base_delay=15,
             last_err = f"HTTP {code} {e.reason}"
             # Non-retryable 4xx (404/400/403/410/...). 404 is silent.
             if 400 <= code < 500 and code != 429:
+                _HTTP_STATUS.failed = True
                 if code != 404:
                     print(f"  [{source_name}] {code} {e.reason} (not retryable) url={url[:90]}")
                 return None
@@ -616,20 +622,24 @@ def _http_get(url, *, as_json=True, timeout=30, retries=3, base_delay=15,
             else:
                 wait = min(base_delay * (2 ** attempt), max_delay)
             print(f"  [{source_name}] {code} {e.reason}, backoff {wait}s (attempt {attempt + 1}/{retries})")
-            time.sleep(wait)
+            if attempt + 1 < retries:
+                time.sleep(wait)
         except (urllib.error.URLError, TimeoutError, ConnectionError, socket.timeout) as e:
             last_err = f"{type(e).__name__}: {e}"
             wait = min(base_delay * (2 ** attempt), max_delay)
             print(f"  [{source_name}] network error {last_err}, backoff {wait}s (attempt {attempt + 1}/{retries})")
-            time.sleep(wait)
+            if attempt + 1 < retries:
+                time.sleep(wait)
         except Exception as e:
+            _HTTP_STATUS.failed = True
             last_err = f"{type(e).__name__}: {e}"
             print(f"  [{source_name}] unexpected error {last_err}")
             return None
     print(f"  [{source_name}] giving up after {retries} attempts: {last_err}")
+    _HTTP_STATUS.failed = True
     return None
 
-def call_minimax(prompt, system_prompt, max_retries=5, max_tokens=500):
+def call_minimax(prompt, system_prompt, max_retries=2, max_tokens=500):
     global _MINIMAX_THROTTLE_UNTIL
     api_key = os.environ.get("MINIMAX_API_KEY", "")
     if not api_key:
@@ -669,6 +679,10 @@ def call_minimax(prompt, system_prompt, max_retries=5, max_tokens=500):
 
             with urllib.request.urlopen(req, timeout=90) as response:
                 result = json.loads(response.read().decode("utf-8"))
+                base_resp = result.get("base_resp") or {}
+                if base_resp.get("status_code", 0):
+                    print(f"MiniMax API error: {base_resp.get('status_code')} {base_resp.get('status_msg', '')}")
+                    return None
                 return result.get("choices", [{}])[0].get("message", {}).get("content", "")
 
         except urllib.error.HTTPError as e:
@@ -682,7 +696,11 @@ def call_minimax(prompt, system_prompt, max_retries=5, max_tokens=500):
                         _MINIMAX_THROTTLE_UNTIL,
                         time.time() + wait_time,
                     )
-                time.sleep(wait_time)
+                if attempt + 1 < max_retries:
+                    time.sleep(wait_time)
+            elif 400 <= e.code < 500:
+                print(f"MiniMax API HTTP error: {e.code} {e.reason} (not retryable)")
+                return None
             else:
                 print(f"MiniMax API HTTP error: {e.code} {e.reason}")
                 if attempt < max_retries - 1:
@@ -1092,14 +1110,14 @@ def parse_json_object(response):
                 return None
     return None
 
-def analyze_item_with_llm(title, content, is_news=False):
+def analyze_item_with_llm(title, content, is_news=False, use_llm=True):
     prompt = f"""标题：{title}
 内容：{content[:1800]}
 
 请分析并返回JSON，tags最多3-4个。论文 summary 要具体说明主要内容、方法、评估结论和关注点。"""
     
     system_prompt = NEWS_PROMPT if is_news else PAPER_PROMPT
-    response = call_minimax(prompt, system_prompt, max_tokens=700 if is_news else 1000)
+    response = call_minimax(prompt, system_prompt, max_tokens=700 if is_news else 1000) if use_llm else None
     
     if not response:
         inferred_relevance = heuristic_relevance(title, content)
@@ -1234,7 +1252,7 @@ def _parse_paper_batch_response(resp, batch_size):
     for k in range(1, batch_size + 1):
         if k in by_index:
             out[k] = by_index[k]
-        elif k <= len(sequential):
+        elif not by_index and k <= len(sequential):
             out[k] = sequential[k - 1]
     return out
 
@@ -1435,7 +1453,7 @@ def fetch_openalex_papers(query, max_results=8):
             pairs.sort(key=lambda x: x[0])
             abstract = " ".join([w for _, w in pairs])
         year = item.get("publication_year", 0) or 0
-        url_val = item.get("primary_location", {}).get("landing_page_url") or item.get("id", "")
+        url_val = (item.get("primary_location") or {}).get("landing_page_url") or item.get("id", "")
 
         if title and url_val and year >= MIN_YEAR:
             papers.append({
@@ -2132,24 +2150,48 @@ def main():
     
     paper_candidates = []
     
-    print("\n[Phase 1] Fetching papers from arXiv...")
+    print("\n[Phase 1-2] Fetching papers from independent sources...")
+    # Each source remains serial and retains its own request delay; sources
+    # run concurrently so a slow or rate-limited API does not stall the rest.
     split_idx = len(SEARCH_KEYWORDS) // 2
-    for keyword in SEARCH_KEYWORDS[:split_idx]:
-        print(f"  Keyword: {keyword}")
-        paper_candidates.extend(fetch_arxiv_papers(keyword, 8))
-    
-    print("\n[Phase 2] Fetching papers from Semantic Scholar/OpenAlex/Crossref/DBLP/OpenReview...")
-    for keyword in SEARCH_KEYWORDS[split_idx:]:
-        print(f"  Keyword: {keyword}")
-        paper_candidates.extend(fetch_semantic_scholar_papers(keyword, 8))
-        paper_candidates.extend(fetch_openalex_papers(keyword, 6))
-        paper_candidates.extend(fetch_crossref_papers(keyword, 4))
-        paper_candidates.extend(fetch_dblp_papers(keyword, 4))
-        paper_candidates.extend(fetch_openreview_papers(keyword, 4))
+    source_keywords = {
+        fetch_arxiv_papers: SEARCH_KEYWORDS[:split_idx],
+        fetch_semantic_scholar_papers: SEARCH_KEYWORDS[split_idx:],
+        fetch_openalex_papers: SEARCH_KEYWORDS[split_idx:],
+        fetch_crossref_papers: SEARCH_KEYWORDS[split_idx:],
+        fetch_dblp_papers: SEARCH_KEYWORDS[split_idx:],
+        fetch_openreview_papers: SEARCH_KEYWORDS[split_idx:],
+    }
+    sources = [(fetch_arxiv_papers, 8), (fetch_semantic_scholar_papers, 8),
+               (fetch_openalex_papers, 6), (fetch_crossref_papers, 4),
+               (fetch_dblp_papers, 4), (fetch_openreview_papers, 4)]
+    def fetch_source(source):
+        fetch, limit = source
+        results = []
+        failures = 0
+        deadline = time.monotonic() + 300
+        for keyword in source_keywords[fetch]:
+            if time.monotonic() >= deadline:
+                print(f"  {fetch.__name__}: stopping after 300s source budget")
+                break
+            try:
+                _HTTP_STATUS.failed = False
+                results.extend(fetch(keyword, limit))
+                failures = failures + 1 if _HTTP_STATUS.failed else 0
+            except Exception as exc:
+                print(f"  {fetch.__name__} failed for {keyword}: {exc}")
+                failures += 1
+            if failures >= 2:
+                print(f"  {fetch.__name__}: stopping after {failures} consecutive failures")
+                break
+        return results
+
+    with ThreadPoolExecutor(max_workers=len(sources)) as executor:
+        for results in executor.map(fetch_source, sources):
+            paper_candidates.extend(results)
 
     stats["paper_candidates_raw"] = len(paper_candidates)
     
-    paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
     before_abstract_gate = len(paper_candidates)
     paper_candidates = [
         paper for paper in paper_candidates
@@ -2158,6 +2200,7 @@ def main():
     dropped_no_abstract = before_abstract_gate - len(paper_candidates)
     if dropped_no_abstract:
         print(f"  Dropped {dropped_no_abstract} paper candidates without usable abstracts")
+    paper_candidates = deduplicate(paper_candidates, existing_hashes, "papers")
     paper_candidates = prioritize_items(paper_candidates, "abstract")
     stats["paper_candidates_dedup"] = len(paper_candidates)
     
@@ -2166,7 +2209,7 @@ def main():
     # 先做本地硬排除 + 领域门槛（不调用 LLM），把通过门槛的候选收集起来，
     # 再批量调用 LLM 初筛，把请求量降 QUICK_BATCH_SIZE 倍，避免逐条限流。
     gate_passed = []
-    for i, paper in enumerate(paper_candidates[:MAX_CANDIDATES]):
+    for i, paper in enumerate(paper_candidates):
         if is_hard_excluded(f"{paper['title']} {paper['abstract']}"):
             print(f"  [{i+1}] {paper['title'][:40]}... -> excluded by hard rules")
             continue
@@ -2174,7 +2217,9 @@ def main():
             print(f"  [{i+1}] {paper['title'][:40]}... -> excluded by domain gate")
             continue
         gate_passed.append((i, paper))
-    print(f"  gate kept {len(gate_passed)}/{min(len(paper_candidates), MAX_CANDIDATES)} candidates")
+        if len(gate_passed) >= MAX_CANDIDATES:
+            break
+    print(f"  gate kept {len(gate_passed)}/{len(paper_candidates)} candidates (limit {MAX_CANDIDATES})")
 
     for offset in range(0, len(gate_passed), QUICK_BATCH_SIZE):
         batch = gate_passed[offset:offset + QUICK_BATCH_SIZE]
@@ -2184,7 +2229,7 @@ def main():
             if k in batch_results:
                 relevance = batch_results[k]
             else:
-                relevance = quick_filter_relevance(paper['title'], paper['abstract'])
+                relevance = heuristic_relevance(paper['title'], paper['abstract'])
             print(f"    -> {paper['title'][:40]}... {relevance}")
             if relevance in ['high', 'medium']:
                 filtered_candidates.append(paper)
@@ -2197,7 +2242,7 @@ def main():
     if len(filtered_candidates) < MIN_PAPERS_TARGET:
         print("  Relevant papers below target, adding heuristic low-relevance candidates...")
         low_pool = []
-        for paper in paper_candidates[:MAX_CANDIDATES]:
+        for _, paper in gate_passed:
             if paper in filtered_candidates:
                 continue
             if not passes_domain_gate(paper['title'], paper['abstract'], paper.get('source', '')):
@@ -2309,8 +2354,7 @@ def main():
         print(f"\n[{i+1}/{len(filtered_candidates)}] {paper['title'][:50]}...")
         analysis = analyses.get(i)
         if analysis is None:
-            random_delay(LLM_DELAY_MIN, LLM_DELAY_MAX)
-            analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False)
+            analysis = analyze_item_with_llm(paper['title'], paper['abstract'], is_news=False, use_llm=False)
         
         paper_hot_score = hot_topic_score(f"{paper['title']} {paper['abstract']}")
         if (
@@ -2372,7 +2416,8 @@ def main():
     if fallback_papers:
         print(f"\n[Phase 6.5] Retrying LLM for {len(fallback_papers)} papers that fell into fallback...")
         time.sleep(25)
-        retry_rounds = 2
+        retry_rounds = 1
+        fallback_papers = fallback_papers[:4]
         for round_idx in range(retry_rounds):
             if not fallback_papers:
                 break
@@ -2505,26 +2550,6 @@ def main():
     beijing_now = datetime.now(timezone.utc) + timedelta(hours=8)
     today = beijing_now.strftime("%Y-%m-%d")
 
-    # ---------- Lore kernel patches (yesterday) ----------
-    try:
-        script_dir_lore = os.path.dirname(os.path.abspath(__file__))
-        if script_dir_lore not in sys.path:
-            sys.path.insert(0, script_dir_lore)
-        import fetch_lore_patches  # type: ignore
-        yesterday_str = (beijing_now - timedelta(days=1)).strftime("%Y-%m-%d")
-        fetch_lore_patches.run(
-            docs_dir,
-            yesterday_str,
-            call_minimax_fn=call_minimax,
-            gate_fn=passes_domain_gate_reasoned,
-            excluded_fn=is_hard_excluded_reasoned,
-            delay_min=LLM_DELAY_MIN,
-            delay_max=LLM_DELAY_MAX,
-            max_workers=4,
-        )
-    except Exception as e:
-        print(f"[lore] skipped: {e}", flush=True)
-    
     output = {
         "date": today,
         "categories": {
@@ -2558,5 +2583,25 @@ def main():
     print(f"Output: {output_path}")
     print(f"Metrics: {metrics_path}")
 
+    if "--skip-lore" not in sys.argv:
+        run_lore(docs_dir, beijing_now)
+
+
+def run_lore(docs_dir, beijing_now):
+    try:
+        import fetch_lore_patches
+        yesterday_str = (beijing_now - timedelta(days=1)).strftime("%Y-%m-%d")
+        fetch_lore_patches.run(
+            docs_dir, yesterday_str, call_minimax_fn=call_minimax,
+            gate_fn=passes_domain_gate_reasoned,
+            excluded_fn=is_hard_excluded_reasoned, max_workers=4,
+        )
+    except Exception as e:
+        print(f"[lore] skipped: {e}", flush=True)
+
 if __name__ == "__main__":
-    main()
+    if "--lore-only" in sys.argv:
+        run_lore(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs"),
+                 datetime.now(timezone.utc) + timedelta(hours=8))
+    else:
+        main()

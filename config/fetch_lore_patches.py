@@ -634,7 +634,7 @@ def _process_batch(batch, call_minimax_fn):
     out, failed = {}, []
     for orig_idx, p in batch:
         parsed = parsed_map.get(orig_idx)
-        if not parsed and call_minimax_fn:
+        if not parsed and resp:
             # Patch missing from batch output. Try a single-call LLM
             # immediately so we don't depend on the serial retry rounds
             # (which run after the whole batch pass and may still fail).
@@ -668,7 +668,7 @@ def _process_batch(batch, call_minimax_fn):
 
 def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
                       limit=None, max_workers=2, llm_budget=None,
-                      delay_min=None, delay_max=None, retry_rounds=2,
+                      delay_min=None, delay_max=None, retry_rounds=0,
                       batch_size=None):
     """Run domain gate + LLM summary on every patch, in parallel batches.
 
@@ -698,12 +698,16 @@ def summarize_patches(call_minimax_fn, patches, gate_fn, excluded_fn,
     # ---- Pass 1: synchronous gate + detail load ----
     disable_gate_env = os.environ.get("LORE_DISABLE_GATE", "").lower() in ("1", "true", "yes")
     gated = []
-    for i, p in enumerate(candidates):
+    def load_detail(p):
         try:
             _load_patch_detail(p)
         except Exception as e:
             print(f"  [lore] detail fetch failed for {p.get('id')}: {e}", flush=True)
-            continue
+        return p
+
+    with ThreadPoolExecutor(max_workers=max(1, int(max_workers or 1))) as executor:
+        loaded = list(executor.map(load_detail, candidates))
+    for i, p in enumerate(loaded):
         raw = p.get("raw") or {}
         gate_text = f"{p.get('title', '')}\n{(raw.get('content') or '')[:600]}"
         if disable_gate_env:

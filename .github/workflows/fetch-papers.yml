@@ -36,7 +36,15 @@ jobs:
           python-version: '3.11'
           
       - name: Fetch papers
-        run: python config/fetch_papers.py
+        run: python config/fetch_papers.py --skip-lore
+        env:
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          LORE_DISABLE_GATE: ${{ github.event_name == 'schedule' && '1' || (inputs.disable_gate == true && '1' || '0') }}
+
+      - name: Fetch patches
+        timeout-minutes: 45
+        continue-on-error: true
+        run: python config/fetch_papers.py --lore-only
         env:
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
           LORE_DISABLE_GATE: ${{ github.event_name == 'schedule' && '1' || (inputs.disable_gate == true && '1' || '0') }}
