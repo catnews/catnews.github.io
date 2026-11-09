@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-09",
+  "categories": {
+    "papers": [
+      {
+        "title": "uBPF-based Network Intrusion Detection and Prevention Systems empowered by machine learning algorithms",
+        "url": "https://doi.org/10.1016/j.comnet.2026.112868",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Network Intrusion Detection and Prevention Systems (NIDPSs) play a crucial role in identifying and blocking malicious traffic. In-kernel NIDPSs leveraging extended Berkeley Packet Filter (eBPF) have achieved high detection performance and throughput by operating directly in kernel space. However, eBPF-based NIDPSs face portability challenges across diverse runtime environments, limiting their deployment on kernel-bypassing frameworks such as AF_XDP and the Data Plane Development Kit (DPDK). In this paper, we propose a userspace BPF (uBPF)-based NIDPS empowered by machine learning (ML) algorith...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "XDP",
+          "包处理",
+          "旁路"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 6
+      },
+      {
+        "title": "NIC and DPU Landscape for QUIC Cryptographic Offload A Survey and Gap Analysis",
+        "url": "https://scholarship.libraries.rutgers.edu/esploro/outputs/report/NIC-and-DPU-Landscape-for-QUIC/991032377766204646",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "We survey the commercial NIC and DPU landscape to assess how well existing hardware supports QUIC cryptographic offload for edge servers at scale, including media delivery and general-purpose HTTP/3. An edge server terminates one independently keyed QUIC connection per subscriber. Thus every object it delivers to 10,000 to 100,000 subscribers requires as many separate encryptions, each on the host CPU. Host-only measurements reported at Mile High Video 2026 locate the ceiling in QUIC's per-packet cryptography: a dual-socket server that sustains about 1,000 Gbps of HTTPS sustains about 300 Gbps...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "Socket",
+          "驱动",
+          "包处理"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 8
+      },
+      {
+        "title": "MODELING AND EVALUATING THE IMPACT OF INTRUSION DETECTION SYSTEMS ON THE PERFORMANCE OF ISOLATED INFORMATION AND COMMUNICATION SYSTEMS",
+        "url": "https://doi.org/10.20998/3083-6298.2026.02.04",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "Topicality. Today’s information and communication systems (ICS) face a growing number of complex cyber threats, making active defense mechanisms absolutely necessary. Yet, running these security tools constantly, especially Intrusion Detection and Prevention Systems (IDS/IPS), takes a toll on network bandwidth and creates heavy computational loads at the routing level. The subject of the study is the direct impact of IDS/IPS on the performance characteristics of an isolated network segment under various load conditions, with an emphasis on resource depletion due to fragmentation at layer 3 of ...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "路由",
+          "驱动",
+          "包处理"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 3
+      },
+      {
+        "title": "TenonAgent: Virtualizing Execution Residency for Memory-Oversubscribed LLM Agents",
+        "url": "https://arxiv.org/abs/2611.00051",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "LLM agents execute as long-lived, multi-stage workflows with substantial resource-demand variation across phases. Provisioning each agent or sandbox for its lifetime peak leads to low resource utilization, particularly for memory, whereas aggressive oversubscription risks memory contention, out-of-memory failures, and costly workflow retries. This tension limits the concurrency and efficiency of agent serving under constrained host memory. We present TenonAgent, a runtime system that virtualizes sandbox residency by decoupling the logical agent's lifetime from its physical execution environmen...",
+        "source": "OpenAlex",
+        "tags": [
+          "TCP/IP",
+          "沙箱"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 3
+      },
+      {
+        "title": "LiHA: Worse is Better for Lightweight Hash-based Source Authentication",
+        "url": "https://scholarship.libraries.rutgers.edu/esploro/outputs/report/LiHA-Worse-is-Better-for-Lightweight/991032379962404646",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "The omission of source IP authentication remains a fundamental vulnerability in the Internet. Existing approaches rely on routing plausibility, topology assumptions, per-flow state, or wide deployment. These requirements have kept strong source authentication out of the data plane. As simplicity is the key to deployability, we present LIHA, a lightweight source authentication mechanism built around operations that routers already perform efficiently. LIHA binds secret keys to source prefixes using longest prefix match and authenticates each packet with a single message authenti-cation code (MA...",
+        "source": "OpenAlex",
+        "tags": [
+          "eBPF",
+          "TCP/IP",
+          "路由",
+          "包处理"
+        ],
+        "readingTime": 5,
+        "relevance": "high",
+        "innovationScore": 4
+      },
+      {
+        "title": "Tracekit Box: Running AI Agents in Micro-VMs Where Every Way Out Is Decided and Signed",
+        "url": "https://arxiv.org/abs/2610.38458",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "summary_en": "AI agents now install packages, call model APIs with their operators' keys and change code in repositories that deploy to production. The network, credentials and write access they need are also how they can leak data, steal a key or change a system nobody approved. Sandboxes contain an agent but leave little evidence of what crossed their boundary; tracing records what happened but contains nothing. We present Tracekit Box, an open-source system (MIT, v0) that does both. Each job runs in its own Firecracker micro-VM with no network card. The only ways out are doors on the host, served over vs...",
+        "source": "OpenAlex",
+        "tags": [
+          "网络优化",
+          "沙箱"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 1
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for October 29, 2026",
+        "url": "https://lwn.net/Articles/1102136/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for October 29, 2026 This edition contains the following feature content: Python's experimental JIT to be removed : after much discussion, the JIT work will be moved out of C Python main. The end of __get_user() and __put_user() : a large patch series directly from Linus Torvalds to perform some long-delayed cleanup. Guidelines for panics in kernel code : a discussion on when Rust code is allowed to panic, and how it should do error handling. Rust features in the future : a look at some in-progress Rust features, such as a smarter borrow checker. The campaign to push Northstar into Linux distributions : maintainers are not eager to include a vibe-coded web browser in distribution repositories. The first part of the 7.4 merge window : noteworthy changes coming to the next kernel release. Seeking smaller kernel stacks : one possible path to reducing memory usage. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (",
+        "summary": "⚠️ 此论文 AI 中文总结暂未生成（LLM 调用失败或被限流），请直接查看下方原文摘要。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "TCP/IP",
+          "驱动",
+          "性能"
+        ],
+        "readingTime": 3,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "eBPF": 2,
+    "XDP": 1,
+    "包处理": 4,
+    "旁路": 1,
+    "TCP/IP": 1,
+    "Socket": 1,
+    "驱动": 1,
+    "路由": 2,
+    "沙箱": 2,
+    "网络优化": 1,
+    "性能": 1
+  }
+}
