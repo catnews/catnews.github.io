@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-11",
+  "categories": {
+    "papers": [
+      {
+        "title": "ANALYSIS OF LATENCY AND RESPONSE VARIABILITY OF SERVICES ON LINUX PLATFORMS",
+        "url": "https://cyberleninka.ru/article/n/analysis-of-latency-and-response-variability-of-services-on-linux-platforms",
+        "summary": "面向 Linux 上服务响应时延不稳定及尾延迟尖峰问题，研究拆解入站与出站报文处理、网络队列、数据缓冲、网络负载在处理器核心间的分布，以及 Linux 网络栈对应用执行时延和可预测性的影响，强调平均延迟不能代表极端响应时间。缓解方案包括计算资源隔离、系统事件处理控制和网络队列调优。摘要侧重机制分析与改进方向，未给出具体数据集、负载规模、基线配置、延迟数值或统计显著性，因而无法量化各因素贡献。其与内核网络路径直接相关，落地点是结合 CPU 隔离、系统事件处理和队列参数定位尾延迟；原摘要未说明是否修改内核、采用何种队列算法以及生产环境开销。",
+        "summary_en": "This article investigates the problem of unstable latency and response-time variability in services running on Linux platforms. It examines the influence of operating system mechanisms on the predictability of application execution. It analyzes network-related factors affecting response time, including the processing of incoming and outgoing packets, the operation of network queues, data buffering, the distribution of network load across processor cores, and the impact of the Linux network stack on application-level service execution. Particular attention is paid to the distinction between ave...",
+        "source": "OpenAlex",
+        "tags": [
+          "Linux网络栈",
+          "尾延迟",
+          "网络队列",
+          "性能隔离"
+        ],
+        "readingTime": 4,
+        "relevance": "high",
+        "innovationScore": 2
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "Linux网络栈": 1,
+    "尾延迟": 1,
+    "网络队列": 1,
+    "性能隔离": 1
+  }
+}
