@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-09",
+  "fetchedAt": "2026-11-10T09:08:15+0800",
+  "totals": {
+    "inReview": 0,
+    "merged": 0,
+    "rfc": 0
+  },
+  "inReview": [],
+  "merged": []
+}
