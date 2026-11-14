@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-15",
+  "categories": {
+    "papers": [],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for November 5, 2026",
+        "url": "https://lwn.net/Articles/1103480/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for November 5, 2026 This edition contains the following feature content: Containers as a recognized kernel object : Josef Bacik has proposed a container abstraction called \"cells\", which would turn containers into first-class kernel objects. LLM reviews for Debian's new queue spark debate : after feedback, maintainers can now opt-out of LLM-generated emails, but questions remain. System-call wrappers for glibc : making kernel functionality easier to use from the C library. Removing binder.c : the journey to replace the kernel's Binder driver with a Rust implementation. Managing the kernel CVE flood : one vendor's approach to coping with the storm of kernel CVEs. Plasma X11 session removal surprises some Fedora users : a mid-release update obsoleted Plasma X11 packages for Fedora Linux 44 users. The second part of the 7.4 merge window : the rest of the changes headed into the next kernel release. Portable Python scripts with dependencies : a look at the standard for declaring a Python script's dependencies, and some of the implementations. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the co",
+        "summary": "本期为LWN周报索引，核心是“cells”容器对象提案：在现有命名空间、cgroup和沙箱机制之上，尝试建立内核识别的一等容器抽象；另涉及glibc系统调用封装、Binder驱动Rust化及7.4合并窗口。内容未明确涉及网络子系统、eBPF/XDP、网卡驱动、RDMA/DPDK或容器网络数据面，也没有网络方法的性能评估结论。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "Linux内核网络",
+          "容器抽象",
+          "内核开发"
+        ],
+        "readingTime": 6,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "Linux内核网络": 1,
+    "容器抽象": 1,
+    "内核开发": 1
+  }
+}
