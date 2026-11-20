@@ -1,0 +1,110 @@
+{
+  "date": "2026-11-20",
+  "categories": {
+    "papers": [
+      {
+        "title": "Courier: Host-Transparent Direct Network I/O for Secure Containers in Cloud VMs",
+        "url": "https://doi.org/10.1145/3828523.3857111",
+        "summary": "面向运行于云虚拟机中的安全 microVM，嵌套虚拟化使网络 I/O 仍需跨层处理，半虚拟化开销高，而公有云常缺少可用的 IOMMU 直通能力。方案在客户机内加入 shadow IOMMU，以较短网络栈完成类设备直通和零拷贝传输，并以 direct-kick 通知、used-ring 直通及高效中断处理优化数据面，无需宿主机参与。生产实现通过微基准和真实应用评估，相对 virtio-net 与 vhost-net，吞吐最高提升 9.36 倍、尾延迟最高降低 96.7%，真实负载下接近原生性能。其落地点是支持设备虚拟化的 microVM 运行时；原摘要未给出具体应用、数据集和硬件配置，也未说明 shadow IOMMU 的兼容性与安全边界，跨云平台适用性仍需验证。",
+        "summary_en": "Secure containers strengthen isolation by encapsulating conventional OS-level containers within lightweight virtual machines (microVMs), and have been widely adopted to execute untrusted, multi-tenant workloads in modern cloud platforms. In practice, these platforms are increasingly deployed atop cloud virtual machines to exploit cloud elasticity and cost efficiency, which places secure containers within a nested virtualization stack. Although prior work has significantly advanced nested CPU and memory virtualization, network I/O remains a critical bottleneck. Existing para-virtualized network...",
+        "source": "OpenAlex",
+        "tags": [
+          "沙箱",
+          "shadow IOMMU",
+          "设备直通",
+          "零拷贝"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 4
+      },
+      {
+        "title": "fRAC: Remote Accelerator Calls on Hostless FPGAs",
+        "url": "https://doi.org/10.1145/3828523.3857070",
+        "summary": "分布式应用调用 FPGA 加速器时，RPC/RDMA 仍依赖 CPU 在主机侧重组请求并启动设备，微秒级服务易被调用开销主导；SmartNIC 的包级卸载又无法识别完整请求。方案提出 Remote Accelerator Call（RAC）范式，把传输接入、请求重组、派发和加速器调用全部下沉到硬件；fRAC 以 FPGA 上的轻量 shim 实现网络到加速器接口，承载多个虚拟化加速器，并可在数毫秒内完成运行时重配置。评估中端到端延迟低于 7.8 μs、应用吞吐最高 90 Gbps；与优化过的 DPDK CPU 和 DPU 基线相比，饱和负载延迟至少低 80%，功耗低 85%。该工作属于绕过主机软件或内核的硬件卸载路径，适合 serverless 细粒度加速器；原摘要未提供应用集合、流量分布、FPGA 资源占用及错误恢复机制。",
+        "summary_en": "Hardware accelerators are essential for meeting microsecond-scale demands in distributed applications, but invoking them over the network remains bottlenecked by host software. Host-mediated paths (RPC, RDMA) still rely on the CPU to reassemble requests and launch accelerators, which dominates end-to-end latency, while packet-level offload on SmartNICs lacks any notion of a complete request. We introduce the Remote Accelerator Call (RAC) paradigm, in which transport ingestion, request reassembly, dispatch, and accelerator invocation are handled entirely in hardware. We build fRAC, a hostless p...",
+        "source": "OpenAlex",
+        "tags": [
+          "RAC",
+          "FPGA",
+          "旁路",
+          "硬件卸载"
+        ],
+        "readingTime": 4,
+        "relevance": "medium",
+        "innovationScore": 3
+      },
+      {
+        "title": "Joseph: Hypervisor–RDMA Co-Design for Kernel-Bypass Remote MicroVM SnapStart",
+        "url": "https://doi.org/10.1145/3828523.3857060",
+        "summary": "MicroVM 快照从远端聚合内存恢复到本地 DRAM 时，NIC→kernel→VMM→guest 路径产生分层复制和缺页停顿，限制高并发启动。Joseph 让 hypervisor 成为 RDMA 端点，约定每次 RDMA read 写入缺页对应的 guest frame，并在 RDMA completion 后才安装 EPT 映射，把网络传输与 guest 内存可见性合并为一次 VMM/RNIC 操作。其 RNIC→guest 数据路径绕过内核缓冲区，VMM pager 合并远端页读取以摊薄延迟，并流水线化 scatter–gather 取页，配合 RNIC 卸载的 guest-memory fetch 与原位映射实现零拷贝恢复。基于 Firecracker/KVM，对比 FaaSnap（TrEnv），高并发下 SnapStart 延迟最多降低 77%（87%），并发能力提高 2×（3×），内存效率提高 81%（56%）。这是典型的内核旁路高速网络方案，但依赖 RNIC、VMM pager 与 EPT 协同；原摘要未说明两组指标对应配置及测试数据。",
+        "summary_en": "Modern serverless platforms such as AWS Lambda increasingly use MicroVM SnapStart to pair lightweight isolation with fast startup. However, restoring snapshots from remote disaggregated memory to local DRAM induces layered copies and fault-driven stalls along the NIC → kernel → VMM → guest datapath, inflating latency and limiting scalability under high concurrency. We present Joseph, a hypervisor–RDMA co-designed system that treats the hypervisor as a first-class RDMA endpoint for fast remote MicroVM SnapStart. Joseph’s key principle is a network-to-guest placement contract: each RDMA read tar...",
+        "source": "OpenAlex",
+        "tags": [
+          "沙箱",
+          "RDMA",
+          "RNIC",
+          "内核旁路"
+        ],
+        "readingTime": 5,
+        "relevance": "medium",
+        "innovationScore": 2
+      },
+      {
+        "title": "MTRDMA: Lightweight User-Space Control-Plane Isolation for Multi-Tenant RDMA",
+        "url": "https://arxiv.org/abs/2611.11991",
+        "summary": "托管多租户云中，RDMA控制面缺少资源隔离，噪声租户可耗尽共享RNIC的QP或MR微架构缓存，使受害租户吞吐最高下降96.4%。MTRDMA在库层拦截RDMA控制面操作，以原子共享内存配额和每进程缓存准入（约0.13微秒）实施分层配额；混合垃圾回收器可在数秒内回收孤儿配额，并通过rdma-cgroup上限及ledger—kernel对账限制和发现残留篡改，同时保持零拷贝数据面。ConnectX-6实验显示，QP缓存耗尽场景下受害租户性能退化由94.5%降至0.08%，MR缓存耗尽也获得保护，并扩展至256个并发租户，数据面开销可忽略。其核心属于用户态RDMA旁路隔离而非Linux TCP/IP或sk_buff路径修改，Linux内核关联点主要是rdma-cgroup强制边界；落地需依赖库层拦截兼容性和内核对账语义，原摘要未给出绝对吞吐、CPU占用及跨RNIC通用性数据。",
+        "summary_en": "In managed multi-tenant clouds, RDMA's lack of control-plane (CP) resource isolation lets a noisy tenant exhaust shared NIC microarchitectural caches, degrading victim throughput by up to 96.4\\%. Data-path schedulers leave CP resources unprotected, and hardware approaches require FPGAs or SmartNICs rather than the commodity RNICs operators already deploy. We present MTRDMA, a lightweight user-space CP isolation mechanism for commodity RNICs, applicable to managed runtimes such as containers and sandboxed processes. MTRDMA intercepts library-level CP operations to enforce hierarchical quotas wh...",
+        "source": "OpenAlex",
+        "tags": [
+          "RDMA",
+          "多租户隔离",
+          "用户态控制面",
+          "rdma-cgroup"
+        ],
+        "readingTime": 4,
+        "relevance": "medium",
+        "innovationScore": 1
+      }
+    ],
+    "news": [
+      {
+        "title": "LWN.net Weekly Edition for November 12, 2026",
+        "url": "https://lwn.net/Articles/1105460/bigpage",
+        "abstract": "Welcome to the LWN.net Weekly Edition for November 12, 2026 This edition contains the following feature content: Synaptics patent claims stop work on DisplayLink drivers : an attempt to ensure DisplayLink docks work well on Linux is derailed by a cease-and-desist demand. Git considers voting to determine its LLM policy : no consensus has been reached for how to make decisions when there is no consensus. Locking down hibernation for the winter : Matthew Garrett tries to solve the problem of allowing hibernation on systems using lockdown. User namespaces + file capabilities = trouble : an attempt to improve the security of user namespaces. Additional hardening for the glibc dynamic linker : tunable settings that could allow administrators to forbid running programs without ASLR. This week's edition also includes these inner pages: Brief items : Brief news items from throughout the community. Announcements : Newsletters, conferences, security updates, patches, and more. Please enjoy this week's edition, and, as always, thank you for supporting LWN.net. Comments (none posted) Synaptics patent claims stop work on DisplayLink drivers By Joe Brockmeier November 10, 2026 Mike Lothian owns ",
+        "summary": "是LWN每周发行版介绍，内容涵盖DisplayLink驱动专利纠纷、Git的LLM政策、休眠机制、用户命名空间与文件能力、glibc动态链接器加固，以及社区简讯和公告。提供内容未涉及Linux网络子系统、eBPF/XDP、网络性能优化、容器网络数据面或SmartNIC、DPU、DPDK、RDMA等高速网络路径；讨论重点是显示驱动、通用内核安全机制和项目治理，因此不属于目标技术范围。",
+        "keyPoints": [],
+        "source": "LWN.net",
+        "tags": [
+          "LWN周报",
+          "Linux驱动",
+          "用户命名空间",
+          "安全加固"
+        ],
+        "readingTime": 4,
+        "relevance": "high",
+        "access": "free"
+      }
+    ]
+  },
+  "tagStats": {
+    "沙箱": 2,
+    "shadow IOMMU": 1,
+    "设备直通": 1,
+    "零拷贝": 1,
+    "RAC": 1,
+    "FPGA": 1,
+    "旁路": 1,
+    "硬件卸载": 1,
+    "RDMA": 2,
+    "RNIC": 1,
+    "内核旁路": 1,
+    "多租户隔离": 1,
+    "用户态控制面": 1,
+    "rdma-cgroup": 1,
+    "LWN周报": 1,
+    "Linux驱动": 1,
+    "用户命名空间": 1,
+    "安全加固": 1
+  }
+}
