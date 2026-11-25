@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-25",
+  "categories": {
+    "papers": [
+      {
+        "title": "TCP Segmentation Offload Without Microbursts: Splitting Pacing Between Host and NIC",
+        "url": "https://doi.org/10.1145/3856976",
+        "summary": "TCP pacing通常在软件侧按时间分散流量，而NIC执行的TSO位于pacing之后，会在1 Gbit/s及以上链路一次发出数十个分段，形成微突发并加剧瓶颈队列波动；关闭TSO虽可细化节奏，却会损失高速TCP发送所需的CPU效率。研究面向Linux与Netronome Agilio CX SmartNIC，提出“TSO pacing”通用设计：在NIC侧利用有限调度资源拆分pacing与分段节奏，规避保存大量待分段数据状态造成的内存成本，实现仅修改NIC驱动和固件，不改动Linux TCP/IP核心路径。摘要称该实现可在保留TSO卸载收益的同时恢复高精度pacing，说明微突发并非分段卸载的固有代价。原摘要未提供实验拓扑、流量分布、对比配置及吞吐量、时延、CPU占用等定量结果，也未说明对其他NIC的适配范围；落地时需验证调度元数据开销、驱动兼容性和多队列行为。",
+        "summary_en": "TCP pacing and TCP Segmentation Offload (TSO) are widely used mechanisms for improving network performance. Pacing, commonly implemented in software, spaces traffic over time to reduce bursts and thereby bottleneck queue length variation; TSO, commonly implemented in the network interface card (NIC), reduces CPU overhead by offloading packet segmentation. Because TSO happens after pacing, today's NICs emit microbursts that comprise dozens of segments for 1 Gbit/s and faster links. Disabling TSO can restore fine-grained pacing, but at the cost of the CPU efficiency that is required for high-rat...",
+        "source": "OpenAlex",
+        "tags": [
+          "TSO",
+          "TCP pacing",
+          "SmartNIC",
+          "微突发"
+        ],
+        "readingTime": 4,
+        "relevance": "medium",
+        "innovationScore": 4
+      }
+    ],
+    "news": []
+  },
+  "tagStats": {
+    "TSO": 1,
+    "TCP pacing": 1,
+    "SmartNIC": 1,
+    "微突发": 1
+  }
+}
